@@ -36,6 +36,8 @@ maxwellian(u::Array{Float64,2}, v::Array{Float64,2}, ρ::Float64, U::Float64, λ
 # ------------------------------------------------------------
 function prim_conserve(prim::Array{Float64,1}, gamma::Float64)
 
+	W = similar(prim)
+
 	if length(prim) == 3 # 1D
 		W[1] = prim[1]
 		W[2] = prim[1] * prim[2]
