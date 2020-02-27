@@ -1,5 +1,18 @@
+# ============================================================
+# Kinetic.jl : Theory and Applications
+# ============================================================
+
+
 module Kinetic
 
-greet() = print("Hello World!")
 
-end # module
+using Reexport
+using OffsetArrays, SpecialFunctions
+@reexport using FileIO, JLD2
+
+
+include("abstract.jl")
+include("theory.jl")
+
+
+end

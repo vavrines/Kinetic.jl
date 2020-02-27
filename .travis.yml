@@ -1,0 +1,28 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia/
+
+codecov: true
+coveralls: true
+
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+  - 1.1
+  - 1.2
+  - 1.3
+  - nightly
+
+matrix:
+  allow_failures:
+    - julia: nightly
+  fast_finish: true
+  
+notifications:
+  email: false
+
+after_success:
+  # push coverage results to Coveralls
+  - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+  # push coverage results to Codecov
+  - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
