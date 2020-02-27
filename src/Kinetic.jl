@@ -12,7 +12,7 @@ using OffsetArrays, SpecialFunctions
 
 
 include("abstract.jl")
-include("kinetic.jl")
+include("theory.jl")
 
 
 end
