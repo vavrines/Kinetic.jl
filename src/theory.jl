@@ -27,7 +27,7 @@ maxwellian(u::Array{Float64,1}, ρ::Float64, U::Float64, λ::Float64) =
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
 
-maxwellian(u::Array{Float64,2}, v::Array{Float64,2}, ρ::Float64, U::Float64, λ::Float64) =
+maxwellian(u::Array{Float64,2}, v::Array{Float64,2}, ρ::Float64, U::Float64, V::Float64, λ::Float64) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
 
