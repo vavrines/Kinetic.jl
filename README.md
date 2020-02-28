@@ -9,4 +9,4 @@ Methods in kinetic theory of gases, photons, plasmas and neutrons.
 </p>
 
 Install:
-`pkg> add https://github.com/00vareladavid/Unregistered.jl`
+`pkg> add https://github.com/vavrines/Kinetic.jl`
