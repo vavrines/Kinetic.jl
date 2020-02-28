@@ -7,7 +7,7 @@ module Kinetic
 
 
 using Reexport
-using OffsetArrays, SpecialFunctions
+using OffsetArrays
 @reexport using FileIO, JLD2
 
 
