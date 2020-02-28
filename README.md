@@ -1,4 +1,5 @@
 ![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/vavrines/Kinetic.jl/badge.svg?branch=master)](https://coveralls.io/github/vavrines/Kinetic.jl?branch=master)
 
 # Kinetic.jl
 
