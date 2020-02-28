@@ -7,7 +7,8 @@
   <img src="https://github.com/tbxiao/tbxiao.github.io/blob/master/img/kinetic.gif">
 </p>
 Install:  
-`julia> ]; pkg> add https://github.com/vavrines/Kinetic.jl`
+`julia> ]`  
+`pkg> add https://github.com/vavrines/Kinetic.jl`
 
 Usage:  
 `julia> using Kinetic`
