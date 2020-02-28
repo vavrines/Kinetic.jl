@@ -7,7 +7,7 @@ export velocity_moments,
 	   maxwellian, 
 	   conserve_prim, 
 	   prim_conserve, 
-	   gas_constant, 
+	   heat_capacity_ratio, 
 	   ref_vis, 
 	   sos, 
 	   collision_time
@@ -85,15 +85,15 @@ prim_conserve([ρ, U, λ], gamma)
 # ------------------------------------------------------------
 # Calculate physical property parameters
 # ------------------------------------------------------------
-function gas_constant(inK, dim::Int64) 
+function heat_capacity_ratio(K, D::Int64) 
 	
-	if dim == 1
-		gam = (inK + 3.) / (inK + 1.)
-	elseif dim == 2
-		gam = (inK + 4.) / (inK + 2.)
+	if D == 1
+		γ = (K + 3.) / (K + 1.)
+	elseif D == 2
+		γ = (K + 4.) / (K + 2.)
 	end
 
-	return gam
+	return γ
 
 end
 
