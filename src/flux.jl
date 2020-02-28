@@ -5,7 +5,6 @@
 
 export flux_kfvs,
        flux_kcu,
-       heaviside,
        normal_moments,
        normal_moments_uv,
        normal_moments_au
