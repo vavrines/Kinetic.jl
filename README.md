@@ -1,4 +1,4 @@
-![](https://en.wikipedia.org/wiki/Kinetic_theory_of_gases#/media/File:Translational_motion.gif)
+![](https://github.com/tbxiao/tbxiao.github.io/blob/master/img/kinetic.gif)
 
 # Kinetic.jl
 
