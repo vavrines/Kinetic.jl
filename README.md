@@ -9,7 +9,6 @@
 Install:  
 
 `julia> ]`  
-
 `pkg> add https://github.com/vavrines/Kinetic.jl`
 
 Usage:  
