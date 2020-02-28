@@ -15,12 +15,6 @@ git-tree-sha1 = "05916673a2627dd91b4969ff8ba6941bc85a960e"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
 version = "0.6.0"
 
-[[CompilerSupportLibraries_jll]]
-deps = ["Libdl", "Pkg"]
-git-tree-sha1 = "b57c5d019367c90f234a7bc7e24ff0a84971da5d"
-uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "0.2.0+1"
-
 [[DataStructures]]
 deps = ["InteractiveUtils", "OrderedCollections"]
 git-tree-sha1 = "5a431d46abf2ef2a4d5d00bd0ae61f651cf854c8"
@@ -72,12 +66,6 @@ git-tree-sha1 = "707e34562700b81e8aa13548eb6b23b18112e49b"
 uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 version = "1.0.2"
 
-[[OpenSpecFun_jll]]
-deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg"]
-git-tree-sha1 = "d110040968b9afe95c6bd9c6233570b0fe8abd22"
-uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
-version = "0.5.3+2"
-
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
 git-tree-sha1 = "c4c13474d23c60d20a67b217f1d7f22a40edf8f1"
@@ -114,12 +102,6 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
 [[Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
-
-[[SpecialFunctions]]
-deps = ["OpenSpecFun_jll"]
-git-tree-sha1 = "e19b98acb182567bcb7b75bb5d9eedf3a3b5ec6c"
-uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "0.10.0"
 
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
