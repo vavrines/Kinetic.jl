@@ -180,12 +180,6 @@ end
 
 
 # ------------------------------------------------------------
-# Heaviside step function
-# ------------------------------------------------------------
-heaviside(x::Union{Int, AbstractFloat}) = ifelse(x >= 0, 1., 0.)
-
-
-# ------------------------------------------------------------
 # Calculate moments of Maxwellian distribution function
 # ------------------------------------------------------------
 function normal_moments(prim::Array{Float64,1}, inK::Union{Int, Float64})

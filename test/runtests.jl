@@ -1,6 +1,8 @@
 using Kinetic
 
 prim = [1., 0., 1.]
-gamma = 1.4
+inK = 0
+γ = heat_capacity_ratio(inK, 1) 
 
-w = prim_conserve(prim, gamma)
+w0 = prim_conserve(prim, γ)
+prim0 = conserve_prim(w0, γ)

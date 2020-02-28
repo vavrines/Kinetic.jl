@@ -3,9 +3,7 @@
 # ============================================================
 
 
-export AbstractControlVolume,
-       AbstractVspace
+export AbstractVelocitySpace
 
 
-abstract type AbstractControlVolume end
-abstract type AbstractVspace end
+abstract type AbstractVelocitySpace end

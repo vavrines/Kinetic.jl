@@ -1,10 +1,23 @@
 # ============================================================
-# Mathematical Operations
+# Geometrical Methods
 # ============================================================
 
 
-export global_frame, 
+export uniform_mesh,
+       global_frame, 
        local_frame
+
+
+function uniform_mesh(x0::AbstractFloat, xnum::Int, dx::AbstractFloat)
+
+    points = zeros(xnum)
+    for i=1:xnum
+        points[i] = x0 + (i - 0.5) * dx
+    end
+
+    return points
+
+end
 
 
 function global_frame(w::Array{Float64,1}, cosa::AbstractFloat, sina::AbstractFloat) 

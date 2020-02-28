@@ -85,12 +85,14 @@ prim_conserve([ρ, U, λ], gamma)
 # ------------------------------------------------------------
 # Calculate physical property parameters
 # ------------------------------------------------------------
-function heat_capacity_ratio(K, D::Int64) 
+function heat_capacity_ratio(K, D::Int64)
 	
 	if D == 1
 		γ = (K + 3.) / (K + 1.)
 	elseif D == 2
 		γ = (K + 4.) / (K + 2.)
+	elseif D ==3
+		γ = (K + 5.) / (K + 3.)
 	end
 
 	return γ
