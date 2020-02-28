@@ -5,10 +5,10 @@
 
 export flux_kfvs,
        flux_kcu,
+       heaviside,
        normal_moments,
        normal_moments_uv,
-       normal_moments_au,
-       heaviside
+       normal_moments_au
 
 
 # ------------------------------------------------------------
@@ -180,6 +180,12 @@ end
 
 
 # ------------------------------------------------------------
+# Heaviside step function
+# ------------------------------------------------------------
+heaviside(x::Union{Int, AbstractFloat}) = ifelse(x >= 0, 1., 0.)
+
+
+# ------------------------------------------------------------
 # Calculate moments of Maxwellian distribution function
 # ------------------------------------------------------------
 function normal_moments(prim::Array{Float64,1}, inK::Union{Int, Float64})
@@ -276,6 +282,3 @@ function normal_moments_au(a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::
     return au
 
 end
-
-
-heaviside(x::Union{Int, AbstractFloat}) = ifelse(x >= 0, 1., 0.)
