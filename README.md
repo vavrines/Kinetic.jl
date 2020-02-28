@@ -1,6 +1,6 @@
-![](https://github.com/tbxiao/tbxiao.github.io/blob/master/img/kinetic.gif)
-
 # Kinetic.jl
+
+![](https://github.com/tbxiao/tbxiao.github.io/blob/master/img/kinetic.gif)
 
 ![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
 
