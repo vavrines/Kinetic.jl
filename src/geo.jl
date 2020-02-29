@@ -3,9 +3,77 @@
 # ============================================================
 
 
-export uniform_mesh,
+export PMesh1D,
+       PMesh2D,
+       uniform_mesh,
        global_frame, 
        local_frame
+
+
+# ------------------------------------------------------------
+# Structure of mesh
+# ------------------------------------------------------------
+mutable struct PMesh1D <: AbstractPhysicalMesh
+
+	x0 :: Float64; x1 :: Float64; nx :: Int64
+	x :: AbstractArray{Float64,1}; dx :: AbstractArray{Float64,1}
+
+    function PMesh1D( X0::AbstractFloat, X1::AbstractFloat, XNUM::Int, 
+                      TYPE="uniform"::String, NG=0::Int)
+
+        x0 = X0; x1 = X1; nx = XNUM; δ = (x1 - x0) / nx
+        x = OffsetArray{Float64}(undef, 1-NG:nx+NG); dx = similar(x)
+
+		if TYPE == "uniform" #// uniform mesh
+            for i in eachindex(x)
+                x[i] = x0 + (i - 0.5) * δ
+                dx[i] = δ
+            end
+		end
+
+		# inner constructor method
+		new(x0, x1, nx, x, dx)
+    
+    end
+
+end # struct
+
+
+mutable struct PMesh2D <: AbstractPhysicalMesh
+
+	x0 :: Float64; x1 :: Float64; nx :: Int64
+	y0 :: Float64; y1 :: Float64; ny :: Int64
+	x :: Array{Float64,2}; y :: Array{Float64,2}
+    dx :: Array{Float64,2}; dy :: Array{Float64,2}
+
+    function PMesh2D( X0::AbstractFloat, X1::AbstractFloat, XNUM::Int, 
+    				  Y0::AbstractFloat, Y1::AbstractFloat, YNUM::Int, 
+    				  TYPE="uniform"::String, NGX=0::Int, NGY=0::Int)
+
+		x0 = X0; x1 = X1; nx = XNUM; δx = (X1 - X0) / XNUM
+        y0 = Y0; y1 = Y1; ny = YNUM; δy = (Y1 - Y0) / YNUM
+        x = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+        y = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+        dx = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+        dy = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+
+		if TYPE == "uniform" # rectangular formula
+            for j in axes(x, 2)
+                for i in axes(x, 1)
+                    x[i,j] = x0 + (i - 0.5) * δx
+                    y[i,j] = y0 + (y - 0.5) * δx
+                    dx[i, j] = δx
+                    dy[i, j] = δy
+                end
+            end
+		end
+
+		# inner constructor method
+		new(x0, x1, nx, y0, y1, ny, x, y, dx, dy)
+    
+    end
+
+end # struct
 
 
 function uniform_mesh(x0::AbstractFloat, xnum::Int, dx::AbstractFloat)

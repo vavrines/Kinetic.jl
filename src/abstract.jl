@@ -3,7 +3,9 @@
 # ============================================================
 
 
-export AbstractVelocitySpace
+export AbstractVelocityMesh,
+       AbstractPhysicalMesh
 
 
-abstract type AbstractVelocitySpace end
+abstract type AbstractPhysicalMesh end      
+abstract type AbstractVelocityMesh end

@@ -3,44 +3,39 @@
 # ============================================================
 
 
-export VSpace1D,
-       VSpace2D,
+export VMesh1D,
+       VMesh2D,
        newton_cotes
 
 
 # ------------------------------------------------------------
 # Structure of velocity space
 # ------------------------------------------------------------
-mutable struct VSpace1D <: AbstractVelocitySpace
+mutable struct VMesh1D <: AbstractVelocityMesh
 
-	u0 :: Float64
-	u1 :: Float64
-	nu :: Int64
-	u :: Array{Float64,1}
-    weights :: Array{Float64,1}
+	u0 :: Float64; u1 :: Float64; nu :: Int64
+	u :: AbstractArray{Float64,1}; du :: AbstractArray{Float64,1}; weights :: AbstractArray{Float64,1}
 
-	VSpace1D() = VSpace1D(-5.0, 5.0, 50, "rectangle")
+	VMesh1D() = VMesh1D(-5.0, 5.0, 50, "rectangle")
 
-    function VSpace1D(U0::AbstractFloat, U1::AbstractFloat, UNUM::Int, TYPE="rectangle"::String)
+	function VMesh1D( U0::AbstractFloat, U1::AbstractFloat, UNUM::Int, 
+					  TYPE="rectangle"::String, NG=0::Int)
 
-		u0 = U0
-		u1 = U1
-		nu = UNUM
-        du = (U1 - U0) / UNUM
-
-		u = zeros(UNUM)
-		weights = similar(u)
+		u0 = U0; u1 = U1; nu = UNUM; δ = (U1 - U0) / UNUM
+		u = OffsetArray{Float64}(undef, 1-NG:nu+NG); du = similar(u); weights = similar(u)
 
 		if TYPE == "rectangle" #// rectangular formula
-			for i=1:UNUM
-				u[i] = U0 + (i - 0.5) * du
+			for i in eachindex(u)
+				u[i] = U0 + (i - 0.5) * δ
+				du[i] = δ
+				weights[i] = δ
 			end
-			weights = ones(UNUM) .* du
 
 		elseif TYPE == "newton" #// newton-cotes formula
-			for i=1:UNUM
-				u[i] = U0 + (i - 0.5) * du
-				weights[i] = newton_cotes(i, UNUM) * du
+			for i in eachindex(u)
+				u[i] = U0 + (i - 0.5) * δ
+				du[i] = δ
+				weights[i] = newton_cotes(i+NG, UNUM+NG*2) * δ
             end
             
 		elseif TYPE == "gauss" #// gaussian integration
@@ -51,71 +46,63 @@ mutable struct VSpace1D <: AbstractVelocitySpace
 		end
 
 		# inner constructor method
-		new(u0, u1, nu, u, weights)
+		new(u0, u1, nu, u, du, weights)
     
     end # constructor
 
 end # struct
 
 
-mutable struct VSpace2D <: AbstractVelocitySpace
+mutable struct VMesh2D <: AbstractVelocityMesh
 
-	u0 :: Float64
-	u1 :: Float64
-	nu :: Int64
-	v0 :: Float64
-	v1 :: Float64
-	nv :: Int64
-	u :: Array{Float64,2}
-	v :: Array{Float64,2}
+	u0 :: Float64; u1 :: Float64; nu :: Int64
+	v0 :: Float64; v1 :: Float64; nv :: Int64
+	u :: Array{Float64,2}; v :: Array{Float64,2}
+	du :: Array{Float64,2}; dv :: Array{Float64,2}
     weights :: Array{Float64,2}
 
-	VSpace2D() = VSpace2D(-5.0, 5.0, 28, -5.0, 5.0, 28, 1)
+	VMesh2D() = VMesh2D(-5.0, 5.0, 28, -5.0, 5.0, 28, 1)
 
-    function VSpace2D(U0::AbstractFloat, U1::AbstractFloat, UNUM::Int, 
-                          V0::AbstractFloat, V1::AbstractFloat, VNUM::Int, TYPE=1::Int)
+    function VMesh2D(U0::AbstractFloat, U1::AbstractFloat, UNUM::Int, 
+					 V0::AbstractFloat, V1::AbstractFloat, VNUM::Int, 
+					 TYPE=1::Int, NGU=0::Int, NGV=0::Int)
 
-		u0 = U0
-		u1 = U1
-		nu = UNUM
-		v0 = V0
-		v1 = V1
-		nv = VNUM
-        du = (U1 - U0) / UNUM
-        dv = (V1 - V0) / VNUM
-            
+		u0 = U0; u1 = U1; nu = UNUM; δu = (U1 - U0) / UNUM
+		v0 = V0; v1 = V1; nv = VNUM; δv = (V1 - V0) / VNUM
+		u = OffsetArray{Float64}(undef, 1-NGU:nu+NGU, 1-NGV:nv+NGV)
+        v = similar(u); du = similar(u); dv = similar(u); weights = similar(u)
+
 		if TYPE == "rectangle" #// rectangular formula
-			u = zeros(UNUM, VNUM)
-			v = zeros(UNUM, VNUM)
-			for i=1:UNUM
-				for j=1:VNUM
-					u[i,j] = U0 + (i - 0.5) * du
-					v[i,j] = V0 + (j - 0.5) * dv
+			for j in axes(u, 2)
+				for i in axes(u, 1)
+					u[i,j] = U0 + (i - 0.5) * δu
+					v[i,j] = V0 + (j - 0.5) * δv
+					du[i,j] = δu
+					dv[i,j] = δv
+					weights[i,j] = δu * δv
 				end
 			end
-			weights = ones(UNUM, VNUM) .* du .* dv
 
 		elseif TYPE == "newton" #// newton-cotes formula
-			u = zeros(UNUM, VNUM)
-			v = zeros(UNUM, VNUM)
-			weights = zeros(UNUM, VNUM)
-			for i=1:UNUM
-				for j=1:VNUM
-					u[i,j] = U0 + (i - 0.5) * du
-					v[i,j] = V0 + (j - 0.5) * dv
-
-					weights[i,j] = (newton_cotes(i, UNUM) * du) * (newton_cotes(j, VNUM) * dv)
+			for j in axes(u, 2)
+				for i in axes(u, 1)
+					u[i,j] = U0 + (i - 0.5) * δu
+					v[i,j] = V0 + (j - 0.5) * δv
+					du[i,j] = δu
+					dv[i,j] = δv
+					weights[i,j] = newton_cotes(i+NGU, UNUM+NGU*2) * δu * newton_cotes(j+NGV, VNUM+NGV*2) * δv
 				end
 			end
 
 		elseif TYPE == "gauss" #// gaussian integration
 			println("Gaussian integration coming soon")
+
 		else
 			println("error: no velocity quadrature rule")
 		end
 
 		# inner constructor method
-		new(u0, u1, nu, v0, v1, nv, u, v, weights)
+		new(u0, u1, nu, v0, v1, nv, u, v, du, dv, weights)
     
     end # constructor
 

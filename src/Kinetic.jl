@@ -1,5 +1,5 @@
 # ============================================================
-# Kinetic.jl : Theory and Applications
+# Kinetic.jl : Theory, Experiments and Simulations
 # ============================================================
 
 
