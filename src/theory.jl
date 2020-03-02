@@ -3,16 +3,126 @@
 # ============================================================
 
 
-export velocity_moments, 
+export gauss_moments,
+	   gauss_moments_u,
+	   gauss_moments_uv,
+	   gauss_moments_uvw,
+	   velocity_moments, 
 	   maxwellian, 
 	   conserve_prim, 
 	   prim_conserve, 
 	   heat_capacity_ratio, 
 	   ref_vis, 
-	   sos, 
+	   sound_speed, 
 	   vhs_collision_time,
 	   aap_hs_collision_time,
 	   aap_hs_prim
+
+
+# ------------------------------------------------------------
+# Calculate velocity moments from Gaussian distribution
+# ------------------------------------------------------------
+function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
+
+	MuL = OffsetArray{Float64}(undef, 0:6); MuR = similar(MuL); Mu = similar(MuL)
+
+	MuL[0] = 0.5 * erfc(-sqrt(prim[end]) * prim[2])
+	MuL[1] = prim[2] * MuL[0] + 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
+	MuR[0] = 0.5 * erfc(sqrt(prim[end]) * prim[2])
+	MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
+
+	for i=2:6
+		MuL[i,:] = prim[2] * MuL[i-1] + 0.5 * (i-1) * MuL[i-2] / prim[end]
+		MuR[i,:] = prim[2] * MuR[i-1] + 0.5 * (i-1) * MuR[i-2] / prim[end]
+	end
+
+	@. Mu = MuL + MuR
+
+	if length(prim) == 3
+		Mxi = OffsetArray{Float64}(undef, 0:2)
+		Mxi[0] = 1.0
+		Mxi[1] = 0.5 * inK / prim[end]
+		Mxi[2] = (inK^2 + 2.0 * inK) / (4.0 * prim[end]^2)
+
+		return Mu, Mxi, MuL, MuR
+	elseif length(prim) == 4
+		Mv = OffsetArray{Float64}(undef, 0:6)
+		Mv[0] = 1.0
+    	Mv[1] = prim[3]
+		for i=2:6
+			Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i-1) * Mv[i-2] / prim[end]
+		end
+
+		Mxi = OffsetArray{Float64}(undef, 0:2)
+		Mxi[0] = 1.0
+		Mxi[1] = 0.5 * inK / prim[end]
+		Mxi[2] = (inK^2 + 2.0 * inK) / (4.0 * prim[end]^2)
+
+		return Mu, Mv, Mxi, MuL, MuR
+	elseif length(prim) == 5
+		Mv = OffsetArray{Float64}(undef, 0:6)
+		Mv[0] = 1.
+		Mv[1] = prim[3]
+		for i=2:6
+			Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i-1) * Mv[i-2] / prim[end]
+		end
+
+		Mw = OffsetArray{Float64}(undef, 0:6)
+		Mw[0] = 1.
+		Mw[1] = prim[4]
+		for i=2:6
+			Mw[i] = prim[4] * Mw[i-1] + 0.5 * (i-1) * Mw[i-2] / prim[end]
+		end
+
+		return Mu, Mv, Mw, MuL, MuR
+	end
+
+end
+
+
+function gauss_moments_u(Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int, delta::Int)
+
+    uv = zeros(3)
+
+    uv[1] = Mu[alpha] * Mxi[delta÷2]
+    uv[2] = Mu[alpha+1] * Mxi[delta÷2]
+    uv[3] = 0.5 * (Mu[alpha+2] * Mxi[delta÷2] + Mu[alpha] * Mxi[(delta+2)÷2])
+
+    return uv
+
+end
+
+
+function gauss_moments_uv(Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int, beta::Int, delta::Int)
+
+    uv = zeros(4)
+
+    uv[1] = Mu[alpha] * Mv[beta] * Mxi[delta÷2]
+    uv[2] = Mu[alpha+1] * Mv[beta] * Mxi[delta÷2]
+    uv[3] = Mu[alpha] * Mv[beta+1] * Mxi[delta÷2]
+	uv[4] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mxi[delta÷2] + Mu[alpha] * Mv[beta+2] * Mxi[delta÷2] + 
+			Mu[alpha] * Mv[beta] * Mxi[(delta+2)÷2])
+
+    return uv
+
+end
+
+
+function gauss_moments_uvw( Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mw::OffsetArray{Float64,1}, 
+							alpha::Int, beta::Int, delta::Int )
+
+	uv = zeros(5)
+
+	uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
+	uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta]
+	uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta]
+	uv[4] = Mu[alpha] * Mv[beta] * Mw[delta+1]
+	uv[5] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mw[delta] + Mu[alpha] * Mv[beta+2] * Mw[delta] + 
+			Mu[alpha] * Mv[beta] * Mw[delta+2])
+
+	return uv
+
+end
 
 
 # ------------------------------------------------------------
@@ -145,11 +255,11 @@ end
 # ------------------------------------------------------------
 # Calculate speed of sound
 # ------------------------------------------------------------
-sos(λ::Union{Int,Float64}, γ::Union{Int,Float64}) = (0.5 * γ / λ)^0.5
+sound_speed(λ::Union{Int,Float64}, γ::Union{Int,Float64}) = (0.5 * γ / λ)^0.5
 
-sos(prim::Array{Float64,1}, γ::Union{Int,Float64}) = sos(prim[end], γ)
+sound_speed(prim::Array{Float64,1}, γ::Union{Int,Float64}) = sos(prim[end], γ)
 
-sos(prim::Array{Int,1}, γ::Union{Int,Float64}) = sos(Float64.(prim), γ)
+sound_speed(prim::Array{Int,1}, γ::Union{Int,Float64}) = sos(Float64.(prim), γ)
 
 
 # ------------------------------------------------------------
