@@ -113,7 +113,7 @@ function conserve_prim(W::Array{Float64,1}, γ::Union{Int,Float64})
 
 end
 
-prim_conserve(W::Array{Int,1}, γ::Union{Int,Float64}) = conserve_prim(Float64.(W), γ)
+conserve_prim(W::Array{Int,1}, γ::Union{Int,Float64}) = conserve_prim(Float64.(W), γ)
 
 conserve_prim(ρ::Union{Int,Float64}, M::Union{Int,Float64}, E::Union{Int,Float64}, gamma::Union{Int,Float64}) = 
 conserve_prim([ρ, M, E], gamma)
