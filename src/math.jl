@@ -15,13 +15,13 @@ heaviside(x::Union{Int, AbstractFloat}) = ifelse(x >= 0, 1., 0.)
 
 
 # ------------------------------------------------------------
-# Fortran sign()
+# Fortran sign() function
 # ------------------------------------------------------------
 fortsign(x, y) = abs(x) * sign(y)
 
 
 # ------------------------------------------------------------
-# Alternative solver for Linear system
+# Alternative linear solver for Ax=b
 # ------------------------------------------------------------
 function solve_linear(A::Array{Float64,2}, b::Array{Float64,1})
 

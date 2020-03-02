@@ -17,6 +17,7 @@ include("math.jl")
 include("geo.jl")
 include("theory.jl")
 include("velocity.jl")
+include("slope.jl")
 include("flux.jl")
 
 
