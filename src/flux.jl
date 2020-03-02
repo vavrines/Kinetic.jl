@@ -73,12 +73,12 @@ flux_kfvs(fL, zeros(axes(fL)), fR, zeros(axes(fR)), u, v, ω, dt, len)
 
 
 # ------------------------------------------------------------
-# central-upwind flux of particle distribution function
+# Kinetic central-upwind flux of particle distribution function
 # ------------------------------------------------------------
 function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1}, 
                    wR::Array{Float64,1}, fR::AbstractArray{Float64,1},
                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, 
-                   inK::Union{Int,Float64}, γ::Float64, visRef::Float64, visIdx::Float64, pr::Float64, dt::Float64 )
+                   inK::Union{Int64,Float64}, γ::Float64, visRef::Float64, visIdx::Float64, pr::Float64, dt::Float64 )
 
     #--- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -129,7 +129,7 @@ end
 function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2}, 
                    wR::Array{Float64,1}, fR::AbstractArray{Float64,2},
                    u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, 
-                   inK::Union{Int,Float64}, γ::Float64, visRef::Float64, visIdx::Float64, pr::Float64, 
+                   inK::Union{Int64,Float64}, γ::Float64, visRef::Float64, visIdx::Float64, pr::Float64, 
                    dt::Float64, len::Float64 )
     
     #--- prepare ---#
@@ -181,7 +181,7 @@ end
 # ------------------------------------------------------------
 # Calculate moments of Maxwellian distribution function
 # ------------------------------------------------------------
-function normal_moments(prim::Array{Float64,1}, inK::Union{Int, Float64})
+function normal_moments(prim::Array{Float64,1}, inK::Union{Int64, Float64})
 
     MuL = zeros(7); MuR = zeros(7); Mu = zeros(7); Mxi = zeros(3)
     MuL = OffsetArray(MuL, 0:6); MuR = OffsetArray(MuR, 0:6); Mu = OffsetArray(Mu, 0:6); Mxi = OffsetArray(Mxi, 0:2)

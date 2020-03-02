@@ -16,37 +16,54 @@ export velocity_moments,
 # ------------------------------------------------------------
 # Calculate conservative moments from distribution function
 # ------------------------------------------------------------
-velocity_moments(f::Array{Float64,1}, u::Array{Float64,1}, ω::Array{Float64,1}, N::Int64) =
-sum(@. ω * u^N * f)
+velocity_moments(f::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, n::Int) =
+sum(@. ω * u^n * f)
+
+
+velocity_moments(f::AbstractArray{Float64,2}, u::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, n::Int) =
+sum(@. ω * u^n * f)
 
 
 # ------------------------------------------------------------
 # Calculate equilibrium distribution function
 # ------------------------------------------------------------
-maxwellian(u::Array{Float64,1}, ρ::Float64, U::Float64, λ::Float64) =
+maxwellian(u::AbstractArray{Float64,1}, ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, λ::Union{Int64,Float64}) =
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
+maxwellian(u::AbstractArray{Float64,1}, prim::Array{Union{Int64,Float64},1}) =
+maxwellian(u, prim[1], prim[2], prim[3])
 
-maxwellian(u::Array{Float64,2}, v::Array{Float64,2}, ρ::Float64, U::Float64, V::Float64, λ::Float64) =
+
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, 
+		   ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, V::Union{Int64,Float64}, λ::Union{Int64,Float64}) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
+
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Union{Int64,Float64},1}) =
+maxwellian(u, v, prim[1], prim[2], prim[3], prim[4])
 
 
 # ------------------------------------------------------------
 # Calculate conservative/primitive variables
 # ------------------------------------------------------------
-function prim_conserve(prim::Array{Float64,1}, gamma::Float64)
+function prim_conserve(prim::Array{Union{Int64,Float64},1}, γ::Union{Int64,Float64})
 
 	W = similar(prim)
 
 	if length(prim) == 3 # 1D
 		W[1] = prim[1]
 		W[2] = prim[1] * prim[2]
-		W[3] = 0.5 * prim[1] / prim[3] / (gamma - 1.0) + 0.5 * prim[1] * prim[2]^2
+		W[3] = 0.5 * prim[1] / prim[3] / (γ - 1.0) + 0.5 * prim[1] * prim[2]^2
 	elseif length(prim) == 4 # 2D
 		W[1] = prim[1]
 		W[2] = prim[1] * prim[2]
 		W[3] = prim[1] * prim[3]
-		W[4] = 0.5 * prim[1] / prim[4] / (gamma - 1.0) + 0.5 * prim[1] * (prim[2]^2 + prim[3]^2)
+		W[4] = 0.5 * prim[1] / prim[4] / (γ - 1.0) + 0.5 * prim[1] * (prim[2]^2 + prim[3]^2)
+	elseif length(prim) == 5 # 3D
+		W[1] = prim[1]
+		W[2] = prim[1] * prim[2]
+		W[3] = prim[1] * prim[3]
+		W[4] = prim[1] * prim[4]
+		W[5] = 0.5 * prim[1] / prim[5] / (γ - 1.0) + 0.5 * prim[1] * (prim[2]^2 + prim[3]^2 + prim[4]^2)
 	else
 		println("prim -> w : dimension error")
 	end
@@ -55,20 +72,33 @@ function prim_conserve(prim::Array{Float64,1}, gamma::Float64)
 
 end
 
+prim_conserve(ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, λ::Union{Int64,Float64}, γ::Union{Int64,Float64}) = 
+prim_conserve([ρ, U, λ], γ)
 
-function conserve_prim(W::Array{Float64,1}, gamma::Float64)
+prim_conserve(ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, V::Union{Int64,Float64}, 
+			  λ::Union{Int64,Float64}, γ::Union{Int64,Float64}) = 
+prim_conserve([ρ, U, V, λ], γ)
+
+
+function conserve_prim(W::Array{Union{Int64,Float64},1}, γ::Union{Int64,Float64})
 
 	prim = similar(W)
 
 	if length(W) == 3 # 1D
 		prim[1] = W[1]
 		prim[2] = W[2] / W[1]
-		prim[3] = 0.5 * W[1] / (gamma - 1.0) / (W[3] - 0.5 * W[2]^2 / W[1])
+		prim[3] = 0.5 * W[1] / (γ - 1.0) / (W[3] - 0.5 * W[2]^2 / W[1])
 	elseif length(W) == 4 # 2D
 		prim[1] = W[1]
 		prim[2] = W[2] / W[1]
 		prim[3] = W[3] / W[1]
-		prim[4] = 0.5 * W[1] / (gamma - 1.0) / (W[4] - 0.5 * (W[2]^2 + W[3]^2) / W[1])
+		prim[4] = 0.5 * W[1] / (γ - 1.0) / (W[4] - 0.5 * (W[2]^2 + W[3]^2) / W[1])
+	elseif length(W) == 5 # 3D
+		prim[1] = W[1]
+		prim[2] = W[2] / W[1]
+		prim[3] = W[3] / W[1]
+		prim[4] = W[4] / W[1]
+		prim[5] = 0.5 * W[1] / (γ - 1.0) / (W[5] - 0.5 * (W[2]^2 + W[3]^2 + W[4]^2) / W[1])
 	else
 		println("w -> prim : dimension error")
 	end
@@ -77,15 +107,18 @@ function conserve_prim(W::Array{Float64,1}, gamma::Float64)
 
 end
 
+conserve_prim(ρ::Union{Int64,Float64}, M::Union{Int64,Float64}, E::Union{Int64,Float64}, gamma::Union{Int64,Float64}) = 
+conserve_prim([ρ, M, E], gamma)
 
-prim_conserve(ρ::Float64, U::Float64, λ::Float64, gamma::Float64) = 
-prim_conserve([ρ, U, λ], gamma)
+conserve_prim(ρ::Union{Int64,Float64}, MX::Union{Int64,Float64}, MY::Union{Int64,Float64}, 
+			  E::Union{Int64,Float64}, gamma::Union{Int64,Float64}) = 
+conserve_prim([ρ, MX, MY, E], gamma)
 
 
 # ------------------------------------------------------------
-# Calculate physical property parameters
+# Calculate heat capacity ratio
 # ------------------------------------------------------------
-function heat_capacity_ratio(K, D::Int64)
+function heat_capacity_ratio(K::Union{Int64, Float64}, D::Int64)
 	
 	if D == 1
 		γ = (K + 3.) / (K + 1.)
@@ -100,13 +133,25 @@ function heat_capacity_ratio(K, D::Int64)
 end
 
 
-ref_vis(Kn::Float64, alpha::Float64, omega::Float64) = 
+# ------------------------------------------------------------
+# Calculate speed of sound
+# ------------------------------------------------------------
+sos(λ::Union{Int64,Float64}, γ::Union{Int64,Float64}) = (0.5 * γ / λ)^0.5
+
+sos(prim::Array{Union{Int64,Float64},1}, γ::Union{Int64,Float64}) = sos(prim[end], γ)
+
+
+# ------------------------------------------------------------
+# Calculate reference viscosity
+# 1. variable hard sphere (VHS) model
+# ------------------------------------------------------------
+ref_vis(Kn::Union{Int64,Float64}, alpha::Union{Int64,Float64}, omega::Union{Int64,Float64}) = 
 5.0 * (alpha + 1.) * (alpha + 2.) * √π / (4. * alpha * (5. - 2. * omega) * (7. - 2. * omega)) * Kn
 
 
-sos(λ::Float64, γ::Float64) = (0.5 * γ / λ)^0.5
-
-sos(prim::Array{Float64,1}, γ::Float64) = sos(prim[end], γ)
-
-
-collision_time(prim::Array{Float64,1}, muRef::Float64, omega::Float64) = muRef * 2. * prim[end]^(1. - omega) / prim[1]
+# ------------------------------------------------------------
+# Calculate collision time
+# 1. variable hard sphere (VHS) model
+# ------------------------------------------------------------
+collision_time(prim::Array{Union{Int64,Float64},1}, muRef::Union{Int64,Float64}, omega::Union{Int64,Float64}) = 
+muRef * 2. * prim[end]^(1. - omega) / prim[1]
