@@ -27,25 +27,30 @@ sum(@. ω * u^n * f)
 # ------------------------------------------------------------
 # Calculate equilibrium distribution function
 # ------------------------------------------------------------
-maxwellian(u::AbstractArray{Float64,1}, ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, λ::Union{Int64,Float64}) =
+maxwellian(u::AbstractArray{Float64,1}, ρ::Union{Int,Float64}, U::Union{Int,Float64}, λ::Union{Int,Float64}) =
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
-maxwellian(u::AbstractArray{Float64,1}, prim::Array{Union{Int64,Float64},1}) =
+maxwellian(u::AbstractArray{Float64,1}, prim::Array{Float64,1}) =
 maxwellian(u, prim[1], prim[2], prim[3])
 
+maxwellian(u::AbstractArray{Float64,1}, prim::Array{Int,1}) =
+maxwellian(u, Float64.(prim))
 
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, 
-		   ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, V::Union{Int64,Float64}, λ::Union{Int64,Float64}) =
+
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float64}, λ::Union{Int,Float64}) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Union{Int64,Float64},1}) =
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Float64,1}) =
 maxwellian(u, v, prim[1], prim[2], prim[3], prim[4])
+
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Int,1}) =
+maxwellian(u, v, Float64.(prim))
 
 
 # ------------------------------------------------------------
 # Calculate conservative/primitive variables
 # ------------------------------------------------------------
-function prim_conserve(prim::Array{Union{Int64,Float64},1}, γ::Union{Int64,Float64})
+function prim_conserve(prim::Array{Float64,1}, γ::Union{Int,Float64})
 
 	W = similar(prim)
 
@@ -72,15 +77,16 @@ function prim_conserve(prim::Array{Union{Int64,Float64},1}, γ::Union{Int64,Floa
 
 end
 
-prim_conserve(ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, λ::Union{Int64,Float64}, γ::Union{Int64,Float64}) = 
+prim_conserve(prim::Array{Int,1}, γ::Union{Int,Float64}) = prim_conserve(Float64.(prim), γ)
+
+prim_conserve(ρ::Union{Int,Float64}, U::Union{Int,Float64}, λ::Union{Int,Float64}, γ::Union{Int,Float64}) = 
 prim_conserve([ρ, U, λ], γ)
 
-prim_conserve(ρ::Union{Int64,Float64}, U::Union{Int64,Float64}, V::Union{Int64,Float64}, 
-			  λ::Union{Int64,Float64}, γ::Union{Int64,Float64}) = 
+prim_conserve(ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float64}, λ::Union{Int,Float64}, γ::Union{Int,Float64}) = 
 prim_conserve([ρ, U, V, λ], γ)
 
 
-function conserve_prim(W::Array{Union{Int64,Float64},1}, γ::Union{Int64,Float64})
+function conserve_prim(W::Array{Float64,1}, γ::Union{Int,Float64})
 
 	prim = similar(W)
 
@@ -107,18 +113,19 @@ function conserve_prim(W::Array{Union{Int64,Float64},1}, γ::Union{Int64,Float64
 
 end
 
-conserve_prim(ρ::Union{Int64,Float64}, M::Union{Int64,Float64}, E::Union{Int64,Float64}, gamma::Union{Int64,Float64}) = 
+prim_conserve(W::Array{Int,1}, γ::Union{Int,Float64}) = conserve_prim(Float64.(W), γ)
+
+conserve_prim(ρ::Union{Int,Float64}, M::Union{Int,Float64}, E::Union{Int,Float64}, gamma::Union{Int,Float64}) = 
 conserve_prim([ρ, M, E], gamma)
 
-conserve_prim(ρ::Union{Int64,Float64}, MX::Union{Int64,Float64}, MY::Union{Int64,Float64}, 
-			  E::Union{Int64,Float64}, gamma::Union{Int64,Float64}) = 
+conserve_prim(ρ::Union{Int,Float64}, MX::Union{Int,Float64}, MY::Union{Int,Float64}, E::Union{Int,Float64}, gamma::Union{Int,Float64}) = 
 conserve_prim([ρ, MX, MY, E], gamma)
 
 
 # ------------------------------------------------------------
 # Calculate heat capacity ratio
 # ------------------------------------------------------------
-function heat_capacity_ratio(K::Union{Int64, Float64}, D::Int64)
+function heat_capacity_ratio(K::Union{Int, Float64}, D::Int)
 	
 	if D == 1
 		γ = (K + 3.) / (K + 1.)
@@ -136,16 +143,18 @@ end
 # ------------------------------------------------------------
 # Calculate speed of sound
 # ------------------------------------------------------------
-sos(λ::Union{Int64,Float64}, γ::Union{Int64,Float64}) = (0.5 * γ / λ)^0.5
+sos(λ::Union{Int,Float64}, γ::Union{Int,Float64}) = (0.5 * γ / λ)^0.5
 
-sos(prim::Array{Union{Int64,Float64},1}, γ::Union{Int64,Float64}) = sos(prim[end], γ)
+sos(prim::Array{Float64,1}, γ::Union{Int,Float64}) = sos(prim[end], γ)
+
+sos(prim::Array{Int,1}, γ::Union{Int,Float64}) = sos(Float64.(prim), γ)
 
 
 # ------------------------------------------------------------
 # Calculate reference viscosity
 # 1. variable hard sphere (VHS) model
 # ------------------------------------------------------------
-ref_vis(Kn::Union{Int64,Float64}, alpha::Union{Int64,Float64}, omega::Union{Int64,Float64}) = 
+ref_vis(Kn::Union{Int,Float64}, alpha::Union{Int,Float64}, omega::Union{Int,Float64}) = 
 5.0 * (alpha + 1.) * (alpha + 2.) * √π / (4. * alpha * (5. - 2. * omega) * (7. - 2. * omega)) * Kn
 
 
@@ -153,5 +162,8 @@ ref_vis(Kn::Union{Int64,Float64}, alpha::Union{Int64,Float64}, omega::Union{Int6
 # Calculate collision time
 # 1. variable hard sphere (VHS) model
 # ------------------------------------------------------------
-collision_time(prim::Array{Union{Int64,Float64},1}, muRef::Union{Int64,Float64}, omega::Union{Int64,Float64}) = 
+collision_time(prim::Array{Float64,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
 muRef * 2. * prim[end]^(1. - omega) / prim[1]
+
+collision_time(prim::Array{Int,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
+collision_time(Float64.(prim), muRef, omega)
