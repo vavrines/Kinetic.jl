@@ -10,7 +10,9 @@ export velocity_moments,
 	   heat_capacity_ratio, 
 	   ref_vis, 
 	   sos, 
-	   collision_time
+	   vhs_collision_time,
+	   aap_hs_collision_time,
+	   aap_hs_prim
 
 
 # ------------------------------------------------------------
@@ -162,8 +164,57 @@ ref_vis(Kn::Union{Int,Float64}, alpha::Union{Int,Float64}, omega::Union{Int,Floa
 # Calculate collision time
 # 1. variable hard sphere (VHS) model
 # ------------------------------------------------------------
-collision_time(prim::Array{Float64,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
+vhs_collision_time(prim::Array{Float64,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
 muRef * 2. * prim[end]^(1. - omega) / prim[1]
 
-collision_time(prim::Array{Int,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
+vhs_collision_time(prim::Array{Int,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
 collision_time(Float64.(prim), muRef, omega)
+
+
+"""
+Multicomponent gases
+"""
+# ------------------------------------------------------------
+# Calculate mixture collision time from AAP model
+# ------------------------------------------------------------
+function aap_hs_collision_time( prim::Array{Float64,2}, mi::Union{Int,Float64}, ni::Union{Int,Float64}, 
+								me::Union{Int,Float64}, ne::Union{Int,Float64}, kn::Union{Int,Float64} )
+
+	ν = zeros(axes(prim, 2))
+
+	ν[1] = prim[1,1] / (mi * (ni + ne)) * 4. * sqrt(π) / 3. * sqrt(1. / prim[5,1] + 1. / prim[5,1]) / (sqrt(2.) * π * kn) + 
+		   prim[1,2] / (me * (ni + ne)) * 4. * sqrt(π) / 3. * sqrt(1. / prim[5,1] + 1. / prim[5,2]) / (sqrt(2.) * π * kn)
+	ν[2] = prim[1,1] / (mi * (ni + ne)) * 4. * sqrt(π) / 3. * sqrt(1. / prim[5,1] + 1. / prim[5,2]) / (sqrt(2.) * π * kn) + 
+		   prim[1,2] / (me * (ni + ne)) * 4. * sqrt(π) / 3. * sqrt(1. / prim[5,2] + 1. / prim[5,2]) / (sqrt(2.) * π * kn)
+
+	return 1. ./ ν
+
+end
+
+
+# ------------------------------------------------------------
+# Calculate mixture primitive variables from AAP model
+# ------------------------------------------------------------
+function aap_hs_prim( prim::Array{Float64,2}, tau::Array{Float64,1}, mi::Union{Int,Float64}, ni::Union{Int,Float64}, 
+					  me::Union{Int,Float64}, ne::Union{Int,Float64}, kn::Union{Int,Float64} )
+
+	mixprim = similar(prim)
+
+	mixprim[1,:] = deepcopy(prim[1,:])
+	mixprim[2,1] = prim[2,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (prim[2,2] - prim[2,1])
+	mixprim[2,2] = prim[2,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (prim[2,1] - prim[2,2])
+	mixprim[3,1] = prim[3,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (prim[3,2] - prim[3,1])
+	mixprim[3,2] = prim[3,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (prim[3,1] - prim[3,2])
+	mixprim[4,1] = prim[4,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (prim[4,2] - prim[4,1])
+	mixprim[4,2] = prim[4,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (prim[4,1] - prim[4,2])
+	
+	mixprim[5,1] = 1. / (1. / prim[5,1] - 2. / 3. * (mixprim[2,1] - prim[2,1])^2 - 2. / 3. * (mixprim[3,1] - prim[3,1])^2 - 2. / 3. * (mixprim[4,1] - prim[4,1])^2 + 
+				   tau[1] / kn * 2. * mi / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (1. / prim[5,2] * me / mi - 1. / prim[5,1] + 
+				   2. / 3. * me / mi * (prim[2,2] - prim[2,1])^2 + 2. / 3. * me / mi * (prim[3,2] - prim[3,1])^2 + 2. / 3. * me / mi * (prim[4,2] - prim[4,1])^2))
+	mixprim[5,2] = 1. / (1. / prim[5,2] - 2. / 3. * (mixprim[2,2] - prim[2,2])^2 - 2. / 3. * (mixprim[3,2] - prim[3,2])^2 - 2. / 3. * (mixprim[4,2] - prim[4,2])^2 + 
+				   tau[2] / kn * 2. * me / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[5,1] + 1. / prim[5,2])) * (1. / prim[5,1] * mi / me - 1. / prim[5,2] + 
+				   2. / 3. * mi / me * (prim[2,1] - prim[2,2])^2 + 2. / 3. * mi / me * (prim[3,1] - prim[3,2])^2 + 2. / 3. * mi / me * (prim[4,1] - prim[4,2])^2))
+
+	return mixprim
+
+end
