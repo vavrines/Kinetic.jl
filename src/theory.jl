@@ -4,10 +4,9 @@
 
 
 export gauss_moments,
-	   gauss_moments_u,
-	   gauss_moments_uv,
-	   gauss_moments_uvw,
-	   velocity_moments, 
+	   moments_conserve,
+	   moments_conserve_slope,
+	   discrete_moments, 
 	   maxwellian, 
 	   conserve_prim, 
 	   prim_conserve, 
@@ -20,7 +19,8 @@ export gauss_moments,
 
 
 # ------------------------------------------------------------
-# Calculate velocity moments from Gaussian distribution
+# Calculate directional velocity moments of Gaussian
+# G = (λ / π)^(D/2) * exp[-λ(c^2+ξ^2)]
 # ------------------------------------------------------------
 function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 
@@ -79,8 +79,14 @@ function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 
 end
 
+gauss_moments(prim::Array{Int,1}, inK::Union{Int,Float64}) = 
+gauss_moments(Float64.(prim), inK)
 
-function gauss_moments_u(Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int, delta::Int)
+
+# ------------------------------------------------------------
+# Calculate conservative moments
+# ------------------------------------------------------------
+function moments_conserve(Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int, delta::Int)
 
     uv = zeros(3)
 
@@ -93,32 +99,27 @@ function gauss_moments_u(Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}
 end
 
 
-function gauss_moments_uv(Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int, beta::Int, delta::Int)
+function moments_conserve( Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mw::OffsetArray{Float64,1}, 
+						   alpha::Int, beta::Int, delta::Int )
 
-    uv = zeros(4)
+	if length(Mw) == 3
+		uv = zeros(4)
 
-    uv[1] = Mu[alpha] * Mv[beta] * Mxi[delta÷2]
-    uv[2] = Mu[alpha+1] * Mv[beta] * Mxi[delta÷2]
-    uv[3] = Mu[alpha] * Mv[beta+1] * Mxi[delta÷2]
-	uv[4] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mxi[delta÷2] + Mu[alpha] * Mv[beta+2] * Mxi[delta÷2] + 
-			Mu[alpha] * Mv[beta] * Mxi[(delta+2)÷2])
+		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta÷2]
+		uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta÷2]
+		uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta÷2]
+		uv[4] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mw[delta÷2] + Mu[alpha] * Mv[beta+2] * Mw[delta÷2] + 
+				Mu[alpha] * Mv[beta] * Mw[(delta+2)÷2])	
+	else
+		uv = zeros(5)
 
-    return uv
-
-end
-
-
-function gauss_moments_uvw( Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mw::OffsetArray{Float64,1}, 
-							alpha::Int, beta::Int, delta::Int )
-
-	uv = zeros(5)
-
-	uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
-	uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta]
-	uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta]
-	uv[4] = Mu[alpha] * Mv[beta] * Mw[delta+1]
-	uv[5] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mw[delta] + Mu[alpha] * Mv[beta+2] * Mw[delta] + 
-			Mu[alpha] * Mv[beta] * Mw[delta+2])
+		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
+		uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta]
+		uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta]
+		uv[4] = Mu[alpha] * Mv[beta] * Mw[delta+1]
+		uv[5] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mw[delta] + Mu[alpha] * Mv[beta+2] * Mw[delta] + 
+				Mu[alpha] * Mv[beta] * Mw[delta+2])
+	end
 
 	return uv
 
@@ -126,13 +127,59 @@ end
 
 
 # ------------------------------------------------------------
+# Calculate slope-related conservative moments
+# a = a1 + u*a2 + 0.5*u^2*a3
+# ------------------------------------------------------------
+function moments_conserve_slope(a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int)
+
+	au = @. a[1] * moments_conserve(Mu, Mxi, alpha+0, 0) +
+         a[2] * moments_conserve(Mu, Mxi, alpha+1, 0) +
+         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha+2, 0) +
+         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha+0, 2)
+
+    return au
+
+end
+
+
+function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
+								 alpha::Int, beta::Int )
+
+    au = @. a[1] * velo_moments_uv(Mu, Mv, Mxi, alpha+0, beta+0, 0) +
+         a[2] * velo_moments_uv(Mu, Mv, Mxi, alpha+1, beta+0, 0) +
+         a[3] * velo_moments_uv(Mu, Mv, Mxi, alpha+0, beta+1, 0) +
+         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+2, beta+0, 0) +
+         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+2, 0) +
+         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+0, 2)
+
+    return au
+
+end
+
+function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, 
+								 Mw::OffsetArray{Float64,1}, alpha::Int, beta::Int, delta::Int )
+
+	au = @. a[1] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+0, delta+0) +
+			a[2] * get_moment_uv(Mu, Mv, Mw, alpha+1, beta+0, delta+0) +
+			a[3] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+1, delta+0) +
+			a[4] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+0, delta+1) +
+			0.5 * a[5] * get_moment_uv(Mu, Mv, Mw, alpha+2, beta+0, delta+0) +
+			0.5 * a[5] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+2, delta+0) +
+			0.5 * a[5] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+0, delta+2)
+
+	return au
+
+end
+
+
+# ------------------------------------------------------------
 # Calculate conservative moments from distribution function
 # ------------------------------------------------------------
-velocity_moments(f::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, n::Int) =
+discrete_moments(f::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, n::Int) =
 sum(@. ω * u^n * f)
 
 
-velocity_moments(f::AbstractArray{Float64,2}, u::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, n::Int) =
+discrete_moments(f::AbstractArray{Float64,2}, u::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, n::Int) =
 sum(@. ω * u^n * f)
 
 
