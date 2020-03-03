@@ -10,8 +10,18 @@ export flux_kfvs,
        normal_moments_au
 
 
+"""
+Kinetic flux vector splitting (KFVS) method
+
+# >@param[in] : particle distribution functions and their slopes at left/right sides of interface
+# >@param[in] : particle velocity quadrature points and weights
+# >@param[in] : time step
+
+# >@return : flux of particle distribution function and its velocity moments on conservative variables
+"""
+
 # ------------------------------------------------------------
-# Kinetic flux vector splitting of particle distribution function
+# Pure 1D1F flux
 # ------------------------------------------------------------
 function flux_kfvs( fL::AbstractArray{Float64,1}, sfL::AbstractArray{Float64,1}, 
                     fR::AbstractArray{Float64,1}, sfR::AbstractArray{Float64,1},
@@ -36,11 +46,98 @@ function flux_kfvs( fL::AbstractArray{Float64,1}, sfL::AbstractArray{Float64,1},
 
 end
 
-
 flux_kfvs(fL::AbstractArray{Float64,1}, fR::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
-flux_kfvs(fL, zeros(axes(fL)), fR, zeros(axes(fR)), u, ω, dt)     
+flux_kfvs(fL, zeros(axes(fL)), fR, zeros(axes(fR)), u, ω, dt)
 
 
+# ------------------------------------------------------------
+# Reduced 1D2F flux
+# ------------------------------------------------------------
+function flux_kfvs( hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, shL::AbstractArray{Float64,1}, sbL::AbstractArray{Float64,1}, 
+                    hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1}, shR::AbstractArray{Float64,1}, sbR::AbstractArray{Float64,1}, 
+                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64 )
+
+    #--- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    h = @. hL * δ + hR * (1. - δ)
+    b = @. bL * δ + bR * (1. - δ)
+
+    sh = @. shL * δ + shR * (1. - δ)
+    sb = @. sbL * δ + sbR * (1. - δ)
+
+    #--- calculate fluxes ---#
+    fw = zeros(5); fh = similar(h); fb = similar(b)
+
+    fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh)
+    fw[2] = dt * sum(ω .* u.^2 .* h) - 0.5 * dt^2 * sum(ω .* u.^3 .* sh)
+    fw[3] = dt * 0.5 * (sum(ω .* u.^3 .* h) + sum(ω .* u .* b)) - 
+            0.5 * dt^2 * 0.5 * (sum(ω .* u.^4 .* sh) + sum(ω .* u.^2 .* sb))
+
+    @. fh = dt * u * h - 0.5 * dt^2 * u^2 * sh
+    @. fb = dt * u * b - 0.5 * dt^2 * u^2 * sb
+
+    return fw, fh, fb
+
+end
+
+flux_kfvs(hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1},
+u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
+flux_kfvs(h0L, h1L, h2L, zeros(axes(h0L)), zeros(axes(h1L)), zeros(axes(h2L)), zeros(axes(h3L)), 
+h0R, h1R, h2R, zeros(axes(h0R)), zeros(axes(h1R)), zeros(axes(h2R)), zeros(axes(h3R)), u, ω, dt)     
+
+
+# ------------------------------------------------------------
+# Reduced 1D4F flux
+# ------------------------------------------------------------
+function flux_kfvs( h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}, h2L :: AbstractArray{Float64,1}, h3L :: AbstractArray{Float64,1},
+                    sh0L::AbstractArray{Float64,1}, sh1L::AbstractArray{Float64,1}, sh2L::AbstractArray{Float64,1}, sh3L::AbstractArray{Float64,1}, 
+                    h0R::AbstractArray{Float64,1}, h1R::AbstractArray{Float64,1}, h2R :: AbstractArray{Float64,1}, h3R :: AbstractArray{Float64,1},
+                    sh0R::AbstractArray{Float64,1}, sh1R::AbstractArray{Float64,1}, sh2R::AbstractArray{Float64,1}, sh3R::AbstractArray{Float64,1}, 
+                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64 )
+
+    #--- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    h0 = @. h0L * δ + h0R * (1. - δ)
+    h1 = @. h1L * δ + h1R * (1. - δ)
+    h2 = @. h2L * δ + h2R * (1. - δ)
+    h3 = @. h3L * δ + h3R * (1. - δ)
+
+    sh0 = @. sh0L * δ + sh0R * (1. - δ)
+    sh1 = @. sh1L * δ + sh1R * (1. - δ)
+    sh2 = @. sh2L * δ + sh2R * (1. - δ)
+    sh3 = @. sh3L * δ + sh3R * (1. - δ)
+
+    #--- calculate fluxes ---#
+    fw = zeros(5); fh0 = similar(h0L); fh1 = similar(h1L); fh2 = similar(h2L); fh3 = similar(h3L)
+
+    fw[1] = dt * sum(ω .* u .* h0) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh0)
+    fw[2] = dt * sum(ω .* u.^2 .* h0) - 0.5 * dt^2 * sum(ω .* u.^3 .* sh0)
+    fw[3] = dt * sum(ω .* u .* h1) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh1)
+    fw[4] = dt * sum(ω .* u .* h2) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh2)
+    fw[5] = dt * 0.5 * (sum(ω .* u.^3 .* h0) + sum(ω .* u .* h3)) - 
+            0.5 * dt^2 * 0.5 * (sum(ω .* u.^4 .* sh0) + sum(ω .* u.^2 .* sh3))
+
+    @. fh0 = dt * u * h0 - 0.5 * dt^2 * u^2 * sh0
+    @. fh1 = dt * u * h1 - 0.5 * dt^2 * u^2 * sh1
+    @. fh2 = dt * u * h2 - 0.5 * dt^2 * u^2 * sh2
+    @. fh3 = dt * u * h3 - 0.5 * dt^2 * u^2 * sh3
+
+    return fw, fh0, fh1, fh2, fh3
+
+end
+
+flux_kfvs(h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}, h2L :: AbstractArray{Float64,1}, h3L :: AbstractArray{Float64,1},
+          h0R::AbstractArray{Float64,1}, h1R::AbstractArray{Float64,1}, h2R :: AbstractArray{Float64,1}, h3R :: AbstractArray{Float64,1},
+          u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
+flux_kfvs(h0L, h1L, h2L, h3L, zeros(axes(h0L)), zeros(axes(h1L)), zeros(axes(h2L)), zeros(axes(h3L)), 
+          h0R, h1R, h2R, h3R, zeros(axes(h0R)), zeros(axes(h1R)), zeros(axes(h2R)), zeros(axes(h3R)), u, ω, dt)     
+
+
+# ------------------------------------------------------------
+# Pure 2D1F flux
+# ------------------------------------------------------------
 function flux_kfvs( fL::AbstractArray{Float64,2}, sfL::AbstractArray{Float64,2}, 
                     fR::AbstractArray{Float64,2}, sfR::AbstractArray{Float64,2},
                     u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, 
@@ -72,8 +169,18 @@ flux_kfvs(fL::AbstractArray{Float64,2}, fR::AbstractArray{Float64,2}, u::Abstrac
 flux_kfvs(fL, zeros(axes(fL)), fR, zeros(axes(fR)), u, v, ω, dt, len)
 
 
+"""
+Kinetic central-upwind (KCU) method
+
+# >@param[in] : particle distribution functions and their slopes at left/right sides of interface
+# >@param[in] : particle velocity quadrature points and weights
+# >@param[in] : time step
+
+# >@return : flux of particle distribution function and its velocity moments on conservative variables
+"""
+
 # ------------------------------------------------------------
-# Kinetic central-upwind flux of particle distribution function
+# Pure 1D1F flux
 # ------------------------------------------------------------
 function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1}, 
                    wR::Array{Float64,1}, fR::AbstractArray{Float64,1},
@@ -126,6 +233,9 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1},
 end
 
 
+# ------------------------------------------------------------
+# Pure 2D1F flux
+# ------------------------------------------------------------
 function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2}, 
                    wR::Array{Float64,1}, fR::AbstractArray{Float64,2},
                    u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, 
@@ -174,104 +284,5 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2},
     ff = @. Mt[1] * u * g + Mt[2] * u * f
 
     return fw .* len, ff.* len
-
-end
-
-
-# ------------------------------------------------------------
-# Calculate moments of Maxwellian distribution function
-# ------------------------------------------------------------
-function normal_moments(prim::Array{Float64,1}, inK::Union{Int64, Float64})
-
-    MuL = zeros(7); MuR = zeros(7); Mu = zeros(7); Mxi = zeros(3)
-    MuL = OffsetArray(MuL, 0:6); MuR = OffsetArray(MuR, 0:6); Mu = OffsetArray(Mu, 0:6); Mxi = OffsetArray(Mxi, 0:2)
-
-    MuL[0] = 0.5 * erfc(-sqrt(prim[end]) * prim[2])
-    MuL[1] = prim[2] * MuL[0] + 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
-    MuR[0] = 0.5 * erfc(sqrt(prim[end]) * prim[2])
-    MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
-
-    for i=2:6
-        MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i-1) * MuL[i-2] / prim[end]
-        MuR[i] = prim[2] * MuR[i-1] + 0.5 * (i-1) * MuR[i-2] / prim[end]
-    end
-
-    Mu = MuL .+ MuR
-
-    Mxi[0] = 1.0
-    Mxi[1] = 0.5 * inK / prim[end]
-    Mxi[2] = (inK^2 + 2.0 * inK) / (4.0 * prim[end]^2)
-
-    if length(prim) == 4
-        Mv = zeros(7)
-        Mv = OffsetArray(Mv, 0:6)
-        
-        Mv[0] = 1.0
-        Mv[1] = prim[3]
-        for i=2:6
-            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i-1) * Mv[i-2] / prim[end]
-        end
-
-        return Mu, Mv, Mxi, MuL, MuR
-    else
-        return Mu, Mxi, MuL, MuR
-    end
-
-end
-
-
-function normal_moments_uv(Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int64, delta::Int64)
-
-    uv = zeros(3)
-
-    uv[1] = Mu[alpha] * Mxi[Int64(delta/2)]
-    uv[2] = Mu[alpha+1] * Mxi[Int64(delta/2)]
-    uv[3] = 0.5 * (Mu[alpha+2] * Mxi[Int64(delta/2)] + Mu[alpha] * Mxi[Int64((delta+2)/2)])
-
-    return uv
-
-end
-
-
-function normal_moments_uv(Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int64, beta::Int64, delta::Int64)
-
-    uv = zeros(4)
-
-    uv[1] = Mu[alpha] * Mv[beta] * Mxi[Int64(delta/2)]
-    uv[2] = Mu[alpha+1] * Mv[beta] * Mxi[Int64(delta/2)]
-    uv[3] = Mu[alpha] * Mv[beta+1] * Mxi[Int64(delta/2)]
-    uv[4] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mxi[delta÷2] + Mu[alpha] * Mv[beta+2] * Mxi[delta÷2] + Mu[alpha] * Mv[beta] * Mxi[(delta+2)÷2])
-
-    return uv
-
-end
-
-
-function normal_moments_au(a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int64)
-
-    au = zeros(3)
-
-    au = a[1] .* get_moment_uv(Mu, Mxi, alpha+0, 0) +
-         a[2] .* get_moment_uv(Mu, Mxi, alpha+1, 0) +
-         0.5 .* a[3] .* get_moment_uv(Mu, Mxi, alpha+2, 0) +
-         0.5 .* a[3] .* get_moment_uv(Mu, Mxi, alpha+0, 2)
-
-    return au
-
-end
-
-
-function normal_moments_au(a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int64, beta::Int64)
-
-    au = zeros(4)
-
-    au = a[1] .* get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+0, 0) +
-         a[2] .* get_moment_uv(Mu, Mv, Mxi, alpha+1, beta+0, 0) +
-         a[3] .* get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+1, 0) +
-         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+2, beta+0, 0) +
-         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+2, 0) +
-         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+0, 2)
-
-    return au
 
 end
