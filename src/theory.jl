@@ -18,9 +18,14 @@ export gauss_moments,
 	   aap_hs_prim
 
 
+"""
+Velocity moments of particle distribution function
+1. theoretical form
+"""
+
 # ------------------------------------------------------------
 # Calculate directional velocity moments of Gaussian
-# G = (λ / π)^(D/2) * exp[-λ(c^2+ξ^2)]
+# G = (λ / π)^(D / 2) * exp[-λ(c^2 + ξ^2)]
 # ------------------------------------------------------------
 function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 
@@ -128,7 +133,7 @@ end
 
 # ------------------------------------------------------------
 # Calculate slope-related conservative moments
-# a = a1 + u*a2 + 0.5*u^2*a3
+# a = a1 + u * a2 + 0.5 * u^2 * a3
 # ------------------------------------------------------------
 function moments_conserve_slope(a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int)
 
@@ -172,20 +177,37 @@ function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}
 end
 
 
-# ------------------------------------------------------------
-# Calculate conservative moments from distribution function
-# ------------------------------------------------------------
+"""
+Velocity moments of particle distribution function
+2. discrete form
+"""
+
+#--- 1D ---#
 discrete_moments(f::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, n::Int) =
 sum(@. ω * u^n * f)
 
 
+#--- 2D ---#
 discrete_moments(f::AbstractArray{Float64,2}, u::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, n::Int) =
 sum(@. ω * u^n * f)
 
 
-# ------------------------------------------------------------
-# Calculate equilibrium distribution function
-# ------------------------------------------------------------
+#--- 3D ---#
+discrete_moments(f::AbstractArray{Float64,3}, u::AbstractArray{Float64,3}, ω::AbstractArray{Float64,3}, n::Int) =
+sum(@. ω * u^n * f)
+
+
+"""
+Equilibrium in discrete form 
+1. Gas: Maxwellian
+
+# >@param[in] : particle velocity quadrature points
+# >@param[in] : density, velocity and inverse of temperature
+
+# >@return : Maxwellian distribution function
+"""
+
+#--- 1D ---#
 maxwellian(u::AbstractArray{Float64,1}, ρ::Union{Int,Float64}, U::Union{Int,Float64}, λ::Union{Int,Float64}) =
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
@@ -196,6 +218,7 @@ maxwellian(u::AbstractArray{Float64,1}, prim::Array{Int,1}) =
 maxwellian(u, Float64.(prim))
 
 
+#--- 2D ---#
 maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float64}, λ::Union{Int,Float64}) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
@@ -206,8 +229,24 @@ maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array
 maxwellian(u, v, Float64.(prim))
 
 
+#--- 3D ---#
+maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, 
+		   ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float64}, W::Union{Int,Float64}, λ::Union{Int,Float64}) =
+@. ρ * (λ / π)^1.5 * exp(-λ * ((u - U)^2 + (v - V)^2+ (w - W)^2))
+
+maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, prim::Array{Float64,1}) =
+maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
+
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, w::AbstractArray{Float64,3}, prim::Array{Int,1}) =
+maxwellian(u, v, w, Float64.(prim))
+
+
+"""
+Flow variables with conservative and primitive forms
+"""
+
 # ------------------------------------------------------------
-# Calculate conservative/primitive variables
+# primitive -> conservative
 # ------------------------------------------------------------
 function prim_conserve(prim::Array{Float64,1}, γ::Union{Int,Float64})
 
@@ -245,6 +284,9 @@ prim_conserve(ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float6
 prim_conserve([ρ, U, V, λ], γ)
 
 
+# ------------------------------------------------------------
+# conservative -> primitive
+# ------------------------------------------------------------
 function conserve_prim(W::Array{Float64,1}, γ::Union{Int,Float64})
 
 	prim = similar(W)
@@ -281,6 +323,10 @@ conserve_prim(ρ::Union{Int,Float64}, MX::Union{Int,Float64}, MY::Union{Int,Floa
 conserve_prim([ρ, MX, MY, E], gamma)
 
 
+"""
+Thermodynamical properties
+"""
+
 # ------------------------------------------------------------
 # Calculate heat capacity ratio
 # ------------------------------------------------------------
@@ -309,6 +355,10 @@ sound_speed(prim::Array{Float64,1}, γ::Union{Int,Float64}) = sos(prim[end], γ)
 sound_speed(prim::Array{Int,1}, γ::Union{Int,Float64}) = sos(Float64.(prim), γ)
 
 
+"""
+Single component gas models
+"""
+
 # ------------------------------------------------------------
 # Calculate reference viscosity
 # 1. variable hard sphere (VHS) model
@@ -329,8 +379,9 @@ vhs_collision_time(Float64.(prim), muRef, omega)
 
 
 """
-Multicomponent gases
+Multiple component gas models
 """
+
 # ------------------------------------------------------------
 # Calculate mixture collision time from AAP model
 # ------------------------------------------------------------
