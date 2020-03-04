@@ -32,8 +32,8 @@ function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 	MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
 
 	Threads.@threads for i=2:6
-		MuL[i,:] = prim[2] * MuL[i-1] + 0.5 * (i-1) * MuL[i-2] / prim[end]
-		MuR[i,:] = prim[2] * MuR[i-1] + 0.5 * (i-1) * MuR[i-2] / prim[end]
+		MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i-1) * MuL[i-2] / prim[end]
+		MuR[i] = prim[2] * MuR[i-1] + 0.5 * (i-1) * MuR[i-2] / prim[end]
 	end
 
 	@. Mu = MuL + MuR
