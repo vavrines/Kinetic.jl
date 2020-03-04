@@ -20,9 +20,9 @@ Kinetic flux vector splitting (KFVS) method
 # ------------------------------------------------------------
 # Pure 1D1F flux
 # ------------------------------------------------------------
-function flux_kfvs( fL::AbstractArray{Float64,1}, sfL::AbstractArray{Float64,1}, 
-                    fR::AbstractArray{Float64,1}, sfR::AbstractArray{Float64,1},
-                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64 )
+function flux_kfvs( fL::AbstractArray{Float64,1}, fR::AbstractArray{Float64,1}, 
+                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
+                    sfL=zeros(axes(fL))::AbstractArray{Float64,1}, sfR=zeros(axes(fR))::AbstractArray{Float64,1} )
 
     #--- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -43,16 +43,15 @@ function flux_kfvs( fL::AbstractArray{Float64,1}, sfL::AbstractArray{Float64,1},
 
 end
 
-flux_kfvs(fL::AbstractArray{Float64,1}, fR::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
-flux_kfvs(fL, zeros(axes(fL)), fR, zeros(axes(fR)), u, ω, dt)
-
 
 # ------------------------------------------------------------
 # Reduced 1D2F flux
 # ------------------------------------------------------------
-function flux_kfvs( hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, shL::AbstractArray{Float64,1}, sbL::AbstractArray{Float64,1}, 
-                    hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1}, shR::AbstractArray{Float64,1}, sbR::AbstractArray{Float64,1}, 
-                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64 )
+function flux_kfvs( hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1},  
+                    hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1}, 
+                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
+                    shL=zeros(axes(hL))::AbstractArray{Float64,1}, sbL=zeros(axes(bL))::AbstractArray{Float64,1},
+                    shR=zeros(axes(hR))::AbstractArray{Float64,1}, sbR=zeros(axes(bR))::AbstractArray{Float64,1} )
 
     #--- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -78,19 +77,17 @@ function flux_kfvs( hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, 
 
 end
 
-flux_kfvs(hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1}, 
-          u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
-flux_kfvs(hL, bL, zeros(axes(hL)), zeros(axes(bL)), hR, bR, zeros(axes(hR)), zeros(axes(bR)), u, ω, dt) 
-
 
 # ------------------------------------------------------------
 # Reduced 1D4F flux
 # ------------------------------------------------------------
-function flux_kfvs( h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}, h2L :: AbstractArray{Float64,1}, h3L :: AbstractArray{Float64,1},
-                    sh0L::AbstractArray{Float64,1}, sh1L::AbstractArray{Float64,1}, sh2L::AbstractArray{Float64,1}, sh3L::AbstractArray{Float64,1}, 
-                    h0R::AbstractArray{Float64,1}, h1R::AbstractArray{Float64,1}, h2R :: AbstractArray{Float64,1}, h3R :: AbstractArray{Float64,1},
-                    sh0R::AbstractArray{Float64,1}, sh1R::AbstractArray{Float64,1}, sh2R::AbstractArray{Float64,1}, sh3R::AbstractArray{Float64,1}, 
-                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64 )
+function flux_kfvs( h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}, h2L :: AbstractArray{Float64,1}, h3L :: AbstractArray{Float64,1}, 
+                    h0R::AbstractArray{Float64,1}, h1R::AbstractArray{Float64,1}, h2R :: AbstractArray{Float64,1}, h3R :: AbstractArray{Float64,1},   
+                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
+                    sh0L=zeros(axes(h0L))::AbstractArray{Float64,1}, sh1L=zeros(axes(h1L))::AbstractArray{Float64,1}, 
+                    sh2L=zeros(axes(h2L))::AbstractArray{Float64,1}, sh3L=zeros(axes(h3L))::AbstractArray{Float64,1},
+                    sh0R=zeros(axes(h0R))::AbstractArray{Float64,1}, sh1R=zeros(axes(h1R))::AbstractArray{Float64,1}, 
+                    sh2R=zeros(axes(h2R))::AbstractArray{Float64,1}, sh3R=zeros(axes(h3R))::AbstractArray{Float64,1} )
 
     #--- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -124,20 +121,14 @@ function flux_kfvs( h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}
 
 end
 
-flux_kfvs(h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}, h2L :: AbstractArray{Float64,1}, h3L :: AbstractArray{Float64,1},
-          h0R::AbstractArray{Float64,1}, h1R::AbstractArray{Float64,1}, h2R :: AbstractArray{Float64,1}, h3R :: AbstractArray{Float64,1},
-          u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
-flux_kfvs(h0L, h1L, h2L, h3L, zeros(axes(h0L)), zeros(axes(h1L)), zeros(axes(h2L)), zeros(axes(h3L)), 
-          h0R, h1R, h2R, h3R, zeros(axes(h0R)), zeros(axes(h1R)), zeros(axes(h2R)), zeros(axes(h3R)), u, ω, dt)     
-
 
 # ------------------------------------------------------------
 # Pure 2D1F flux
 # ------------------------------------------------------------
-function flux_kfvs( fL::AbstractArray{Float64,2}, sfL::AbstractArray{Float64,2}, 
-                    fR::AbstractArray{Float64,2}, sfR::AbstractArray{Float64,2},
+function flux_kfvs( fL::AbstractArray{Float64,2}, fR::AbstractArray{Float64,2},
                     u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, 
-                    ω::AbstractArray{Float64,2}, dt::Float64, len::Float64 )
+                    ω::AbstractArray{Float64,2}, dt::Float64, len::Float64,
+                    sfL=zeros(axes(fL))::AbstractArray{Float64,2}, sfR=zeros(axes(fR))::AbstractArray{Float64,2} )
     
     #--- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -158,11 +149,6 @@ function flux_kfvs( fL::AbstractArray{Float64,2}, sfL::AbstractArray{Float64,2},
     return fw .* len, ff.* len
 
 end
-
-
-flux_kfvs(fL::AbstractArray{Float64,2}, fR::AbstractArray{Float64,2}, u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, 
-          ω::AbstractArray{Float64,2}, dt::Float64, len::Float64) = 
-flux_kfvs(fL, zeros(axes(fL)), fR, zeros(axes(fR)), u, v, ω, dt, len)
 
 
 """
