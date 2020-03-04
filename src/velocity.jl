@@ -17,9 +17,9 @@ mutable struct VMesh1D <: AbstractVelocityMesh
 	u :: AbstractArray{Float64,1}; du :: AbstractArray{Float64,1}; weights :: AbstractArray{Float64,1}
 
 	VMesh1D() = VMesh1D(-5, 5, 50)
-	VMesh1D(U0::Union{Int, AbstractFloat}, U1::Union{Int, AbstractFloat}) = VMesh1D(U0, U1, 50)
+	VMesh1D(U0::Union{Int, Real}, U1::Union{Int, Real}) = VMesh1D(U0, U1, 50)
 
-	function VMesh1D( U0::Union{Int, AbstractFloat}, U1::Union{Int, AbstractFloat}, UNUM::Int, 
+	function VMesh1D( U0::Union{Int, Real}, U1::Union{Int, Real}, UNUM::Int, 
 					  TYPE="rectangle"::String, NG=0::Int)
 
 		u0 = Float64(U0); u1 = Float64(U1); nu = UNUM; δ = (u1 - u0) / nu
@@ -63,12 +63,12 @@ mutable struct VMesh2D <: AbstractVelocityMesh
     weights :: Array{Float64,2}
 
 	VMesh2D() = VMesh2D(-5, 5, 28, -5, 5, 28)
-	VMesh2D(U0::Union{Int, AbstractFloat}, U1::Union{Int, AbstractFloat}, 
-			V0::Union{Int, AbstractFloat}, V1::Union{Int, AbstractFloat}) = 
+	VMesh2D(U0::Union{Int, Real}, U1::Union{Int, Real}, 
+			V0::Union{Int, Real}, V1::Union{Int, Real}) = 
 	VMesh2D(U0, U1, 28, V0, V1, 28)
 
-    function VMesh2D( U0::Union{Int, AbstractFloat}, U1::Union{Int, AbstractFloat}, UNUM::Int, 
-					  V0::Union{Int, AbstractFloat}, V1::Union{Int, AbstractFloat}, VNUM::Int, 
+    function VMesh2D( U0::Union{Int, Real}, U1::Union{Int, Real}, UNUM::Int, 
+					  V0::Union{Int, Real}, V1::Union{Int, Real}, VNUM::Int, 
 					  TYPE="rectangle"::String, NGU=0::Int, NGV=0::Int )
 
 		u0 = Float64(U0); u1 = Float64(U1); nu = UNUM; δu = (u1 - u0) / nu
