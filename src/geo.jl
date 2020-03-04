@@ -19,9 +19,9 @@ mutable struct PMesh1D <: AbstractPhysicalMesh
 	x :: AbstractArray{Float64,1}; dx :: AbstractArray{Float64,1}
 
     PMesh1D() = PMesh1D(0, 1, 100)
-    PMesh1D(X0::Union{Int, AbstractFloat}, X1::Union{Int, AbstractFloat}) = PMesh1D(X0, X1, 100)
+    PMesh1D(X0::Union{Int, Real}, X1::Union{Int, Real}) = PMesh1D(X0, X1, 100)
     
-    function PMesh1D( X0::Union{Int, AbstractFloat}, X1::Union{Int, AbstractFloat}, XNUM::Int, 
+    function PMesh1D( X0::Union{Int, Real}, X1::Union{Int, Real}, XNUM::Int, 
                       TYPE="uniform"::String, NG=0::Int)
 
         x0 = Float64(X0); x1 = Float64(X1); nx = XNUM; δ = (x1 - x0) / nx
@@ -50,12 +50,12 @@ mutable struct PMesh2D <: AbstractPhysicalMesh
     dx :: Array{Float64,2}; dy :: Array{Float64,2}
 
     PMesh2D() = PMesh2D(0, 1, 45, 0, 1, 45)
-	PMesh2D(X0::Union{Int, AbstractFloat}, X1::Union{Int, AbstractFloat}, 
-			Y0::Union{Int, AbstractFloat}, Y1::Union{Int, AbstractFloat}) = 
+	PMesh2D(X0::Union{Int, Real}, X1::Union{Int, Real}, 
+			Y0::Union{Int, Real}, Y1::Union{Int, Real}) = 
 	PMesh2D(X0, X1, 45, Y0, Y1, 45)
 
-    function PMesh2D( X0::Union{Int, AbstractFloat}, X1::Union{Int, AbstractFloat}, XNUM::Int, 
-    				  Y0::Union{Int, AbstractFloat}, Y1::Union{Int, AbstractFloat}, YNUM::Int, 
+    function PMesh2D( X0::Union{Int, Real}, X1::Union{Int, Real}, XNUM::Int, 
+    				  Y0::Union{Int, Real}, Y1::Union{Int, Real}, YNUM::Int, 
     				  TYPE="uniform"::String, NGX=0::Int, NGY=0::Int)
 
 		x0 = Float64(X0); x1 = Float64(X1); nx = XNUM; δx = (x1 - x0) / nx
@@ -84,7 +84,7 @@ mutable struct PMesh2D <: AbstractPhysicalMesh
 end # struct
 
 
-function uniform_mesh(x0::AbstractFloat, xnum::Int, dx::AbstractFloat)
+function uniform_mesh(x0::Union{Int,Real}, xnum::Int, dx::Real)
 
     points = zeros(xnum)
     for i=1:xnum
@@ -96,7 +96,7 @@ function uniform_mesh(x0::AbstractFloat, xnum::Int, dx::AbstractFloat)
 end
 
 
-function global_frame(w::Array{Float64,1}, cosa::AbstractFloat, sina::AbstractFloat) 
+function global_frame(w::Array{Float64,1}, cosa::Union{Int,Real}, sina::Union{Int,Real}) 
     
     if length(w) == 2
         G = [ w[1] * cosa - w[2] * sina, w[1] * sina + w[2] * cosa ]
@@ -110,8 +110,11 @@ function global_frame(w::Array{Float64,1}, cosa::AbstractFloat, sina::AbstractFl
 
 end
 
+global_frame(w::Array{Int,1}, cosa::Union{Int,Real}, sina::Union{Int,Real}) = 
+global_frame(Float64.(w), cosa, sina)
 
-function local_frame(w::Array{Float64,1}, cosa::AbstractFloat, sina::AbstractFloat)
+
+function local_frame(w::Array{Float64,1}, cosa::Union{Int,Real}, sina::Union{Int,Real})
     
     if length(w) == 2
         L = [ w[1] * cosa + w[2] * sina, w[2] * cosa - w[1] * sina]
@@ -124,3 +127,6 @@ function local_frame(w::Array{Float64,1}, cosa::AbstractFloat, sina::AbstractFlo
     return L
 
 end
+
+local_frame(w::Array{Int,1}, cosa::Union{Int,Real}, sina::Union{Int,Real}) = 
+local_frame(Float64.(w), cosa, sina)

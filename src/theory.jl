@@ -11,7 +11,7 @@ export gauss_moments,
 	   conserve_prim, 
 	   prim_conserve, 
 	   heat_capacity_ratio, 
-	   ref_vis, 
+	   ref_vhs_vis, 
 	   sound_speed, 
 	   vhs_collision_time,
 	   aap_hs_collision_time,
@@ -31,7 +31,7 @@ function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 	MuR[0] = 0.5 * erfc(sqrt(prim[end]) * prim[2])
 	MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
 
-	for i=2:6
+	Threads.@threads for i=2:6
 		MuL[i,:] = prim[2] * MuL[i-1] + 0.5 * (i-1) * MuL[i-2] / prim[end]
 		MuR[i,:] = prim[2] * MuR[i-1] + 0.5 * (i-1) * MuR[i-2] / prim[end]
 	end
@@ -49,7 +49,7 @@ function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 		Mv = OffsetArray{Float64}(undef, 0:6)
 		Mv[0] = 1.0
     	Mv[1] = prim[3]
-		for i=2:6
+		Threads.@threads for i=2:6
 			Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i-1) * Mv[i-2] / prim[end]
 		end
 
@@ -63,14 +63,14 @@ function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 		Mv = OffsetArray{Float64}(undef, 0:6)
 		Mv[0] = 1.
 		Mv[1] = prim[3]
-		for i=2:6
+		Threads.@threads for i=2:6
 			Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i-1) * Mv[i-2] / prim[end]
 		end
 
 		Mw = OffsetArray{Float64}(undef, 0:6)
 		Mw[0] = 1.
 		Mw[1] = prim[4]
-		for i=2:6
+		Threads.@threads for i=2:6
 			Mw[i] = prim[4] * Mw[i-1] + 0.5 * (i-1) * Mw[i-2] / prim[end]
 		end
 
@@ -313,7 +313,7 @@ sound_speed(prim::Array{Int,1}, γ::Union{Int,Float64}) = sos(Float64.(prim), γ
 # Calculate reference viscosity
 # 1. variable hard sphere (VHS) model
 # ------------------------------------------------------------
-ref_vis(Kn::Union{Int,Float64}, alpha::Union{Int,Float64}, omega::Union{Int,Float64}) = 
+ref_vhs_vis(Kn::Union{Int,Float64}, alpha::Union{Int,Float64}, omega::Union{Int,Float64}) = 
 5.0 * (alpha + 1.) * (alpha + 2.) * √π / (4. * alpha * (5. - 2. * omega) * (7. - 2. * omega)) * Kn
 
 
@@ -325,7 +325,7 @@ vhs_collision_time(prim::Array{Float64,1}, muRef::Union{Int,Float64}, omega::Uni
 muRef * 2. * prim[end]^(1. - omega) / prim[1]
 
 vhs_collision_time(prim::Array{Int,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
-collision_time(Float64.(prim), muRef, omega)
+vhs_collision_time(Float64.(prim), muRef, omega)
 
 
 """

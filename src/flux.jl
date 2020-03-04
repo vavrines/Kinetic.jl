@@ -4,10 +4,7 @@
 
 
 export flux_kfvs,
-       flux_kcu,
-       normal_moments,
-       normal_moments_uv,
-       normal_moments_au
+       flux_kcu
 
 
 """
@@ -81,10 +78,9 @@ function flux_kfvs( hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, 
 
 end
 
-flux_kfvs(hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1},
-u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
-flux_kfvs(h0L, h1L, h2L, zeros(axes(h0L)), zeros(axes(h1L)), zeros(axes(h2L)), zeros(axes(h3L)), 
-h0R, h1R, h2R, zeros(axes(h0R)), zeros(axes(h1R)), zeros(axes(h2R)), zeros(axes(h3R)), u, ω, dt)     
+flux_kfvs(hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1}, hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1}, 
+          u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64) = 
+flux_kfvs(hL, bL, zeros(axes(hL)), zeros(axes(bL)), hR, bR, zeros(axes(hR)), zeros(axes(bR)), u, ω, dt) 
 
 
 # ------------------------------------------------------------
@@ -195,16 +191,16 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1},
     primR = conserve_prim(wR, gam)
 
     #--- construct interface distribution ---#
-    Mu1, Mxi1, MuL1, MuR1 = normal_moments(primL, inK)
-    Muv1 = normal_moments_uv(MuL1, Mxi1, 0, 0)
-    Mu2, Mxi2, MuL2, MuR2 = normal_moments(primR, inK)
-    Muv2 = normal_moments_uv(MuR2, Mxi2, 0, 0)
+    Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mxi1, 0, 0)
+    Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
 
     w = zeros(3)
     @. w = primL[1] * Muv1 + primR[1] * Muv2
 
-    prim = conserve_primitive(w, γ)
-    tau = collision_time(prim, visRef, visIdx)
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
     #tau = tau + abs(cellL.prim[1] / cellL.prim[end] - cellR.prim[1] / cellR.prim[end]) / 
     #       (cellL.prim[1] / cellL.prim[end] + cellR.prim[1] / cellR.prim[end]) * dt * 1.
 
@@ -213,10 +209,10 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1},
     Mt[1] = dt - Mt[2] # M0
 
     #--- calculate fluxes ---#
-    Mu, Mxi, MuL, MuR = normal_moments(prim, inK)
+    Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
 
     # flux from M0
-    Muv = normal_moments_uv(Mu, Mxi, 1, 0)
+    Muv = moments_conserve(Mu, Mxi, 1, 0)
     fw = @. Mt[1] * prim[1] * Muv
 
     # flux from f0
@@ -253,24 +249,24 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2},
     primR = conserve_prim(wR, gam)
 
     #--- construct interface distribution ---#
-    Mu1, Mv1, Mxi1, MuL1, MuR1 = normal_moments(primL, inK)
-    Muv1 = normal_moments_uv(MuL1, Mv1, Mxi1, 0, 0, 0)
-    Mu2, Mv2, Mxi2, MuL2, MuR2 = normal_moments(primR, inK)
-    Muv2 = normal_moments_uv(MuR2, Mv2, Mxi2, 0, 0, 0)
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
 
     w = @. primL[1] * Muv1 + primR[1] * Muv2
     prim = conserve_prim(w, γ)
-    tau = collision_time(prim, visRef, visIdx)
+    tau = vhs_collision_time(prim, visRef, visIdx)
 
     Mt = zeros(2)
     Mt[2] = tau * (1. - exp(-dt / tau)) # f0
     Mt[1] = dt - Mt[2] # M0
 
     #--- calculate interface flux ---#
-    Mu, Mv, Mxi, MuL, MuR = normal_moments(prim, inK)
+    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
 
     # flux from M0
-    Muv = normal_moments_uv(Mu, Mv, Mxi, 1, 0, 0)
+    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
     fw = @. Mt[1] * prim[1] * Muv
 
     # flux from f0
