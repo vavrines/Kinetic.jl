@@ -212,7 +212,7 @@ maxwellian(u::AbstractArray{Float64,1}, ρ::Union{Int,Float64}, U::Union{Int,Flo
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
 maxwellian(u::AbstractArray{Float64,1}, prim::Array{Float64,1}) =
-maxwellian(u, prim[1], prim[2], prim[3])
+maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 maxwellian(u::AbstractArray{Float64,1}, prim::Array{Int,1}) =
 maxwellian(u, Float64.(prim))
@@ -223,7 +223,7 @@ maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Union{I
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
 maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Float64,1}) =
-maxwellian(u, v, prim[1], prim[2], prim[3], prim[4])
+maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5 
 
 maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Int,1}) =
 maxwellian(u, v, Float64.(prim))
