@@ -173,8 +173,8 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1},
     δ = heaviside.(u)
     f = @. fL * δ + fR * (1. - δ)
 
-    primL = conserve_prim(wL, gam)
-    primR = conserve_prim(wR, gam)
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
 
     #--- construct interface distribution ---#
     Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
@@ -231,8 +231,8 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2},
     δ = heaviside.(u)
     f = @. fL * δ + fR * (1. - δ)
 
-    primL = conserve_prim(wL, gam)
-    primR = conserve_prim(wR, gam)
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
 
     #--- construct interface distribution ---#
     Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)

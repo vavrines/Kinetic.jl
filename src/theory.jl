@@ -150,12 +150,12 @@ end
 function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
 								 alpha::Int, beta::Int )
 
-    au = @. a[1] * velo_moments_uv(Mu, Mv, Mxi, alpha+0, beta+0, 0) +
-         a[2] * velo_moments_uv(Mu, Mv, Mxi, alpha+1, beta+0, 0) +
-         a[3] * velo_moments_uv(Mu, Mv, Mxi, alpha+0, beta+1, 0) +
-         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+2, beta+0, 0) +
-         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+2, 0) +
-         0.5 * a[4] * get_moment_uv(Mu, Mv, Mxi, alpha+0, beta+0, 2)
+    au = @. a[1] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+0, 0) +
+         a[2] * moments_conserve(Mu, Mv, Mxi, alpha+1, beta+0, 0) +
+         a[3] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+1, 0) +
+         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha+2, beta+0, 0) +
+         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+2, 0) +
+         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+0, 2)
 
     return au
 
@@ -164,13 +164,13 @@ end
 function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, 
 								 Mw::OffsetArray{Float64,1}, alpha::Int, beta::Int, delta::Int )
 
-	au = @. a[1] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+0, delta+0) +
-			a[2] * get_moment_uv(Mu, Mv, Mw, alpha+1, beta+0, delta+0) +
-			a[3] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+1, delta+0) +
-			a[4] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+0, delta+1) +
-			0.5 * a[5] * get_moment_uv(Mu, Mv, Mw, alpha+2, beta+0, delta+0) +
-			0.5 * a[5] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+2, delta+0) +
-			0.5 * a[5] * get_moment_uv(Mu, Mv, Mw, alpha+0, beta+0, delta+2)
+	au = @. a[1] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+0, delta+0) +
+			a[2] * moments_conserve(Mu, Mv, Mw, alpha+1, beta+0, delta+0) +
+			a[3] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+1, delta+0) +
+			a[4] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+0, delta+1) +
+			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha+2, beta+0, delta+0) +
+			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+2, delta+0) +
+			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+0, delta+2)
 
 	return au
 
@@ -350,9 +350,9 @@ end
 # ------------------------------------------------------------
 sound_speed(λ::Union{Int,Float64}, γ::Union{Int,Float64}) = (0.5 * γ / λ)^0.5
 
-sound_speed(prim::Array{Float64,1}, γ::Union{Int,Float64}) = sos(prim[end], γ)
+sound_speed(prim::Array{Float64,1}, γ::Union{Int,Float64}) = sound_speed(prim[end], γ)
 
-sound_speed(prim::Array{Int,1}, γ::Union{Int,Float64}) = sos(Float64.(prim), γ)
+sound_speed(prim::Array{Int,1}, γ::Union{Int,Float64}) = sound_speed(Float64.(prim), γ)
 
 
 """
