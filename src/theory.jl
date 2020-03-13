@@ -31,9 +31,9 @@ function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 
 	MuL = OffsetArray{Float64}(undef, 0:6); MuR = similar(MuL); Mu = similar(MuL)
 
-	MuL[0] = 0.5 * erfc(-sqrt(prim[end]) * prim[2])
+	MuL[0] = 0.5 * SpecialFunctions.erfc(-sqrt(prim[end]) * prim[2])
 	MuL[1] = prim[2] * MuL[0] + 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
-	MuR[0] = 0.5 * erfc(sqrt(prim[end]) * prim[2])
+	MuR[0] = 0.5 * SpecialFunctions.erfc(sqrt(prim[end]) * prim[2])
 	MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
 
 	Threads.@threads for i=2:6

@@ -3,8 +3,9 @@
 # ------------------------------------------------------------
 
 # setup
-dim = 1
+isNewStart = 1
 case = shock
+space = 1d2f
 interpOrder = 1
 cfl = 0.95
 maxTime = 250.0
@@ -13,18 +14,15 @@ maxTime = 250.0
 x0 = -35.0
 x1 = 35.0
 nx = 100
+pMeshType = uniform
+nxg = 0
 
+# velocity space
 u0 = -12.0
 u1 = 12.0
 nu = 64
-quadType = rectangle
-
-# random space
-nr = 5
-nRec = 10
-opType = gauss
-parameter1 = 1.0
-parameter2 = 0.05
+vMeshType = rectangle
+nug = 0
 
 # gas
 knudsen = 1.0
