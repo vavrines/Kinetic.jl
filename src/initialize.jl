@@ -60,9 +60,9 @@ function init_fvm(KS::SolverSet1D)
     dim = parse(Int, KS.set.space[1])
 
     if KS.set.space == "1d1f"
-        #ctr = Array{ControlVolume1D1F}(undef, KS.mesh.nx)
+        #ctr = Array{ControlVolume1D1F}(undef, KS.pMesh.nx)
         ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x)) # with ghost cells
-        face = Array{Interface1D1F}(undef, KS.mesh.nx+1)
+        face = Array{Interface1D1F}(undef, KS.pMesh.nx+1)
 
         w0 = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x), dim+2)
         prim0 = similar(w0)
@@ -71,7 +71,7 @@ function init_fvm(KS::SolverSet1D)
         for i in axes(w0, 1)
             # shock problems
             if KS.set.case == "shock"
-                if i <= KS.mesh.nx÷2
+                if i <= KS.pMesh.nx÷2
                     w0[i,:] .= KS.ib.wL
                     prim0[i,:] .= KS.ib.primL
                     h0[i,:] .= KS.ib.hL
@@ -84,10 +84,10 @@ function init_fvm(KS::SolverSet1D)
         end
 
         for i in axes(w0, 1)
-            ctr[i] = ControlVolume1D1F(KS.mesh.points[i], KS.mesh.interval[i], w0[i,:], prim0[i,:], h0[i,:])
+            ctr[i] = ControlVolume1D1F(KS.pMesh.points[i], KS.pMesh.interval[i], w0[i,:], prim0[i,:], h0[i,:])
         end
     
-        for i=1:KS.mesh.nx+1
+        for i=1:KS.pMesh.nx+1
             face[i] = Interface1D1F(h0)
         end
 

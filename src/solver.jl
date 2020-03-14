@@ -24,7 +24,7 @@ struct SolverSet1D <: AbstractSolverSet
 	pMesh :: AbstractPhysicalMesh
 
 	# velocity space
-	uMesh :: AbstractVelocityMesh
+	vMesh :: AbstractVelocityMesh
 
 	# gas property
 	gas :: AbstractProperty
@@ -80,18 +80,18 @@ struct SolverSet1D <: AbstractSolverSet
 		# generate data structure
 		set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
 		pMesh = PMesh1D(x0, x1, nx, pMeshType, nxg)
-        uMesh = VMesh1D(u0, u1, nu, vMeshType, nug)
+        vMesh = VMesh1D(u0, u1, nu, vMeshType, nug)
 	    gas = GasProperty(Kn, Ma, Pr, K, γ, ω, αᵣ, ωᵣ, μᵣ)
 
 		if case == "shock"
 			if space == "1d1f"
 				wL, primL, hL, bcL,
-				wR, primR, hR, bcR = ib_rh(Ma, γ, uMesh.u)
+				wR, primR, hR, bcR = ib_rh(Ma, γ, vMesh.u)
 
 				ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
 			elseif space == "1d2f"
 				wL, primL, hL, bL, bcL,
-				wR, primR, hR, bR, bcR = ib_rh(Ma, γ, uMesh.u, K)
+				wR, primR, hR, bR, bcR = ib_rh(Ma, γ, vMesh.u, K)
 
 				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
 			end
@@ -107,7 +107,7 @@ struct SolverSet1D <: AbstractSolverSet
 		cp(configfilename, string(outputFolder, "config.txt"))
 
 		# create new struct
-		new(set, pMesh, uMesh, gas, ib, outputFolder)
+		new(set, pMesh, vMesh, gas, ib, outputFolder)
 
 	end # function
 
