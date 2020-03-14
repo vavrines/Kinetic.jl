@@ -65,32 +65,20 @@ function init_fvm(KS::SolverSet1D)
         #ctr = Array{ControlVolume1D1F}(undef, KS.pMesh.nx)
         ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x)) # with ghost cells
         face = Array{Interface1D1F}(undef, KS.pMesh.nx+1)
-
-        w0 = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x), 1:dim+2)
-        prim0 = similar(w0)
-        h0 = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x), eachindex(KS.vMesh.u))
         
-        for i in axes(w0, 1)
+        for i in eachindex(ctr)
             # shock problems
             if KS.set.case == "shock"
                 if i <= KS.pMesh.nx÷2
-                    w0[i,:] .= KS.ib.wL
-                    prim0[i,:] .= KS.ib.primL
-                    h0[i,:] .= KS.ib.hL
+                    ctr[i] = ControlVolume1D1F(KS.pMesh.x[i], KS.pMesh.dx[i], KS.ib.wL, KS.ib.primL, KS.ib.hL)
                 else
-                    w0[i,:] .= KS.ib.wR
-                    prim0[i,:] .= KS.ib.primR
-                    h0[i,:] .= KS.ib.hR
+                    ctr[i] = ControlVolume1D1F(KS.pMesh.x[i], KS.pMesh.dx[i], KS.ib.wR, KS.ib.primR, KS.ib.hR)
                 end
             end
         end
-
-        for i in axes(w0, 1)
-            ctr[i] = ControlVolume1D1F(KS.pMesh.points[i], KS.pMesh.interval[i], w0[i,:], prim0[i,:], h0[i,:])
-        end
     
         for i=1:KS.pMesh.nx+1
-            face[i] = Interface1D1F(h0)
+            face[i] = Interface1D1F(KS.ib.hL)
         end
 
     else

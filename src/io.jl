@@ -49,7 +49,7 @@ end
 # ------------------------------------------------------------
 # Write output data with JLD2
 # ------------------------------------------------------------
-function write_jld(KS::AbstractSolverSet, ctr::Array{<:AbstractControlVolume,1}, t::Number)
+function write_jld(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVolume,1}, t::Real)
 
     strIter = string(t)
     fileOut = KS.outputFolder * "data/t=" * strIter * ".jld2"
@@ -62,7 +62,7 @@ end
 # ------------------------------------------------------------
 # Plot line
 # ------------------------------------------------------------
-function plot_line(KS::AbstractSolverSet, ctr::Array{<:AbstractControlVolume1D,1})
+function plot_line(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
 
     pltx = deepcopy(KS.pMesh.x)
     plty = zeros(KS.pMesh.nx, 6)

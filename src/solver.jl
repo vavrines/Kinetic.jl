@@ -117,7 +117,8 @@ end # struct
 # ------------------------------------------------------------
 # Solution algorithm
 # ------------------------------------------------------------
-function solve!(KS::SolverSet1D, ctr, face, simTime)
+function solve!( KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, 
+				 face::Array{<:AbstractInterface1D,1}, simTime::Float64 )
 	
 	#--- setup ---#
 	dim = parse(Int, KS.set.space[1])
@@ -125,10 +126,11 @@ function solve!(KS::SolverSet1D, ctr, face, simTime)
 	iter = 0
 	dt = 0.
 	res = zeros(dim+2)
-	
+	write_jld(KS, ctr, simTime)
+
 	#--- main loop ---#
 	#while KS.simTime < KS.maxTime
-#=	while true
+	while true
 
 		dt = timestep(KS, ctr, simTime)
 
@@ -136,13 +138,13 @@ function solve!(KS::SolverSet1D, ctr, face, simTime)
 
 		evolve!(KS, ctr, face, dt)
 
-		update!(KS, ctr, face, dt, res, i)
+		update!(KS, ctr, face, dt, res)
 
 		iter += 1
 		simTime += dt
 		
 		if iter%1000 == 0
-			println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:KS.set.dim+2])")
+			println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:dim+2])")
 
 			#if iter%400 == 0
 				#write_jld(KS, ctr, iter)
@@ -159,7 +161,7 @@ function solve!(KS::SolverSet1D, ctr, face, simTime)
 	write_jld(KS, ctr, simTime)
 
 	return ctr
-=#
+
 end # function
 
 
@@ -170,10 +172,10 @@ function timestep(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,
 
     tmax = 0.0
 
-    Threads.@threads for i=1:KS.mesh.nx
+    Threads.@threads for i=1:KS.pMesh.nx
         @inbounds prim = ctr[i].prim
         sos = sound_speed(prim, KS.gas.γ)
-        vmax = max(KS.quad.u1, abs(prim[2])) + sos
+        vmax = max(KS.vMesh.u1, abs(prim[2])) + sos
         @inbounds tmax = max(tmax, vmax / ctr[i].dx)
     end
 
@@ -196,7 +198,7 @@ function reconstruct!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolum
 		#ctr[1].sw .= reconstruct3(ctr[1].w, ctr[2].w, 0.5*(ctr[1].dx+ctr[2].dx))
 		#ctr[KS.nx].sw .= reconstruct3(ctr[KS.nx-1].w, ctr[KS.nx].w, 0.5*(ctr[KS.nx-1].dx+ctr[KS.nx].dx))
 
-	    Threads.@threads for i=2:KS.mesh.nx-1
+	    Threads.@threads for i=2:KS.pMesh.nx-1
 			@inbounds ctr[i].sw .= reconstruct3( ctr[i-1].w, ctr[i].w, ctr[i+1].w, 
 												 0.5*(ctr[i-1].dx+ctr[i].dx), 0.5*(ctr[i].dx+ctr[i+1].dx),
 									   			 KS.set.limiter )
@@ -215,9 +217,9 @@ function evolve!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1
 #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
 #    end
 
-    Threads.@threads for i=2:KS.mesh.nx
-		@inbounds flux_kfvs( ctr[i-1].h, ctr[i].h, KS.vMesh.u, KS.vMesh.weights, dt, ctr[i-1].sh, ctr[i].h )
-    end
+    Threads.@threads for i=2:KS.pMesh.nx
+		@inbounds face[i].fw, face[i].fh = flux_kfvs( ctr[i-1].h, ctr[i].h, KS.vMesh.u, KS.vMesh.weights, dt, ctr[i-1].sh, ctr[i].sh )
+	end
 
 end
 
@@ -225,26 +227,26 @@ end
 # ------------------------------------------------------------
 # Update
 # ------------------------------------------------------------
-function update!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::AbstractFloat, residual::Array{Float64,1})
+function update!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Float64, residual::Array{Float64,1})
 
 	dim = parse(Int, KS.set.space[1])
     sumRes = zeros(dim+2)
     sumAvg = zeros(dim+2)
 
-    Threads.@threads for i=2:KS.mesh.nx-1
+    Threads.@threads for i=2:KS.pMesh.nx-1
 		@inbounds step!( face[i].fw, face[i].fh, ctr[i].w, ctr[i].prim, ctr[i].h, ctr[i].dx,
 						 face[i+1].fw, face[i+1].fh, KS.gas.γ, KS.vMesh.u, KS.gas.μᵣ, KS.gas.ω,
 						 dt, sumRes, sumAvg )
     end
 
     #if KS.set.case == "heat"
-    #    ctr[KS.mesh.nx].w = deepcopy(ctr[KS.mesh.nx-1].w)
-    #    ctr[KS.mesh.nx].prim = deepcopy(ctr[KS.mesh.nx-1].prim)
-    #    ctr[KS.mesh.nx].h = deepcopy(ctr[KS.mesh.nx-1].h)
+    #    ctr[KS.pMesh.nx].w = deepcopy(ctr[KS.pMesh.nx-1].w)
+    #    ctr[KS.pMesh.nx].prim = deepcopy(ctr[KS.pMesh.nx-1].prim)
+    #    ctr[KS.pMesh.nx].h = deepcopy(ctr[KS.pMesh.nx-1].h)
     #end
 
     for i in eachindex(residual)
-    	residual[i] = sqrt(sumRes[i] * KS.mesh.nx) / (sumAvg[i] + 1.e-7)
+    	residual[i] = sqrt(sumRes[i] * KS.pMesh.nx) / (sumAvg[i] + 1.e-7)
     end
     
 end
@@ -262,17 +264,16 @@ function step!( fwL::Array{Float64,1}, fhL::AbstractArray{Float64,1},
 	#--- store W^n and calculate H^n,\tau^n ---#
 	w_old = deepcopy(w)
 
-	#--- update W^{n+1} and calculate H^{n+1}, B^{n+1}, \tau^{n+1} ---#
+	#--- update W^{n+1} ---#
 	@. w += (fwL - fwR) / dx
-	prim = conserve_prim(w, γ)
+	prim .= conserve_prim(w, γ)
 
 	#--- record residuals ---#
 	@. RES += (w - w_old)^2
 	@. AVG += abs(w)
 
-	#--- construct point collocations of H^{n+1} ---#
+	#--- calculate M^{n+1} and tau^{n+1} ---#
 	H = maxwellian(u, prim)
-
 	τ = vhs_collision_time(prim, μᵣ, ω)
 
 	#--- update distribution function ---#
