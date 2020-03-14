@@ -9,7 +9,7 @@ module Kinetic
 using Reexport
 using Dates
 using OffsetArrays, SpecialFunctions
-using FileIO, JLD2
+using FileIO, JLD2, GR
 #@reexport using FileIO, JLD2
 
 

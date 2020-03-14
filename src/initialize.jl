@@ -12,6 +12,11 @@ export initialize,
 # ------------------------------------------------------------
 function initialize(configfilename::String)
 
+    println("==============================================================")
+	println("Kinetic.jl")
+	println("A Software Package for Kinetic Theory and Simulation")
+    println("==============================================================")
+    
     if configfilename[end-2:end] == "txt"
         allowed = ["space"]
         D = read_dict(configfilename, allowed)
@@ -19,10 +24,10 @@ function initialize(configfilename::String)
         dim = parse(Int, space[1])
 
         if dim == 1
-            println("1D solver")
+            println("initialize 1D solver")
             ks = SolverSet1D(configfilename)
         elseif dim == 2
-            println("2D solver")
+            println("initialize 2D solver")
             #ks = SolverSet2D(configfilename)
         elseif dim == 3
             # coming soon
