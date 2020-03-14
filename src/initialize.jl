@@ -59,7 +59,7 @@ function init_fvm(KS::SolverSet1D)
 
     dim = parse(Int, KS.set.space[1])
 
-    if KS.space == "1d1f"
+    if KS.set.space == "1d1f"
         #ctr = Array{ControlVolume1D1F}(undef, KS.mesh.nx)
         ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x)) # with ghost cells
         face = Array{Interface1D1F}(undef, KS.mesh.nx+1)
