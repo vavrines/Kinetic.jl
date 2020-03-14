@@ -38,13 +38,15 @@ function initialize(configfilename::String)
         end
 
         ctr, face = init_fvm(ks)
+
         return ks, ctr, face, 0.
 
     elseif configfilename[end-3:end] == "jld2"
         _1, _2, _3 = @load configfilename KS ctr t
         ks, ctr, simTime = eval(_1), eval(_2), eval(_3)
 
-		face = init_fvm(ks)[2]
+        face = init_fvm(ks)[2]
+        
         return ks, ctr, face, simTime
 
     end
@@ -64,7 +66,7 @@ function init_fvm(KS::SolverSet1D)
         ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x)) # with ghost cells
         face = Array{Interface1D1F}(undef, KS.pMesh.nx+1)
 
-        w0 = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x), dim+2)
+        w0 = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x), 1:dim+2)
         prim0 = similar(w0)
         h0 = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x), eachindex(KS.vMesh.u))
         
