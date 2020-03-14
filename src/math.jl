@@ -10,10 +10,10 @@ export heaviside,
 # ------------------------------------------------------------
 # Heaviside step function
 # ------------------------------------------------------------
-heaviside(x::Union{Int, Real}) = ifelse(x >= 0, 1., 0.)
+heaviside(x::Real) = ifelse(x >= 0, 1., 0.)
 
 
 # ------------------------------------------------------------
 # Fortran sign() function
 # ------------------------------------------------------------
-fortsign(x::Union{Int, Real}, y::Union{Int, Real}) = abs(x) * sign(y)
+fortsign(x::Real, y::Real) = abs(x) * sign(y)

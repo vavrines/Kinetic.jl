@@ -30,7 +30,7 @@ function initialize(configfilename::String)
 
         ctr, face = init_fvm(ks)
         return ks, ctr, face, 0.
-        
+
     elseif configfilename[end-3:end] == "jld2"
         _1, _2, _3 = @load configfilename KS ctr t
         ks, ctr, simTime = eval(_1), eval(_2), eval(_3)
@@ -79,7 +79,7 @@ function init_fvm(KS::SolverSet1D)
         end
     
         for i=1:KS.mesh.nx+1
-            face[i] = Interface1D1F(KS.quad.nu)
+            face[i] = Interface1D1F(h0)
         end
 
     else

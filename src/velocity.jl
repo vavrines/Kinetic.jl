@@ -17,9 +17,9 @@ mutable struct VMesh1D <: AbstractVelocityMesh
 	u :: AbstractArray{Float64,1}; du :: AbstractArray{Float64,1}; weights :: AbstractArray{Float64,1}
 
 	VMesh1D() = VMesh1D(-5, 5, 50)
-	VMesh1D(U0::Union{Int, Real}, U1::Union{Int, Real}) = VMesh1D(U0, U1, 50)
+	VMesh1D(U0::Real, U1::Real) = VMesh1D(U0, U1, 50)
 
-	function VMesh1D( U0::Union{Int, Real}, U1::Union{Int, Real}, UNUM::Int, 
+	function VMesh1D( U0::Real, U1::Real, UNUM::Int, 
 					  TYPE="rectangle"::String, NG=0::Int)
 
 		u0 = Float64(U0); u1 = Float64(U1); nu = UNUM; δ = (u1 - u0) / nu
@@ -63,12 +63,10 @@ mutable struct VMesh2D <: AbstractVelocityMesh
     weights :: Array{Float64,2}
 
 	VMesh2D() = VMesh2D(-5, 5, 28, -5, 5, 28)
-	VMesh2D(U0::Union{Int, Real}, U1::Union{Int, Real}, 
-			V0::Union{Int, Real}, V1::Union{Int, Real}) = 
-	VMesh2D(U0, U1, 28, V0, V1, 28)
+	VMesh2D(U0::Real, U1::Real, V0::Real, V1::Real) = VMesh2D(U0, U1, 28, V0, V1, 28)
 
-    function VMesh2D( U0::Union{Int, Real}, U1::Union{Int, Real}, UNUM::Int, 
-					  V0::Union{Int, Real}, V1::Union{Int, Real}, VNUM::Int, 
+    function VMesh2D( U0::Real, U1::Real, UNUM::Int, 
+					  V0::Real, V1::Real, VNUM::Int, 
 					  TYPE="rectangle"::String, NGU=0::Int, NGV=0::Int )
 
 		u0 = Float64(U0); u1 = Float64(U1); nu = UNUM; δu = (u1 - u0) / nu
@@ -120,9 +118,9 @@ function newton_cotes(idx::Int, num::Int)
 
 	if idx == 1 || idx == num
 	    nc_coeff = 14.0 / 45.0
-	elseif (idx - 5) % 4 == 0
+	elseif (idx-5) % 4 == 0
 		nc_coeff = 28.0 / 45.0
-	elseif (idx - 3) % 4 == 0
+	elseif (idx-3) % 4 == 0
 	    nc_coeff = 24.0 / 45.0
 	else
 	    nc_coeff = 64.0 / 45.0

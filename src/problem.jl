@@ -9,7 +9,7 @@ export ib_rh
 # ------------------------------------------------------------
 # Initialize Rankine-Hugoniot relation
 # ------------------------------------------------------------
-function ib_rh(MaL::Number, gam::Number, u::AbstractArray{Float64,1})
+function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1})
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
@@ -35,7 +35,7 @@ function ib_rh(MaL::Number, gam::Number, u::AbstractArray{Float64,1})
 
 end
 
-function ib_rh(MaL::Number, gam::Number, u::AbstractArray{Float64,1}, K::Number)
+function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1}, K::Real)
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]

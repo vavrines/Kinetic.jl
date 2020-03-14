@@ -23,7 +23,7 @@ struct Setup <: AbstractSetup
 	cfl :: Float64
 	maxTime :: Float64
 
-    function Setup(CASE::AbstractString, SPACE::AbstractString, ORDER::Int, LM::AbstractString, CFL::Number, TIME::Number)
+    function Setup(CASE::AbstractString, SPACE::AbstractString, ORDER::Int, LM::AbstractString, CFL::Real, TIME::Real)
 
     	case = CASE
         space = SPACE
@@ -49,9 +49,9 @@ struct GasProperty <: AbstractProperty
 	K :: Float64; γ :: Float64; ω :: Float64
     αᵣ :: Float64; ωᵣ :: Float64; μᵣ :: Float64
 
-    function GasProperty( KN::Number, MA::Number, PR::Number, 
-    			 		  INK::Number, GAMMA::Number, OMEGA::Number,
-    			 		  ALPHAREF::Number, OMEGAREF::Number, MUREF::Number )
+    function GasProperty( KN::Real, MA::Real, PR::Real, 
+    			 		  INK::Real, GAMMA::Real, OMEGA::Real,
+    			 		  ALPHAREF::Real, OMEGAREF::Real, MUREF::Real )
 
     	Kn = Float64(KN)
     	Ma = Float64(MA)
@@ -89,13 +89,13 @@ struct IB1D1F <: AbstractCondition
 	hR :: AbstractArray{Float64,1}
 	bcR :: Array{Float64,1}
 
-    function IB1D1F( WL::Array{Float64,1}, PRIML::Array{Float64,1}, 
-    			     HL::AbstractArray{Float64,1}, BCL::Array{Float64,1}, 
-    			     WR::Array{Float64,1}, PRIMR::Array{Float64,1}, 
-    			     HR::AbstractArray{Float64,1}, BCR::Array{Float64,1} )
+    function IB1D1F( WL::Array{<:Real,1}, PRIML::Array{<:Real,1}, 
+    			     HL::AbstractArray{Float64,1}, BCL::Array{<:Real,1}, 
+    			     WR::Array{<:Real,1}, PRIMR::Array{<:Real,1}, 
+    			     HR::AbstractArray{Float64,1}, BCR::Array{<:Real,1} )
 
-    	wL = WL; primL = PRIML; hL = HL; bcL = BCL
-    	wR = WR; primR = PRIMR; hR = HR; bcR = BCR
+    	wL = Float64.(WL); primL = Float64.(PRIML); hL = deepcopy(HL); bcL = Float64.(BCL)
+    	wR = Float64.(WR); primR = Float64.(PRIMR); hR = deepcopy(HR); bcR = Float64.(BCR)
 
 		# inner constructor
 		new(wL, primL, hL, bcL, wR, primR, hR, bcR)
@@ -119,13 +119,13 @@ struct IB1D2F <: AbstractCondition
     bR :: AbstractArray{Float64,1}
 	bcR :: Array{Float64,1}
 
-    function IB1D2F( WL::Array{Float64,1}, PRIML::Array{Float64,1}, 
-    			     HL::AbstractArray{Float64,1}, BL::AbstractArray{Float64,1}, BCL::Array{Float64,1}, 
-    			     WR::Array{Float64,1}, PRIMR::Array{Float64,1}, 
-    			     HR::AbstractArray{Float64,1}, BR::AbstractArray{Float64,1}, BCR::Array{Float64,1} )
+    function IB1D2F( WL::Array{<:Real,1}, PRIML::Array{<:Real,1}, 
+    			     HL::AbstractArray{Float64,1}, BL::AbstractArray{<:Real,1}, BCL::Array{<:Real,1}, 
+    			     WR::Array{<:Real,1}, PRIMR::Array{<:Real,1}, 
+    			     HR::AbstractArray{Float64,1}, BR::AbstractArray{<:Real,1}, BCR::Array{<:Real,1} )
 
-    	wL = WL; primL = PRIML; hL = HL; bL = BL; bcL = BCL
-    	wR = WR; primR = PRIMR; hR = HR; bR = BR; bcR = BCR
+    	wL = Float64.(WL); primL = Float64.(PRIML); hL = deepcopy(HL); bL = Float64.(BL); bcL = Float64.(BCL)
+    	wR = Float64.(WR); primR = Float64.(PRIMR); hR = deepcopy(HR); bR = Float64.(BR); bcR = Float64.(BCR)
 
 		# inner constructor
 		new(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
@@ -138,7 +138,7 @@ end
 # ------------------------------------------------------------
 # Structure of control volume
 # ------------------------------------------------------------
-mutable struct ControlVolume1D1F <: AbstractControlVolume1D <: AbstractControlVolume
+mutable struct ControlVolume1D1F <: AbstractControlVolume1D
 
 	x :: Float64
 	dx :: Float64
@@ -147,20 +147,20 @@ mutable struct ControlVolume1D1F <: AbstractControlVolume1D <: AbstractControlVo
 	prim :: Array{Float64,1}
 	sw :: Array{Float64,1}
 
-	h :: Array{Float64,1}
-	sh :: Array{Float64,1}
+	h :: AbstractArray{Float64,1}
+	sh :: AbstractArray{Float64,1}
 
-	function ControlVolume1D1F( X::Number, DX::Number, 
-							    w0::Array{<:Number,1}, prim0::Array{<:Number,1}, h0::AbstractArray{Float64,1} )
+	function ControlVolume1D1F( X::Real, DX::Real, 
+							    w0::Array{<:Real,1}, prim0::Array{<:Real,1}, h0::AbstractArray{Float64,1} )
 
-		x = X
-		dx = DX
+		x = Float64(X)
+		dx = Float64(DX)
 
-		w = w0
-		prim = prim0
+		w = Float64.(w0)
+		prim = Float64.(prim0)
 		sw = zeros(axes(w))
 
-		h = h0
+		h = deepcopy(h0)
 		sh = zeros(axes(h))
 
 		new(x, dx, w, prim, sw, h, sh)
@@ -173,15 +173,15 @@ end
 # ------------------------------------------------------------
 # Structure of cell interface
 # ------------------------------------------------------------
-mutable struct Interface1D1F <: AbstractInterface1D <: AbstractInterface
+mutable struct Interface1D1F <: AbstractInterface1D
 
 	fw :: Array{Float64,1}
-	fh :: Array{Float64,1}
+	fh :: AbstractArray{Float64,1}
 
-	function Interface1D1F(nu::Int)
+	function Interface1D1F(f::AbstractArray{Float64,1})
 
 		fw = zeros(3)
-		fh = zeros(nu)
+		fh = zeros(axes(f))
 
 		new(fw, fh)
 

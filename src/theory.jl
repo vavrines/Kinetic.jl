@@ -27,7 +27,7 @@ Velocity moments of particle distribution function
 # Calculate directional velocity moments of Gaussian
 # G = (λ / π)^(D / 2) * exp[-λ(c^2 + ξ^2)]
 # ------------------------------------------------------------
-function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
+function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 
 	MuL = OffsetArray{Float64}(undef, 0:6); MuR = similar(MuL); Mu = similar(MuL)
 
@@ -83,9 +83,6 @@ function gauss_moments(prim::Array{Float64,1}, inK::Union{Int,Float64})
 	end
 
 end
-
-gauss_moments(prim::Array{Int,1}, inK::Union{Int,Float64}) = 
-gauss_moments(Float64.(prim), inK)
 
 
 # ------------------------------------------------------------
@@ -208,37 +205,28 @@ Equilibrium in discrete form
 """
 
 #--- 1D ---#
-maxwellian(u::AbstractArray{Float64,1}, ρ::Union{Int,Float64}, U::Union{Int,Float64}, λ::Union{Int,Float64}) =
+maxwellian(u::AbstractArray{Float64,1}, ρ::Real, U::Real, λ::Real) =
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
-maxwellian(u::AbstractArray{Float64,1}, prim::Array{Float64,1}) =
+maxwellian(u::AbstractArray{Float64,1}, prim::Array{<:Real,1}) =
 maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
-
-maxwellian(u::AbstractArray{Float64,1}, prim::Array{Int,1}) =
-maxwellian(u, Float64.(prim))
 
 
 #--- 2D ---#
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float64}, λ::Union{Int,Float64}) =
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Real, U::Real, V::Real, λ::Real) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Float64,1}) =
+maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{<:Real,1}) =
 maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5 
-
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{Int,1}) =
-maxwellian(u, v, Float64.(prim))
 
 
 #--- 3D ---#
 maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, 
-		   ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float64}, W::Union{Int,Float64}, λ::Union{Int,Float64}) =
+		   ρ::Real, U::Real, V::Real, W::Real, λ::Real) =
 @. ρ * (λ / π)^1.5 * exp(-λ * ((u - U)^2 + (v - V)^2+ (w - W)^2))
 
-maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, prim::Array{Float64,1}) =
+maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, prim::Array{<:Real,1}) =
 maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
-
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, w::AbstractArray{Float64,3}, prim::Array{Int,1}) =
-maxwellian(u, v, w, Float64.(prim))
 
 
 """
@@ -248,7 +236,7 @@ Flow variables with conservative and primitive forms
 # ------------------------------------------------------------
 # primitive -> conservative
 # ------------------------------------------------------------
-function prim_conserve(prim::Array{Float64,1}, γ::Union{Int,Float64})
+function prim_conserve(prim::Array{<:Real,1}, γ::Real)
 
 	W = similar(prim)
 
@@ -275,19 +263,17 @@ function prim_conserve(prim::Array{Float64,1}, γ::Union{Int,Float64})
 
 end
 
-prim_conserve(prim::Array{Int,1}, γ::Union{Int,Float64}) = prim_conserve(Float64.(prim), γ)
-
-prim_conserve(ρ::Union{Int,Float64}, U::Union{Int,Float64}, λ::Union{Int,Float64}, γ::Union{Int,Float64}) = 
+prim_conserve(ρ::Real, U::Real, λ::Real, γ::Real) = 
 prim_conserve([ρ, U, λ], γ)
 
-prim_conserve(ρ::Union{Int,Float64}, U::Union{Int,Float64}, V::Union{Int,Float64}, λ::Union{Int,Float64}, γ::Union{Int,Float64}) = 
+prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) = 
 prim_conserve([ρ, U, V, λ], γ)
 
 
 # ------------------------------------------------------------
 # conservative -> primitive
 # ------------------------------------------------------------
-function conserve_prim(W::Array{Float64,1}, γ::Union{Int,Float64})
+function conserve_prim(W::Array{<:Real,1}, γ::Real)
 
 	prim = similar(W)
 
@@ -314,12 +300,10 @@ function conserve_prim(W::Array{Float64,1}, γ::Union{Int,Float64})
 
 end
 
-conserve_prim(W::Array{Int,1}, γ::Union{Int,Float64}) = conserve_prim(Float64.(W), γ)
-
-conserve_prim(ρ::Union{Int,Float64}, M::Union{Int,Float64}, E::Union{Int,Float64}, gamma::Union{Int,Float64}) = 
+conserve_prim(ρ::Real, M::Real, E::Real, gamma::Real) = 
 conserve_prim([ρ, M, E], gamma)
 
-conserve_prim(ρ::Union{Int,Float64}, MX::Union{Int,Float64}, MY::Union{Int,Float64}, E::Union{Int,Float64}, gamma::Union{Int,Float64}) = 
+conserve_prim(ρ::Real, MX::Real, MY::Real, E::Real, gamma::Real) = 
 conserve_prim([ρ, MX, MY, E], gamma)
 
 
@@ -330,7 +314,7 @@ Thermodynamical properties
 # ------------------------------------------------------------
 # Calculate heat capacity ratio
 # ------------------------------------------------------------
-function heat_capacity_ratio(K::Union{Int, Float64}, D::Int)
+function heat_capacity_ratio(K::Real, D::Int)
 	
 	if D == 1
 		γ = (K + 3.) / (K + 1.)
@@ -348,11 +332,9 @@ end
 # ------------------------------------------------------------
 # Calculate speed of sound
 # ------------------------------------------------------------
-sound_speed(λ::Union{Int,Float64}, γ::Union{Int,Float64}) = (0.5 * γ / λ)^0.5
+sound_speed(λ::Real, γ::Real) = (0.5 * γ / λ)^0.5
 
-sound_speed(prim::Array{Float64,1}, γ::Union{Int,Float64}) = sound_speed(prim[end], γ)
-
-sound_speed(prim::Array{Int,1}, γ::Union{Int,Float64}) = sound_speed(Float64.(prim), γ)
+sound_speed(prim::Array{<:Real,1}, γ::Real) = sound_speed(prim[end], γ)
 
 
 """
@@ -363,7 +345,7 @@ Single component gas models
 # Calculate reference viscosity
 # 1. variable hard sphere (VHS) model
 # ------------------------------------------------------------
-ref_vhs_vis(Kn::Union{Int,Float64}, alpha::Union{Int,Float64}, omega::Union{Int,Float64}) = 
+ref_vhs_vis(Kn::Real, alpha::Real, omega::Real) = 
 5.0 * (alpha + 1.) * (alpha + 2.) * √π / (4. * alpha * (5. - 2. * omega) * (7. - 2. * omega)) * Kn
 
 
@@ -371,11 +353,8 @@ ref_vhs_vis(Kn::Union{Int,Float64}, alpha::Union{Int,Float64}, omega::Union{Int,
 # Calculate collision time
 # 1. variable hard sphere (VHS) model
 # ------------------------------------------------------------
-vhs_collision_time(prim::Array{Float64,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
+vhs_collision_time(prim::Array{<:Real,1}, muRef::Real, omega::Real) = 
 muRef * 2. * prim[end]^(1. - omega) / prim[1]
-
-vhs_collision_time(prim::Array{Int,1}, muRef::Union{Int,Float64}, omega::Union{Int,Float64}) = 
-vhs_collision_time(Float64.(prim), muRef, omega)
 
 
 """
@@ -385,8 +364,7 @@ Multiple component gas models
 # ------------------------------------------------------------
 # Calculate mixture collision time from AAP model
 # ------------------------------------------------------------
-function aap_hs_collision_time( prim::Array{Float64,2}, mi::Union{Int,Float64}, ni::Union{Int,Float64}, 
-								me::Union{Int,Float64}, ne::Union{Int,Float64}, kn::Union{Int,Float64} )
+function aap_hs_collision_time(prim::Array{<:Real,2}, mi::Real, ni::Real, me::Real, ne::Real, kn::Real)
 
 	ν = zeros(axes(prim, 2))
 
@@ -403,8 +381,7 @@ end
 # ------------------------------------------------------------
 # Calculate mixture primitive variables from AAP model
 # ------------------------------------------------------------
-function aap_hs_prim( prim::Array{Float64,2}, tau::Array{Float64,1}, mi::Union{Int,Float64}, ni::Union{Int,Float64}, 
-					  me::Union{Int,Float64}, ne::Union{Int,Float64}, kn::Union{Int,Float64} )
+function aap_hs_prim(prim::Array{<:Real,2}, tau::Array{<:Real,1}, mi::Real, ni::Real, me::Real, ne::Real, kn::Real)
 
 	mixprim = similar(prim)
 

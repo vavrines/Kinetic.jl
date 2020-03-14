@@ -7,13 +7,13 @@ export read_dict,
        write_jld
 
 
-# ------------------------------------------------------------
+"""
 # Read text into dictionary
 #
 # >@param[in]  filename     :  configuration text file
 # >@param[in]  allowed      :  keywords
 # >@return  vars            :  dictionary with values of variables
-# ------------------------------------------------------------
+"""
 function read_dict(filename::String, allowed)
 
     println("")
