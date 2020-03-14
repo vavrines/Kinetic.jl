@@ -49,7 +49,7 @@ end
 # ------------------------------------------------------------
 # Write output data with JLD2
 # ------------------------------------------------------------
-function write_jld(KS::SolverSet1D, ctr::Array{<:AbstractControlVolume,1}, t::Float64)
+function write_jld(KS::AbstractSolverSet, ctr::Array{<:AbstractControlVolume,1}, t::Number)
 
     strIter = string(t)
     fileOut = KS.outputFolder * "data/t=" * strIter * ".jld2"
