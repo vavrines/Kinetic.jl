@@ -238,7 +238,7 @@ Flow variables with conservative and primitive forms
 # ------------------------------------------------------------
 function prim_conserve(prim::Array{<:Real,1}, γ::Real)
 
-	W = similar(prim)
+	W = zeros(axes(prim))
 
 	if length(prim) == 3 # 1D
 		W[1] = prim[1]
@@ -275,7 +275,7 @@ prim_conserve([ρ, U, V, λ], γ)
 # ------------------------------------------------------------
 function conserve_prim(W::Array{<:Real,1}, γ::Real)
 
-	prim = similar(W)
+	prim = zeros(axes(W))
 
 	if length(W) == 3 # 1D
 		prim[1] = W[1]
@@ -346,7 +346,7 @@ Single component gas models
 # 1. variable hard sphere (VHS) model
 # ------------------------------------------------------------
 ref_vhs_vis(Kn::Real, alpha::Real, omega::Real) = 
-5.0 * (alpha + 1.) * (alpha + 2.) * √π / (4. * alpha * (5. - 2. * omega) * (7. - 2. * omega)) * Kn
+5. * (alpha + 1.) * (alpha + 2.) * √π / (4. * alpha * (5. - 2. * omega) * (7. - 2. * omega)) * Kn
 
 
 # ------------------------------------------------------------

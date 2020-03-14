@@ -160,8 +160,6 @@ function solve!( KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1
 
 	write_jld(KS, ctr, simTime)
 
-	return ctr
-
 end # function
 
 
