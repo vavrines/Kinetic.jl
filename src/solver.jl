@@ -3,9 +3,13 @@
 # ------------------------------------------------------------
 
 
-export SolverSet1D
+export SolverSet1D,
+	   solve!
 
 
+# ------------------------------------------------------------
+# Structure of solver setup
+# ------------------------------------------------------------
 struct SolverSet1D <: AbstractSolverSet
 
 	# setup
@@ -34,7 +38,7 @@ struct SolverSet1D <: AbstractSolverSet
 				    "x0", "x1", "nx", "nxg", "pMeshType",
 				    "u0", "u1", "nu", "nug", "vMeshType",
 				    "knudsen", "mach", "prandtl", "inK", "omega", "alphaRef", "omegaRef" ]
-		D = readtodict(configfilename, allowed)
+		D = read_dict(configfilename, allowed)
 
 		# read configuration from text file
         isNewStart = Bool(parse(Int64, D["isNewStart"]))
@@ -91,7 +95,8 @@ struct SolverSet1D <: AbstractSolverSet
 
 		# create working directory
 		identifier = string(Dates.now(), "/")
-		outputFolder = string("../out/", replace(identifier, ":"=>"."))
+		#outputFolder = string("../out/", replace(identifier, ":"=>"."))
+		outputFolder = replace(identifier, ":"=>".")
 		mkdir(outputFolder)
 		mkdir(string(outputFolder, "data/"))
 		cp(configfilename, string(outputFolder, "config.txt"))
@@ -102,3 +107,52 @@ struct SolverSet1D <: AbstractSolverSet
 	end # function
 
 end # struct
+
+
+# ------------------------------------------------------------
+# Solution algorithm
+# ------------------------------------------------------------
+function solve!(KS::SolverSet1D, ctr, face, simTime)
+	
+	#--- setup ---#
+	dim = parse(Int, KS.space[1])
+
+	iter = 0
+	dt = 0.
+	res = zeros(dim+2)
+	
+	#--- main loop ---#
+	#while KS.simTime < KS.maxTime
+#=	while true
+
+		dt = timestep(KS, ctr, simTime)
+
+		reconstruct!(KS, ctr)
+
+		evolve!(KS, ctr, face, dt)
+
+		update!(KS, ctr, face, dt, res, i)
+
+		iter += 1
+		simTime += dt
+		
+		if iter%1000 == 0
+			println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:KS.set.dim+2])")
+
+			#if iter%400 == 0
+				#write_jld(KS, ctr, iter)
+			#end
+		end
+
+		if maximum(res) < 5.e-7 || simTime > KS.set.maxTime
+		#if simTime > KS.set.maxTime
+			break
+		end
+
+	end # while loop
+
+	write_jld(KS, ctr, simTime)
+
+	return ctr
+=#
+end # function

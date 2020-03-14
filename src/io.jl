@@ -3,7 +3,8 @@
 # ============================================================
 
 
-export readtodict
+export read_dict,
+       write_jld
 
 
 # ------------------------------------------------------------
@@ -13,12 +14,12 @@ export readtodict
 # >@param[in]  allowed      :  keywords
 # >@return  vars            :  dictionary with values of variables
 # ------------------------------------------------------------
-function readtodict(filename::String, allowed)
+function read_dict(filename::String, allowed)
 
     println("")
     f = open(filename)
     vars = Dict{String, Any}()
-    println("Reading config from $filename")
+    #println("Reading config from $filename")
     println("")
 
     for line in eachline(f)
@@ -41,5 +42,18 @@ function readtodict(filename::String, allowed)
 
     println("")
     return vars
+
+end
+
+
+# ------------------------------------------------------------
+# Write output data with JLD2
+# ------------------------------------------------------------
+function write_jld(KS::SolverSet1D, ctr::Array{<:AbstractControlVolume,1}, t::Float64)
+
+    strIter = string(t)
+    fileOut = KS.outputFolder * "data/t=" * strIter * ".jld2"
+
+    @save fileOut KS ctr t
 
 end
