@@ -16,24 +16,24 @@ export Setup,
 # ------------------------------------------------------------
 struct Setup <: AbstractSetup
 
-    isNewStart :: Bool
     case :: AbstractString
     space :: AbstractString
 	interpOrder :: Int64
+	limiter :: AbstractString
 	cfl :: Float64
 	maxTime :: Float64
 
-    function Setup(NS::Bool, CASE::AbstractString, SPACE::AbstractString, ORDER::Int, CFL::Number, TIME::Number)
+    function Setup(CASE::AbstractString, SPACE::AbstractString, ORDER::Int, LM::AbstractString, CFL::Number, TIME::Number)
 
-        isNewStart = NS
     	case = CASE
         space = SPACE
-        interpOrder = Int64(ORDER)
+		interpOrder = Int64(ORDER)
+		limiter = LM
     	cfl = Float64(CFL)
     	maxTime = Float64(TIME)
 
 		# inner constructor method
-		new(isNewStart, case, space, interpOrder, cfl, maxTime)
+		new(case, space, interpOrder, limiter, cfl, maxTime)
     
     end
 
@@ -138,7 +138,7 @@ end
 # ------------------------------------------------------------
 # Structure of control volume
 # ------------------------------------------------------------
-mutable struct ControlVolume1D1F <: AbstractControlVolume
+mutable struct ControlVolume1D1F <: AbstractControlVolume1D <: AbstractControlVolume
 
 	x :: Float64
 	dx :: Float64
@@ -173,7 +173,7 @@ end
 # ------------------------------------------------------------
 # Structure of cell interface
 # ------------------------------------------------------------
-mutable struct Interface1D1F <: AbstractInterface
+mutable struct Interface1D1F <: AbstractInterface1D <: AbstractInterface
 
 	fw :: Array{Float64,1}
 	fh :: Array{Float64,1}

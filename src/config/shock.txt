@@ -3,10 +3,10 @@
 # ------------------------------------------------------------
 
 # setup
-isNewStart = 1
 case = shock
 space = 1d2f
 interpOrder = 1
+limiter = vanleer
 cfl = 0.95
 maxTime = 250.0
 

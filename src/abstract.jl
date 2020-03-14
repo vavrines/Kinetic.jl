@@ -10,7 +10,9 @@ export AbstractVelocityMesh,
        AbstractCondition,
        AbstractSolverSet,
        AbstractControlVolume,
-       AbstractInterface
+       AbstractControlVolume1D,
+       AbstractInterface,
+       AbstractInterface1D
 
 
 abstract type AbstractPhysicalMesh end      
@@ -21,3 +23,6 @@ abstract type AbstractCondition end
 abstract type AbstractSolverSet end
 abstract type AbstractControlVolume end
 abstract type AbstractInterface end
+
+abstract type AbstractControlVolume1D <: AbstractControlVolume end
+abstract type AbstractInterface1D <: AbstractInterface end
