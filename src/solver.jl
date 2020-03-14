@@ -120,7 +120,7 @@ end # struct
 function solve!(KS::SolverSet1D, ctr, face, simTime)
 	
 	#--- setup ---#
-	dim = parse(Int, KS.space[1])
+	dim = parse(Int, KS.set.space[1])
 
 	iter = 0
 	dt = 0.
@@ -227,7 +227,7 @@ end
 # ------------------------------------------------------------
 function update!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::AbstractFloat, residual::Array{Float64,1})
 
-	dim = parse(Int, KS.space[1])
+	dim = parse(Int, KS.set.space[1])
     sumRes = zeros(dim+2)
     sumAvg = zeros(dim+2)
 

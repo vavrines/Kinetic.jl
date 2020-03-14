@@ -4,7 +4,7 @@
 
 # setup
 case = shock
-space = 1d2f
+space = 1d1f
 interpOrder = 1
 limiter = vanleer
 cfl = 0.95

@@ -17,11 +17,9 @@ export read_dict,
 """
 function read_dict(filename::String, allowed)
 
-    println("")
+    #println("Reading config from $filename")
     f = open(filename)
     vars = Dict{String, Any}()
-    #println("Reading config from $filename")
-    println("")
 
     for line in eachline(f)
         # skip comments
