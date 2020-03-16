@@ -18,7 +18,7 @@ Kinetic flux vector splitting (KFVS) method
 """
 
 # ------------------------------------------------------------
-# Pure 1D1F flux
+# 1D1F flux
 # ------------------------------------------------------------
 function flux_kfvs( fL::AbstractArray{Float64,1}, fR::AbstractArray{Float64,1}, 
                     u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
@@ -45,7 +45,7 @@ end
 
 
 # ------------------------------------------------------------
-# Reduced 1D2F flux
+# 1D2F flux
 # ------------------------------------------------------------
 function flux_kfvs( hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1},  
                     hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1}, 
@@ -79,7 +79,7 @@ end
 
 
 # ------------------------------------------------------------
-# Reduced 1D4F flux
+# 1D4F flux
 # ------------------------------------------------------------
 function flux_kfvs( h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}, h2L :: AbstractArray{Float64,1}, h3L :: AbstractArray{Float64,1}, 
                     h0R::AbstractArray{Float64,1}, h1R::AbstractArray{Float64,1}, h2R :: AbstractArray{Float64,1}, h3R :: AbstractArray{Float64,1},   
@@ -123,7 +123,7 @@ end
 
 
 # ------------------------------------------------------------
-# Pure 2D1F flux
+# 2D1F flux
 # ------------------------------------------------------------
 function flux_kfvs( fL::AbstractArray{Float64,2}, fR::AbstractArray{Float64,2},
                     u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, 
@@ -162,7 +162,7 @@ Kinetic central-upwind (KCU) method
 """
 
 # ------------------------------------------------------------
-# Pure 1D1F flux
+# 1D1F flux
 # ------------------------------------------------------------
 function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1}, 
                    wR::Array{Float64,1}, fR::AbstractArray{Float64,1},
@@ -216,7 +216,64 @@ end
 
 
 # ------------------------------------------------------------
-# Pure 2D1F flux
+# 1D2F flux
+# ------------------------------------------------------------
+function flux_kcu( wL::Array{Float64,1}, hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1},
+                   wR::Array{Float64,1}, hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1},
+                   u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, 
+                   inK::Union{Int64,Float64}, γ::Float64, visRef::Float64, visIdx::Float64, pr::Float64, dt::Float64 )
+
+    #--- upwind reconstruction ---#
+    δ = heaviside.(u)
+    h = @. hL * δ + hR * (1. - δ)
+    b = @. bL * δ + bR * (1. - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    #--- construct interface distribution ---#
+    Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mxi1, 0, 0)
+    Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
+
+    w = zeros(3)
+    @. w = primL[1] * Muv1 + primR[1] * Muv2
+
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    #tau = tau + abs(cellL.prim[1] / cellL.prim[end] - cellR.prim[1] / cellR.prim[end]) / 
+    #       (cellL.prim[1] / cellL.prim[end] + cellR.prim[1] / cellR.prim[end]) * dt * 1.
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1. - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    #--- calculate fluxes ---#
+    Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mxi, 1, 0)
+    fw = @. Mt[1] * prim[1] * Muv
+
+    # flux from f0
+    Mh = maxwellian(u, prim)
+    Mb = Mh .* inK ./ (2. * prim[end])
+
+    fw[1] += Mt[2] * sum(ω .* u .* h)
+    fw[2] += Mt[2] * sum(ω .* u.^2 .* h)
+    fw[3] += Mt[2] * 0.5 * (sum(ω .* u.^3 .* h) + sum(ω .* u .* b))
+
+    fh = @. Mt[1] * u * Mh + Mt[2] * u * h
+    fb = @. Mt[1] * u * Mb + Mt[2] * u * b
+
+    return fw, fh, fb
+
+end
+
+
+# ------------------------------------------------------------
+# 2D1F flux
 # ------------------------------------------------------------
 function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2}, 
                    wR::Array{Float64,1}, fR::AbstractArray{Float64,2},
@@ -266,5 +323,105 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2},
     ff = @. Mt[1] * u * g + Mt[2] * u * f
 
     return fw .* len, ff.* len
+
+end
+
+
+"""
+Kinetic central-upwind (KCU) method of multi-component gas
+
+# >@param[in] : particle distribution functions and their slopes at left/right sides of interface
+# >@param[in] : particle velocity quadrature points and weights
+# >@param[in] : time step
+
+# >@return : flux of particle distribution function and its velocity moments on conservative variables
+"""
+
+# ------------------------------------------------------------
+# 1D4F flux with AAP model
+# ------------------------------------------------------------
+function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::AbstractArray{Float64,2}, h2L :: AbstractArray{Float64,2}, h3L :: AbstractArray{Float64,2}, 
+                   wR::Array{Float64,2}, h0R::AbstractArray{Float64,2}, h1R::AbstractArray{Float64,2}, h2R :: AbstractArray{Float64,2}, h3R :: AbstractArray{Float64,2},   
+                   u::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, inK::Union{Int64,Float64}, γ::Float64, 
+                   mi::Float64, ni::Float64, me::Float64, ne::Float64, kn::Float64, dt::Float64 )
+
+    #--- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    h0 = @. h0L * δ + h0R * (1. - δ)
+    h1 = @. h1L * δ + h1R * (1. - δ)
+    h2 = @. h2L * δ + h2R * (1. - δ)
+    h3 = @. h3L * δ + h3R * (1. - δ)
+
+    primL = zeros(axes(wL)); primR = similar(primL)
+    for j in 1:2
+        primL[:,j] .= conserve_prim(wL[:,j], γ)
+        primR{:,j} .= conserve_prim(wR[:,j], γ)
+    end
+
+    #--- construct interface distribution ---#
+    Mu1 = OffsetArray{Float64}(undef, 0:6, 1:2); Mv1 = similar(Mu1); Mw1 = similar(Mu1); MuL1 = similar(Mu1); MuR1 = similar(Mu1)
+    Mu2 = similar(Mu1); Mv2 = similar(Mu1); Mw2 = similar(Mu1); MuL2 = similar(Mu1); MuR2 = similar(Mu1)
+    Muv1 = similar(wL); Muv2 = similar(wL)
+    for j in 1:2
+        Mu1[:,j], Mv1[:,j], Mw1[:,j], MuL1[:,j], MuR1[:,j] = gauss_moments(primL[:,j], inK)
+        Muv1[:,j] = moments_conserve(MuL1[:,j], Mv1[:,j], Mw1[:,j], 0, 0, 0)
+        Mu2[:,j], Mv2[:,j], Mw2[:,j], MuL2[:,j], MuR2[:,j] = gauss_moments(primR[:,j], inK)
+        Muv2[:,j] = moments_conserve(MuR2[:,j], Mv2[:,j], Mw2[:,j], 0, 0, 0)
+    end
+
+    w = zeros(axes(wL)); prim = zeros(axes(wL))
+    for j in 1:2
+        @. w[:,j] = primL[1,j] * Muv1[:,j] + primR[1,j] * Muv2[:,j]
+        prim[:,j] .= conserve_prim(w[:,j], γ)
+    end
+
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
+    #tau .+= abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
+    #        (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
+    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
+
+    Mt = zeros(2, 2)
+    @. Mt[2,:] = tau * (1. - exp(-dt / tau)) # f0
+    @. Mt[1,:] = dt - Mt[2,:] # M0
+
+    #--- calculate fluxes ---#
+    Mu = similar(Mu1); Mv = similar(Mu1); Mw = similar(Mu1); MuL = similar(Mu1); MuR = similar(Mu1)
+    Muv = similar(wL)
+    for j in axes(Mu1, 2)
+        Mu[:,j], Mv[:,j], Mw[:,j], MuL[:,j], MuR[:,j] = gauss_moments(prim[:,j], inK)
+        Muv[:,j] .= moments_conserve(MuL[:,j], Mv[:,j], Mw[:,j], 1, 0, 0)
+    end
+
+    # flux from M0
+    fw = similar(wL)
+    for j in 1:2
+        @. fw[:,j] = Mt[1,j] * prim[1,j] * Muv[:,j]
+    end
+
+    # flux from f0
+    g0 = similar(h0); g1 = similar(h0); g2 = similar(h0); g3 = similar(h0)
+    for j in 1:2
+        g0[:,j] .= maxwellian(u[:,j], prim[:,j])
+        g1[:,j] .= Mv[1,j] * g0[:,j]
+        g2[:,j] .= Mw[1,j] * g0[:,j]
+        g3[:,j] .= (Mv[2,j] + Mw[2,j]) * g0[:,j]
+    end
+
+    fh0 = similar(h0); fh1 = similar(h0); fh2 = similar(h0); fh3 = similar(h0)
+    for j=1:2
+        fw[1,j] += Mt[2,j] * sum(ω[:,j] .* u[:,j] .* h0[:,j])
+        fw[2,j] += Mt[2,j] * sum(ω[:,j] .* u[:,j].^2 .* h0[:,j])
+        fw[3,j] += Mt[2,j] * sum(ω[:,j] .* u[:,j] .* h1[:,j])
+        fw[4,j] += Mt[2,j] * sum(ω[:,j] .* u[:,j] .* h2[:,j])
+        fw[5,j] += Mt[2,j] * 0.5 * (sum(ω[:,j] .* u[:,j].^3 .* h0[:,j]) + sum(ω[:,j] .* u[:,j] .* h3[:,j]))
+
+        @. fh0[:,j] = Mt[1,j] * u[:,j] * g0[:,j] + Mt[2,j] * u[:,j] * h0[:,j]
+        @. fh1[:,j] = Mt[1,j] * u[:,j] * g1[:,j] + Mt[2,j] * u[:,j] * h1[:,j]
+        @. fh2[:,j] = Mt[1,j] * u[:,j] * g2[:,j] + Mt[2,j] * u[:,j] * h2[:,j]
+        @. fh3[:,j] = Mt[1,j] * u[:,j] * g3[:,j] + Mt[2,j] * u[:,j] * h3[:,j]
+    end
+
+    return fw, fh0, fh1, fh2, fh3
 
 end
