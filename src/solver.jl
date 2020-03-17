@@ -90,13 +90,25 @@ struct SolverSet <: AbstractSolverSet
 
 		# deduce configuration from existed data
 		γ = heat_capacity_ratio(inK, parse(Int, space[1]))
-        μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
-
+		
 		# generate data structure
-		set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
-		pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
-        vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
-	    gas = GasProperty(knudsen, mach, prandtl, inK, γ, omega, alphaRef, omegaRef, μᵣ)
+		if space == "1d1f" || space == "1d2f"
+			μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
+		
+			set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
+			pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+			vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
+			gas = GasProperty(knudsen, mach, prandtl, inK, γ, omega, alphaRef, omegaRef, μᵣ)
+		elseif space == "1d4f"
+			v0 = u0 * sqrt(mi / me)
+			v1 = u1 * sqrt(mi / me)
+			kne = knudsen * (me / mi)
+
+			set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
+			mesh = PSpace1D(x0, x1, nx, pMeshType, nxg)
+			quad = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
+			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, gamma, mi, ni, me, ne, lD, rL, sol, echi, bnu)
+		end
 
 		if case == "shock"
 			if space == "1d1f"
@@ -110,7 +122,8 @@ struct SolverSet <: AbstractSolverSet
 
 				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
 			end
-		else
+		elseif case == "brio-wu"
+
 		end
 
 		# create working directory
@@ -232,7 +245,7 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 #    end
 
     Threads.@threads for i=2:KS.pSpace.nx
-		@inbounds face[i].fw, face[i].fh = flux_kfvs( ctr[i-1].h, ctr[i].h, KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sh, ctr[i].sh )
+		@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].h, ctr[i].h, KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sh, ctr[i].sh )
 	end
 
 end
@@ -248,8 +261,8 @@ function update!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
     sumAvg = zeros(dim+2)
 
     Threads.@threads for i=2:KS.pSpace.nx-1
-		@inbounds step!( face[i].fw, face[i].fh, ctr[i].w, ctr[i].prim, ctr[i].h, ctr[i].dx,
-						 face[i+1].fw, face[i+1].fh, KS.gas.γ, KS.vSpace.u, KS.gas.μᵣ, KS.gas.ω,
+		@inbounds step!( face[i].fw, face[i].ff, ctr[i].w, ctr[i].prim, ctr[i].h, ctr[i].dx,
+						 face[i+1].fw, face[i+1].ff, KS.gas.γ, KS.vSpace.u, KS.gas.μᵣ, KS.gas.ω,
 						 dt, sumRes, sumAvg )
     end
 

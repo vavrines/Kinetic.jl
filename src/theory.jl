@@ -8,6 +8,7 @@ export gauss_moments,
 	   moments_conserve_slope,
 	   discrete_moments, 
 	   maxwellian, 
+	   mixture_maxwellian,
 	   conserve_prim, 
 	   prim_conserve, 
 	   heat_capacity_ratio, 
@@ -212,12 +213,32 @@ maxwellian(u::AbstractArray{Float64,1}, prim::Array{<:Real,1}) =
 maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 
+function mixture_maxwellian(u::AbstractArray{Float64,2}, prim::Array{<:Real,2})
+	mixM = zeros(axes(u))
+	for j in axes(mixM, 2)
+		mixM[:,j] .= maxwellian(u[:,j], prim[:,j])
+	end
+
+	return mixM
+end
+
+
 # --- 2D ---#
 maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Real, U::Real, V::Real, λ::Real) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
 maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{<:Real,1}) =
 maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5 
+
+
+function mixture_maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, prim::Array{<:Real,2})
+	mixM = zeros(axes(u))
+	for k in axes(mixM, 3)
+		mixM[:,:,k] .= maxwellian(u[:,:,k], v[:,:,k], prim[:,k])
+	end
+
+	return mixM
+end
 
 
 # --- 3D ---#
@@ -227,6 +248,16 @@ maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::Abstract
 
 maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, prim::Array{<:Real,1}) =
 maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
+
+
+function mixture_maxwellian(u::AbstractArray{Float64,4}, v::AbstractArray{Float64,4}, w::AbstractArray{Float64,4}, prim::Array{<:Real,2})
+	mixM = zeros(axes(u))
+	for l in axes(mixM, 4)
+		mixM[:,:,:,l] .= maxwellian(u[:,:,:,l], v[:,:,:,l], w[:,:,:,l], prim[:,l])
+	end
+
+	return mixM
+end
 
 
 """
