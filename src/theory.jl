@@ -36,9 +36,9 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 	MuR[0] = 0.5 * SpecialFunctions.erfc(sqrt(prim[end]) * prim[2])
 	MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
 
-	Threads.@threads for i=2:6
-		MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i-1) * MuL[i-2] / prim[end]
-		MuR[i] = prim[2] * MuR[i-1] + 0.5 * (i-1) * MuR[i-2] / prim[end]
+	Threads.@threads for i = 2:6
+		MuL[i] = prim[2] * MuL[i - 1] + 0.5 * (i - 1) * MuL[i - 2] / prim[end]
+		MuR[i] = prim[2] * MuR[i - 1] + 0.5 * (i - 1) * MuR[i - 2] / prim[end]
 	end
 
 	@. Mu = MuL + MuR
@@ -54,8 +54,8 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 		Mv = OffsetArray{Float64}(undef, 0:6)
 		Mv[0] = 1.0
     	Mv[1] = prim[3]
-		Threads.@threads for i=2:6
-			Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i-1) * Mv[i-2] / prim[end]
+		Threads.@threads for i = 2:6
+			Mv[i] = prim[3] * Mv[i - 1] + 0.5 * (i - 1) * Mv[i - 2] / prim[end]
 		end
 
 		Mxi = OffsetArray{Float64}(undef, 0:2)
@@ -68,15 +68,15 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 		Mv = OffsetArray{Float64}(undef, 0:6)
 		Mv[0] = 1.
 		Mv[1] = prim[3]
-		Threads.@threads for i=2:6
-			Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i-1) * Mv[i-2] / prim[end]
+		Threads.@threads for i = 2:6
+			Mv[i] = prim[3] * Mv[i - 1] + 0.5 * (i - 1) * Mv[i - 2] / prim[end]
 		end
 
 		Mw = OffsetArray{Float64}(undef, 0:6)
 		Mw[0] = 1.
 		Mw[1] = prim[4]
-		Threads.@threads for i=2:6
-			Mw[i] = prim[4] * Mw[i-1] + 0.5 * (i-1) * Mw[i-2] / prim[end]
+		Threads.@threads for i = 2:6
+			Mw[i] = prim[4] * Mw[i - 1] + 0.5 * (i - 1) * Mw[i - 2] / prim[end]
 		end
 
 		return Mu, Mv, Mw, MuL, MuR
@@ -92,9 +92,9 @@ function moments_conserve(Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1
 
     uv = zeros(3)
 
-    uv[1] = Mu[alpha] * Mxi[delta÷2]
-    uv[2] = Mu[alpha+1] * Mxi[delta÷2]
-    uv[3] = 0.5 * (Mu[alpha+2] * Mxi[delta÷2] + Mu[alpha] * Mxi[(delta+2)÷2])
+    uv[1] = Mu[alpha] * Mxi[delta ÷ 2]
+    uv[2] = Mu[alpha + 1] * Mxi[delta ÷ 2]
+    uv[3] = 0.5 * (Mu[alpha + 2] * Mxi[delta ÷ 2] + Mu[alpha] * Mxi[(delta + 2) ÷ 2])
 
     return uv
 
@@ -107,20 +107,20 @@ function moments_conserve( Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1
 	if length(Mw) == 3
 		uv = zeros(4)
 
-		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta÷2]
-		uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta÷2]
-		uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta÷2]
-		uv[4] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mw[delta÷2] + Mu[alpha] * Mv[beta+2] * Mw[delta÷2] + 
-				Mu[alpha] * Mv[beta] * Mw[(delta+2)÷2])	
+		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta ÷ 2]
+		uv[2] = Mu[alpha + 1] * Mv[beta] * Mw[delta ÷ 2]
+		uv[3] = Mu[alpha] * Mv[beta + 1] * Mw[delta ÷ 2]
+		uv[4] = 0.5 * (Mu[alpha + 2] * Mv[beta] * Mw[delta ÷ 2] + Mu[alpha] * Mv[beta + 2] * Mw[delta ÷ 2] + 
+				Mu[alpha] * Mv[beta] * Mw[(delta + 2) ÷ 2])	
 	else
 		uv = zeros(5)
 
 		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
-		uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta]
-		uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta]
-		uv[4] = Mu[alpha] * Mv[beta] * Mw[delta+1]
-		uv[5] = 0.5 * (Mu[alpha+2] * Mv[beta] * Mw[delta] + Mu[alpha] * Mv[beta+2] * Mw[delta] + 
-				Mu[alpha] * Mv[beta] * Mw[delta+2])
+		uv[2] = Mu[alpha + 1] * Mv[beta] * Mw[delta]
+		uv[3] = Mu[alpha] * Mv[beta + 1] * Mw[delta]
+		uv[4] = Mu[alpha] * Mv[beta] * Mw[delta + 1]
+		uv[5] = 0.5 * (Mu[alpha + 2] * Mv[beta] * Mw[delta] + Mu[alpha] * Mv[beta + 2] * Mw[delta] + 
+				Mu[alpha] * Mv[beta] * Mw[delta + 2])
 	end
 
 	return uv
@@ -134,10 +134,10 @@ end
 # ------------------------------------------------------------
 function moments_conserve_slope(a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int)
 
-	au = @. a[1] * moments_conserve(Mu, Mxi, alpha+0, 0) +
-         a[2] * moments_conserve(Mu, Mxi, alpha+1, 0) +
-         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha+2, 0) +
-         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha+0, 2)
+	au = @. a[1] * moments_conserve(Mu, Mxi, alpha + 0, 0) +
+         a[2] * moments_conserve(Mu, Mxi, alpha + 1, 0) +
+         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha + 2, 0) +
+         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha + 0, 2)
 
     return au
 
@@ -147,12 +147,12 @@ end
 function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
 								 alpha::Int, beta::Int )
 
-    au = @. a[1] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+0, 0) +
-         a[2] * moments_conserve(Mu, Mv, Mxi, alpha+1, beta+0, 0) +
-         a[3] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+1, 0) +
-         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha+2, beta+0, 0) +
-         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+2, 0) +
-         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha+0, beta+0, 2)
+    au = @. a[1] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 0) +
+         a[2] * moments_conserve(Mu, Mv, Mxi, alpha + 1, beta + 0, 0) +
+         a[3] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 1, 0) +
+         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha + 2, beta + 0, 0) +
+         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 2, 0) +
+         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 2)
 
     return au
 
@@ -161,13 +161,13 @@ end
 function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, 
 								 Mw::OffsetArray{Float64,1}, alpha::Int, beta::Int, delta::Int )
 
-	au = @. a[1] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+0, delta+0) +
-			a[2] * moments_conserve(Mu, Mv, Mw, alpha+1, beta+0, delta+0) +
-			a[3] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+1, delta+0) +
-			a[4] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+0, delta+1) +
-			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha+2, beta+0, delta+0) +
-			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+2, delta+0) +
-			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha+0, beta+0, delta+2)
+	au = @. a[1] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) +
+			a[2] * moments_conserve(Mu, Mv, Mw, alpha + 1, beta + 0, delta + 0) +
+			a[3] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 1, delta + 0) +
+			a[4] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 1) +
+			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha + 2, beta + 0, delta + 0) +
+			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 2, delta + 0) +
+			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 2)
 
 	return au
 
@@ -179,17 +179,17 @@ Velocity moments of particle distribution function
 2. discrete form
 """
 
-#--- 1D ---#
+# --- 1D ---#
 discrete_moments(f::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, n::Int) =
 sum(@. ω * u^n * f)
 
 
-#--- 2D ---#
+# --- 2D ---#
 discrete_moments(f::AbstractArray{Float64,2}, u::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, n::Int) =
 sum(@. ω * u^n * f)
 
 
-#--- 3D ---#
+# --- 3D ---#
 discrete_moments(f::AbstractArray{Float64,3}, u::AbstractArray{Float64,3}, ω::AbstractArray{Float64,3}, n::Int) =
 sum(@. ω * u^n * f)
 
@@ -204,7 +204,7 @@ Equilibrium in discrete form
 # >@return : Maxwellian distribution function
 """
 
-#--- 1D ---#
+# --- 1D ---#
 maxwellian(u::AbstractArray{Float64,1}, ρ::Real, U::Real, λ::Real) =
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
@@ -212,7 +212,7 @@ maxwellian(u::AbstractArray{Float64,1}, prim::Array{<:Real,1}) =
 maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 
-#--- 2D ---#
+# --- 2D ---#
 maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Real, U::Real, V::Real, λ::Real) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
@@ -220,10 +220,10 @@ maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array
 maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5 
 
 
-#--- 3D ---#
+# --- 3D ---#
 maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, 
 		   ρ::Real, U::Real, V::Real, W::Real, λ::Real) =
-@. ρ * (λ / π)^1.5 * exp(-λ * ((u - U)^2 + (v - V)^2+ (w - W)^2))
+@. ρ * (λ / π)^1.5 * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
 
 maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, prim::Array{<:Real,1}) =
 maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
@@ -320,7 +320,7 @@ function heat_capacity_ratio(K::Real, D::Int)
 		γ = (K + 3.) / (K + 1.)
 	elseif D == 2
 		γ = (K + 4.) / (K + 2.)
-	elseif D ==3
+	elseif D == 3
 		γ = (K + 5.) / (K + 3.)
 	end
 
@@ -385,21 +385,46 @@ function aap_hs_prim(prim::Array{<:Real,2}, tau::Array{<:Real,1}, mi::Real, ni::
 
 	mixprim = similar(prim)
 
-	mixprim[1,:] = deepcopy(prim[1,:])
-	mixprim[2,1] = prim[2,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,2] - prim[2,1])
-	mixprim[2,2] = prim[2,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,1] - prim[2,2])
-	mixprim[3,1] = prim[3,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[3,2] - prim[3,1])
-	mixprim[3,2] = prim[3,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[3,1] - prim[3,2])
-	mixprim[4,1] = prim[4,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[4,2] - prim[4,1])
-	mixprim[4,2] = prim[4,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[4,1] - prim[4,2])
-	
-	mixprim[5,1] = 1. / (1. / prim[end,1] - 2. / 3. * (mixprim[2,1] - prim[2,1])^2 - 2. / 3. * (mixprim[3,1] - prim[3,1])^2 - 2. / 3. * (mixprim[4,1] - prim[4,1])^2 + 
-				   tau[1] / kn * 2. * mi / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,2] * me / mi - 1. / prim[end,1] + 
-				   2. / 3. * me / mi * (prim[2,2] - prim[2,1])^2 + 2. / 3. * me / mi * (prim[3,2] - prim[3,1])^2 + 2. / 3. * me / mi * (prim[4,2] - prim[4,1])^2))
-	mixprim[5,2] = 1. / (1. / prim[end,2] - 2. / 3. * (mixprim[2,2] - prim[2,2])^2 - 2. / 3. * (mixprim[3,2] - prim[3,2])^2 - 2. / 3. * (mixprim[4,2] - prim[4,2])^2 + 
-				   tau[2] / kn * 2. * me / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,1] * mi / me - 1. / prim[end,2] + 
-				   2. / 3. * mi / me * (prim[2,1] - prim[2,2])^2 + 2. / 3. * mi / me * (prim[3,1] - prim[3,2])^2 + 2. / 3. * mi / me * (prim[4,1] - prim[4,2])^2))
+	if size(prim, 1) == 3
+		mixprim[1,:] = deepcopy(prim[1,:])
+		mixprim[2,1] = prim[2,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,2] - prim[2,1])
+		mixprim[2,2] = prim[2,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,1] - prim[2,2])
+		mixprim[3,1] = 1. / (1. / prim[end,1] - 2. / 3. * (mixprim[2,1] - prim[2,1])^2 + 
+					   tau[1] / kn * 2. * mi / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,2] * me / mi - 1. / prim[end,1] + 
+					   2. / 3. * me / mi * (prim[2,2] - prim[2,1])^2))
+		mixprim[3,2] = 1. / (1. / prim[end,2] - 2. / 3. * (mixprim[2,2] - prim[2,2])^2 + 
+					   tau[2] / kn * 2. * me / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,1] * mi / me - 1. / prim[end,2] + 
+					   2. / 3. * mi / me * (prim[2,1] - prim[2,2])^2))
+	elseif size(prim, 1) == 4
+		mixprim[1,:] = deepcopy(prim[1,:])
+		mixprim[2,1] = prim[2,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,2] - prim[2,1])
+		mixprim[2,2] = prim[2,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,1] - prim[2,2])
+		mixprim[3,1] = prim[3,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[3,2] - prim[3,1])
+		mixprim[3,2] = prim[3,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[3,1] - prim[3,2])
+		mixprim[4,1] = 1. / (1. / prim[end,1] - 2. / 3. * (mixprim[2,1] - prim[2,1])^2 - 2. / 3. * (mixprim[3,1] - prim[3,1])^2 + 
+					   tau[1] / kn * 2. * mi / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,2] * me / mi - 1. / prim[end,1] + 
+					   2. / 3. * me / mi * (prim[2,2] - prim[2,1])^2 + 2. / 3. * me / mi * (prim[3,2] - prim[3,1])^2))
+		mixprim[4,2] = 1. / (1. / prim[end,2] - 2. / 3. * (mixprim[2,2] - prim[2,2])^2 - 2. / 3. * (mixprim[3,2] - prim[3,2])^2 + 
+					   tau[2] / kn * 2. * me / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,1] * mi / me - 1. / prim[end,2] + 
+					   2. / 3. * mi / me * (prim[2,1] - prim[2,2])^2 + 2. / 3. * mi / me * (prim[3,1] - prim[3,2])^2))
+	elseif size(prim, 1) == 5
+		mixprim[1,:] = deepcopy(prim[1,:])
+		mixprim[2,1] = prim[2,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,2] - prim[2,1])
+		mixprim[2,2] = prim[2,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[2,1] - prim[2,2])
+		mixprim[3,1] = prim[3,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[3,2] - prim[3,1])
+		mixprim[3,2] = prim[3,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[3,1] - prim[3,2])
+		mixprim[4,1] = prim[4,1] + tau[1] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[4,2] - prim[4,1])
+		mixprim[4,2] = prim[4,2] + tau[2] / kn * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (prim[4,1] - prim[4,2])
+		mixprim[5,1] = 1. / (1. / prim[end,1] - 2. / 3. * (mixprim[2,1] - prim[2,1])^2 - 2. / 3. * (mixprim[3,1] - prim[3,1])^2 - 2. / 3. * (mixprim[4,1] - prim[4,1])^2 + 
+					tau[1] / kn * 2. * mi / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,2] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,2] * me / mi - 1. / prim[end,1] + 
+					2. / 3. * me / mi * (prim[2,2] - prim[2,1])^2 + 2. / 3. * me / mi * (prim[3,2] - prim[3,1])^2 + 2. / 3. * me / mi * (prim[4,2] - prim[4,1])^2))
+		mixprim[5,2] = 1. / (1. / prim[end,2] - 2. / 3. * (mixprim[2,2] - prim[2,2])^2 - 2. / 3. * (mixprim[3,2] - prim[3,2])^2 - 2. / 3. * (mixprim[4,2] - prim[4,2])^2 + 
+					tau[2] / kn * 2. * me / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,1] * mi / me - 1. / prim[end,2] + 
+					2. / 3. * mi / me * (prim[2,1] - prim[2,2])^2 + 2. / 3. * mi / me * (prim[3,1] - prim[3,2])^2 + 2. / 3. * mi / me * (prim[4,1] - prim[4,2])^2))
+		else
+			println("AAP mixture : dimension error")
+		end
 
 	return mixprim
 
-end
+    end
