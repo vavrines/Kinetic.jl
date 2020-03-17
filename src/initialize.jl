@@ -22,6 +22,7 @@ function initialize(configfilename::String)
     print("initializeing solver: ")
 
     if configfilename[end-2:end] == "txt"
+        
         allowed = ["space"]
         D = read_dict(configfilename, allowed)
         space = D["space"]
@@ -42,6 +43,7 @@ function initialize(configfilename::String)
         return ks, ctr, face, 0.
 
     elseif configfilename[end-3:end] == "jld2"
+        
         _1, _2, _3 = @load configfilename KS ctr t
         ks, ctr, simTime = eval(_1), eval(_2), eval(_3)
 

@@ -126,7 +126,7 @@ function solve!( KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1
 	iter = 0
 	dt = 0.
 	res = zeros(dim+2)
-	write_jld(KS, ctr, simTime)
+	#write_jld(KS, ctr, simTime)
 
 	#--- main loop ---#
 	#while KS.simTime < KS.maxTime
