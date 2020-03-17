@@ -62,22 +62,22 @@ function init_fvm(KS::SolverSet1D)
     dim = parse(Int, KS.set.space[1])
 
     if KS.set.space == "1d1f"
-        #ctr = Array{ControlVolume1D1F}(undef, KS.pMesh.nx)
-        ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pMesh.x)) # with ghost cells
-        face = Array{Interface1D1F}(undef, KS.pMesh.nx+1)
+        #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx)
+        ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
+        face = Array{Interface1D1F}(undef, KS.pSpace.nx+1)
         
         for i in eachindex(ctr)
             # shock problems
             if KS.set.case == "shock"
-                if i <= KS.pMesh.nx÷2
-                    ctr[i] = ControlVolume1D1F(KS.pMesh.x[i], KS.pMesh.dx[i], KS.ib.wL, KS.ib.primL, KS.ib.hL)
+                if i <= KS.pSpace.nx÷2
+                    ctr[i] = ControlVolume1D1F(KS.pSpace.x[i], KS.pSpace.dx[i], KS.ib.wL, KS.ib.primL, KS.ib.hL)
                 else
-                    ctr[i] = ControlVolume1D1F(KS.pMesh.x[i], KS.pMesh.dx[i], KS.ib.wR, KS.ib.primR, KS.ib.hR)
+                    ctr[i] = ControlVolume1D1F(KS.pSpace.x[i], KS.pSpace.dx[i], KS.ib.wR, KS.ib.primR, KS.ib.hR)
                 end
             end
         end
     
-        for i=1:KS.pMesh.nx+1
+        for i=1:KS.pSpace.nx+1
             face[i] = Interface1D1F(KS.ib.hL)
         end
 

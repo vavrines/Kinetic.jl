@@ -3,8 +3,8 @@
 # ============================================================
 
 
-export AbstractVelocityMesh,
-       AbstractPhysicalMesh,
+export AbstractVelocitySpace,
+       AbstractPhysicalSpace,
        AbstractSetup,
        AbstractProperty,
        AbstractCondition,
@@ -15,8 +15,8 @@ export AbstractVelocityMesh,
        AbstractInterface1D
 
 
-abstract type AbstractPhysicalMesh end      
-abstract type AbstractVelocityMesh end
+abstract type AbstractPhysicalSpace end      
+abstract type AbstractVelocitySpace end
 abstract type AbstractSetup end
 abstract type AbstractProperty end
 abstract type AbstractCondition end

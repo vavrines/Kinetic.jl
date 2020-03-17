@@ -3,24 +3,24 @@
 # ============================================================
 
 
-export VMesh1D,
-       VMesh2D,
+export VSpace1D,
+       VSpace2D,
        newton_cotes
 
 
 # ------------------------------------------------------------
 # Structure of velocity space
 # ------------------------------------------------------------
-mutable struct VMesh1D <: AbstractVelocityMesh
+mutable struct VSpace1D <: AbstractVelocitySpace
 
 	u0 :: Float64; u1 :: Float64; nu :: Int64
 	u :: AbstractArray{Float64,1}; du :: AbstractArray{Float64,1}; weights :: AbstractArray{Float64,1}
 
-	VMesh1D() = VMesh1D(-5, 5, 50)
-	VMesh1D(U0::Real, U1::Real) = VMesh1D(U0, U1, 50)
+	VSpace1D() = VSpace1D(-5, 5, 50)
+	VSpace1D(U0::Real, U1::Real) = VSpace1D(U0, U1, 50)
 
-	function VMesh1D( U0::Real, U1::Real, UNUM::Int, 
-					  TYPE="rectangle"::String, NG=0::Int)
+	function VSpace1D( U0::Real, U1::Real, UNUM::Int, 
+					   TYPE="rectangle"::String, NG=0::Int )
 
 		u0 = Float64(U0); u1 = Float64(U1); nu = UNUM; δ = (u1 - u0) / nu
 		u = OffsetArray{Float64}(undef, 1-NG:nu+NG); du = similar(u); weights = similar(u)
@@ -31,17 +31,14 @@ mutable struct VMesh1D <: AbstractVelocityMesh
 				du[i] = δ
 				weights[i] = δ
 			end
-
 		elseif TYPE == "newton" #// newton-cotes formula
 			for i in eachindex(u)
 				u[i] = u0 + (i - 0.5) * δ
 				du[i] = δ
 				weights[i] = newton_cotes(i+NG, UNUM+NG*2) * δ
             end
-            
 		elseif TYPE == "gauss" #// gaussian integration
             println("Gaussian integration coming soon")
-            
 		else
             println("error: no velocity quadrature rule")
 		end
@@ -54,7 +51,7 @@ mutable struct VMesh1D <: AbstractVelocityMesh
 end # struct
 
 
-mutable struct VMesh2D <: AbstractVelocityMesh
+mutable struct VSpace2D <: AbstractVelocitySpace
 
 	u0 :: Float64; u1 :: Float64; nu :: Int64
 	v0 :: Float64; v1 :: Float64; nv :: Int64
@@ -62,12 +59,12 @@ mutable struct VMesh2D <: AbstractVelocityMesh
 	du :: Array{Float64,2}; dv :: Array{Float64,2}
     weights :: Array{Float64,2}
 
-	VMesh2D() = VMesh2D(-5, 5, 28, -5, 5, 28)
-	VMesh2D(U0::Real, U1::Real, V0::Real, V1::Real) = VMesh2D(U0, U1, 28, V0, V1, 28)
+	VSpace2D() = VSpace2D(-5, 5, 28, -5, 5, 28)
+	VSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = VSpace2D(U0, U1, 28, V0, V1, 28)
 
-    function VMesh2D( U0::Real, U1::Real, UNUM::Int, 
-					  V0::Real, V1::Real, VNUM::Int, 
-					  TYPE="rectangle"::String, NGU=0::Int, NGV=0::Int )
+    function VSpace2D( U0::Real, U1::Real, UNUM::Int, 
+					   V0::Real, V1::Real, VNUM::Int, 
+					   TYPE="rectangle"::String, NGU=0::Int, NGV=0::Int )
 
 		u0 = Float64(U0); u1 = Float64(U1); nu = UNUM; δu = (u1 - u0) / nu
 		v0 = Float64(V0); v1 = Float64(V1); nv = VNUM; δv = (v1 - v0) / nv
@@ -84,7 +81,6 @@ mutable struct VMesh2D <: AbstractVelocityMesh
 					weights[i,j] = δu * δv
 				end
 			end
-
 		elseif TYPE == "newton" #// newton-cotes formula
 			for j in axes(u, 2)
 				for i in axes(u, 1)
@@ -95,10 +91,8 @@ mutable struct VMesh2D <: AbstractVelocityMesh
 					weights[i,j] = newton_cotes(i+NGU, UNUM+NGU*2) * δu * newton_cotes(j+NGV, VNUM+NGV*2) * δv
 				end
 			end
-
 		elseif TYPE == "gauss" #// gaussian integration
 			println("Gaussian integration coming soon")
-
 		else
 			println("error: no velocity quadrature rule")
 		end

@@ -3,8 +3,8 @@
 # ============================================================
 
 
-export PMesh1D,
-       PMesh2D,
+export PSpace1D,
+       PSpace2D,
        uniform_mesh,
        global_frame, 
        local_frame
@@ -13,16 +13,16 @@ export PMesh1D,
 # ------------------------------------------------------------
 # Structure of mesh
 # ------------------------------------------------------------
-mutable struct PMesh1D <: AbstractPhysicalMesh
+mutable struct PSpace1D <: AbstractPhysicalSpace
 
 	x0 :: Float64; x1 :: Float64; nx :: Int64
 	x :: AbstractArray{Float64,1}; dx :: AbstractArray{Float64,1}
 
-    PMesh1D() = PMesh1D(0, 1, 100)
-    PMesh1D(X0::Real, X1::Real) = PMesh1D(X0, X1, 100)
+    PSpace1D() = PSpace1D(0, 1, 100)
+    PSpace1D(X0::Real, X1::Real) = PSpace1D(X0, X1, 100)
     
-    function PMesh1D( X0::Real, X1::Real, XNUM::Int, 
-                      TYPE="uniform"::String, NG=0::Int)
+    function PSpace1D( X0::Real, X1::Real, XNUM::Int, 
+                       TYPE="uniform"::String, NG=0::Int )
 
         x0 = Float64(X0); x1 = Float64(X1); nx = XNUM; δ = (x1 - x0) / nx
         x = OffsetArray{Float64}(undef, 1-NG:nx+NG); dx = similar(x)
@@ -42,19 +42,19 @@ mutable struct PMesh1D <: AbstractPhysicalMesh
 end # struct
 
 
-mutable struct PMesh2D <: AbstractPhysicalMesh
+mutable struct PSpace2D <: AbstractPhysicalSpace
 
 	x0 :: Float64; x1 :: Float64; nx :: Int64
 	y0 :: Float64; y1 :: Float64; ny :: Int64
 	x :: Array{Float64,2}; y :: Array{Float64,2}
     dx :: Array{Float64,2}; dy :: Array{Float64,2}
 
-    PMesh2D() = PMesh2D(0, 1, 45, 0, 1, 45)
-	PMesh2D(X0::Real, X1::Real, Y0::Real, Y1::Real) = PMesh2D(X0, X1, 45, Y0, Y1, 45)
+    PSpace2D() = PSpace2D(0, 1, 45, 0, 1, 45)
+	PSpace2D(X0::Real, X1::Real, Y0::Real, Y1::Real) = PSpace2D(X0, X1, 45, Y0, Y1, 45)
 
-    function PMesh2D( X0::Real, X1::Real, XNUM::Int, 
-    				  Y0::Real, Y1::Real, YNUM::Int, 
-    				  TYPE="uniform"::String, NGX=0::Int, NGY=0::Int)
+    function PSpace2D( X0::Real, X1::Real, XNUM::Int, 
+    				   Y0::Real, Y1::Real, YNUM::Int, 
+    				   TYPE="uniform"::String, NGX=0::Int, NGY=0::Int )
 
 		x0 = Float64(X0); x1 = Float64(X1); nx = XNUM; δx = (x1 - x0) / nx
         y0 = Float64(Y0); y1 = Float64(Y1); ny = YNUM; δy = (y1 - y0) / ny

@@ -21,10 +21,10 @@ struct SolverSet1D <: AbstractSolverSet
 	set :: AbstractSetup
 
 	# physical space
-	pMesh :: AbstractPhysicalMesh
+	pSpace :: AbstractPhysicalSpace
 
 	# velocity space
-	vMesh :: AbstractVelocityMesh
+	vSpace :: AbstractVelocitySpace
 
 	# gas property
 	gas :: AbstractProperty
@@ -79,19 +79,19 @@ struct SolverSet1D <: AbstractSolverSet
 
 		# generate data structure
 		set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
-		pMesh = PMesh1D(x0, x1, nx, pMeshType, nxg)
-        vMesh = VMesh1D(u0, u1, nu, vMeshType, nug)
+		pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+        vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
 	    gas = GasProperty(Kn, Ma, Pr, K, γ, ω, αᵣ, ωᵣ, μᵣ)
 
 		if case == "shock"
 			if space == "1d1f"
 				wL, primL, hL, bcL,
-				wR, primR, hR, bcR = ib_rh(Ma, γ, vMesh.u)
+				wR, primR, hR, bcR = ib_rh(Ma, γ, vSpace.u)
 
 				ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
 			elseif space == "1d2f"
 				wL, primL, hL, bL, bcL,
-				wR, primR, hR, bR, bcR = ib_rh(Ma, γ, vMesh.u, K)
+				wR, primR, hR, bR, bcR = ib_rh(Ma, γ, vSpace.u, K)
 
 				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
 			end
@@ -107,7 +107,7 @@ struct SolverSet1D <: AbstractSolverSet
 		cp(configfilename, string(outputFolder, "config.txt"))
 
 		# create new struct
-		new(set, pMesh, vMesh, gas, ib, outputFolder)
+		new(set, pSpace, vSpace, gas, ib, outputFolder)
 
 	end # function
 
@@ -170,10 +170,10 @@ function timestep(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,
 
     tmax = 0.0
 
-    Threads.@threads for i=1:KS.pMesh.nx
+    Threads.@threads for i=1:KS.pSpace.nx
         @inbounds prim = ctr[i].prim
         sos = sound_speed(prim, KS.gas.γ)
-        vmax = max(KS.vMesh.u1, abs(prim[2])) + sos
+        vmax = max(KS.vSpace.u1, abs(prim[2])) + sos
         @inbounds tmax = max(tmax, vmax / ctr[i].dx)
     end
 
@@ -196,7 +196,7 @@ function reconstruct!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolum
 		#ctr[1].sw .= reconstruct3(ctr[1].w, ctr[2].w, 0.5*(ctr[1].dx+ctr[2].dx))
 		#ctr[KS.nx].sw .= reconstruct3(ctr[KS.nx-1].w, ctr[KS.nx].w, 0.5*(ctr[KS.nx-1].dx+ctr[KS.nx].dx))
 
-	    Threads.@threads for i=2:KS.pMesh.nx-1
+	    Threads.@threads for i=2:KS.pSpace.nx-1
 			@inbounds ctr[i].sw .= reconstruct3( ctr[i-1].w, ctr[i].w, ctr[i+1].w, 
 												 0.5*(ctr[i-1].dx+ctr[i].dx), 0.5*(ctr[i].dx+ctr[i+1].dx),
 									   			 KS.set.limiter )
@@ -215,8 +215,8 @@ function evolve!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1
 #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
 #    end
 
-    Threads.@threads for i=2:KS.pMesh.nx
-		@inbounds face[i].fw, face[i].fh = flux_kfvs( ctr[i-1].h, ctr[i].h, KS.vMesh.u, KS.vMesh.weights, dt, ctr[i-1].sh, ctr[i].sh )
+    Threads.@threads for i=2:KS.pSpace.nx
+		@inbounds face[i].fw, face[i].fh = flux_kfvs( ctr[i-1].h, ctr[i].h, KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sh, ctr[i].sh )
 	end
 
 end
@@ -231,20 +231,20 @@ function update!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1
     sumRes = zeros(dim+2)
     sumAvg = zeros(dim+2)
 
-    Threads.@threads for i=2:KS.pMesh.nx-1
+    Threads.@threads for i=2:KS.pSpace.nx-1
 		@inbounds step!( face[i].fw, face[i].fh, ctr[i].w, ctr[i].prim, ctr[i].h, ctr[i].dx,
-						 face[i+1].fw, face[i+1].fh, KS.gas.γ, KS.vMesh.u, KS.gas.μᵣ, KS.gas.ω,
+						 face[i+1].fw, face[i+1].fh, KS.gas.γ, KS.vSpace.u, KS.gas.μᵣ, KS.gas.ω,
 						 dt, sumRes, sumAvg )
     end
 
     #if KS.set.case == "heat"
-    #    ctr[KS.pMesh.nx].w = deepcopy(ctr[KS.pMesh.nx-1].w)
-    #    ctr[KS.pMesh.nx].prim = deepcopy(ctr[KS.pMesh.nx-1].prim)
-    #    ctr[KS.pMesh.nx].h = deepcopy(ctr[KS.pMesh.nx-1].h)
+    #    ctr[KS.pSpace.nx].w = deepcopy(ctr[KS.pSpace.nx-1].w)
+    #    ctr[KS.pSpace.nx].prim = deepcopy(ctr[KS.pSpace.nx-1].prim)
+    #    ctr[KS.pSpace.nx].h = deepcopy(ctr[KS.pSpace.nx-1].h)
     #end
 
     for i in eachindex(residual)
-    	residual[i] = sqrt(sumRes[i] * KS.pMesh.nx) / (sumAvg[i] + 1.e-7)
+    	residual[i] = sqrt(sumRes[i] * KS.pSpace.nx) / (sumAvg[i] + 1.e-7)
     end
     
 end

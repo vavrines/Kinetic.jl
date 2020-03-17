@@ -64,8 +64,8 @@ end
 # ------------------------------------------------------------
 function plot_line(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
 
-    pltx = deepcopy(KS.pMesh.x)
-    plty = zeros(KS.pMesh.nx, 6)
+    pltx = deepcopy(KS.pSpace.x)
+    plty = zeros(KS.pSpace.nx, 6)
 
     for i in eachindex(pltx)
         for j=1:2
