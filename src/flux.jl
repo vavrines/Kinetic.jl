@@ -4,7 +4,8 @@
 
 
 export flux_kfvs,
-       flux_kcu
+       flux_kcu,
+       flux_em
 
 
 """
@@ -584,5 +585,67 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
     end
 
     return fw, fh0, fh1, fh2, fh3
+
+end
+
+
+function flux_em( ELL::Array{Float64,1}, BLL::Array{Float64,1}, EL::Array{Float64,1}, BL::Array{Float64,1}, 
+                  ER::Array{Float64,1}, BR::Array{Float64,1}, ERR::Array{Float64,1}, BRR::Array{Float64,1}, 
+                  ϕL::Float64, ϕR::Float64, ψL::Float64, ψR::Float64, dxL::Float64, dxR::Float64,
+                  A1p::Array{Float64,2}, A1n::Array{Float64,2}, D1::Array{Float64,1}, 
+                  sol::Float64, χ::Float64, ν::Float64, dt::Float64 )
+
+    slop = zeros(8, 8)
+    slop[3,1] = -0.5 * sol^2 * (BR[2] - BL[2]) + 0.5 * sol * (ER[3]-EL[3])
+    slop[5,1] = 0.5 * sol * (BR[2] - BL[2]) - 0.5 * (ER[3] - EL[3])
+    slop[2,2] = 0.5 * sol^2 * (BR[3] - BL[3]) + 0.5 * sol * (ER[2] - EL[2])
+    slop[6,2] = 0.5 * sol * (BR[3] - BL[3]) + 0.5 * (ER[2] - EL[2])
+    slop[1,3] = 0.5 * sol * χ * (ER[1] - EL[1])
+    slop[7,3] = 0.5 * χ * (ER[1] - EL[1])
+    slop[4,4] = 0.5 * sol * ν * (BR[1] - BR[1])
+    slop[8,4] = 0.5 * sol^2 * χ * (BR[1] - BR[1])
+    slop[3,5] = -0.5 * sol^2 * (BR[2] - BL[2]) - 0.5 * sol * (ER[3] - EL[3])
+    slop[5,5] = -0.5 * sol * (BR[2] - BL[2]) - 0.5 * (ER[3] - EL[3])
+    slop[2,6] = 0.5 * sol^2 * (BR[3] - BL[3]) - 0.5 * sol * (ER[2] - EL[2])
+    slop[6,6] = -0.5 * sol * (BR[3] - BL[3]) + 0.5 * (ER[2] - EL[2])
+    slop[1,7] = -0.5 * sol * χ * (ER[1] - EL[1])
+    slop[7,7] = 0.5 * χ * (ER[1] - EL[1])
+    slop[4,8] = -0.5 * sol * ν * (BR[1] - BR[1])
+    slop[8,8] = 0.5 * sol^2 * χ * (BR[1] - BR[1])
+
+    limiter = zeros(8, 8)
+    limiter[3,1] = -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
+    limiter[5,1] = 0.5 * sol * (BL[2] - BLL[2]) - 0.5 * (EL[3] - ELL[3])
+    limiter[2,2] = 0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[2] - ELL[2])
+    limiter[6,2] = 0.5 * sol * (BL[3] - BLL[3]) + 0.5 * (EL[2] - ELL[2])
+    limiter[1,3] = 0.5 * sol * χ * (EL[1] - ELL[1])
+    limiter[7,3] = 0.5 * χ * (EL[1] - ELL[1])
+    limiter[4,4] = 0.5 * sol * ν * (BL[1] - BL[1])
+    limiter[8,4] = 0.5 * sol^2 * χ * (BL[1] - BL[1])
+    limiter[3,5] = -0.5 * sol^2 *(BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
+    limiter[5,5] = -0.5 * sol *(BRR[2] - BR[2]) - 0.5 * (ERR[3] - ER[3])
+    limiter[2,6] = 0.5 * sol^2 *(BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
+    limiter[6,6] = -0.5 * sol * (BRR[3] - BR[3]) + 0.5 * (ERR[2] - ER[2])
+    limiter[1,7] = -0.5 * sol * χ * (ERR[1] - ER[1])
+    limiter[7,7] = 0.5 * χ *(ERR[1] - ER[1])
+    limiter[4,8] = -0.5 * sol * ν *(BRR[1] - BRR[1])
+    limiter[8,8] = 0.5 * sol^2 * χ * (BRR[1] - BRR[1])
+
+    for i=1:8
+    limiter_theta = sum(slop[:,i] .* limiter[:,i]) / (sum(slop[:,i].^2) + 1.e-7)
+    slop[:,i] .*= max(0., min(min((1. + limiter_theta) / 2., 2.), 2. * limiter_theta))
+    end
+
+    femL = zeros(8); femR = zeros(8)
+    for i=1:8
+    femL[i] = sum(A1n[i,1:3] .* (ER .- EL)) + sum(A1n[i,4:6] .* (BR .- BL)) +
+        A1n[i,7] * (ϕR - ϕL) + A1n[i,8] * (ψR - ψL) +
+        0.5 * sum(fortsign.(1., D1) .* (1. .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i,:])
+    femR[i] = sum(A1p[i,1:3] .* (ER .- EL)) + sum(A1p[i,4:6] .* (BR .- BL)) +
+        A1p[i,7] * (ϕR - ϕL) + A1p[i,8] * (ψR - ψL) -
+        0.5 * sum(fortsign.(1., D1) .* (1. .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i,:])
+    end
+
+    return femL, femR
 
 end
