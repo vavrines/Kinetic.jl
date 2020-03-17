@@ -92,25 +92,14 @@ struct SolverSet <: AbstractSolverSet
 		γ = heat_capacity_ratio(inK, parse(Int, space[1]))
 		
 		# generate data structure
-		if space == "1d1f" || space == "1d2f"
+		if case == "shock"
 			μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
 		
 			set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
 			pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
 			vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
 			gas = GasProperty(knudsen, mach, prandtl, inK, γ, omega, alphaRef, omegaRef, μᵣ)
-		elseif space == "1d4f"
-			v0 = u0 * sqrt(mi / me)
-			v1 = u1 * sqrt(mi / me)
-			kne = knudsen * (me / mi)
-
-			set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
-			mesh = PSpace1D(x0, x1, nx, pMeshType, nxg)
-			quad = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
-			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, gamma, mi, ni, me, ne, lD, rL, sol, echi, bnu)
-		end
-
-		if case == "shock"
+			
 			if space == "1d1f"
 				wL, primL, hL, bcL,
 				wR, primR, hR, bcR = ib_rh(mach, γ, vSpace.u)
@@ -123,7 +112,19 @@ struct SolverSet <: AbstractSolverSet
 				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
 			end
 		elseif case == "brio-wu"
+			v0 = u0 * sqrt(mi / me)
+			v1 = u1 * sqrt(mi / me)
+			kne = knudsen * (me / mi)
 
+			set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
+			mesh = PSpace1D(x0, x1, nx, pMeshType, nxg)
+			quad = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
+			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, gamma, mi, ni, me, ne, lD, rL, sol, echi, bnu)
+		
+			wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 
+            wR, primR, h0R, h1R, h2R, h3R, bcR, ER, BR, lorenzR = ib_briowu(γ, vSpace.u, mi, me)
+		    ib = MIB1D4F( wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 
+           				  wR, primR, h0R, h1R, h2R, h3R, bcR, ER, BR, lorenzR )
 		end
 
 		# create working directory

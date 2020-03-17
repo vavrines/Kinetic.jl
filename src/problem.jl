@@ -86,11 +86,18 @@ function ib_briowu(gam::Float64, uspace::AbstractArray{Float64,2}, mi::Float64, 
     primL[4,2] = 0.
     primL[5,2] = 1. / mr
 
-    wL = prim_conserve(primL, gam)
-    hL = mixture_maxwellian(uspace, primL)
+    wL = mixture_prim_conserve(primL, gam)
+    h0L = mixture_maxwellian(uspace, primL)
+    
+    h1L = similar(h0L); h2L = similar(h0L), h3L = similar(h0L)    
+    for j in axes(h0L, 2)
+        h1L[:,j] .= primL[3,j] .* h0L[:,j]
+        h2L[:,j] .= primL[4,j] .* h0L[:,j]
+        h3L[:,j] .= (primL[3,j]^2 + primL[4,j]^2 + 2. / (2. * primL[end,j])) * h0L[:,j]
+    end
 
     EL = zeros(3)
-    BL = zeros(3); BL[1] = 0.75; BL[2] = 1.0
+    BL = zeros(3); BL[1] = 0.75; BL[2] = 1.
 
     # downstream
     primR = Array{Float64}(undef, 5, 2)
@@ -105,16 +112,23 @@ function ib_briowu(gam::Float64, uspace::AbstractArray{Float64,2}, mi::Float64, 
     primR[4,2] = 0.
     primR[5,2] = 1.25 / mr
 
-    wR = get_conserved(primR, gam)
-    hR = get_maxwell(uspace, primR)
+    wR = mixture_prim_conserve(primR, gam)
+    h0R = mixture_maxwellian(uspace, primR)
     
+    h1R = similar(h0R); h2R = similar(h0R), h3R = similar(h0R)    
+    for j in axes(h0L, 2)
+        h1R[:,j] .= primR[3,j] .* h0R[:,j]
+        h2R[:,j] .= primR[4,j] .* h0R[:,j]
+        h3R[:,j] .= (primR[3,j]^2 + primR[4,j]^2 + 2. / (2. * primR[end,j])) * h0R[:,j]
+    end
+
     ER = zeros(3)
-    BR = zeros(3); BR[1] = 0.75; BR[2] = -1.0
+    BR = zeros(3); BR[1] = 0.75; BR[2] = -1.
 
     lorenz = zeros(3, 2)
     bc = zeros(5, 2)
     
-    return wL, primL, hL, bc, EL, BL, lorenz, 
-           wR, primR, hR, bc, ER, BR, lorenz
+    return wL, primL, h0L, h1L, h2L, h3L, bc, EL, BL, lorenz, 
+           wR, primR, h0R, h1R, h2R, h3R, bc, ER, BR, lorenz
 
 end
