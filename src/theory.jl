@@ -10,7 +10,9 @@ export gauss_moments,
 	   maxwellian, 
 	   mixture_maxwellian,
 	   conserve_prim, 
+	   mixture_conserve_prim,
 	   prim_conserve, 
+	   mixture_prim_conserve,
 	   heat_capacity_ratio, 
 	   ref_vhs_vis, 
 	   sound_speed, 
@@ -301,6 +303,16 @@ prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) =
 prim_conserve([ρ, U, V, λ], γ)
 
 
+function mixture_prim_conserve(prim::Array{<:Real,2}, γ::Real)
+	w = zeros(axes(prim))
+	for j in axes(w, 2)
+		w[:,j] .= prim_conserve(prim[:,j], γ)
+	end
+
+	return w
+end
+
+
 # ------------------------------------------------------------
 # conservative -> primitive
 # ------------------------------------------------------------
@@ -336,6 +348,16 @@ conserve_prim([ρ, M, E], gamma)
 
 conserve_prim(ρ::Real, MX::Real, MY::Real, E::Real, gamma::Real) = 
 conserve_prim([ρ, MX, MY, E], gamma)
+
+
+function mixture_conserve_prim(w::Array{<:Real,2}, γ::Real)
+	prim = zeros(axes(w))
+	for j in axes(prim, 2)
+		prim[:,j] .= conserve_prim(w[:,j], γ)
+	end
+
+	return prim
+end
 
 
 """
