@@ -15,6 +15,7 @@ export read_dict,
 # >@param[in]  allowed      :  keywords
 # >@return  vars            :  dictionary with values of variables
 """
+
 function read_dict(filename::String, allowed)
 
     #println("Reading config from $filename")
@@ -36,7 +37,42 @@ function read_dict(filename::String, allowed)
             println(line)
 
             #vars[stripped] = parse(Float64, val)
+            #vars[stripped] = strip(val)
+            tmp = tryparse(Float64, val)
+            if isa(tmp, Nothing)
+                vars[stripped] = strip(val)
+            else
+                vars[stripped] = isinteger(tmp) ? Int(tmp) : tmp
+            end
+        end
+    end
+
+    println("")
+    return vars
+
+end
+
+
+function read_dict(filename::String)
+
+    f = open(filename)
+    vars = Dict{String, Any}()
+
+    for line in eachline(f)
+        # skip comments
+        if length(line) == 0 || line[1] == '#' 
+            continue
+        end
+
+        var, val = split(line, "=")
+        stripped = strip(var)
+        println(line)
+
+        tmp = tryparse(Float64, val)
+        if isa(tmp, Nothing)
             vars[stripped] = strip(val)
+        else
+            vars[stripped] = isinteger(tmp) ? Int(tmp) : tmp
         end
     end
 

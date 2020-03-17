@@ -3,7 +3,7 @@
 # ------------------------------------------------------------
 
 
-export SolverSet1D,
+export SolverSet,
 	   solve!,
 	   timestep,
 	   reconstruct!,
@@ -15,7 +15,7 @@ export SolverSet1D,
 # ------------------------------------------------------------
 # Structure of solver setup
 # ------------------------------------------------------------
-struct SolverSet1D <: AbstractSolverSet
+struct SolverSet <: AbstractSolverSet
 
 	# setup
 	set :: AbstractSetup
@@ -35,63 +35,78 @@ struct SolverSet1D <: AbstractSolverSet
 	# file system
 	outputFolder :: String
 
-	#--- initialization ---#
-	function SolverSet1D(configfilename::String)
+	# constructor
+	SolverSet() = SolverSet("./config/config.txt")
+
+	function SolverSet(configfilename::String)
 		
+		#--- with allowrance ---#
 		# read following data from text file
+		#=
 		allowed = [ "case", "space", "interpOrder", "limiter", "cfl", "maxTime", 
 				    "x0", "x1", "nx", "nxg", "pMeshType",
 				    "u0", "u1", "nu", "nug", "vMeshType",
-				    "knudsen", "mach", "prandtl", "inK", "omega", "alphaRef", "omegaRef" ]
-		D = read_dict(configfilename, allowed)
+				    "knudsen", "mach", "prandtl", "inK", "omega", "alphaRef", "omegaRef" ]=#
+		# D = read_dict(configfilename, allowed)
 
-		# read configuration from text file
+		# define variables
+		#=
 		case = D["case"]
         space = D["space"]
-		interpOrder = parse(Int64, D["interpOrder"])
+		interpOrder = D["interpOrder"]
 		limiter = D["limiter"]
-		cfl = parse(Float64, D["cfl"])
-		maxTime = parse(Float64, D["maxTime"])
+		cfl = D["cfl"]
+		maxTime = D["maxTime"]
 
-		x0 = parse(Float64, D["x0"])
-		x1 = parse(Float64, D["x1"])
-		nx = parse(Int64, D["nx"])
-        nxg = parse(Int64, D["nxg"])
+		x0 = D["x0"]
+		x1 = D["x1"]
+		nx = D["nx"]
+        nxg = D["nxg"]
         pMeshType = D["pMeshType"]
 
-		u0 = parse(Float64, D["u0"])
-		u1 = parse(Float64, D["u1"])
-        nu = parse(Int64, D["nu"])
-        nug = parse(Int64, D["nug"])
+		u0 = D["u0"]
+		u1 = D["u1"]
+        nu = D["nu"]
+        nug = D["nug"]
 		vMeshType = D["vMeshType"]
 
-		Kn = parse(Float64, D["knudsen"])
-		Ma = parse(Float64, D["mach"])
-		Pr = parse(Float64, D["prandtl"])
-        K = parse(Float64, D["inK"])
-        ω = parse(Float64, D["omega"])
-		αᵣ = parse(Float64, D["alphaRef"])
-        ωᵣ = parse(Float64, D["omegaRef"])
+		Kn = D["knudsen"]
+		Ma = D["mach"]
+		Pr = D["prandtl"]
+        K = D["inK"]
+        ω = D["omega"]
+		αᵣ = D["alphaRef"]
+        ωᵣ = D["omegaRef"]
+		=#
+
+		#--- without allowrance ---#
+		D = read_dict(configfilename)
+
+		# automatically generate variables from dictionary
+		for key in keys(D)
+			s = Symbol(key)
+			@eval $s = $(D[key])
+		end
 
 		# deduce configuration from existed data
-		γ = heat_capacity_ratio(K, parse(Int,space[1]))
-        μᵣ = ref_vhs_vis(Kn, αᵣ, ωᵣ)
+		γ = heat_capacity_ratio(inK, parse(Int, space[1]))
+        μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
 
 		# generate data structure
 		set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
 		pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
         vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
-	    gas = GasProperty(Kn, Ma, Pr, K, γ, ω, αᵣ, ωᵣ, μᵣ)
+	    gas = GasProperty(knudsen, mach, prandtl, inK, γ, omega, alphaRef, omegaRef, μᵣ)
 
 		if case == "shock"
 			if space == "1d1f"
 				wL, primL, hL, bcL,
-				wR, primR, hR, bcR = ib_rh(Ma, γ, vSpace.u)
+				wR, primR, hR, bcR = ib_rh(mach, γ, vSpace.u)
 
 				ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
 			elseif space == "1d2f"
 				wL, primL, hL, bL, bcL,
-				wR, primR, hR, bR, bcR = ib_rh(Ma, γ, vSpace.u, K)
+				wR, primR, hR, bR, bcR = ib_rh(mach, γ, vSpace.u, inK)
 
 				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
 			end
@@ -117,11 +132,12 @@ end # struct
 # ------------------------------------------------------------
 # Solution algorithm
 # ------------------------------------------------------------
-function solve!( KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, 
+function solve!( KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, 
 				 face::Array{<:AbstractInterface1D,1}, simTime::Float64 )
 	
 	#--- setup ---#
 	dim = parse(Int, KS.set.space[1])
+	ns = 
 
 	iter = 0
 	dt = 0.
@@ -166,7 +182,7 @@ end # function
 # ------------------------------------------------------------
 # Calculate time step
 # ------------------------------------------------------------
-function timestep(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, simTime::Float64)
+function timestep(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, simTime::Float64)
 
     tmax = 0.0
 
@@ -188,7 +204,7 @@ end
 # ------------------------------------------------------------
 # Reconstruction
 # ------------------------------------------------------------
-function reconstruct!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1})
+function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
 
 	if KS.set.interpOrder == 1
 		return
@@ -209,7 +225,7 @@ end
 # ------------------------------------------------------------
 # Evolution
 # ------------------------------------------------------------
-function evolve!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Float64)
+function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{Interface1D1F,1}, dt::Float64)
 
     #if KS.set.case == "heat"
 #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
@@ -225,7 +241,7 @@ end
 # ------------------------------------------------------------
 # Update
 # ------------------------------------------------------------
-function update!(KS::SolverSet1D, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Float64, residual::Array{Float64,1})
+function update!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Float64, residual::Array{Float64,1})
 
 	dim = parse(Int, KS.set.space[1])
     sumRes = zeros(dim+2)

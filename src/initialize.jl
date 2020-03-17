@@ -30,7 +30,7 @@ function initialize(configfilename::String)
 
         if dim == 1
             println("1D solver")
-            ks = SolverSet1D(configfilename)
+            ks = SolverSet(configfilename)
         elseif dim == 2
             println("2D solver")
             #ks = SolverSet2D(configfilename)
@@ -59,7 +59,7 @@ end
 # ------------------------------------------------------------
 # Initialize finite volume method
 # ------------------------------------------------------------
-function init_fvm(KS::SolverSet1D)
+function init_fvm(KS::SolverSet)
 
     dim = parse(Int, KS.set.space[1])
 
