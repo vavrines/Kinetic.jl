@@ -4,7 +4,8 @@
 
 
 export Setup,
-       GasProperty,
+	   GasProperty,
+	   PlasmaProperty,
        IB1D1F,
 	   IB1D2F,
 	   ControlVolume1D1F,
@@ -41,7 +42,7 @@ end
 
 
 # ------------------------------------------------------------
-# Structure of gas property
+# Structure of property
 # ------------------------------------------------------------
 struct GasProperty <: AbstractProperty
 
@@ -67,6 +68,81 @@ struct GasProperty <: AbstractProperty
 
 		# inner constructor method
 		new(Kn, Ma, Pr, K, γ, ω, αᵣ, ωᵣ, μᵣ)
+    
+    end
+
+end
+
+
+struct PlasmaProperty <: AbstractProperty
+
+	Kn :: Float64; Ma :: Float64; Pr :: Float64
+	K :: Float64; γ :: Float64; 
+
+	sol :: Float64; χ :: Float64; ν :: Float64
+	A1p :: Array{Float64,2}; A1n :: Array{Float64,2}; D1 :: Array{Float64,1}
+
+    function GasProperty( KN::Array{<:Real,1}, MA::Real, PR::Real, 
+    			 		  INK::Real, GAMMA::Real, 
+    			 		  MI::Real, NI::Real, ME::Real, NE::Real,
+    			 		  LD::Real, RL::Real, SOL::Real, CHI::Real, NU::Real )
+
+    	Kn = Float64.(KN)
+    	Ma = Float64(MA)
+    	Pr = Float64(PR)
+		K = Float64(INK)
+		γ = Float64(GAMMA)
+
+		mi = Float64(MI); ni = Float64(NI)
+		me = Float64(ME); ne = Float64(NE)
+		lD = Float64(LD); rL = Float64(RL)
+
+		sol = Float64(SOL)
+		χ = Float64(CHI)
+		ν = Float64(NU)
+		
+		# A^+
+		A1p = Array{Float64}(undef, 8, 8)
+		A1p[1,1] = (sol * χ) / 2.
+		A1p[7,1] = χ / 2.
+		A1p[2,2] = sol / 2.
+		A1p[6,2] = 0.5
+		A1p[3,3] = sol / 2.
+		A1p[5,3] = -1. / 2.
+		A1p[4,4] = (sol * ν) / 2.
+		A1p[8,4] = (sol^2 * ν) / 2.
+		A1p[3,5] = -sol^2 / 2.
+		A1p[5,5] = sol / 2.
+		A1p[2,6] = sol^2 / 2.
+		A1p[6,6] = sol / 2.
+		A1p[1,7] = (sol^2 * χ) / 2.
+		A1p[7,7] = (sol * χ) / 2.
+		A1p[4,8] = ν / 2.
+		A1p[8,8] = (sol * ν) / 2.
+
+		# A^-
+		A1n = Array{Float64}(undef, 8, 8)
+		A1n[1,1] = -(sol * χ) / 2.
+		A1n[7,1] = χ / 2.
+		A1n[2,2] = -sol / 2.
+		A1n[6,2] = 1. / 2.
+		A1n[3,3] = -sol / 2.
+		A1n[5,3] = -1. / 2.
+		A1n[4,4] = -(sol * ν) / 2.
+		A1n[8,4] = (sol^2 * ν) / 2.
+		A1n[3,5] = -sol^2 / 2.
+		A1n[5,5] = -sol / 2.
+		A1n[2,6] = sol^2 / 2.
+		A1n[6,6] = -sol / 2.
+		A1n[1,7] = (sol^2 * χ) / 2.
+		A1n[7,7] = -(sol * χ) / 2.
+		A1n[4,8] = ν / 2.
+		A1n[8,8] = -(sol * ν) / 2.
+
+		D1 = [sol, sol, sol * χ, sol * ν, -sol, -sol, -sol * χ, -sol * ν]
+
+		# inner constructor method
+		new(Kn, Ma, Pr, K, γ, mi, ni, me, ne, lD, rL, sol, χ, ν, A1p, A1n, D1)
     
     end
 
