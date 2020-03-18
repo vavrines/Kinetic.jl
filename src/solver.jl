@@ -274,7 +274,7 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 #    end
 
     Threads.@threads for i=2:KS.pSpace.nx
-		@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].h, ctr[i].h, KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sh, ctr[i].sh )
+		@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].f, ctr[i].f, KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sf, ctr[i].sf )
 	end
 
 end
@@ -290,9 +290,9 @@ function update!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
     sumAvg = zeros(dim+2)
 
     Threads.@threads for i=2:KS.pSpace.nx-1
-		@inbounds step!( face[i].fw, face[i].ff, ctr[i].w, ctr[i].prim, ctr[i].h, ctr[i].dx,
+		@inbounds step!( face[i].fw, face[i].ff, ctr[i].w, ctr[i].prim, ctr[i].f, 
 						 face[i+1].fw, face[i+1].ff, KS.gas.γ, KS.vSpace.u, KS.gas.μᵣ, KS.gas.ω,
-						 dt, sumRes, sumAvg )
+						 ctr[i].dx, dt, sumRes, sumAvg )
     end
 
     #if KS.set.case == "heat"
@@ -311,11 +311,11 @@ end
 # ------------------------------------------------------------
 # Stochastic collocation update
 # ------------------------------------------------------------
-function step!( fwL::Array{Float64,1}, fhL::AbstractArray{Float64,1}, 
-				w::Array{Float64,1}, prim::Array{Float64,1}, h::AbstractArray{Float64,1}, dx::Float64, 
-				fwR::Array{Float64,1}, fhR::AbstractArray{Float64,1}, 
+function step!( fwL::Array{Float64,1}, ffL::AbstractArray{Float64,1}, 
+				w::Array{Float64,1}, prim::Array{Float64,1}, f::AbstractArray{Float64,1}, 
+				fwR::Array{Float64,1}, ffR::AbstractArray{Float64,1}, 
 				γ::Float64, u::AbstractArray{Float64,1}, μᵣ::Float64, ω::Float64,
-				dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
+				dx::Float64, dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
 
 	#--- store W^n and calculate H^n,\tau^n ---#
 	w_old = deepcopy(w)
@@ -329,12 +329,42 @@ function step!( fwL::Array{Float64,1}, fhL::AbstractArray{Float64,1},
 	@. AVG += abs(w)
 
 	#--- calculate M^{n+1} and tau^{n+1} ---#
-	H = maxwellian(u, prim)
+	M = maxwellian(u, prim)
 	τ = vhs_collision_time(prim, μᵣ, ω)
 
 	#--- update distribution function ---#
 	for i in eachindex(u)
-		h[i] = (h[i] + (fhL[i] - fhR[i]) / dx + dt / τ * H[i]) / (1.0 + dt / τ)
+		f[i] = (f[i] + (ffL[i] - ffR[i]) / dx + dt / τ * M[i]) / (1.0 + dt / τ)
+	end
+
+end
+
+function step!( fwL::Array{Float64,1}, fhL::AbstractArray{Float64,1}, fbL::AbstractArray{Float64,1},
+				w::Array{Float64,1}, prim::Array{Float64,1}, h::AbstractArray{Float64,1}, b::AbstractArray{Float64,1}, 
+				fwR::Array{Float64,1}, fhR::AbstractArray{Float64,1}, fbR::AbstractArray{Float64,1}, 
+				K::Float64, γ::Float64, u::AbstractArray{Float64,1}, μᵣ::Float64, ω::Float64,
+				dx::Float64, dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
+
+	#--- store W^n and calculate H^n,\tau^n ---#
+	w_old = deepcopy(w)
+
+	#--- update W^{n+1} ---#
+	@. w += (fwL - fwR) / dx
+	prim .= conserve_prim(w, γ)
+
+	#--- record residuals ---#
+	@. RES += (w - w_old)^2
+	@. AVG += abs(w)
+
+	#--- calculate M^{n+1} and tau^{n+1} ---#
+	MH = maxwellian(u, prim)
+	MB = MH .* K ./ (2. * prim[end])
+	τ = vhs_collision_time(prim, μᵣ, ω)
+
+	#--- update distribution function ---#
+	for i in eachindex(u)
+		h[i] = (h[i] + (fhL[i] - fhR[i]) / dx + dt / τ * MH[i]) / (1.0 + dt / τ)
+		b[i] = (b[i] + (fbL[i] - fbR[i]) / dx + dt / τ * MB[i]) / (1.0 + dt / τ)
 	end
 
 end
