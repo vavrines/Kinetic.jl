@@ -273,11 +273,46 @@ mutable struct ControlVolume1D1F <: AbstractControlVolume1D
 	prim :: Array{Float64,1}
 	sw :: Array{Float64,1}
 
-	h :: AbstractArray{Float64,1}
-	sh :: AbstractArray{Float64,1}
+	f :: AbstractArray{Float64,1}
+	sf :: AbstractArray{Float64,1}
 
 	function ControlVolume1D1F( X::Real, DX::Real, 
-							    w0::Array{<:Real,1}, prim0::Array{<:Real,1}, h0::AbstractArray{Float64,1} )
+							    w0::Array{<:Real,1}, prim0::Array{<:Real,1}, f0::AbstractArray{Float64,1} )
+
+		x = Float64(X)
+		dx = Float64(DX)
+
+		w = Float64.(w0)
+		prim = Float64.(prim0)
+		sw = zeros(axes(w))
+
+		f = deepcopy(f0)
+		sf = zeros(axes(f))
+
+		new(x, dx, w, prim, sw, f, sf)
+
+	end
+
+end
+
+
+mutable struct ControlVolume1D2F <: AbstractControlVolume1D
+
+	x :: Float64
+	dx :: Float64
+
+	w :: Array{Float64,1}
+	prim :: Array{Float64,1}
+	sw :: Array{Float64,1}
+
+	h :: AbstractArray{Float64,1}
+	b :: AbstractArray{Float64,1}
+	sh :: AbstractArray{Float64,1}
+	sb :: AbstractArray{Float64,1}
+
+	function ControlVolume1D1F( X::Real, DX::Real, 
+								w0::Array{<:Real,1}, prim0::Array{<:Real,1}, 
+								h0::AbstractArray{Float64,1}, b0::AbstractArray{Float64,1} )
 
 		x = Float64(X)
 		dx = Float64(DX)
@@ -287,9 +322,11 @@ mutable struct ControlVolume1D1F <: AbstractControlVolume1D
 		sw = zeros(axes(w))
 
 		h = deepcopy(h0)
+		b = deepcopy(b0)
 		sh = zeros(axes(h))
+		sb = zeros(axes(b))
 
-		new(x, dx, w, prim, sw, h, sh)
+		new(x, dx, w, prim, sw, h, b, sh, sb)
 
 	end
 

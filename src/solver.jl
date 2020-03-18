@@ -221,15 +221,44 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
 
 	if KS.set.interpOrder == 1
 		return
-	elseif KS.set.interpOrder == 2
-		#ctr[1].sw .= reconstruct3(ctr[1].w, ctr[2].w, 0.5*(ctr[1].dx+ctr[2].dx))
-		#ctr[KS.nx].sw .= reconstruct3(ctr[KS.nx-1].w, ctr[KS.nx].w, 0.5*(ctr[KS.nx-1].dx+ctr[KS.nx].dx))
+	end
 
-	    Threads.@threads for i=2:KS.pSpace.nx-1
-			@inbounds ctr[i].sw .= reconstruct3( ctr[i-1].w, ctr[i].w, ctr[i+1].w, 
-												 0.5*(ctr[i-1].dx+ctr[i].dx), 0.5*(ctr[i].dx+ctr[i+1].dx),
-									   			 KS.set.limiter )
-	    end
+	#ctr[1].sw .= reconstruct3(ctr[1].w, ctr[2].w, 0.5*(ctr[1].dx+ctr[2].dx))
+	#ctr[KS.nx].sw .= reconstruct3(ctr[KS.nx-1].w, ctr[KS.nx].w, 0.5*(ctr[KS.nx-1].dx+ctr[KS.nx].dx))
+
+	# macroscopic variables
+	Threads.@threads for i=2:KS.pSpace.nx-1
+		@inbounds ctr[i].sw .= reconstruct3( ctr[i-1].w, ctr[i].w, ctr[i+1].w, 
+											 0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+											 KS.set.limiter )									
+	end
+	
+	# particle distribution function
+	Threads.@threads for i=2:KS.pSpace.nx-1
+		if KS.set.space == "1d1f"
+			@inbounds ctr[i].sf .= reconstruct3( ctr[i-1].f, ctr[i].f, ctr[i+1].f, 
+												 0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+												 KS.set.limiter )
+		elseif KS.set.space == "1d2f"
+			@inbounds ctr[i].sh .= reconstruct3( ctr[i-1].h, ctr[i].h, ctr[i+1].h, 
+												 0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+												 KS.set.limiter )
+			@inbounds ctr[i].sb .= reconstruct3( ctr[i-1].b, ctr[i].b, ctr[i+1].b, 
+												 0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+												 KS.set.limiter )	
+		elseif KS.set.space == "1d4f"
+			@inbounds ctr[i].sh0 .= reconstruct3( ctr[i-1].h0, ctr[i].h0, ctr[i+1].h0, 
+												  0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+												  KS.set.limiter )		
+			@inbounds ctr[i].sh1 .= reconstruct3( ctr[i-1].h1, ctr[i].h1, ctr[i+1].h1, 
+												  0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+												  KS.set.limiter )	
+			@inbounds ctr[i].sh2 .= reconstruct3( ctr[i-1].h2, ctr[i].h2, ctr[i+1].h2, 
+												  0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+												  KS.set.limiter )	
+			@inbounds ctr[i].sh3 .= reconstruct3( ctr[i-1].h3, ctr[i].h3, ctr[i+1].h3, 
+												  0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
+												  KS.set.limiter )							 								 									
 	end
 
 end
