@@ -418,7 +418,7 @@ end
 
 
 # ------------------------------------------------------------
-# 1D4F flux with AAP model
+# 1D2F flux with AAP model
 # ------------------------------------------------------------
 function flux_kcu( wL::Array{Float64,2}, hL::AbstractArray{Float64,2}, bL::AbstractArray{Float64,2},  
                    wR::Array{Float64,2}, hR::AbstractArray{Float64,2}, bR::AbstractArray{Float64,2},  

@@ -21,7 +21,10 @@ export gauss_moments,
 	   sound_speed, 
 	   vhs_collision_time,
 	   aap_hs_collision_time,
-	   aap_hs_prim
+	   aap_hs_prim,
+	   aap_hs_diffeq,
+	   shift_pdf!,
+	   em_coefficients
 
 
 """
@@ -599,10 +602,143 @@ function aap_hs_prim(prim::Array{<:Real,2}, tau::Array{<:Real,1}, mi::Real, ni::
 		mixprim[5,2] = 1. / (1. / prim[end,2] - 2. / 3. * (mixprim[2,2] - prim[2,2])^2 - 2. / 3. * (mixprim[3,2] - prim[3,2])^2 - 2. / 3. * (mixprim[4,2] - prim[4,2])^2 + 
 					tau[2] / kn * 2. * me / (mi + me) * (4. * sqrt(2.) / (3. * sqrt(π)) * prim[1,1] / (ni + ne) / (mi + me) * sqrt(1. / prim[end,1] + 1. / prim[end,2])) * (1. / prim[end,1] * mi / me - 1. / prim[end,2] + 
 					2. / 3. * mi / me * (prim[2,1] - prim[2,2])^2 + 2. / 3. * mi / me * (prim[3,1] - prim[3,2])^2 + 2. / 3. * mi / me * (prim[4,1] - prim[4,2])^2))
-		else
-			println("AAP mixture : dimension error")
-		end
+	else
+		println("AAP mixture : dimension error")
+	end
 
 	return mixprim
 
-    end
+end
+
+
+# ------------------------------------------------------------
+# Mixture source term function for DifferentialEquations.jl
+# ------------------------------------------------------------
+function aap_hs_diffeq(du, u, p, t)
+	
+	I₁, I₂, I₃, I₄, I₅, E₁, E₂, E₃, E₄, E₅ = u
+    τᵢ, τₑ, mi, ni, me, ne, kn, γ = p
+
+    τ = [ τᵢ, τₑ ]
+    w = [ I₁ E₁;
+          I₂ E₂;
+          I₃ E₃;
+          I₄ E₄;
+          I₅ E₅ ]
+    
+    # modified variables
+	prim = mixture_conserve_prim(w, γ)
+	mixprim = aap_hs_prim(prim, τ, mi, ni, me, ne, kn)
+	mixw = mixture_conserve_prim(prim, γ)
+
+    du[1] = (mixw[1,1] - I₁) / τᵢ
+    du[2] = (mixw[2,1] - I₂) / τᵢ
+    du[3] = (mixw[3,1] - I₃) / τᵢ
+    du[4] = (mixw[4,1] - I₄) / τᵢ
+    du[5] = (mixw[5,1] - I₅) / τᵢ
+    du[6] = (mixw[1,2] - E₁) / τₑ
+    du[7] = (mixw[2,2] - E₂) / τₑ
+    du[8] = (mixw[3,2] - E₃) / τₑ
+    du[9] = (mixw[4,2] - E₄) / τₑ
+    du[10] = (mixw[5,2] - E₅) / τₑ
+
+	nothing
+	
+end
+
+
+# ------------------------------------------------------------
+# Shift distribution function by external force
+# ------------------------------------------------------------
+function shift_pdf!(f::AbstractArray{Float64,1}, a::Float64, du::Float64, dt::Float64)
+
+	q0 = eachindex(f) |> first # for OffsetArray
+	q1 = eachindex(f) |> last
+
+	if a > 0
+		shift = Int(floor(a * dt / du)) # only for uniform velocity grid
+		for k=q1:-1:q0+shift
+			f[k] = f[k-shift]
+		end
+		for k=q0:shift+q0-1
+			f[k] = 0.
+		end
+
+		for k=q0+1:q1
+			f[k] += (dt * a - du * shift) * (f[k-1] - f[k]) / du
+		end
+	else
+		shift = Int(floor(-a * dt / du))
+		for k=q0:q1-shift
+			f[k] = f[k+shift]
+		end
+		for k=q1-shift+1:q1
+			f[k] = 0.
+		end
+
+		for k=q0:q1-1
+			f[k] += (dt * a + du * shift) * (f[k] - f[k+1]) / du
+		end
+	end
+
+	f[q0] = f[q0+1]
+	f[q1] = f[q1-1]
+
+end
+
+
+function em_coefficients( prim::Array{Float64,2}, E::Array{Float64,1}, B::Array{Float64,1}, mr::Float64, 
+						  lD::Float64, rL::Float64, dt::Float64 )
+
+	A = zeros(9, 9)
+	A[1,1] = -1. / (2. * rL)
+	A[2,2] = -1. / (2. * rL)
+	A[3,3] = -1. / (2. * rL)
+	A[4,1] = mr / (2. * rL)
+	A[5,2] = mr / (2. * rL)
+	A[6,3] = mr / (2. * rL)
+	A[7,1] = 1. / (dt)
+	A[8,2] = 1. / (dt)
+	A[9,3] = 1. / (dt)
+
+	A[1,4] = 1. / (dt)
+	A[1,5] = -B[3] / (2. * rL)
+	A[1,6] = B[2] / (2. * rL)
+	A[2,4] = B[3] / (2. * rL)
+	A[2,5] = 1. / (dt)
+	A[2,6] = -B[1] / (2. * rL)
+	A[3,4] = -B[2] / (2. * rL)
+	A[3,5] = B[1] / (2. * rL)
+	A[3,6] = 1. / (dt)
+
+	A[4,7] = 1. / (dt)
+	A[4,8] = mr * B[3] / (2. * rL)
+	A[4,9] = -mr * B[2] / (2. * rL)
+	A[5,7] = -mr * B[3] / (2. * rL)
+	A[5,8] = 1. / (dt)
+	A[5,9] = mr * B[1] / (2. * rL)
+	A[6,7] = mr * B[2] / (2. * rL)
+	A[6,8] = -mr * B[1] / (2. * rL)
+	A[6,9] = 1. / (dt)
+
+	A[7,4] = prim[1,1] / (2. * rL * lD^2)
+	A[8,5] = prim[1,1] / (2. * rL * lD^2)
+	A[9,6] = prim[1,1] / (2. * rL * lD^2)
+	A[7,7] = -(prim[1,2] * mr) / (2. * rL * lD^2)
+	A[8,8] = -(prim[1,2] * mr) / (2. * rL * lD^2)
+	A[9,9] = -(prim[1,2] * mr) / (2. * rL * lD^2)
+
+	b = zeros(9)
+	b[1] = prim[2,1] / (dt) + E[1] / (2. * rL) - B[2] * prim[4,1] / (2. * rL) + B[3] * prim[3,1] / (2. * rL)
+	b[2] = prim[3,1] / (dt) + E[2] / (2. * rL) - B[3] * prim[2,1] / (2. * rL) + B[1] * prim[4,1] / (2. * rL)
+	b[3] = prim[4,1] / (dt) + E[3] / (2. * rL) - B[1] * prim[3,1] / (2. * rL) + B[2] * prim[2,1] / (2. * rL)
+	b[4] = prim[2,2] / (dt) - mr * E[1] / (2. * rL) + mr * B[2] * prim[4,2] / (2. * rL) - mr * B[3] * prim[3,2] / (2. * rL)
+	b[5] = prim[3,2] / (dt) - mr * E[2] / (2. * rL) + mr * B[3] * prim[2,2] / (2. * rL) - mr * B[1] * prim[4,2] / (2. * rL)
+	b[6] = prim[4,2] / (dt) - mr * E[3] / (2. * rL) + mr * B[1] * prim[3,2] / (2. * rL) - mr * B[2] * prim[2,2] / (2. * rL)
+	b[7] = E[1] / (dt) - prim[1,1] * prim[2,1] / (2. * rL * lD^2) + prim[1,2] * prim[2,2] * mr / (2. * rL * lD^2)
+	b[8] = E[2] / (dt) - prim[1,1] * prim[3,1] / (2. * rL * lD^2) + prim[1,2] * prim[3,2] * mr / (2. * rL * lD^2)
+	b[9] = E[3] / (dt) - prim[1,1] * prim[4,1] / (2. * rL * lD^2) + prim[1,2] * prim[4,2] * mr / (2. * rL * lD^2)
+
+	return A, b
+
+end

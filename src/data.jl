@@ -21,23 +21,26 @@ export Setup,
 struct Setup <: AbstractSetup
 
     case :: AbstractString
-    space :: AbstractString
+	space :: AbstractString
+	nSpecies :: Int64
 	interpOrder :: Int64
 	limiter :: AbstractString
 	cfl :: Float64
 	maxTime :: Float64
 
-    function Setup(CASE::AbstractString, SPACE::AbstractString, ORDER::Int, LM::AbstractString, CFL::Real, TIME::Real)
+	function Setup( CASE::AbstractString, SPACE::AbstractString, SPECIES::Int, ORDER::Int, 
+					LM::AbstractString, CFL::Real, TIME::Real )
 
     	case = CASE
-        space = SPACE
+		space = SPACE
+		nSpecies = SPECIES
 		interpOrder = Int64(ORDER)
 		limiter = LM
     	cfl = Float64(CFL)
     	maxTime = Float64(TIME)
 
 		# inner constructor method
-		new(case, space, interpOrder, limiter, cfl, maxTime)
+		new(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
     
     end
 
@@ -79,7 +82,7 @@ end
 
 struct PlasmaProperty <: AbstractProperty
 
-	Kn :: Float64; Ma :: Float64; Pr :: Float64
+	Kn :: Array{Float64,1}; Ma :: Float64; Pr :: Float64
 	K :: Float64; γ :: Float64; 
 
 	sol :: Float64; χ :: Float64; ν :: Float64

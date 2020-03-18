@@ -88,15 +88,15 @@ struct SolverSet <: AbstractSolverSet
 			@eval $s = $(D[key])
 		end
 
-		# deduce configuration from existed data
+		# generate data structure
 		γ = heat_capacity_ratio(inK, parse(Int, space[1]))
 		
-		# generate data structure
+		set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
+		pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+
 		if case == "shock"
 			μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
-		
-			set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
-			pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+			
 			vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
 			gas = GasProperty(knudsen, mach, prandtl, inK, γ, omega, alphaRef, omegaRef, μᵣ)
 			
@@ -116,8 +116,6 @@ struct SolverSet <: AbstractSolverSet
 			v1 = u1 * sqrt(mi / me)
 			kne = knudsen * (me / mi)
 
-			set = Setup(case, space, interpOrder, limiter, cfl, maxTime)
-			mesh = PSpace1D(x0, x1, nx, pMeshType, nxg)
 			quad = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
 			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, gamma, mi, ni, me, ne, lD, rL, sol, echi, bnu)
 		
@@ -199,12 +197,27 @@ function timestep(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}
 
     tmax = 0.0
 
-    Threads.@threads for i=1:KS.pSpace.nx
-        @inbounds prim = ctr[i].prim
-        sos = sound_speed(prim, KS.gas.γ)
-        vmax = max(KS.vSpace.u1, abs(prim[2])) + sos
-        @inbounds tmax = max(tmax, vmax / ctr[i].dx)
-    end
+	if KS.set.nSpecies == 1
+
+		Threads.@threads for i=1:KS.pSpace.nx
+			@inbounds prim = ctr[i].prim
+			sos = sound_speed(prim, KS.gas.γ)
+			vmax = max(KS.vSpace.u1, abs(prim[2])) + sos
+			@inbounds tmax = max(tmax, vmax / ctr[i].dx)
+		end
+
+	elseif KS.set.nSpecies == 2
+
+		Threads.@threads for i=1:KS.pSpace.nx
+			@inbounds prim = ctr[i].prim
+			sos = sound_speed(prim, KS.gas.γ)
+			vmax = max(maximum(KS.quad.u1), abs(prim[2,1]), abs(prim[2,2])) + sos
+			@inbounds tmax = ifelse( KS.set.space == "1d4f", 
+									 max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx), 
+									 max(tmax, vmax / ctr[i].dx) )
+		end
+
+	end
 
     dt = KS.set.cfl / tmax
     dt = ifelse(dt < (KS.set.maxTime - simTime), dt, KS.set.maxTime - simTime)
@@ -259,6 +272,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
 			@inbounds ctr[i].sh3 .= reconstruct3( ctr[i-1].h3, ctr[i].h3, ctr[i+1].h3, 
 												  0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
 												  KS.set.limiter )							 								 									
+	
+		end
 	end
 
 end
@@ -273,8 +288,56 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
 #    end
 
-    Threads.@threads for i=2:KS.pSpace.nx
-		@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].f, ctr[i].f, KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sf, ctr[i].sf )
+	if KS.set.space == "1d1f"
+
+		Threads.@threads for i=2:KS.pSpace.nx
+		#	@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
+		#												  ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf, 
+		#												  KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sf, ctr[i].sf )
+
+			@inbounds flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
+								ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
+								KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
+		end
+
+	elseif KS.set.space == "1d2f"
+
+		Threads.@threads for i=2:KS.pSpace.nx
+			@inbounds flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, 
+								ctr[i-1].h .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh, 
+								ctr[i-1].b .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sb, 
+								ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, 
+								ctr[i].h .- 0.5 .* ctr[i].dx .* ctr[i].sh,
+								ctr[i].b .- 0.5 .* ctr[i].dx .* ctr[i].sb,
+								KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
+		end
+
+	elseif KS.set.space == "1d4f"
+
+		if KS.set.nSpecies == 2
+			Threads.@threads for i=2:KS.pSpace.nx
+				@inbounds face[i].fw, face[i].fh0, face[i].fh1, face[i].fh2, face[i].fh3 = 
+				flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, 
+						ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0, 
+						ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1, 
+						ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2, 
+						ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3, 
+						ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, 
+						ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
+						ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
+						ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
+						ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
+						KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, 
+						KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.knudsen[1], dt )
+			
+				@inbounds face[i].femL, face[i].femR = 
+				flux_em( ctr[i-2].E, ctr[i-2].B, ctr[i-1].E, ctr[i-1].B, 
+						 ctr[i].E, ctr[i].B, ctr[i+1].E, ctr[i+1].B, 
+						 ctr[i-1].ϕ, ctr[i].ϕ, ctr[i-1].ψ, ctr[i].ψ, ctr[i-1].dx, ctr[i].dx,
+						 KS.gas.A1p, KS.gas.A1n, KS.gas.D1, KS.gas.sol, KS.gas.χ, KS.gas.ν, dt ) 
+			end
+		end
+	
 	end
 
 end
@@ -368,3 +431,5 @@ function step!( fwL::Array{Float64,1}, fhL::AbstractArray{Float64,1}, fbL::Abstr
 	end
 
 end
+
+
