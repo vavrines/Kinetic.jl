@@ -151,7 +151,6 @@ function solve!( KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 	
 	#--- setup ---#
 	dim = parse(Int, KS.set.space[1])
-	ns = 
 
 	iter = 0
 	dt = 0.
