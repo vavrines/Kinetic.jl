@@ -83,15 +83,19 @@ end
 struct PlasmaProperty <: AbstractProperty
 
 	Kn :: Array{Float64,1}; Ma :: Float64; Pr :: Float64
-	K :: Float64; γ :: Float64; 
+	K :: Float64; γ :: Float64;
+	
+	mi :: Float64; ni::Float64
+	me :: Float64; ne::Float64
+	lD :: Float64; rL::Float64 
 
 	sol :: Float64; χ :: Float64; ν :: Float64
 	A1p :: Array{Float64,2}; A1n :: Array{Float64,2}; D1 :: Array{Float64,1}
 
-    function GasProperty( KN::Array{<:Real,1}, MA::Real, PR::Real, 
-    			 		  INK::Real, GAMMA::Real, 
-    			 		  MI::Real, NI::Real, ME::Real, NE::Real,
-    			 		  LD::Real, RL::Real, SOL::Real, CHI::Real, NU::Real )
+    function PlasmaProperty( KN::Array{<:Real,1}, MA::Real, PR::Real, 
+    			 		  	 INK::Real, GAMMA::Real, 
+    			 		  	 MI::Real, NI::Real, ME::Real, NE::Real,
+    			 		  	 LD::Real, RL::Real, SOL::Real, CHI::Real, NU::Real )
 
     	Kn = Float64.(KN)
     	Ma = Float64(MA)
@@ -354,10 +358,11 @@ mutable struct MControlVolume1D4F <: AbstractControlVolume1D
 	ϕ :: Float64; ψ :: Float64
 	lorenz :: Array{Float64,2}
 
-	function ControlVolume1D1F( X::Real, DX::Real, 
-								w0::Array{<:Real,2}, prim0::Array{<:Real,2}, 
-								H0::Array{Float64,2}, H1::Array{Float64,2}, H2::Array{Float64,2}, H3::Array{Float64,2},
-							 	E0::Array{Float64,1}, B0::Array{Float64,1}, L::Array{Float64,2} )
+	function MControlVolume1D4F( X::Real, DX::Real, 
+								 w0::Array{<:Real,2}, prim0::Array{<:Real,2}, 
+								 H0::AbstractArray{Float64,2}, H1::AbstractArray{Float64,2}, 
+								 H2::AbstractArray{Float64,2}, H3::AbstractArray{Float64,2},
+							 	 E0::Array{Float64,1}, B0::Array{Float64,1}, L::Array{Float64,2} )
 
 		x = Float64(X)
 		dx = Float64(DX)
@@ -403,20 +408,20 @@ end
 mutable struct MInterface1D4F <: AbstractInterface1D
 
 	fw :: Array{Float64,2}
-	fh0 :: Array{Float64,2}
-	fh1 :: Array{Float64,2}
-	fh2 :: Array{Float64,2}
-	fh3 :: Array{Float64,2}
+	fh0 :: AbstractArray{Float64,2}
+	fh1 :: AbstractArray{Float64,2}
+	fh2 :: AbstractArray{Float64,2}
+	fh3 :: AbstractArray{Float64,2}
 	femL :: Array{Float64,1}
 	femR :: Array{Float64,1}
 
 	function MInterface1D4F(f::AbstractArray{Float64,2})
 
 		fw = zeros(5, axes(f, 2))
-		fh0 = Array{Float64}(undef, axes(f))
-		fh1 = Array{Float64}(undef, axes(f))
-		fh2 = Array{Float64}(undef, axes(f))
-		fh3 = Array{Float64}(undef, axes(f))
+		fh0 = zeros(axes(f))
+		fh1 = zeros(axes(f))
+		fh2 = zeros(axes(f))
+		fh3 = zeros(axes(f))
 		femL = zeros(8)
 		femR = zeros(8)
 

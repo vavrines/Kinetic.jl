@@ -87,7 +87,7 @@ function ib_briowu(gam::Real, uspace::AbstractArray{Float64,2}, mi::Real, me::Re
     wL = mixture_prim_conserve(primL, gam)
     h0L = mixture_maxwellian(uspace, primL)
     
-    h1L = similar(h0L); h2L = similar(h0L), h3L = similar(h0L)    
+    h1L = similar(h0L); h2L = similar(h0L); h3L = similar(h0L)    
     for j in axes(h0L, 2)
         h1L[:,j] .= primL[3,j] .* h0L[:,j]
         h2L[:,j] .= primL[4,j] .* h0L[:,j]

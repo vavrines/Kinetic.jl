@@ -115,7 +115,7 @@ struct SolverSet <: AbstractSolverSet
 			v1 = u1 * sqrt(mi / me)
 			kne = knudsen * (me / mi)
 
-			quad = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
+			vSpace = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
 			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, γ, mi, ni, me, ne, lD, rL, sol, echi, bnu)
 		
 			wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 

@@ -1,0 +1,45 @@
+# ------------------------------------------------------------
+# Configuration of Brio-Wu MHD shock tube
+# ------------------------------------------------------------
+
+# setup
+case = brio-wu
+space = 1d4f
+nSpecies = 2
+interpOrder = 2
+limiter = vanleer
+cfl = 0.5
+maxTime = 0.1
+
+# phase space
+x0 = 0
+x1 = 1
+nx = 100
+pMeshType = uniform
+nxg = 0
+
+# velocity space
+u0 = -5.0
+u1 = 5.0
+nu = 28
+vMeshType = rectangle
+nug = 0
+
+# gas
+knudsen = 0.00001
+mach = 0.0
+prandtl = 1.0
+inK = 0.0
+
+mi = 1
+ni = 0.5
+#me = 0.04
+me = 0.0005446623
+ne = 0.5
+lD = 0.01
+rL = 0.003
+
+# electromagnetic field
+sol = 100
+echi = 1
+bnu = 1
