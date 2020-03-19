@@ -708,7 +708,7 @@ end
 # ------------------------------------------------------------
 # Multi-component gas
 # ------------------------------------------------------------
-function shift_pdf!(f::AbstractArray{Float64,2}, a::Array{Float64,1}, du::Array{Float64,1}, dt::Float64)
+function shift_pdf!(f::AbstractArray{Float64,2}, a::Array{Float64,1}, du::AbstractArray{Float64,1}, dt::Float64)
 	for j in axes(f, 2)
 		shift_pdf!(f[:,j], a[j], du[j], dt)
 	end
