@@ -295,21 +295,23 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 		#												  ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf, 
 		#												  KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sf, ctr[i].sf )
 
-			@inbounds flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
-								ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
-								KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
+			@inbounds face[i].fw, face[i].ff = 
+			flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
+			ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
+			KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
 		end
 
 	elseif KS.set.space == "1d2f"
 
 		Threads.@threads for i=2:KS.pSpace.nx
-			@inbounds flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, 
-								ctr[i-1].h .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh, 
-								ctr[i-1].b .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sb, 
-								ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, 
-								ctr[i].h .- 0.5 .* ctr[i].dx .* ctr[i].sh,
-								ctr[i].b .- 0.5 .* ctr[i].dx .* ctr[i].sb,
-								KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
+			@inbounds face[i].fw, face[i].fh, face[i].fb = 
+			flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, 
+			ctr[i-1].h .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh, 
+			ctr[i-1].b .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sb, 
+			ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, 
+			ctr[i].h .- 0.5 .* ctr[i].dx .* ctr[i].sh,
+			ctr[i].b .- 0.5 .* ctr[i].dx .* ctr[i].sb,
+			KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
 		end
 
 	elseif KS.set.space == "1d4f"
