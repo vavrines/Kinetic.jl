@@ -23,21 +23,7 @@ function initialize(configfilename::String)
 
     if configfilename[end-2:end] == "txt"
         
-        allowed = ["space"]
-        D = read_dict(configfilename, allowed)
-        space = D["space"]
-        dim = parse(Int, space[1])
-
-        if dim == 1
-            println("1D solver")
-            ks = SolverSet(configfilename)
-        elseif dim == 2
-            println("2D solver")
-            #ks = SolverSet2D(configfilename)
-        elseif dim == 3
-            # coming soon
-        end
-
+        ks = SolverSet(configfilename)
         ctr, face = init_fvm(ks)
 
         return ks, ctr, face, 0.
@@ -60,8 +46,6 @@ end
 # Initialize finite volume method
 # ------------------------------------------------------------
 function init_fvm(KS::SolverSet)
-
-    dim = parse(Int, KS.set.space[1])
 
     if KS.set.nSpecies == 1
     

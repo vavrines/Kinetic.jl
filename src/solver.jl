@@ -88,6 +88,7 @@ struct SolverSet <: AbstractSolverSet
 		end
 
 		# generate data structure
+		dim = ifelse( parse(Int, space[3]) >= 3, 3, parse(Int,space[1]) )
 		γ = heat_capacity_ratio(inK, parse(Int, space[1]))
 		
 		set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
@@ -349,7 +350,7 @@ end
 # ------------------------------------------------------------
 function update!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Float64, residual::Array{Float64,1})
 
-	dim = parse(Int, KS.set.space[1])
+	dim = ifelse( parse(Int, KS.set.space[3]) >= 3, 3, parse(Int, KS.set.space[1]) )
     sumRes = zeros(dim+2)
     sumAvg = zeros(dim+2)
 
