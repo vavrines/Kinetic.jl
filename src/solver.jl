@@ -148,7 +148,7 @@ function solve!( KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 				 face::Array{<:AbstractInterface1D,1}, simTime::Float64 )
 	
 	#--- setup ---#
-	dim = parse(Int, KS.set.space[1])
+	dim = ifelse( parse(Int, KS.set.space[3]) >= 3, 3, parse(Int, KS.set.space[1]) ) # dimension
 
 	iter = 0
 	dt = 0.
@@ -211,7 +211,7 @@ function timestep(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}
 		Threads.@threads for i=1:KS.pSpace.nx
 			@inbounds prim = ctr[i].prim
 			sos = sound_speed(prim, KS.gas.γ)
-			vmax = max(maximum(KS.quad.u1), abs(prim[2,1]), abs(prim[2,2])) + sos
+			vmax = max(maximum(KS.quad.u1), maximum(abs.(prim[2,:]))) + sos
 			@inbounds tmax = ifelse( KS.set.space == "1d4f", 
 									 max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx), 
 									 max(tmax, vmax / ctr[i].dx) )
