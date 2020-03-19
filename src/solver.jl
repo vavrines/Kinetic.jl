@@ -89,7 +89,7 @@ struct SolverSet <: AbstractSolverSet
 
 		# generate data structure
 		dim = ifelse( parse(Int, space[3]) >= 3, 3, parse(Int,space[1]) )
-		γ = heat_capacity_ratio(inK, parse(Int, space[1]))
+		γ = heat_capacity_ratio(inK, dim)
 		
 		set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
 		pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
