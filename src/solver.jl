@@ -36,21 +36,20 @@ struct SolverSet <: AbstractSolverSet
 	outputFolder :: String
 
 	# constructor
-	SolverSet() = SolverSet("./config/config.txt")
+	#SolverSet() = SolverSet("./config/config.txt")
 
 	function SolverSet(configfilename::String)
 		
 		#--- with allowrance ---#
 		# read following data from text file
 		#=
-		allowed = [ "case", "space", "interpOrder", "limiter", "cfl", "maxTime", 
+		allowed = [ "case", "space", "nSpecies", "interpOrder", "limiter", "cfl", "maxTime", 
 				    "x0", "x1", "nx", "nxg", "pMeshType",
 				    "u0", "u1", "nu", "nug", "vMeshType",
-				    "knudsen", "mach", "prandtl", "inK", "omega", "alphaRef", "omegaRef" ]=#
-		# D = read_dict(configfilename, allowed)
+				    "knudsen", "mach", "prandtl", "inK", "omega", "alphaRef", "omegaRef" ]
+		D = read_dict(configfilename, allowed)
 
 		# define variables
-		#=
 		case = D["case"]
         space = D["space"]
 		interpOrder = D["interpOrder"]
@@ -70,13 +69,13 @@ struct SolverSet <: AbstractSolverSet
         nug = D["nug"]
 		vMeshType = D["vMeshType"]
 
-		Kn = D["knudsen"]
-		Ma = D["mach"]
-		Pr = D["prandtl"]
-        K = D["inK"]
-        ω = D["omega"]
-		αᵣ = D["alphaRef"]
-        ωᵣ = D["omegaRef"]
+		knudsen = D["knudsen"]
+		mach = D["mach"]
+		prandtl = D["prandtl"]
+        inK = D["inK"]
+        omega = D["omega"]
+		alphaRef = D["alphaRef"]
+        omegaRef = D["omegaRef"]
 		=#
 
 		#--- without allowrance ---#

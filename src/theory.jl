@@ -53,13 +53,16 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 	@. Mu = MuL + MuR
 
 	if length(prim) == 3
+
 		Mxi = OffsetArray{Float64}(undef, 0:2)
 		Mxi[0] = 1.0
 		Mxi[1] = 0.5 * inK / prim[end]
 		Mxi[2] = (inK^2 + 2.0 * inK) / (4.0 * prim[end]^2)
 
 		return Mu, Mxi, MuL, MuR
+
 	elseif length(prim) == 4
+
 		Mv = OffsetArray{Float64}(undef, 0:6)
 		Mv[0] = 1.0
     	Mv[1] = prim[3]
@@ -73,7 +76,9 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 		Mxi[2] = (inK^2 + 2.0 * inK) / (4.0 * prim[end]^2)
 
 		return Mu, Mv, Mxi, MuL, MuR
+
 	elseif length(prim) == 5
+
 		Mv = OffsetArray{Float64}(undef, 0:6)
 		Mv[0] = 1.
 		Mv[1] = prim[3]
@@ -89,6 +94,7 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 		end
 
 		return Mu, Mv, Mw, MuL, MuR
+
 	end
 
 end
@@ -99,6 +105,7 @@ function mixture_gauss_moments(prim::Array{<:Real,2}, inK::Real)
     Mu = OffsetArray{Float64}(undef, 0:6, axes(prim, 2)); MuL = similar(Mu); MuR = similar(Mu)
 	
 	if size(prim, 1) == 3
+
 		Mxi = OffsetArray{Float64}(undef, 0:2, axes(prim, 2))
 		for j in axes(prim, 2)
 			_tu, _txi, _tuL, _tuR = Kinetic.gauss_moments(prim[:,j], inK)
@@ -110,7 +117,9 @@ function mixture_gauss_moments(prim::Array{<:Real,2}, inK::Real)
 		end
 
 		return Mu, Mxi, MuL, MuR
+
 	elseif size(prim, 1) == 4
+
 		Mv = OffsetArray{Float64}(undef, 0:6, axes(prim, 2))
 		Mxi = OffsetArray{Float64}(undef, 0:2, axes(prim, 2))
 		for j in axes(prim, 2)
@@ -124,7 +133,9 @@ function mixture_gauss_moments(prim::Array{<:Real,2}, inK::Real)
 		end
 
 		return Mu, Mv, Mxi, MuL, MuR
+
 	elseif size(prim, 1) == 5
+
 		Mv = OffsetArray{Float64}(undef, 0:6, axes(prim, 2))
 		Mw = OffsetArray{Float64}(undef, 0:6, axes(prim, 2))
 		
@@ -139,6 +150,7 @@ function mixture_gauss_moments(prim::Array{<:Real,2}, inK::Real)
 		end
 
 		return Mu, Mv, Mw, MuL, MuR
+
 	end
 
 end
@@ -147,10 +159,10 @@ end
 # ------------------------------------------------------------
 # Calculate conservative moments
 # ------------------------------------------------------------
-function moments_conserve(Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int, delta::Int)
+function moments_conserve( Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
+						   alpha::Int, delta::Int )
 
     uv = zeros(3)
-
     uv[1] = Mu[alpha] * Mxi[delta ÷ 2]
     uv[2] = Mu[alpha + 1] * Mxi[delta ÷ 2]
     uv[3] = 0.5 * (Mu[alpha + 2] * Mxi[delta ÷ 2] + Mu[alpha] * Mxi[(delta + 2) ÷ 2])
@@ -164,22 +176,24 @@ function moments_conserve( Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1
 						   alpha::Int, beta::Int, delta::Int )
 
 	if length(Mw) == 3
-		uv = zeros(4)
 
+		uv = zeros(4)
 		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta ÷ 2]
 		uv[2] = Mu[alpha + 1] * Mv[beta] * Mw[delta ÷ 2]
 		uv[3] = Mu[alpha] * Mv[beta + 1] * Mw[delta ÷ 2]
 		uv[4] = 0.5 * (Mu[alpha + 2] * Mv[beta] * Mw[delta ÷ 2] + Mu[alpha] * Mv[beta + 2] * Mw[delta ÷ 2] + 
 				Mu[alpha] * Mv[beta] * Mw[(delta + 2) ÷ 2])	
-	else
-		uv = zeros(5)
 
+	else
+
+		uv = zeros(5)
 		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
 		uv[2] = Mu[alpha + 1] * Mv[beta] * Mw[delta]
 		uv[3] = Mu[alpha] * Mv[beta + 1] * Mw[delta]
 		uv[4] = Mu[alpha] * Mv[beta] * Mw[delta + 1]
 		uv[5] = 0.5 * (Mu[alpha + 2] * Mv[beta] * Mw[delta] + Mu[alpha] * Mv[beta + 2] * Mw[delta] + 
 				Mu[alpha] * Mv[beta] * Mw[delta + 2])
+
 	end
 
 	return uv
@@ -188,7 +202,7 @@ end
 
 
 function mixture_moments_conserve( Mu::OffsetArray{Float64,2}, Mxi::OffsetArray{Float64,2},  
-								   alpha::Int, beta::Int, delta::Int )
+								   alpha::Int, delta::Int )
 
 	Muv = zeros(3, axes(Mu, 2))
 	for j in axes(Muv, 2)
@@ -201,7 +215,7 @@ end
 
 
 function mixture_moments_conserve( Mu::OffsetArray{Float64,2}, Mv::OffsetArray{Float64,2}, Mw::OffsetArray{Float64,2}, 
-								   alpha::Int, delta::Int )
+								   alpha::Int, beta::Int, delta::Int )
 	
 	Muv = ifelse(length(Mw) == 3, zeros(4, axes(Mu, 2)), zeros(5, axes(Mu, 2)))
 	for j in axes(Muv, 2)
@@ -216,7 +230,8 @@ end
 # Calculate slope-related conservative moments
 # a = a1 + u * a2 + 0.5 * u^2 * a3
 # ------------------------------------------------------------
-function moments_conserve_slope(a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, alpha::Int)
+function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
+								 alpha::Int )
 
 	au = @. a[1] * moments_conserve(Mu, Mxi, alpha + 0, 0) +
          a[2] * moments_conserve(Mu, Mxi, alpha + 1, 0) +
@@ -226,7 +241,6 @@ function moments_conserve_slope(a::Array{Float64,1}, Mu::OffsetArray{Float64,1},
     return au
 
 end
-
 
 function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
 								 alpha::Int, beta::Int )
@@ -242,8 +256,8 @@ function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}
 
 end
 
-function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, 
-								 Mw::OffsetArray{Float64,1}, alpha::Int, beta::Int, delta::Int )
+function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mw::OffsetArray{Float64,1}, 
+								 alpha::Int, beta::Int, delta::Int )
 
 	au = @. a[1] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) +
 			a[2] * moments_conserve(Mu, Mv, Mw, alpha + 1, beta + 0, delta + 0) +
@@ -258,7 +272,8 @@ function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}
 end
 
 
-function mixture_moments_conserve_slope(a::Array{Float64,2}, Mu::OffsetArray{Float64,2}, Mxi::OffsetArray{Float64,2}, alpha::Int)
+function mixture_moments_conserve_slope( a::Array{Float64,2}, Mu::OffsetArray{Float64,2}, Mxi::OffsetArray{Float64,2}, 
+										 alpha::Int )
 
 	au = zeros(3, axes(a, 2))
 	for j in axes(au, 2)

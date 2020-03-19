@@ -69,22 +69,20 @@ end
 # ------------------------------------------------------------
 # Initialize Brio-Wu MHD shock
 # ------------------------------------------------------------
-function ib_briowu(gam::Float64, uspace::AbstractArray{Float64,2}, mi::Float64, me::Float64)
-
-    mr = mi / me
+function ib_briowu(gam::Real, uspace::AbstractArray{Float64,2}, mi::Real, me::Real)
 
     # upstream
-    primL = Array{Float64}(undef, 5, 2)
-    primL[1,1] = 1.
+    primL = zeros(5, 2)
+    primL[1,1] = 1. * mi
     primL[2,1] = 0.
     primL[3,1] = 0.
     primL[4,1] = 0.
-    primL[5,1] = 1.
-    primL[1,2] = 1. / mr
+    primL[5,1] = mi / 1.
+    primL[1,2] = 1. * me
     primL[2,2] = 0.
     primL[3,2] = 0.
     primL[4,2] = 0.
-    primL[5,2] = 1. / mr
+    primL[5,2] = me / 1.
 
     wL = mixture_prim_conserve(primL, gam)
     h0L = mixture_maxwellian(uspace, primL)
@@ -93,42 +91,42 @@ function ib_briowu(gam::Float64, uspace::AbstractArray{Float64,2}, mi::Float64, 
     for j in axes(h0L, 2)
         h1L[:,j] .= primL[3,j] .* h0L[:,j]
         h2L[:,j] .= primL[4,j] .* h0L[:,j]
-        h3L[:,j] .= (primL[3,j]^2 + primL[4,j]^2 + 2. / (2. * primL[end,j])) * h0L[:,j]
+        h3L[:,j] .= (primL[3,j]^2 + primL[4,j]^2 + 2. / (2. * primL[end,j])) .* h0L[:,j]
     end
 
     EL = zeros(3)
     BL = zeros(3); BL[1] = 0.75; BL[2] = 1.
 
     # downstream
-    primR = Array{Float64}(undef, 5, 2)
-    primR[1,1] = 0.125
+    primR = zeros(5, 2)
+    primR[1,1] = 0.125 * mi
     primR[2,1] = 0.
     primR[3,1] = 0.
     primR[4,1] = 0.
-    primR[5,1] = 1.25
-    primR[1,2] = 0.125 / mr
+    primR[5,1] = mi * 1.25
+    primR[1,2] = 0.125 * me
     primR[2,2] = 0.
     primR[3,2] = 0.
     primR[4,2] = 0.
-    primR[5,2] = 1.25 / mr
+    primR[5,2] = me * 1.25
 
     wR = mixture_prim_conserve(primR, gam)
     h0R = mixture_maxwellian(uspace, primR)
     
-    h1R = similar(h0R); h2R = similar(h0R), h3R = similar(h0R)    
+    h1R = similar(h0R); h2R = similar(h0R); h3R = similar(h0R)    
     for j in axes(h0L, 2)
         h1R[:,j] .= primR[3,j] .* h0R[:,j]
         h2R[:,j] .= primR[4,j] .* h0R[:,j]
-        h3R[:,j] .= (primR[3,j]^2 + primR[4,j]^2 + 2. / (2. * primR[end,j])) * h0R[:,j]
+        h3R[:,j] .= (primR[3,j]^2 + primR[4,j]^2 + 2. / (2. * primR[end,j])) .* h0R[:,j]
     end
 
     ER = zeros(3)
     BR = zeros(3); BR[1] = 0.75; BR[2] = -1.
 
-    lorenz = zeros(3, 2)
-    bc = zeros(5, 2)
+    lorenzL = zeros(3, 2); lorenzR = zeros(3, 2)
+    bcL = zeros(5, 2); bcR = zeros(5, 2)
     
-    return wL, primL, h0L, h1L, h2L, h3L, bc, EL, BL, lorenz, 
-           wR, primR, h0R, h1R, h2R, h3R, bc, ER, BR, lorenz
+    return wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 
+           wR, primR, h0R, h1R, h2R, h3R, bcR, ER, BR, lorenzR
 
 end
