@@ -117,7 +117,7 @@ struct SolverSet <: AbstractSolverSet
 			kne = knudsen * (me / mi)
 
 			quad = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
-			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, gamma, mi, ni, me, ne, lD, rL, sol, echi, bnu)
+			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, γ, mi, ni, me, ne, lD, rL, sol, echi, bnu)
 		
 			wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 
             wR, primR, h0R, h1R, h2R, h3R, bcR, ER, BR, lorenzR = ib_briowu(γ, vSpace.u, mi, me)
