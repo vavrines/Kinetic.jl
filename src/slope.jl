@@ -32,6 +32,15 @@ function reconstruct2(wL::AbstractArray{Float64,2}, wR::AbstractArray{Float64,2}
     return s
 end
 
+function reconstruct2(wL::AbstractArray{Float64,3}, wR::AbstractArray{Float64,3}, Δx::Float64)
+    s = zeros(axes(wL))
+    for k in axes(s, 3), j in axes(s, 2)
+        s[:,j,k] .= reconstruct2(wL[:,j,k], wR[:,j,k], Δx)
+    end
+
+    return s
+end
+
 
 function reconstruct3( wL::Float64, wN::Float64, wR::Float64, ΔxL::Float64, ΔxR::Float64, 
                        limiter="vanleer"::AbstractString )
@@ -78,6 +87,19 @@ function reconstruct3( wL::AbstractArray{Float64,2}, wN::AbstractArray{Float64,2
 
     for j in axes(s, 2)
         s[:,j] .= reconstruct3(wL[:,j], wN[:,j], wR[:,j], ΔxL, ΔxR, limiter)
+    end
+
+    return s
+
+end
+
+function reconstruct3( wL::AbstractArray{Float64,3}, wN::AbstractArray{Float64,3}, wR::AbstractArray{Float64,3}, 
+                       ΔxL::Float64, ΔxR::Float64, limiter="vanleer"::AbstractString )
+
+    s = zeros(axes(wL))
+
+    for k in axes(s, 3), j in axes(s, 2)
+        s[:,j,k] .= reconstruct3(wL[:,j,k], wN[:,j,k], wR[:,j,k], ΔxL, ΔxR, limiter)
     end
 
     return s
