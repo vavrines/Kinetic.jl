@@ -621,18 +621,18 @@ function flux_em( ELL::Array{Float64,1}, BLL::Array{Float64,1}, EL::Array{Float6
     limiter[8,8] = 0.5 * sol^2 * χ * (BRR[1] - BRR[1])
 
     for i=1:8
-    limiter_theta = sum(slop[:,i] .* limiter[:,i]) / (sum(slop[:,i].^2) + 1.e-7)
-    slop[:,i] .*= max(0., min(min((1. + limiter_theta) / 2., 2.), 2. * limiter_theta))
+        limiter_theta = sum(slop[:,i] .* limiter[:,i]) / (sum(slop[:,i].^2) + 1.e-7)
+        slop[:,i] .*= max(0., min(min((1. + limiter_theta) / 2., 2.), 2. * limiter_theta))
     end
 
     femL = zeros(8); femR = zeros(8)
     for i=1:8
-    femL[i] = sum(A1n[i,1:3] .* (ER .- EL)) + sum(A1n[i,4:6] .* (BR .- BL)) +
-        A1n[i,7] * (ϕR - ϕL) + A1n[i,8] * (ψR - ψL) +
-        0.5 * sum(fortsign.(1., D1) .* (1. .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i,:])
-    femR[i] = sum(A1p[i,1:3] .* (ER .- EL)) + sum(A1p[i,4:6] .* (BR .- BL)) +
-        A1p[i,7] * (ϕR - ϕL) + A1p[i,8] * (ψR - ψL) -
-        0.5 * sum(fortsign.(1., D1) .* (1. .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i,:])
+        femL[i] = sum(A1n[i,1:3] .* (ER .- EL)) + sum(A1n[i,4:6] .* (BR .- BL)) +
+                  A1n[i,7] * (ϕR - ϕL) + A1n[i,8] * (ψR - ψL) +
+                  0.5 * sum(fortsign.(1., D1) .* (1. .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i,:])
+        femR[i] = sum(A1p[i,1:3] .* (ER .- EL)) + sum(A1p[i,4:6] .* (BR .- BL)) +
+                  A1p[i,7] * (ϕR - ϕL) + A1p[i,8] * (ψR - ψL) -
+                  0.5 * sum(fortsign.(1., D1) .* (1. .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i,:])
     end
 
     return femL, femR
