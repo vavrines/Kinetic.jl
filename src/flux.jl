@@ -554,9 +554,9 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
 
     g1 = similar(h0); g2 = similar(h0); g3 = similar(h0)
     for j in 1:2
-        g1[:,j] .= Mv[1,j] * g0[:,j]
-        g2[:,j] .= Mw[1,j] * g0[:,j]
-        g3[:,j] .= (Mv[2,j] + Mw[2,j]) * g0[:,j]
+        g1[:,j] .= Mv[1,j] .* g0[:,j]
+        g2[:,j] .= Mw[1,j] .* g0[:,j]
+        g3[:,j] .= (Mv[2,j] + Mw[2,j]) .* g0[:,j]
     end
 
     fh0 = similar(h0); fh1 = similar(h0); fh2 = similar(h0); fh3 = similar(h0)
