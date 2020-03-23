@@ -354,7 +354,7 @@ function flux_kcu( wL::Array{Float64,2}, fL::AbstractArray{Float64,2},
     primL = zeros(axes(wL)); primR = similar(primL)
     for j in 1:2
         primL[:,j] .= conserve_prim(wL[:,j], γ)
-        primR{:,j} .= conserve_prim(wR[:,j], γ)
+        primR[:,j] .= conserve_prim(wR[:,j], γ)
     end
 
     # --- construct interface distribution ---#
@@ -434,7 +434,7 @@ function flux_kcu( wL::Array{Float64,2}, hL::AbstractArray{Float64,2}, bL::Abstr
     primL = zeros(axes(wL)); primR = similar(primL)
     for j in 1:2
         primL[:,j] .= conserve_prim(wL[:,j], γ)
-        primR{:,j} .= conserve_prim(wR[:,j], γ)
+        primR[:,j] .= conserve_prim(wR[:,j], γ)
     end
 
     # --- construct interface distribution ---#
@@ -518,7 +518,7 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
     primL = zeros(axes(wL)); primR = similar(primL)
     for j in 1:2
         primL[:,j] .= conserve_prim(wL[:,j], γ)
-        primR{:,j} .= conserve_prim(wR[:,j], γ)
+        primR[:,j] .= conserve_prim(wR[:,j], γ)
     end
 
     # --- construct interface distribution ---#
