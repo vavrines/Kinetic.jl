@@ -388,7 +388,7 @@ function flux_kcu( wL::Array{Float64,2}, fL::AbstractArray{Float64,2},
     Muv = similar(wL)
     for j in axes(Mu1, 2)
         Mu[:,j], Mxi[:,j], MuL[:,j], MuR[:,j] = gauss_moments(prim[:,j], inK)
-        Muv[:,j] .= moments_conserve(MuL[:,j], Mxi[:,j], 1, 0)
+        Muv[:,j] .= moments_conserve(Mu[:,j], Mxi[:,j], 1, 0)
     end
 
     # flux from M0
@@ -468,7 +468,7 @@ function flux_kcu( wL::Array{Float64,2}, hL::AbstractArray{Float64,2}, bL::Abstr
     Muv = similar(wL)
     for j in axes(Mu1, 2)
         Mu[:,j], Mxi[:,j], MuL[:,j], MuR[:,j] = gauss_moments(prim[:,j], inK)
-        Muv[:,j] .= moments_conserve(MuL[:,j], Mxi[:,j], 1, 0)
+        Muv[:,j] .= moments_conserve(Mu[:,j], Mxi[:,j], 1, 0)
     end
 
     # flux from M0
@@ -515,28 +515,20 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
     h2 = @. h2L * δ + h2R * (1. - δ)
     h3 = @. h3L * δ + h3R * (1. - δ)
 
-    primL = zeros(axes(wL)); primR = similar(primL)
-    for j in 1:2
-        primL[:,j] .= conserve_prim(wL[:,j], γ)
-        primR[:,j] .= conserve_prim(wR[:,j], γ)
-    end
+    primL = mixture_conserve_prim(wL, γ)
+    primR = mixture_conserve_prim(wR, γ)
 
     # --- construct interface distribution ---#
-    Mu1 = OffsetArray{Float64}(undef, 0:6, 1:2); Mv1 = similar(Mu1); Mw1 = similar(Mu1); MuL1 = similar(Mu1); MuR1 = similar(Mu1)
-    Mu2 = similar(Mu1); Mv2 = similar(Mu1); Mw2 = similar(Mu1); MuL2 = similar(Mu1); MuR2 = similar(Mu1)
-    Muv1 = similar(wL); Muv2 = similar(wL)
-    for j in 1:2
-        Mu1[:,j], Mv1[:,j], Mw1[:,j], MuL1[:,j], MuR1[:,j] = gauss_moments(primL[:,j], inK)
-        Muv1[:,j] = moments_conserve(MuL1[:,j], Mv1[:,j], Mw1[:,j], 0, 0, 0)
-        Mu2[:,j], Mv2[:,j], Mw2[:,j], MuL2[:,j], MuR2[:,j] = gauss_moments(primR[:,j], inK)
-        Muv2[:,j] = moments_conserve(MuR2[:,j], Mv2[:,j], Mw2[:,j], 0, 0, 0)
-    end
+    Mu1, Mv1, Mw1, MuL1, MuR1 = mixture_gauss_moments(primL, inK)
+    Muv1 = mixture_moments_conserve(MuL1, Mv1, Mw1, 0, 0, 0)
+    Mu2, Mv2, Mw2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
+    Muv2 = mixture_moments_conserve(MuR2, Mv2, Mw2, 0, 0, 0)
 
-    w = zeros(axes(wL)); prim = zeros(axes(wL))
+    w = zeros(axes(wL))
     for j in 1:2
         @. w[:,j] = primL[1,j] * Muv1[:,j] + primR[1,j] * Muv2[:,j]
-        prim[:,j] .= conserve_prim(w[:,j], γ)
     end
+    prim = mixture_conserve_prim(w, γ)
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
     # tau .+= abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
@@ -548,12 +540,8 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
     @. Mt[1,:] = dt - Mt[2,:] # M0
 
     # --- calculate fluxes ---#
-    Mu = similar(Mu1); Mv = similar(Mu1); Mw = similar(Mu1); MuL = similar(Mu1); MuR = similar(Mu1)
-    Muv = similar(wL)
-    for j in axes(Mu1, 2)
-        Mu[:,j], Mv[:,j], Mw[:,j], MuL[:,j], MuR[:,j] = gauss_moments(prim[:,j], inK)
-        Muv[:,j] .= moments_conserve(MuL[:,j], Mv[:,j], Mw[:,j], 1, 0, 0)
-    end
+    Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, inK)
+    Muv = mixture_moments_conserve(Mu, Mv, Mw, 1, 0, 0)
 
     # flux from M0
     fw = similar(wL)
@@ -562,9 +550,10 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
     end
 
     # flux from f0
-    g0 = similar(h0); g1 = similar(h0); g2 = similar(h0); g3 = similar(h0)
+    g0 = mixture_maxwellian(u, prim)
+
+    g1 = similar(h0); g2 = similar(h0); g3 = similar(h0)
     for j in 1:2
-        g0[:,j] .= maxwellian(u[:,j], prim[:,j])
         g1[:,j] .= Mv[1,j] * g0[:,j]
         g2[:,j] .= Mw[1,j] * g0[:,j]
         g3[:,j] .= (Mv[2,j] + Mw[2,j]) * g0[:,j]
