@@ -34,7 +34,7 @@ function read_dict(filename::String, allowed)
         var, val = split(line, "=")
         stripped = strip(var)
         if stripped in allowed
-            println(line)
+            #println(line)
 
             #vars[stripped] = parse(Float64, val)
             #vars[stripped] = strip(val)
