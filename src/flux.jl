@@ -23,7 +23,7 @@ Kinetic flux vector splitting (KFVS) method
 # ------------------------------------------------------------
 function flux_kfvs( fL::AbstractArray{Float64,1}, fR::AbstractArray{Float64,1}, 
                     u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
-                    sfL = zeros(axes(fL))::AbstractArray{Float64,1}, sfR = zeros(axes(fR))::AbstractArray{Float64,1} )
+                    sfL=zeros(axes(fL))::AbstractArray{Float64,1}, sfR=zeros(axes(fR))::AbstractArray{Float64,1} )
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -51,8 +51,8 @@ end
 function flux_kfvs( hL::AbstractArray{Float64,1}, bL::AbstractArray{Float64,1},  
                     hR::AbstractArray{Float64,1}, bR::AbstractArray{Float64,1}, 
                     u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
-                    shL = zeros(axes(hL))::AbstractArray{Float64,1}, sbL = zeros(axes(bL))::AbstractArray{Float64,1},
-                    shR = zeros(axes(hR))::AbstractArray{Float64,1}, sbR = zeros(axes(bR))::AbstractArray{Float64,1} )
+                    shL=zeros(axes(hL))::AbstractArray{Float64,1}, sbL=zeros(axes(bL))::AbstractArray{Float64,1},
+                    shR=zeros(axes(hR))::AbstractArray{Float64,1}, sbR=zeros(axes(bR))::AbstractArray{Float64,1} )
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -85,10 +85,10 @@ end
 function flux_kfvs( h0L::AbstractArray{Float64,1}, h1L::AbstractArray{Float64,1}, h2L::AbstractArray{Float64,1}, h3L::AbstractArray{Float64,1}, 
                     h0R::AbstractArray{Float64,1}, h1R::AbstractArray{Float64,1}, h2R::AbstractArray{Float64,1}, h3R::AbstractArray{Float64,1},   
                     u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
-                    sh0L = zeros(axes(h0L))::AbstractArray{Float64,1}, sh1L = zeros(axes(h1L))::AbstractArray{Float64,1}, 
-                    sh2L = zeros(axes(h2L))::AbstractArray{Float64,1}, sh3L = zeros(axes(h3L))::AbstractArray{Float64,1},
-                    sh0R = zeros(axes(h0R))::AbstractArray{Float64,1}, sh1R = zeros(axes(h1R))::AbstractArray{Float64,1}, 
-                    sh2R = zeros(axes(h2R))::AbstractArray{Float64,1}, sh3R = zeros(axes(h3R))::AbstractArray{Float64,1} )
+                    sh0L=zeros(axes(h0L))::AbstractArray{Float64,1}, sh1L=zeros(axes(h1L))::AbstractArray{Float64,1}, 
+                    sh2L=zeros(axes(h2L))::AbstractArray{Float64,1}, sh3L=zeros(axes(h3L))::AbstractArray{Float64,1},
+                    sh0R=zeros(axes(h0R))::AbstractArray{Float64,1}, sh1R=zeros(axes(h1R))::AbstractArray{Float64,1}, 
+                    sh2R=zeros(axes(h2R))::AbstractArray{Float64,1}, sh3R=zeros(axes(h3R))::AbstractArray{Float64,1} )
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -129,7 +129,7 @@ end
 function flux_kfvs( fL::AbstractArray{Float64,2}, fR::AbstractArray{Float64,2},
                     u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, 
                     ω::AbstractArray{Float64,2}, dt::Float64, len::Float64,
-                    sfL = zeros(axes(fL))::AbstractArray{Float64,2}, sfR = zeros(axes(fR))::AbstractArray{Float64,2} )
+                    sfL=zeros(axes(fL))::AbstractArray{Float64,2}, sfR=zeros(axes(fR))::AbstractArray{Float64,2} )
     
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -188,8 +188,8 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,1},
 
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    # tau = tau + abs(cellL.prim[1] / cellL.prim[end] - cellR.prim[1] / cellR.prim[end]) / 
-    #       (cellL.prim[1] / cellL.prim[end] + cellR.prim[1] / cellR.prim[end]) * dt * 1.
+    #tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) / 
+    #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
 
     Mt = zeros(2)
     Mt[2] = tau * (1. - exp(-dt / tau)) # f0
@@ -243,8 +243,8 @@ function flux_kcu( wL::Array{Float64,1}, hL::AbstractArray{Float64,1}, bL::Abstr
 
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    # tau = tau + abs(cellL.prim[1] / cellL.prim[end] - cellR.prim[1] / cellR.prim[end]) / 
-    #       (cellL.prim[1] / cellL.prim[end] + cellR.prim[1] / cellR.prim[end]) * dt * 1.
+    #tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) / 
+    #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
 
     Mt = zeros(2)
     Mt[2] = tau * (1. - exp(-dt / tau)) # f0
@@ -301,6 +301,8 @@ function flux_kcu( wL::Array{Float64,1}, fL::AbstractArray{Float64,2},
     w = @. primL[1] * Muv1 + primR[1] * Muv2
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
+    #tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) / 
+    #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
 
     Mt = zeros(2)
     Mt[2] = tau * (1. - exp(-dt / tau)) # f0
@@ -375,8 +377,8 @@ function flux_kcu( wL::Array{Float64,2}, fL::AbstractArray{Float64,2},
     end
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
-    # tau .+= abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
-    #         (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
+    #@. tau += abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
+    #          (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
 
     Mt = zeros(2, 2)
@@ -455,8 +457,8 @@ function flux_kcu( wL::Array{Float64,2}, hL::AbstractArray{Float64,2}, bL::Abstr
     end
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
-    # tau .+= abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
-    #         (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
+    #@. tau += abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
+    #          (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
 
     Mt = zeros(2, 2)
@@ -531,8 +533,8 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
     prim = mixture_conserve_prim(w, γ)
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
-    # tau .+= abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
-    #        (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
+    #@. tau += abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) / 
+    #          (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
 
     Mt = zeros(2, 2)
@@ -577,6 +579,17 @@ function flux_kcu( wL::Array{Float64,2}, h0L::AbstractArray{Float64,2}, h1L::Abs
 
 end
 
+
+"""
+Wave propagation method for the Maxwell's equations
+
+# >@param[in] : variables in left-left, left, right, and right-right cells
+# >@param[in] : eigenmatrix (A), eigenvalue (D)
+# >@param[in] : speed of light (sol) 
+# >@param[in] : auxiliary parameters (χₑ, νᵦ)
+
+# >@return : flux of electromagnetic fields
+"""
 
 function flux_em( ELL::Array{Float64,1}, BLL::Array{Float64,1}, EL::Array{Float64,1}, BL::Array{Float64,1}, 
                   ER::Array{Float64,1}, BR::Array{Float64,1}, ERR::Array{Float64,1}, BRR::Array{Float64,1}, 
