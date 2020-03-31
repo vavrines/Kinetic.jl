@@ -8,10 +8,18 @@ export Setup,
 	   PlasmaProperty,
        IB1D1F,
 	   IB1D2F,
+	   MIB1D1F,
+	   MIB1D2F,
 	   MIB1D4F,
 	   ControlVolume1D1F,
+	   ControlVolume1D2F,
+	   MControlVolume1D1F,
+	   MControlVolume1D2F,
 	   MControlVolume1D4F,
 	   Interface1D1F,
+	   Interface1D2F,
+	   MInterface1D1F,
+	   MInterface1D2F,
 	   MInterface1D4F
 
 
@@ -221,6 +229,65 @@ struct IB1D2F <: AbstractCondition
 end
 
 
+struct MIB1D1F <: AbstractCondition
+
+	# initial/boundary condition
+	wL :: Array{Float64,2}
+	primL :: Array{Float64,2}
+    fL :: AbstractArray{Float64,2}
+	bcL :: Array{Float64,2}
+
+	wR :: Array{Float64,2}
+	primR :: Array{Float64,2}
+    fR :: AbstractArray{Float64,2}
+	bcR :: Array{Float64,2}
+
+	function MIB1D1F( WL::Array{<:Real,2}, PRIML::Array{<:Real,2}, FL::AbstractArray{Float64,2}, BCL::Array{<:Real,2}, 
+					  WR::Array{<:Real,2}, PRIMR::Array{<:Real,2}, FR::AbstractArray{Float64,2}, BCR::Array{<:Real,2} )
+
+		wL = Float64.(WL); primL = Float64.(PRIML); fL = deepcopy(FL); bcL = Float64.(BCL); 
+		wR = Float64.(WR); primR = Float64.(PRIMR); fR = deepcopy(FR); bcR = Float64.(BCR); 
+
+		# inner constructor
+		new(wL, primL, fL, bcL, wR, primR, fR, bcR)
+    
+    end
+
+end
+
+
+struct MIB1D2F <: AbstractCondition
+
+	# initial/boundary condition
+	wL :: Array{Float64,2}
+	primL :: Array{Float64,2}
+    hL :: AbstractArray{Float64,2}
+	bL :: AbstractArray{Float64,2}
+	bcL :: Array{Float64,2}
+
+	wR :: Array{Float64,2}
+	primR :: Array{Float64,2}
+    hR :: AbstractArray{Float64,2}
+	bR :: AbstractArray{Float64,2}
+	bcR :: Array{Float64,2}
+
+	function MIB1D2F( WL::Array{<:Real,2}, PRIML::Array{<:Real,2}, HL::AbstractArray{Float64,2}, 
+					  BL::AbstractArray{Float64,2}, BCL::Array{<:Real,2}, 
+					  WR::Array{<:Real,2}, PRIMR::Array{<:Real,2}, HR::AbstractArray{Float64,2}, 
+					  BR::AbstractArray{Float64,2}, BCR::Array{<:Real,2} )
+
+						
+		wL = Float64.(WL); primL = Float64.(PRIML); hL = deepcopy(HL); bL = Float64.(BL); bcL = Float64.(BCL); 
+		wR = Float64.(WR); primR = Float64.(PRIMR); hR = deepcopy(HR); bR = Float64.(BR); bcR = Float64.(BCR); 
+
+		# inner constructor
+		new(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
+    
+    end
+
+end
+
+
 struct MIB1D4F <: AbstractCondition
 
 	# initial/boundary condition
@@ -317,7 +384,7 @@ mutable struct ControlVolume1D2F <: AbstractControlVolume1D
 	sh :: AbstractArray{Float64,1}
 	sb :: AbstractArray{Float64,1}
 
-	function ControlVolume1D1F( X::Real, DX::Real, 
+	function ControlVolume1D2F( X::Real, DX::Real, 
 								w0::Array{<:Real,1}, prim0::Array{<:Real,1}, 
 								h0::AbstractArray{Float64,1}, b0::AbstractArray{Float64,1} )
 
@@ -332,6 +399,76 @@ mutable struct ControlVolume1D2F <: AbstractControlVolume1D
 		b = deepcopy(b0)
 		sh = zeros(axes(h))
 		sb = zeros(axes(b))
+
+		new(x, dx, w, prim, sw, h, b, sh, sb)
+
+	end
+
+end
+
+
+mutable struct MControlVolume1D1F <: AbstractControlVolume1D
+
+	x :: Float64
+	dx :: Float64
+
+	w :: Array{Float64,2}
+	prim :: Array{Float64,2}
+	sw :: Array{Float64,2}
+
+	f :: AbstractArray{Float64,2}
+	sf :: AbstractArray{Float64,2}
+
+	function MControlVolume1D1F( X::Real, DX::Real, 
+								 w0::Array{<:Real,2}, prim0::Array{<:Real,2}, 
+								 F0::AbstractArray{Float64,2} )
+
+		x = Float64(X)
+		dx = Float64(DX)
+
+		w = Float64.(w0)
+		prim = Float64.(prim0)
+		sw = zeros(axes(w))
+
+		f = deepcopy(F0)
+		sf = zeros(axes(F0))
+
+		new(x, dx, w, prim, sw, f, sf)
+
+	end
+
+end
+
+
+mutable struct MControlVolume1D2F <: AbstractControlVolume1D
+
+	x :: Float64
+	dx :: Float64
+
+	w :: Array{Float64,2}
+	prim :: Array{Float64,2}
+	sw :: Array{Float64,2}
+
+	h :: AbstractArray{Float64,2}
+	b :: AbstractArray{Float64,2}
+	sh :: AbstractArray{Float64,2}
+	sb :: AbstractArray{Float64,2}
+
+	function MControlVolume1D2F( X::Real, DX::Real, 
+								 w0::Array{<:Real,2}, prim0::Array{<:Real,2}, 
+								 H0::AbstractArray{Float64,2}, B0::AbstractArray{Float64,2} )
+
+		x = Float64(X)
+		dx = Float64(DX)
+
+		w = Float64.(w0)
+		prim = Float64.(prim0)
+		sw = zeros(axes(w))
+
+		h = deepcopy(H0)
+		b = deepcopy(B0)
+		sh = zeros(axes(H0))
+		sb = zeros(axes(B0))
 
 		new(x, dx, w, prim, sw, h, b, sh, sb)
 
@@ -399,6 +536,61 @@ mutable struct Interface1D1F <: AbstractInterface1D
 		ff = zeros(axes(f))
 
 		new(fw, ff)
+
+	end
+
+end
+
+
+mutable struct Interface1D2F <: AbstractInterface1D
+
+	fw :: Array{Float64,1}
+	fh :: AbstractArray{Float64,1}
+	fb :: AbstractArray{Float64,1}
+
+	function Interface1D2F(f::AbstractArray{Float64,1}) # for ghost cell
+
+		fw = zeros(3)
+		fh = zeros(axes(f))
+		fb = zeros(axes(f))
+
+		new(fw, fh, fb)
+
+	end
+
+end
+
+
+mutable struct MInterface1D1F <: AbstractInterface1D
+
+	fw :: Array{Float64,2}
+	ff :: AbstractArray{Float64,2}
+
+	function MInterface1D1F(f::AbstractArray{Float64,2})
+
+		fw = zeros(5, axes(f, 2))
+		ff = zeros(axes(f))
+
+		new(fw, ff)
+
+	end
+
+end
+
+
+mutable struct MInterface1D2F <: AbstractInterface1D
+
+	fw :: Array{Float64,2}
+	fh :: AbstractArray{Float64,2}
+	fb :: AbstractArray{Float64,2}
+
+	function MInterface1D2F(f::AbstractArray{Float64,2})
+
+		fw = zeros(5, axes(f, 2))
+		fh = zeros(axes(f))
+		fb = zeros(axes(f))
+
+		new(fw, fh, fb)
 
 	end
 
