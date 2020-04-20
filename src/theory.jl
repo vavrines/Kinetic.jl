@@ -159,7 +159,7 @@ end
 # ------------------------------------------------------------
 # Calculate conservative moments
 # ------------------------------------------------------------
-function moments_conserve( Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
+function moments_conserve( Mu::OffsetArray{<:Real,1}, Mxi::OffsetArray{Real,1}, 
 						   alpha::Int, delta::Int )
 
     uv = zeros(3)
@@ -172,7 +172,7 @@ function moments_conserve( Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,
 end
 
 
-function moments_conserve( Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mw::OffsetArray{Float64,1}, 
+function moments_conserve( Mu::OffsetArray{<:Real,1}, Mv::OffsetArray{<:Real,1}, Mw::OffsetArray{<:Real,1}, 
 						   alpha::Int, beta::Int, delta::Int )
 
 	if length(Mw) == 3
@@ -201,7 +201,7 @@ function moments_conserve( Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1
 end
 
 
-function mixture_moments_conserve( Mu::OffsetArray{Float64,2}, Mxi::OffsetArray{Float64,2},  
+function mixture_moments_conserve( Mu::OffsetArray{<:Real,2}, Mxi::OffsetArray{<:Real,2},  
 								   alpha::Int, delta::Int )
 
 	Muv = zeros(3, axes(Mu, 2))
@@ -214,7 +214,7 @@ function mixture_moments_conserve( Mu::OffsetArray{Float64,2}, Mxi::OffsetArray{
 end
 
 
-function mixture_moments_conserve( Mu::OffsetArray{Float64,2}, Mv::OffsetArray{Float64,2}, Mw::OffsetArray{Float64,2}, 
+function mixture_moments_conserve( Mu::OffsetArray{<:Real,2}, Mv::OffsetArray{<:Real,2}, Mw::OffsetArray{<:Real,2}, 
 								   alpha::Int, beta::Int, delta::Int )
 	
 	Muv = ifelse(length(Mw) == 3, zeros(4, axes(Mu, 2)), zeros(5, axes(Mu, 2)))
@@ -230,7 +230,7 @@ end
 # Calculate slope-related conservative moments
 # a = a1 + u * a2 + 0.5 * u^2 * a3
 # ------------------------------------------------------------
-function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
+function moments_conserve_slope( a::Array{<:Real,1}, Mu::OffsetArray{<:Real,1}, Mxi::OffsetArray{<:Real,1}, 
 								 alpha::Int )
 
 	au = @. a[1] * moments_conserve(Mu, Mxi, alpha + 0, 0) +
@@ -242,7 +242,7 @@ function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}
 
 end
 
-function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mxi::OffsetArray{Float64,1}, 
+function moments_conserve_slope( a::Array{<:Real,1}, Mu::OffsetArray{<:Real,1}, Mv::OffsetArray{<:Real,1}, Mxi::OffsetArray{<:Real,1}, 
 								 alpha::Int, beta::Int )
 
     au = @. a[1] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 0) +
@@ -256,7 +256,7 @@ function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}
 
 end
 
-function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}, Mv::OffsetArray{Float64,1}, Mw::OffsetArray{Float64,1}, 
+function moments_conserve_slope( a::Array{<:Real,1}, Mu::OffsetArray{<:Real,1}, Mv::OffsetArray{<:Real,1}, Mw::OffsetArray{<:Real,1}, 
 								 alpha::Int, beta::Int, delta::Int )
 
 	au = @. a[1] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) +
@@ -272,7 +272,7 @@ function moments_conserve_slope( a::Array{Float64,1}, Mu::OffsetArray{Float64,1}
 end
 
 
-function mixture_moments_conserve_slope( a::Array{Float64,2}, Mu::OffsetArray{Float64,2}, Mxi::OffsetArray{Float64,2}, 
+function mixture_moments_conserve_slope( a::Array{<:Real,2}, Mu::OffsetArray{<:Real,2}, Mxi::OffsetArray{<:Real,2}, 
 										 alpha::Int )
 
 	au = zeros(3, axes(a, 2))
@@ -285,7 +285,7 @@ function mixture_moments_conserve_slope( a::Array{Float64,2}, Mu::OffsetArray{Fl
 end
 
 
-function mixture_moments_conserve_slope( a::Array{Float64,2}, Mu::OffsetArray{Float64,2}, Mv::OffsetArray{Float64,2}, Mxi::OffsetArray{Float64,2}, 
+function mixture_moments_conserve_slope( a::Array{<:Real,2}, Mu::OffsetArray{<:Real,2}, Mv::OffsetArray{<:Real,2}, Mxi::OffsetArray{<:Real,2}, 
 										 alpha::Int, beta::Int)
 
 	au = zeros(4, axes(a, 2))
@@ -298,7 +298,7 @@ function mixture_moments_conserve_slope( a::Array{Float64,2}, Mu::OffsetArray{Fl
 end
 
 
-function mixture_moments_conserve_slope( a::Array{Float64,2}, Mu::OffsetArray{Float64,2}, Mv::OffsetArray{Float64,2}, Mw::OffsetArray{Float64,2}, 
+function mixture_moments_conserve_slope( a::Array{<:Real,2}, Mu::OffsetArray{<:Real,2}, Mv::OffsetArray{<:Real,2}, Mw::OffsetArray{<:Real,2}, 
 										 alpha::Int, beta::Int, delta::Int)
 
 	au = zeros(5, axes(a, 2))
@@ -317,17 +317,17 @@ Velocity moments of particle distribution function
 """
 
 # --- 1D ---#
-discrete_moments(f::AbstractArray{Float64,1}, u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, n::Int) =
+discrete_moments(f::AbstractArray{<:Real,1}, u::AbstractArray{<:Real,1}, ω::AbstractArray{<:Real,1}, n::Int) =
 sum(@. ω * u^n * f)
 
 
 # --- 2D ---#
-discrete_moments(f::AbstractArray{Float64,2}, u::AbstractArray{Float64,2}, ω::AbstractArray{Float64,2}, n::Int) =
+discrete_moments(f::AbstractArray{<:Real,2}, u::AbstractArray{<:Real,2}, ω::AbstractArray{<:Real,2}, n::Int) =
 sum(@. ω * u^n * f)
 
 
 # --- 3D ---#
-discrete_moments(f::AbstractArray{Float64,3}, u::AbstractArray{Float64,3}, ω::AbstractArray{Float64,3}, n::Int) =
+discrete_moments(f::AbstractArray{<:Real,3}, u::AbstractArray{<:Real,3}, ω::AbstractArray{<:Real,3}, n::Int) =
 sum(@. ω * u^n * f)
 
 
@@ -342,14 +342,14 @@ Equilibrium in discrete form
 """
 
 # --- 1D ---#
-maxwellian(u::AbstractArray{Float64,1}, ρ::Real, U::Real, λ::Real) =
+maxwellian(u::AbstractArray{<:Real,1}, ρ::Real, U::Real, λ::Real) =
 @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
-maxwellian(u::AbstractArray{Float64,1}, prim::Array{<:Real,1}) =
+maxwellian(u::AbstractArray{<:Real,1}, prim::Array{<:Real,1}) =
 maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 
-function mixture_maxwellian(u::AbstractArray{Float64,2}, prim::Array{<:Real,2})
+function mixture_maxwellian(u::AbstractArray{<:Real,2}, prim::Array{<:Real,2})
 	mixM = zeros(axes(u))
 	for j in axes(mixM, 2)
 		mixM[:,j] .= maxwellian(u[:,j], prim[:,j])
@@ -360,14 +360,14 @@ end
 
 
 # --- 2D ---#
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, ρ::Real, U::Real, V::Real, λ::Real) =
+maxwellian(u::AbstractArray{<:Real,2}, v::AbstractArray{<:Real,2}, ρ::Real, U::Real, V::Real, λ::Real) =
 @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
-maxwellian(u::AbstractArray{Float64,2}, v::AbstractArray{Float64,2}, prim::Array{<:Real,1}) =
+maxwellian(u::AbstractArray{<:Real,2}, v::AbstractArray{<:Real,2}, prim::Array{<:Real,1}) =
 maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5 
 
 
-function mixture_maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, prim::Array{<:Real,2})
+function mixture_maxwellian(u::AbstractArray{<:Real,3}, v::AbstractArray{<:Real,3}, prim::Array{<:Real,2})
 	mixM = zeros(axes(u))
 	for k in axes(mixM, 3)
 		mixM[:,:,k] .= maxwellian(u[:,:,k], v[:,:,k], prim[:,k])
@@ -378,15 +378,15 @@ end
 
 
 # --- 3D ---#
-maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, 
+maxwellian(u::AbstractArray{<:Real,3}, v::AbstractArray{<:Real,3}, w::AbstractArray{<:Real,3}, 
 		   ρ::Real, U::Real, V::Real, W::Real, λ::Real) =
 @. ρ * (λ / π)^1.5 * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
 
-maxwellian(u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, prim::Array{<:Real,1}) =
+maxwellian(u::AbstractArray{<:Real,3}, v::AbstractArray{<:Real,3}, w::AbstractArray{<:Real,3}, prim::Array{<:Real,1}) =
 maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
 
 
-function mixture_maxwellian(u::AbstractArray{Float64,4}, v::AbstractArray{Float64,4}, w::AbstractArray{Float64,4}, prim::Array{<:Real,2})
+function mixture_maxwellian(u::AbstractArray{<:Real,4}, v::AbstractArray{<:Real,4}, w::AbstractArray{<:Real,4}, prim::Array{<:Real,2})
 	mixM = zeros(axes(u))
 	for l in axes(mixM, 4)
 		mixM[:,:,:,l] .= maxwellian(u[:,:,:,l], v[:,:,:,l], w[:,:,:,l], prim[:,l])
@@ -669,7 +669,7 @@ Shift distribution function by external force
 # ------------------------------------------------------------
 # Single-component gas
 # ------------------------------------------------------------
-function shift_pdf!(f::AbstractArray{Float64,1}, a::Float64, du::Float64, dt::Float64)
+function shift_pdf!(f::AbstractArray{<:Real,1}, a::Real, du::Real, dt::Real)
 
 	q0 = eachindex(f) |> first # for OffsetArray
 	q1 = eachindex(f) |> last
@@ -708,15 +708,15 @@ end
 # ------------------------------------------------------------
 # Multi-component gas
 # ------------------------------------------------------------
-function shift_pdf!(f::AbstractArray{Float64,2}, a::Array{Float64,1}, du::AbstractArray{Float64,1}, dt::Float64)
+function shift_pdf!(f::AbstractArray{<:Real,2}, a::Array{<:Real,1}, du::AbstractArray{<:Real,1}, dt::Real)
 	for j in axes(f, 2)
 		shift_pdf!(f[:,j], a[j], du[j], dt)
 	end
 end
 
 
-function em_coefficients( prim::Array{Float64,2}, E::Array{Float64,1}, B::Array{Float64,1}, mr::Float64, 
-						  lD::Float64, rL::Float64, dt::Float64 )
+function em_coefficients( prim::Array{<:Real,2}, E::Array{<:Real,1}, B::Array{<:Real,1}, mr::Real, 
+						  lD::Real, rL::Real, dt::Real )
 
 	A = zeros(9, 9)
 	A[1,1] = -1. / (2. * rL)
