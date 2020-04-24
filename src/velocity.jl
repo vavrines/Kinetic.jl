@@ -107,6 +107,65 @@ mutable struct VSpace2D <: AbstractVelocitySpace
 end # struct
 
 
+mutable struct VSpace3D <: AbstractVelocitySpace
+
+	u0 :: Float64; u1 :: Float64; nu :: Int64
+	v0 :: Float64; v1 :: Float64; nv :: Int64
+	w0 :: Float64; w1 :: Float64; nw :: Int64
+	u :: Array{Float64,3}; v :: Array{Float64,3}; w :: Array{Float64,3}
+	du :: Array{Float64,3}; dv :: Array{Float64,3}; dw :: Array{Float64,3}
+    weights :: Array{Float64,3}
+
+	VSpace3D() = VSpace3D(-5, 5, 28, -5, 5, 28, -5, 5, 28)
+	VSpace3D(U0::Real, U1::Real, V0::Real, V1::Real, W0::Real, W1::Real) = VSpace2D(U0, U1, 28, V0, V1, 28, W0, W1, 28)
+
+    function VSpace3D( U0::Real, U1::Real, UNUM::Int, 
+					   V0::Real, V1::Real, VNUM::Int, 
+					   W0::Real, W1::Real, WNUM::Int, 
+					   TYPE="rectangle"::String, NGU=0::Int, NGV=0::Int, NGW=0::Int )
+
+		u0 = Float64(U0); u1 = Float64(U1); nu = UNUM; δu = (u1 - u0) / nu
+		v0 = Float64(V0); v1 = Float64(V1); nv = VNUM; δv = (v1 - v0) / nv
+		w0 = Float64(W0); w1 = Float64(W1); nw = WNUM; δw = (w1 - w0) / nw
+		u = OffsetArray{Float64}(undef, 1-NGU:nu+NGU, 1-NGV:nv+NGV, 1-NGW:nw+NGW)
+        v = similar(u); w = similar(u); du = similar(u); dv = similar(u); dw = similar(u); weights = similar(u)
+
+		if TYPE == "rectangle" #// rectangular formula
+			for k in axes(u, 3), j in axes(u, 2), i in axes(u, 1)
+				u[i,j,k] = u0 + (i - 0.5) * δu
+				v[i,j,k] = v0 + (j - 0.5) * δv
+				w[i,j,k] = w0 + (k - 0.5) * δw
+				du[i,j,k] = δu
+				dv[i,j,k] = δv
+				dw[i,j,k] = δw
+				weights[i,j,k] = δu * δv * δw
+			end
+		elseif TYPE == "newton" #// newton-cotes formula
+			for k in axes(u, 3), j in axes(u, 2), i in axes(u, 1)
+				u[i,j,k] = u0 + (i - 0.5) * δu
+				v[i,j,k] = v0 + (j - 0.5) * δv
+				w[i,j,k] = w0 + (k - 0.5) * δw
+				du[i,j,k] = δu
+				dv[i,j,k] = δv
+				dw[i,j,k] = δw
+				weights[i,j,k] = newton_cotes(i+NGU, UNUM+NGU*2) * δu * 
+								 newton_cotes(j+NGV, VNUM+NGV*2) * δv * 
+								 newton_cotes(k+NGW, WNUM+NGW*2) * δw
+			end
+		elseif TYPE == "gauss" #// gaussian integration
+			println("Gaussian integration coming soon")
+		else
+			println("error: no velocity quadrature rule")
+		end
+
+		# inner constructor method
+		new(u0, u1, nu, v0, v1, nv, u, v, du, dv, weights)
+    
+    end # constructor
+
+end # struct
+
+
 # ------------------------------------------------------------
 # Structure of multi-component velocity space
 # ------------------------------------------------------------
