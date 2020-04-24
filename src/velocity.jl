@@ -5,6 +5,7 @@
 
 export VSpace1D,
 	   VSpace2D,
+	   VSpace3D,
 	   MVSpace1D,
 	   MVSpace2D,
        newton_cotes
@@ -159,7 +160,7 @@ mutable struct VSpace3D <: AbstractVelocitySpace
 		end
 
 		# inner constructor method
-		new(u0, u1, nu, v0, v1, nv, u, v, du, dv, weights)
+		new(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, w, du, dv, dw, weights)
     
     end # constructor
 
