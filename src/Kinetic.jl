@@ -6,11 +6,13 @@
 module Kinetic
 
 
-using Reexport
 using Dates
-using OffsetArrays, SpecialFunctions
-using FileIO, JLD2, GR
-#@reexport using FileIO, JLD2
+using OffsetArrays
+using SpecialFunctions
+using FFTW
+using FileIO
+using JLD2
+using GR
 
 
 include("abstract.jl")
