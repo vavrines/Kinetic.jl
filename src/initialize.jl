@@ -49,8 +49,8 @@ function init_fvm(KS::SolverSet)
 
     if KS.set.nSpecies == 1
     
-        if KS.set.space == "1d1f"
-            #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx)
+        if KS.set.space == "1d1f1v"
+            #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx) # without ghost cells
             ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
             face = Array{Interface1D1F}(undef, KS.pSpace.nx+1)
             
@@ -58,15 +58,15 @@ function init_fvm(KS::SolverSet)
                 # shock problems
                 if KS.set.case == "shock"
                     if i <= KS.pSpace.nx÷2
-                        ctr[i] = ControlVolume1D1F(KS.pSpace.x[i], KS.pSpace.dx[i], KS.ib.wL, KS.ib.primL, KS.ib.hL)
+                        ctr[i] = ControlVolume1D1F(KS.pSpace.x[i], KS.pSpace.dx[i], KS.ib.wL, KS.ib.primL, KS.ib.fL)
                     else
-                        ctr[i] = ControlVolume1D1F(KS.pSpace.x[i], KS.pSpace.dx[i], KS.ib.wR, KS.ib.primR, KS.ib.hR)
+                        ctr[i] = ControlVolume1D1F(KS.pSpace.x[i], KS.pSpace.dx[i], KS.ib.wR, KS.ib.primR, KS.ib.fR)
                     end
                 end
             end
         
             for i=1:KS.pSpace.nx+1
-                face[i] = Interface1D1F(KS.ib.hL)
+                face[i] = Interface1D1F(KS.ib.fL)
             end
 
         else
@@ -74,7 +74,7 @@ function init_fvm(KS::SolverSet)
 
     elseif KS.set.nSpecies == 2
 
-        if KS.set.space == "1d4f"
+        if KS.set.space == "1d4f1v"
             #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx)
             ctr = OffsetArray{MControlVolume1D4F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
             face = Array{MInterface1D4F}(undef, KS.pSpace.nx+1)
