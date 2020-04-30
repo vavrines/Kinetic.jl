@@ -4,7 +4,7 @@
 
 # setup
 case = brio-wu
-space = 1d4f
+space = 1d4f1v
 nSpecies = 2
 interpOrder = 2
 limiter = vanleer

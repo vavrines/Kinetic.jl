@@ -4,7 +4,7 @@
 
 # setup
 case = shock
-space = 1d2f
+space = 1d2f1v
 nSpecies = 1
 interpOrder = 1
 limiter = vanleer

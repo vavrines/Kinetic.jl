@@ -88,24 +88,45 @@ struct SolverSet <: AbstractSolverSet
 		end
 
 		# generate data structure
-		dim = ifelse( parse(Int, space[3]) >= 3, 3, parse(Int,space[1]) )
-		γ = heat_capacity_ratio(inK, dim)
-		
+		dim = parse(Int, space[1])
+		gasD = ifelse( parse(Int, space[3]) >= 3, 3, dim ) # in case of plasma
+		γ = heat_capacity_ratio(inK, gasD)		
 		set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
-		pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+		
+		if dim == 1
+			pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+		elseif dim == 2
+			pSpace = PSpace2D(x0, x1, nx, y0, y1, ny, pMeshType, nxg, nyg)
+		else
+		end
 
 		if case == "shock"
 			μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
-			
-			vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
 			gas = GasProperty(knudsen, mach, prandtl, inK, γ, omega, alphaRef, omegaRef, μᵣ)
+
+			if space == "1d1f1v"
+				vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
+
+				wL, primL, hL, bcL, wR, primR, hR, bcR = ib_rh(mach, γ, vSpace.u)
+				ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
+			elseif space == "1d2f1v"
+				vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
+
+				wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR = ib_rh(mach, γ, vSpace.u, inK)
+				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
+			elseif space == "1d1f3v"
+				vSpace = VSpace3D(u0, u1, nu, v0, v1, nv, w0, w1, nw, vMeshType, nug, nvg, nwg)
+
+				wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
+				ib = IB1D1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
+			end
 			
-			if space == "1d1f"
+			if space == "1d1f1v"
 				wL, primL, hL, bcL,
 				wR, primR, hR, bcR = ib_rh(mach, γ, vSpace.u)
 
 				ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
-			elseif space == "1d2f"
+			elseif space == "1d2f1v"
 				wL, primL, hL, bL, bcL,
 				wR, primR, hR, bR, bcR = ib_rh(mach, γ, vSpace.u, inK)
 

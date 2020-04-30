@@ -26,29 +26,21 @@ export Setup,
 # ------------------------------------------------------------
 # Structure of computational setup
 # ------------------------------------------------------------
-struct Setup <: AbstractSetup
+struct Setup{S,I,F} <: AbstractSetup
 
-    case :: AbstractString
-	space :: AbstractString
-	nSpecies :: Int64
-	interpOrder :: Int64
-	limiter :: AbstractString
-	cfl :: Float64
-	maxTime :: Float64
+    case :: S
+	space :: S
+	nSpecies :: I
+	interpOrder :: I
+	limiter :: S
+	cfl :: F
+	maxTime :: F
 
-	function Setup( CASE::AbstractString, SPACE::AbstractString, SPECIES::Int, ORDER::Int, 
-					LM::AbstractString, CFL::Real, TIME::Real )
+	function Setup( case::AbstractString, space::AbstractString, nSpecies::Int, interpOrder::Int, 
+					limiter::AbstractString, cfl::Real, maxtime::Real )
 
-    	case = CASE
-		space = SPACE
-		nSpecies = SPECIES
-		interpOrder = Int64(ORDER)
-		limiter = LM
-    	cfl = Float64(CFL)
-    	maxTime = Float64(TIME)
-
-		# inner constructor method
-		new(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
+		new{typeof(case),typeof(nSpecies),typeof(cfl)}(
+			case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
     
     end
 
@@ -170,31 +162,37 @@ end
 # ------------------------------------------------------------
 # Structure of initial and boundary conditions
 # ------------------------------------------------------------
-struct IB1D1F <: AbstractCondition
+struct IB1D1F{A,B} <: AbstractCondition
 
-	# initial condition
-	wL :: Array{Float64,1}
-	primL :: Array{Float64,1}
-	hL :: AbstractArray{Float64,1}
-	bcL :: Array{Float64,1}
+	wL :: A
+	primL :: A
+	fL :: B
+	bcL :: A
 
-	wR :: Array{Float64,1}
-	primR :: Array{Float64,1}
-	hR :: AbstractArray{Float64,1}
-	bcR :: Array{Float64,1}
+	wR :: A
+	primR :: A
+	fR :: B
+	bcR :: A
 
-    function IB1D1F( WL::Array{<:Real,1}, PRIML::Array{<:Real,1}, 
-    			     HL::AbstractArray{Float64,1}, BCL::Array{<:Real,1}, 
-    			     WR::Array{<:Real,1}, PRIMR::Array{<:Real,1}, 
-    			     HR::AbstractArray{Float64,1}, BCR::Array{<:Real,1} )
+	# 1D1F1V
+    function IB1D1F( wL::Array{<:Real,1}, primL::Array{<:Real,1}, 
+    			     fL::AbstractArray{Float64,1}, bcL::Array{<:Real,1}, 
+    			     wR::Array{<:Real,1}, primR::Array{<:Real,1}, 
+    			     fR::AbstractArray{Float64,1}, bcR::Array{<:Real,1} )
 
-    	wL = Float64.(WL); primL = Float64.(PRIML); hL = deepcopy(HL); bcL = Float64.(BCL)
-    	wR = Float64.(WR); primR = Float64.(PRIMR); hR = deepcopy(HR); bcR = Float64.(BCR)
-
-		# inner constructor
-		new(wL, primL, hL, bcL, wR, primR, hR, bcR)
+		new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
     
-    end
+	end
+	
+	# 1D1F3V
+	function IB1D1F( wL::Array{<:Real,1}, primL::Array{<:Real,1}, 
+					 fL::AbstractArray{Float64,3}, bcL::Array{<:Real,1}, 
+					 wR::Array{<:Real,1}, primR::Array{<:Real,1}, 
+					 fR::AbstractArray{Float64,3}, bcR::Array{<:Real,1} )
+
+		new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
+
+	end
 
 end
 
