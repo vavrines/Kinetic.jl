@@ -3,13 +3,7 @@
 # ------------------------------------------------------------
 
 
-export SolverSet,
-	   solve!,
-	   timestep,
-	   reconstruct!,
-	   evolve!,
-	   update!,
-	   step!
+export SolverSet
 
 
 # ------------------------------------------------------------

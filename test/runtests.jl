@@ -1,3 +1,3 @@
 using Kinetic
 
-ks, ctr, face, simTime = initialize("config.txt")
+ks, ctr, face, simTime = Kinetic.initialize("config.txt")
