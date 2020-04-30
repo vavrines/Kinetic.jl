@@ -19,7 +19,7 @@ function initialize(configfilename::String)
     println("")
     println("reading configurations from $(configfilename)")
     println("")
-    print("initializeing solver: ")
+    println("initializing solver: ")
 
     if configfilename[end-2:end] == "txt"
         
