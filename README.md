@@ -16,4 +16,6 @@ pkg> add https://github.com/vavrines/Kinetic.jl
 ```
 
 **Usage:**  
-`julia> using Kinetic`
+```
+julia> using Kinetic
+```
