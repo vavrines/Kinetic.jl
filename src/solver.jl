@@ -83,7 +83,13 @@ struct SolverSet <: AbstractSolverSet
 
 		# generate data structure
 		dim = parse(Int, space[1])
-		gasD = ifelse( parse(Int, space[3]) >= 3 || parse(Int, space[5]) >= 3, 3, dim ) # in case 1D geo with 3D velo
+		gasD = map(space) do x
+			if parse(Int, x[3]) == 1 return dim
+			elseif parse(Int, x[3]) == 2 return dim
+			elseif parse(Int, x[3]) >= 3 return 3
+			else return nothing
+			end
+		end
 		γ = heat_capacity_ratio(inK, gasD)		
 		set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
 		
