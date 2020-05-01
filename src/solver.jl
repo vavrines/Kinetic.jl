@@ -34,9 +34,9 @@ struct SolverSet <: AbstractSolverSet
 
 	function SolverSet(configfilename::String)
 		
+		#=
 		#--- with allowrance ---#
 		# read following data from text file
-		#=
 		allowed = [ "case", "space", "nSpecies", "interpOrder", "limiter", "cfl", "maxTime", 
 				    "x0", "x1", "nx", "nxg", "pMeshType",
 				    "umin", "umax", "nu", "nug", "vMeshType",
@@ -83,7 +83,7 @@ struct SolverSet <: AbstractSolverSet
 
 		# generate data structure
 		dim = parse(Int, space[1])
-		gasD = ifelse( parse(Int, space[3]) >= 3, 3, dim ) # in case of plasma
+		gasD = ifelse( parse(Int, space[3]) >= 3 || parse(Int, space[5]) >= 3, 3, dim ) # in case 1D geo with 3D velo
 		γ = heat_capacity_ratio(inK, gasD)		
 		set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
 		
