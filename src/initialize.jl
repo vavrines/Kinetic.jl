@@ -49,7 +49,7 @@ function init_fvm(KS::SolverSet)
 
     if KS.set.nSpecies == 1
     
-        if KS.set.space == "1d1f1v"
+        if KS.set.space[1:4] == "1d1f"
             #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx) # without ghost cells
             ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
             face = Array{Interface1D1F}(undef, KS.pSpace.nx+1)
