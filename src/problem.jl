@@ -81,7 +81,7 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,3}, v::AbstractArr
               MaR * sqrt(gam / 2.0) * sqrt(ratioT),
               0.,
               0.,
-              primL[3] / ratioT ]
+              primL[end] / ratioT ]
 
     wL = prim_conserve(primL, gam)
     wR = prim_conserve(primR, gam)
