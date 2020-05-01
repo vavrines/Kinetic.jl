@@ -114,18 +114,6 @@ struct SolverSet <: AbstractSolverSet
 				wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
 				ib = IB1D1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
 			end
-			
-			if space == "1d1f1v"
-				wL, primL, hL, bcL,
-				wR, primR, hR, bcR = ib_rh(mach, γ, vSpace.u)
-
-				ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
-			elseif space == "1d2f1v"
-				wL, primL, hL, bL, bcL,
-				wR, primR, hR, bR, bcR = ib_rh(mach, γ, vSpace.u, inK)
-
-				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
-			end
 		elseif case == "brio-wu"
 			v0 = u0 * sqrt(mi / me)
 			v1 = u1 * sqrt(mi / me)
