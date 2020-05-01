@@ -416,7 +416,7 @@ end
 function step!( fwL::Array{<:AbstractFloat,1}, ffL::AbstractArray{<:AbstractFloat,3}, 
 				w::Array{<:AbstractFloat,1}, prim::Array{<:AbstractFloat,1}, f::AbstractArray{<:AbstractFloat,3}, 
 				fwR::Array{<:AbstractFloat,1}, ffR::AbstractArray{<:AbstractFloat,3}, 
-				γ::Float64, u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, μᵣ::Float64, ω::Float64,
+				γ::Float64, uVelo::AbstractArray{Float64,3}, vVelo::AbstractArray{Float64,3}, wVelo::AbstractArray{Float64,3}, μᵣ::Float64, ω::Float64,
 				dx::Float64, dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
 
 	#--- store W^n and calculate H^n,\tau^n ---#
@@ -431,11 +431,11 @@ function step!( fwL::Array{<:AbstractFloat,1}, ffL::AbstractArray{<:AbstractFloa
 	@. AVG += abs(w)
 
 	#--- calculate M^{n+1} and tau^{n+1} ---#
-	M = maxwellian(u, v, w, prim)
+	M = maxwellian(uVelo, vVelo, wVelo, prim)
 	τ = vhs_collision_time(prim, μᵣ, ω)
 
 	#--- update distribution function ---#
-	for k in eachindex(w, 3), j in eachindex(v, 2), i in eachindex(u, 1)
+	for k in eachindex(wVelo, 3), j in eachindex(vVelo, 2), i in eachindex(uVelo, 1)
 		f[i,j,k] = (f[i,j,k] + (ffL[i,j,k] - ffR[i,j,k]) / dx + dt / τ * M[i,j,k]) / (1.0 + dt / τ)
 	end
 
