@@ -251,18 +251,18 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
 	
 	# particle distribution function
 	Threads.@threads for i=2:KS.pSpace.nx-1
-		if KS.set.space == "1d1f"
+		if KS.set.space[1:4] == "1d1f"
 			@inbounds ctr[i].sf .= reconstruct3( ctr[i-1].f, ctr[i].f, ctr[i+1].f, 
 												 0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
 												 KS.set.limiter )
-		elseif KS.set.space == "1d2f"
+		elseif KS.set.space[1:4] == "1d2f"
 			@inbounds ctr[i].sh .= reconstruct3( ctr[i-1].h, ctr[i].h, ctr[i+1].h, 
 												 0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
 												 KS.set.limiter )
 			@inbounds ctr[i].sb .= reconstruct3( ctr[i-1].b, ctr[i].b, ctr[i+1].b, 
 												 0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
 												 KS.set.limiter )	
-		elseif KS.set.space == "1d4f"
+		elseif KS.set.space[1:4] == "1d4f"
 			@inbounds ctr[i].sh0 .= reconstruct3( ctr[i-1].h0, ctr[i].h0, ctr[i+1].h0, 
 												  0.5 * (ctr[i-1].dx + ctr[i].dx), 0.5 * (ctr[i].dx + ctr[i+1].dx),
 												  KS.set.limiter )		
@@ -291,20 +291,20 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
 #    end
 
-	if KS.set.space == "1d1f"
+	if KS.set.space[1:4] == "1d1f"
 
 		Threads.@threads for i=2:KS.pSpace.nx
-		#	@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
-		#												  ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf, 
-		#												  KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sf, ctr[i].sf )
+			@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
+														  ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf, 
+														  KS.vSpace.u, KS.vSpace.weights, dt, ctr[i-1].sf, ctr[i].sf )
 
-			@inbounds face[i].fw, face[i].ff = 
-			flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
-			ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
-			KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
+		#	@inbounds face[i].fw, face[i].ff = 
+		#	flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
+		#	ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
+		#	KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
 		end
 
-	elseif KS.set.space == "1d2f"
+	elseif KS.set.space[1:4] == "1d2f"
 
 		Threads.@threads for i=2:KS.pSpace.nx
 			@inbounds face[i].fw, face[i].fh, face[i].fb = 
@@ -317,7 +317,7 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 			KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
 		end
 
-	elseif KS.set.space == "1d4f"
+	elseif KS.set.space[1:4] == "1d4f"
 
 		if KS.set.nSpecies == 2
 			Threads.@threads for i=2:KS.pSpace.nx
@@ -353,14 +353,19 @@ end
 # ------------------------------------------------------------
 function update!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Float64, residual::Array{Float64,1})
 
-	dim = ifelse( parse(Int, KS.set.space[3]) >= 3, 3, parse(Int, KS.set.space[1]) )
-    sumRes = zeros(dim+2)
-    sumAvg = zeros(dim+2)
+    sumRes = zeros(axes(KS.ib.wL))
+    sumAvg = zeros(axes(KS.ib.wL))
 
-    Threads.@threads for i=2:KS.pSpace.nx-1
-		@inbounds step!( face[i].fw, face[i].ff, ctr[i].w, ctr[i].prim, ctr[i].f, 
-						 face[i+1].fw, face[i+1].ff, KS.gas.γ, KS.vSpace.u, KS.gas.μᵣ, KS.gas.ω,
-						 ctr[i].dx, dt, sumRes, sumAvg )
+	Threads.@threads for i=2:KS.pSpace.nx-1
+		if length(sumRes) == 3
+			@inbounds step!( face[i].fw, face[i].ff, ctr[i].w, ctr[i].prim, ctr[i].f, 
+							 face[i+1].fw, face[i+1].ff, KS.gas.γ, KS.vSpace.u, KS.gas.μᵣ, KS.gas.ω,
+							 ctr[i].dx, dt, sumRes, sumAvg )
+		else
+			@inbounds step!( face[i].fw, face[i].ff, ctr[i].w, ctr[i].prim, ctr[i].f, 
+							 face[i+1].fw, face[i+1].ff, KS.gas.γ, KS.vSpace.u, KS.vSpace.v, KS.vSpace.w, KS.gas.μᵣ, KS.gas.ω,
+							 ctr[i].dx, dt, sumRes, sumAvg )
+		end
     end
 
     #if KS.set.case == "heat"
@@ -377,7 +382,7 @@ end
 
 
 # ------------------------------------------------------------
-# Stochastic collocation update
+# Time stepping 
 # ------------------------------------------------------------
 function step!( fwL::Array{Float64,1}, ffL::AbstractArray{Float64,1}, 
 				w::Array{Float64,1}, prim::Array{Float64,1}, f::AbstractArray{Float64,1}, 
@@ -406,6 +411,36 @@ function step!( fwL::Array{Float64,1}, ffL::AbstractArray{Float64,1},
 	end
 
 end
+
+
+function step!( fwL::Array{<:AbstractFloat,1}, ffL::AbstractArray{<:AbstractFloat,3}, 
+				w::Array{<:AbstractFloat,1}, prim::Array{<:AbstractFloat,1}, f::AbstractArray{<:AbstractFloat,3}, 
+				fwR::Array{<:AbstractFloat,1}, ffR::AbstractArray{<:AbstractFloat,3}, 
+				γ::Float64, u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, μᵣ::Float64, ω::Float64,
+				dx::Float64, dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
+
+	#--- store W^n and calculate H^n,\tau^n ---#
+	w_old = deepcopy(w)
+
+	#--- update W^{n+1} ---#
+	@. w += (fwL - fwR) / dx
+	prim .= conserve_prim(w, γ)
+
+	#--- record residuals ---#
+	@. RES += (w - w_old)^2
+	@. AVG += abs(w)
+
+	#--- calculate M^{n+1} and tau^{n+1} ---#
+	M = maxwellian(u, v, w, prim)
+	τ = vhs_collision_time(prim, μᵣ, ω)
+
+	#--- update distribution function ---#
+	for k in eachindex(w, 3), j in eachindex(v, 2), i in eachindex(u, 1)
+		f[i,j,k] = (f[i,j,k] + (ffL[i,j,k] - ffR[i,j,k]) / dx + dt / τ * M[i,j,k]) / (1.0 + dt / τ)
+	end
+
+end
+
 
 function step!( fwL::Array{Float64,1}, fhL::AbstractArray{Float64,1}, fbL::AbstractArray{Float64,1},
 				w::Array{Float64,1}, prim::Array{Float64,1}, h::AbstractArray{Float64,1}, b::AbstractArray{Float64,1}, 

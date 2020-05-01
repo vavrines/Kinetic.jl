@@ -19,11 +19,11 @@ Kinetic flux vector splitting (KFVS) method
 """
 
 # ------------------------------------------------------------
-# 1D1F flux
+# 1D1F1V flux
 # ------------------------------------------------------------
-function flux_kfvs( fL::AbstractArray{Float64,1}, fR::AbstractArray{Float64,1}, 
-                    u::AbstractArray{Float64,1}, ω::AbstractArray{Float64,1}, dt::Float64,
-                    sfL=zeros(axes(fL))::AbstractArray{Float64,1}, sfR=zeros(axes(fR))::AbstractArray{Float64,1} )
+function flux_kfvs( fL::AbstractArray{<:AbstractFloat,1}, fR::AbstractArray{<:AbstractFloat,1}, 
+                    u::AbstractArray{<:AbstractFloat,1}, ω::AbstractArray{<:AbstractFloat,1}, dt::AbstractFloat,
+                    sfL=zeros(axes(fL))::AbstractArray{<:AbstractFloat,1}, sfR=zeros(axes(fR))::AbstractArray{<:AbstractFloat,1} )
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -32,11 +32,40 @@ function flux_kfvs( fL::AbstractArray{Float64,1}, fR::AbstractArray{Float64,1},
     sf = @. sfL * δ + sfR * (1. - δ)
 
     # --- calculate fluxes ---#
-    fw = zeros(3); ff = similar(fL)
+    fw = similar(fL, 3); ff = similar(fL)
 
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* sf)
     fw[2] = dt * sum(ω .* u.^2 .* f) - 0.5 * dt^2 * sum(ω .* u.^3 .* sf)
     fw[3] = dt * 0.5 * sum(ω .* u.^3 .* f) - 0.5 * dt^2 * 0.5 * sum(ω .* u.^4 .* sf)
+
+    @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
+
+    return fw, ff
+
+end
+
+
+# ------------------------------------------------------------
+# 1D1F3V flux
+# ------------------------------------------------------------
+function flux_kfvs( fL::AbstractArray{Float64,3}, fR::AbstractArray{Float64,3}, 
+                    u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3}, ω::AbstractArray{Float64,3}, 
+                    dt::Float64, sfL=zeros(axes(fL))::AbstractArray{Float64,3}, sfR=zeros(axes(fR))::AbstractArray{Float64,3} )
+
+    # --- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    f = @. fL * δ + fR * (1. - δ)
+    sf = @. sfL * δ + sfR * (1. - δ)
+
+    # --- calculate fluxes ---#
+    fw = similar(fL, 5); ff = similar(fL)
+
+    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* sf)
+    fw[2] = dt * sum(ω .* u.^2 .* f) - 0.5 * dt^2 * sum(ω .* u.^3 .* sf)
+    fw[3] = dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* v .* sf)
+    fw[4] = dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* w .* sf)
+    fw[5] = dt * 0.5 * sum(ω .* u .* (u.^2 .+ v.^2 .+ w.^2) .* f) - 0.5 * dt^2 * 0.5 * sum(ω .* u.^2 .*  (u.^2 .+ v.^2 .+ w.^2) .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
