@@ -39,7 +39,7 @@ struct SolverSet <: AbstractSolverSet
 		#=
 		allowed = [ "case", "space", "nSpecies", "interpOrder", "limiter", "cfl", "maxTime", 
 				    "x0", "x1", "nx", "nxg", "pMeshType",
-				    "u0", "u1", "nu", "nug", "vMeshType",
+				    "umin", "umax", "nu", "nug", "vMeshType",
 				    "knudsen", "mach", "prandtl", "inK", "omega", "alphaRef", "omegaRef" ]
 		D = read_dict(configfilename, allowed)
 
@@ -57,8 +57,8 @@ struct SolverSet <: AbstractSolverSet
         nxg = D["nxg"]
         pMeshType = D["pMeshType"]
 
-		u0 = D["u0"]
-		u1 = D["u1"]
+		umin = D["umin"]
+		umax = D["umax"]
         nu = D["nu"]
         nug = D["nug"]
 		vMeshType = D["vMeshType"]
@@ -99,27 +99,27 @@ struct SolverSet <: AbstractSolverSet
 			gas = GasProperty(knudsen, mach, prandtl, inK, γ, omega, alphaRef, omegaRef, μᵣ)
 
 			if space == "1d1f1v"
-				vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
+				vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
 				wL, primL, hL, bcL, wR, primR, hR, bcR = ib_rh(mach, γ, vSpace.u)
 				ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
 			elseif space == "1d2f1v"
-				vSpace = VSpace1D(u0, u1, nu, vMeshType, nug)
+				vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
 				wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR = ib_rh(mach, γ, vSpace.u, inK)
 				ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
 			elseif space == "1d1f3v"
-				vSpace = VSpace3D(u0, u1, nu, v0, v1, nv, w0, w1, nw, vMeshType, nug, nvg, nwg)
+				vSpace = VSpace3D(umin, umax, nu, vmin, vmax, nv, wmin, wmax, nw, vMeshType, nug, nvg, nwg)
 
 				wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
 				ib = IB1D1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
 			end
 		elseif case == "brio-wu"
-			v0 = u0 * sqrt(mi / me)
-			v1 = u1 * sqrt(mi / me)
+			v0 = umin * sqrt(mi / me)
+			v1 = umax * sqrt(mi / me)
 			kne = knudsen * (me / mi)
 
-			vSpace = MVSpace1D(u0, u1, v0, v1, nu, vMeshType, nug)
+			vSpace = MVSpace1D(umin, umax, v0, v1, nu, vMeshType, nug)
 			gas = PlasmaProperty([knudsen, kne], mach, prandtl, inK, γ, mi, ni, me, ne, lD, rL, sol, echi, bnu)
 		
 			wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 

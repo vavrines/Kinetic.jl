@@ -19,8 +19,8 @@ pMeshType = uniform
 nxg = 0
 
 # velocity space
-u0 = -12.0
-u1 = 12.0
+umin = -12.0
+umax = 12.0
 nu = 64
 vMeshType = rectangle
 nug = 0
