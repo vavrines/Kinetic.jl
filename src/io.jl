@@ -108,7 +108,7 @@ function plot_line(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVo
             plty[i,j] = ctr[i].prim[j]
         end
 
-        plty[i,3] = 1. / ctr[i].prim[3]
+        plty[i,3] = 1. / ctr[i].prim[end]
     end
 
     # GR
