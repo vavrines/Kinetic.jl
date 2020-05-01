@@ -111,19 +111,16 @@ function plot_line(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVo
         plty[i,3] = 1. / ctr[i].prim[3]
     end
 
-    xlabel("X"); ylabel("Density")
-    #legend("N")
-    p1 = plot(pltx, plty[:,1])
-    display(p1)
-
-    xlabel("X"); ylabel("Velocity")
+    # GR
+    #xlabel("X"); ylabel("Velocity")
     #legend("U")
-    p2 = plot(pltx, plty[:,2])
-    display(p2)
+    #p1 = plot(pltx, plty[:,1])
+    #display(p1)
 
-    xlabel("X"); ylabel("Temperature")
-    #legend("T")
-    p3 = plot(pltx, plty[:,3])
-    display(p3)
+    # Plots
+    p1 = plot(pltx, plty[:,1], label="Density", lw=2, xlabel="X")
+    p1 = plot!(pltx, plty[:,2], label="Velocity", lw=2)
+    p1 = plot!(pltx, plty[:,3], label="Temperature", lw=2)
+    display(p1)
 
 end

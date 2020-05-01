@@ -12,7 +12,7 @@ using SpecialFunctions
 using FFTW
 using FileIO
 using JLD2
-using GR
+using Plots
 
 
 include("abstract.jl")
