@@ -26,7 +26,7 @@ export Setup,
 # ------------------------------------------------------------
 # Structure of computational setup
 # ------------------------------------------------------------
-struct Setup{S,I,E,F} <: AbstractSetup
+struct Setup{S, I, E, F} <: AbstractSetup
 
     case :: S
 	space :: S
@@ -39,7 +39,7 @@ struct Setup{S,I,E,F} <: AbstractSetup
 	function Setup( case::AbstractString, space::AbstractString, nSpecies::Int, interpOrder::Int, 
 					limiter::AbstractString, cfl::Real, maxTime::Real )
 
-		new{typeof(case),typeof(nSpecies),typeof(cfl),typeof(maxTime)}(
+		new{typeof(case), typeof(nSpecies), typeof(cfl), typeof(maxTime)}(
 			case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
     
     end
@@ -180,7 +180,7 @@ struct IB1D1F{A,B} <: AbstractCondition
     			     wR::Array{<:Real,1}, primR::Array{<:Real,1}, 
     			     fR::AbstractArray{<:Real,1}, bcR::Array{<:Real,1} )
 
-		new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
+		new{typeof(wL), typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
     
 	end
 	
@@ -190,7 +190,7 @@ struct IB1D1F{A,B} <: AbstractCondition
 					 wR::Array{<:Real,1}, primR::Array{<:Real,1}, 
 					 fR::AbstractArray{Float64,3}, bcR::Array{<:Real,1} )
 
-		new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
+		new{typeof(wL), typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
 
 	end
 
@@ -336,32 +336,33 @@ end
 # ------------------------------------------------------------
 # Structure of control volume
 # ------------------------------------------------------------
-mutable struct ControlVolume1D1F <: AbstractControlVolume1D
+mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 
-	x :: Float64
-	dx :: Float64
+	x :: F
+	dx :: F
 
-	w :: Array{Float64,1}
-	prim :: Array{Float64,1}
-	sw :: Array{Float64,1}
+	w :: A
+	prim :: A
+	sw :: A
 
-	f :: AbstractArray{Float64,1}
-	sf :: AbstractArray{Float64,1}
+	f :: B
+	sf :: B
 
-	function ControlVolume1D1F( X::Real, DX::Real, 
-							    w0::Array{<:Real,1}, prim0::Array{<:Real,1}, f0::AbstractArray{Float64,1} )
+	function ControlVolume1D1F(x::Real, dx::Real, w::Array{<:Real,1}, prim::Array{<:Real,1}, f::AbstractArray{<:Real,1})
 
-		x = Float64(X)
-		dx = Float64(DX)
-
-		w = Float64.(w0)
-		prim = Float64.(prim0)
 		sw = zeros(axes(w))
-
-		f = deepcopy(f0)
 		sf = zeros(axes(f))
 
-		new(x, dx, w, prim, sw, f, sf)
+		new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
+
+	end
+
+	function ControlVolume1D1F(x::Real, dx::Real, w::Array{<:Real,1}, prim::Array{<:Real,1}, f::AbstractArray{<:Real,3})
+
+		sw = zeros(axes(w))
+		sf = zeros(axes(f))
+
+		new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
 
 	end
 
@@ -523,17 +524,26 @@ end
 # ------------------------------------------------------------
 # Structure of cell interface
 # ------------------------------------------------------------
-mutable struct Interface1D1F <: AbstractInterface1D
+mutable struct Interface1D1F{A, B} <: AbstractInterface1D
 
-	fw :: Array{Float64,1}
-	ff :: AbstractArray{Float64,1}
+	fw :: A
+	ff :: B
 
-	function Interface1D1F(f::AbstractArray{Float64,1}) # for ghost cell
+	function Interface1D1F(f::AbstractArray{<:Real,1}) # for ghost cell
 
 		fw = zeros(3)
 		ff = zeros(axes(f))
 
-		new(fw, ff)
+		new{typeof(fw), typeof(ff)}(fw, ff)
+
+	end
+
+	function Interface1D1F(f::AbstractArray{<:Real,3})
+
+		fw = zeros(5)
+		ff = zeros(axes(f))
+
+		new{typeof(fw), typeof(ff)}(fw, ff)
 
 	end
 
