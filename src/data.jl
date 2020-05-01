@@ -26,20 +26,20 @@ export Setup,
 # ------------------------------------------------------------
 # Structure of computational setup
 # ------------------------------------------------------------
-struct Setup{S,I,F} <: AbstractSetup
+struct Setup{S,I,E,F} <: AbstractSetup
 
     case :: S
 	space :: S
 	nSpecies :: I
 	interpOrder :: I
 	limiter :: S
-	cfl :: F
+	cfl :: E
 	maxTime :: F
 
 	function Setup( case::AbstractString, space::AbstractString, nSpecies::Int, interpOrder::Int, 
-					limiter::AbstractString, cfl::Real, maxtime::Real )
+					limiter::AbstractString, cfl::Real, maxTime::Real )
 
-		new{typeof(case),typeof(nSpecies),typeof(cfl)}(
+		new{typeof(case),typeof(nSpecies),typeof(cfl),typeof(maxTime)}(
 			case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
     
     end
@@ -176,9 +176,9 @@ struct IB1D1F{A,B} <: AbstractCondition
 
 	# 1D1F1V
     function IB1D1F( wL::Array{<:Real,1}, primL::Array{<:Real,1}, 
-    			     fL::AbstractArray{Float64,1}, bcL::Array{<:Real,1}, 
+    			     fL::AbstractArray{<:Real,1}, bcL::Array{<:Real,1}, 
     			     wR::Array{<:Real,1}, primR::Array{<:Real,1}, 
-    			     fR::AbstractArray{Float64,1}, bcR::Array{<:Real,1} )
+    			     fR::AbstractArray{<:Real,1}, bcR::Array{<:Real,1} )
 
 		new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
     
