@@ -83,11 +83,19 @@ struct SolverSet <: AbstractSolverSet
 
 		# generate data structure
 		dim = parse(Int, space[1])
-		gasD = map(space) do x
-			if parse(Int, x[3]) == 1 return dim
-			elseif parse(Int, x[3]) == 2 return dim
-			elseif parse(Int, x[3]) >= 3 return 3
-			else return nothing
+		gasD = map(parse(Int, space[3]), parse(Int, space[5])) do x, y # (x)f(y)v
+			if x == 1 
+				if y >= 3
+					return 3
+				else
+					return dim
+				end
+			elseif x == 2
+				return dim
+			elseif x >= 3
+				return 3
+			else
+				return nothing
 			end
 		end
 		γ = heat_capacity_ratio(inK, gasD)		
