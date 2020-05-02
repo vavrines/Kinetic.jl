@@ -59,7 +59,7 @@ function flux_kfvs( fL::AbstractArray{Float64,3}, fR::AbstractArray{Float64,3},
     sf = @. sfL * δ + sfR * (1. - δ)
 
     # --- calculate fluxes ---#
-    fw = similar(fL, 5); ff = similar(fL)
+    fw = zeros(5); ff = similar(fL)
 
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* sf)
     fw[2] = dt * sum(ω .* u.^2 .* f) - 0.5 * dt^2 * sum(ω .* u.^3 .* sf)

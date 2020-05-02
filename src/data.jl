@@ -348,21 +348,35 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 	f :: B
 	sf :: B
 
-	function ControlVolume1D1F(x::Real, dx::Real, w::Array{<:Real,1}, prim::Array{<:Real,1}, f::AbstractArray{<:Real,1})
+	function ControlVolume1D1F(X::Real, DX::Real, W::Array{<:Real,1}, PRIM::Array{<:Real,1}, F::AbstractArray{<:Real,1})
 
+		x = deepcopy(X)
+		dx = deepcopy(DX)
+
+		w = deepcopy(W)
+		prim = deepcopy(PRIM)
 		sw = zeros(axes(w))
+
+		f = deepcopy(F)
 		sf = zeros(axes(f))
 
-		new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
+		new{typeof(x), typeof(w), typeof(f)}(x, dx, w, prim, sw, f, sf)
 
 	end
 
-	function ControlVolume1D1F(x::Real, dx::Real, w::Array{<:Real,1}, prim::Array{<:Real,1}, f::AbstractArray{<:Real,3})
+	function ControlVolume1D1F(X::Real, DX::Real, W::Array{<:Real,1}, PRIM::Array{<:Real,1}, F::AbstractArray{<:Real,3})
 
+		x = deepcopy(X)
+		dx = deepcopy(DX)
+
+		w = deepcopy(W)
+		prim = deepcopy(PRIM)
 		sw = zeros(axes(w))
+
+		f = deepcopy(F)
 		sf = zeros(axes(f))
 
-		new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
+		new{typeof(x), typeof(w), typeof(f)}(x, dx, w, prim, sw, f, sf)
 
 	end
 

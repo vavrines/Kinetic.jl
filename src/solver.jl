@@ -165,11 +165,9 @@ function solve!( KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 				 face::Array{<:AbstractInterface1D,1}, simTime::Float64 )
 	
 	#--- setup ---#
-	dim = ifelse( parse(Int, KS.set.space[3]) >= 3, 3, parse(Int, KS.set.space[1]) ) # dimension
-
 	iter = 0
 	dt = 0.
-	res = zeros(dim+2)
+	res = zeros(axes(KS.ib.wL))
 	#write_jld(KS, ctr, simTime)
 
 	#--- main loop ---#
@@ -187,8 +185,8 @@ function solve!( KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 		iter += 1
 		simTime += dt
 		
-		if iter%1000 == 0
-			println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:dim+2])")
+		if iter%100 == 0
+			println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:end])")
 
 			#if iter%400 == 0
 				#write_jld(KS, ctr, iter)
@@ -305,7 +303,7 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
 #    end
 
-	if KS.set.space[1:4] == "1d1f"
+	if KS.set.space == "1d1f1v"
 
 		Threads.@threads for i=2:KS.pSpace.nx
 			@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
@@ -316,6 +314,15 @@ function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
 		#	flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
 		#	ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
 		#	KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
+		end
+
+	elseif KS.set.space == "1d1f3v"
+
+		Threads.@threads for i=2:KS.pSpace.nx
+			@inbounds face[i].fw, face[i].ff = flux_kfvs( ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf, 
+														  ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf, 
+														  KS.vSpace.u, KS.vSpace.v, KS.vSpace.w, KS.vSpace.weights, 
+														  dt, ctr[i-1].sf, ctr[i].sf )
 		end
 
 	elseif KS.set.space[1:4] == "1d2f"
@@ -449,7 +456,7 @@ function step!( fwL::Array{<:AbstractFloat,1}, ffL::AbstractArray{<:AbstractFloa
 	τ = vhs_collision_time(prim, μᵣ, ω)
 
 	#--- update distribution function ---#
-	for k in eachindex(wVelo, 3), j in eachindex(vVelo, 2), i in eachindex(uVelo, 1)
+	for k in axes(wVelo, 3), j in axes(vVelo, 2), i in axes(uVelo, 1)
 		f[i,j,k] = (f[i,j,k] + (ffL[i,j,k] - ffR[i,j,k]) / dx + dt / τ * M[i,j,k]) / (1.0 + dt / τ)
 	end
 

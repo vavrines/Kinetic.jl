@@ -58,9 +58,9 @@ mutable struct VSpace2D <: AbstractVelocitySpace
 
 	u0 :: Float64; u1 :: Float64; nu :: Int64
 	v0 :: Float64; v1 :: Float64; nv :: Int64
-	u :: Array{Float64,2}; v :: Array{Float64,2}
-	du :: Array{Float64,2}; dv :: Array{Float64,2}
-    weights :: Array{Float64,2}
+	u :: AbstractArray{Float64,2}; v :: AbstractArray{Float64,2}
+	du :: AbstractArray{Float64,2}; dv :: AbstractArray{Float64,2}
+    weights :: AbstractArray{Float64,2}
 
 	VSpace2D() = VSpace2D(-5, 5, 28, -5, 5, 28)
 	VSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = VSpace2D(U0, U1, 28, V0, V1, 28)
@@ -113,9 +113,9 @@ mutable struct VSpace3D <: AbstractVelocitySpace
 	u0 :: Float64; u1 :: Float64; nu :: Int64
 	v0 :: Float64; v1 :: Float64; nv :: Int64
 	w0 :: Float64; w1 :: Float64; nw :: Int64
-	u :: Array{Float64,3}; v :: Array{Float64,3}; w :: Array{Float64,3}
-	du :: Array{Float64,3}; dv :: Array{Float64,3}; dw :: Array{Float64,3}
-    weights :: Array{Float64,3}
+	u :: AbstractArray{Float64,3}; v :: AbstractArray{Float64,3}; w :: AbstractArray{Float64,3}
+	du :: AbstractArray{Float64,3}; dv :: AbstractArray{Float64,3}; dw :: AbstractArray{Float64,3}
+    weights :: AbstractArray{Float64,3}
 
 	VSpace3D() = VSpace3D(-5, 5, 28, -5, 5, 28, -5, 5, 28)
 	VSpace3D(U0::Real, U1::Real, V0::Real, V1::Real, W0::Real, W1::Real) = VSpace2D(U0, U1, 28, V0, V1, 28, W0, W1, 28)
