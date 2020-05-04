@@ -12,6 +12,7 @@ export gauss_moments,
 	   discrete_moments,
 	   maxwellian,
 	   mixture_maxwellian,
+	   reduce_distribution,
 	   conserve_prim,
 	   mixture_conserve_prim,
 	   prim_conserve,
@@ -424,6 +425,42 @@ function mixture_maxwellian(u::AbstractArray{<:Real,4}, v::AbstractArray{<:Real,
 
 	return mixM
 end
+
+
+
+"""
+Reduced distribution function
+"""
+
+function reduce_distribution(f::AbstractArray{<:Real,3}, w::AbstractArray{<:Real,3}, n::Int)
+
+	if n == 1
+		h = zeros(axes(f, 1))
+		for i in eachindex(h)
+			h[i] = sum(@. w[i,:,:] * f[i,:,:])
+		end
+	elseif n == 2
+		h = zeros(axes(f, 2))
+		for j in eachindex(h)
+			h[j] = sum(@. w[:,j,:] * f[:,j,:])
+		end
+	elseif n == 3
+		h = zeros(axes(f, 3))
+		for k in eachindex(h)
+			h[k] = sum(@. w[:,:,k] * f[:,:,k])
+		end
+	else
+	end
+
+    return h
+end
+
+
+
+
+
+
+
 
 
 """
