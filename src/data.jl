@@ -560,8 +560,8 @@ mutable struct Interface1D1F{A, B} <: AbstractInterface1D
 
 	function Interface1D1F(f::AbstractArray{<:Real,1}) # for ghost cell
 
-		fw = zeros(typeof(f, 1), 3)
-		ff = zeros(typeof(f, 1), axes(f))
+		fw = zeros(typeof(f[1]), 3)
+		ff = zeros(typeof(f[1]), axes(f))
 
 		new{typeof(fw), typeof(ff)}(fw, ff)
 
@@ -569,8 +569,8 @@ mutable struct Interface1D1F{A, B} <: AbstractInterface1D
 
 	function Interface1D1F(f::AbstractArray{<:Real,3})
 
-		fw = zeros(typeof(f, 1), 5)
-		ff = zeros(typeof(f, 1), axes(f))
+		fw = zeros(typeof(f[1]), 5)
+		ff = zeros(typeof(f[1]), axes(f))
 
 		new{typeof(fw), typeof(ff)}(fw, ff)
 
