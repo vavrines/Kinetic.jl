@@ -7,6 +7,7 @@ export gauss_moments,
 	   mixture_gauss_moments,
 	   moments_conserve,
 	   mixture_moments_conserve,
+	   pdf_slope,
 	   moments_conserve_slope,
 	   mixture_moments_conserve_slope,
 	   discrete_moments,
@@ -163,7 +164,7 @@ end
 # ------------------------------------------------------------
 # Calculate conservative moments
 # ------------------------------------------------------------
-function moments_conserve( Mu::OffsetArray{<:Real,1}, Mxi::OffsetArray{Real,1},
+function moments_conserve( Mu::OffsetArray{<:Real,1}, Mxi::OffsetArray{<:Real,1},
 						   alpha::Int, delta::Int )
 
     uv = zeros(3)
@@ -179,7 +180,7 @@ end
 function moments_conserve( Mu::OffsetArray{<:Real,1}, Mv::OffsetArray{<:Real,1}, Mw::OffsetArray{<:Real,1},
 						   alpha::Int, beta::Int, delta::Int )
 
-	if length(Mw) == 3
+	if length(Mw) == 3 # internal motion
 
 		uv = zeros(4)
 		uv[1] = Mu[alpha] * Mv[beta] * Mw[delta ÷ 2]
@@ -230,6 +231,43 @@ function mixture_moments_conserve( Mu::OffsetArray{<:Real,2}, Mv::OffsetArray{<:
 
 end
 
+
+# ------------------------------------------------------------
+# Calculate slope of particle distribution function
+# a = a1 + u * a2 + 0.5 * u^2 * a3
+# ------------------------------------------------------------
+function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
+
+	sl = zeros(axes(prim))
+
+	if length(prim) == 3
+		sl[3] = 4.0 * prim[3]^2 / (inK + 1.0) / prim[1] * 
+				(2.0 * sw[3] - 2.0 * prim[2] * sw[2] + sw[1] * (prim[2]^2 - 0.5 * (inK + 1.0) / prim[3]))
+		sl[2] = 2.0 * prim[3] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[3]
+		sl[1] = sw[1] / prim[1] - prim[2] * sl[2] - 0.5 * (prim[2]^2 + 0.5 * (inK + 1.0) / prim[3]) * sl[3]
+
+	elseif length(prim) == 4
+		sl[4] = 4.0 * prim[4]^2 / (inK + 2.0) / prim[1] * 
+				(2.0 * sw[4] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] + sw[1] * (prim[2]^2 + prim[3]^2 - 0.5 * (inK + 2.0) / prim[4]))
+		sl[3] = 2.0 * prim[4] / prim[1] * (sw[3] - prim[3] * sw[1]) - prim[3] * sl[4]
+		sl[2] = 2.0 * prim[4] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[4]
+		sl[1] = sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] - 0.5 * (prim[2]^2 + prim[3]^2 + 0.5 * (inK + 2.0) / prim[4]) * sl[4]
+	elseif length(prim) == 5
+		sl[5] = 4.0 * prim[5]^2 / (inK + 3.0) / prim[1] * 
+				(2.0 * sw[5] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] - 2.0 * prim[4] * sw[4] + 
+				sw[1] * (prim[2]^2 + prim[3]^2 + prim[4]^2 - 0.5 * (inK + 3.0) / prim[5]))
+		sl[4] = 2.0 * prim[5] / prim[1] * (sw[4] - prim[4] * sw[1]) - prim[4] * sl[5]
+		sl[3] = 2.0 * prim[5] / prim[1] * (sw[3] - prim[3] * sw[1]) - prim[3] * sl[5]
+		sl[2] = 2.0 * prim[5] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[5]
+		sl[1] = sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] - prim[4] * sl[4] -
+				0.5 * (prim[2]^2 + prim[3]^2 + prim[4]^2 + 0.5 * (inK + 3.0) / prim[5]) * sl[5]
+	end
+
+    return sl
+
+end
+
+
 # ------------------------------------------------------------
 # Calculate slope-related conservative moments
 # a = a1 + u * a2 + 0.5 * u^2 * a3
@@ -237,10 +275,10 @@ end
 function moments_conserve_slope( a::Array{<:Real,1}, Mu::OffsetArray{<:Real,1}, Mxi::OffsetArray{<:Real,1},
 								 alpha::Int )
 
-	au = @. a[1] * moments_conserve(Mu, Mxi, alpha + 0, 0) +
-         a[2] * moments_conserve(Mu, Mxi, alpha + 1, 0) +
-         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha + 2, 0) +
-         0.5 * a[3] * moments_conserve(Mu, Mxi, alpha + 0, 2)
+	au = a[1] .* moments_conserve(Mu, Mxi, alpha + 0, 0) .+
+         a[2] .* moments_conserve(Mu, Mxi, alpha + 1, 0) .+
+         0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 2, 0) .+
+         0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 0, 2)
 
     return au
 
@@ -249,12 +287,12 @@ end
 function moments_conserve_slope( a::Array{<:Real,1}, Mu::OffsetArray{<:Real,1}, Mv::OffsetArray{<:Real,1}, Mxi::OffsetArray{<:Real,1},
 								 alpha::Int, beta::Int )
 
-    au = @. a[1] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 0) +
-         a[2] * moments_conserve(Mu, Mv, Mxi, alpha + 1, beta + 0, 0) +
-         a[3] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 1, 0) +
-         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha + 2, beta + 0, 0) +
-         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 2, 0) +
-         0.5 * a[4] * moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 2)
+    au = a[1] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 0) .+
+         a[2] .* moments_conserve(Mu, Mv, Mxi, alpha + 1, beta + 0, 0) .+
+         a[3] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 1, 0) .+
+         0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 2, beta + 0, 0) .+
+         0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 2, 0) .+
+         0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 2)
 
     return au
 
@@ -263,13 +301,13 @@ end
 function moments_conserve_slope( a::Array{<:Real,1}, Mu::OffsetArray{<:Real,1}, Mv::OffsetArray{<:Real,1}, Mw::OffsetArray{<:Real,1},
 								 alpha::Int, beta::Int, delta::Int )
 
-	au = @. a[1] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) +
-			a[2] * moments_conserve(Mu, Mv, Mw, alpha + 1, beta + 0, delta + 0) +
-			a[3] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 1, delta + 0) +
-			a[4] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 1) +
-			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha + 2, beta + 0, delta + 0) +
-			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 2, delta + 0) +
-			0.5 * a[5] * moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 2)
+	au = a[1] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) .+
+		 a[2] .* moments_conserve(Mu, Mv, Mw, alpha + 1, beta + 0, delta + 0) .+
+		 a[3] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 1, delta + 0) .+
+		 a[4] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 1) .+
+		 0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 2, beta + 0, delta + 0) .+
+		 0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 2, delta + 0) .+
+		 0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 2)
 
 	return au
 
@@ -427,7 +465,6 @@ function mixture_maxwellian(u::AbstractArray{<:Real,4}, v::AbstractArray{<:Real,
 end
 
 
-
 """
 Reduced distribution function
 """
@@ -435,17 +472,17 @@ Reduced distribution function
 function reduce_distribution(f::AbstractArray{<:Real,3}, w::AbstractArray{<:Real,3}, n::Int)
 
 	if n == 1
-		h = zeros(axes(f, 1))
+		h = similar(f, axes(f, 1))
 		for i in eachindex(h)
 			h[i] = sum(@. w[i,:,:] * f[i,:,:])
 		end
 	elseif n == 2
-		h = zeros(axes(f, 2))
+		h = similar(f, axes(f, 2))
 		for j in eachindex(h)
 			h[j] = sum(@. w[:,j,:] * f[:,j,:])
 		end
 	elseif n == 3
-		h = zeros(axes(f, 3))
+		h = similar(f, axes(f, 3))
 		for k in eachindex(h)
 			h[k] = sum(@. w[:,:,k] * f[:,:,k])
 		end
@@ -454,13 +491,6 @@ function reduce_distribution(f::AbstractArray{<:Real,3}, w::AbstractArray{<:Real
 
     return h
 end
-
-
-
-
-
-
-
 
 
 """
@@ -691,8 +721,8 @@ end
 # ------------------------------------------------------------
 # calculate collision operator with FFT
 # ------------------------------------------------------------
-function boltzmann_fft( f::Array{<:Real,3}, Kn::Real, M::Int,
-						ϕ::Array{<:Real,4}, ψ::Array{<:Real,4}, phipsi::Array{<:Real,3} )
+function boltzmann_fft( f::AbstractArray{<:Real,3}, Kn::Real, M::Int,
+						ϕ::AbstractArray{<:Real,4}, ψ::AbstractArray{<:Real,4}, phipsi::AbstractArray{<:Real,3} )
 
     f_spec = f .+ 0im
     bfft!(f_spec)

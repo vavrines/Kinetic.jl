@@ -52,12 +52,17 @@ end
 # ------------------------------------------------------------
 struct GasProperty <: AbstractProperty
 
-	Kn :: Float64; Ma :: Float64; Pr :: Float64
-	K :: Float64; γ :: Float64; ω :: Float64
-    αᵣ :: Float64; ωᵣ :: Float64; μᵣ :: Float64
+	Kn :: Float64
+	Ma :: Float64
+	Pr :: Float64
+	K :: Float64
+	γ :: Float64
+	ω :: Float64
+	αᵣ :: Float64
+	ωᵣ :: Float64
+	μᵣ :: Float64
 
-    function GasProperty( KN::Real, MA::Real, PR::Real, 
-    			 		  INK::Real, GAMMA::Real, OMEGA::Real,
+    function GasProperty( KN::Real, MA::Real, PR::Real, INK::Real, GAMMA::Real, OMEGA::Real,
     			 		  ALPHAREF::Real, OMEGAREF::Real, MUREF::Real )
 
     	Kn = Float64(KN)
@@ -82,15 +87,25 @@ end
 
 struct PlasmaProperty <: AbstractProperty
 
-	Kn :: Array{Float64,1}; Ma :: Float64; Pr :: Float64
-	K :: Float64; γ :: Float64;
+	Kn :: Array{Float64,1}
+	Ma :: Float64
+	Pr :: Float64
+	K :: Float64
+	γ :: Float64
 	
-	mi :: Float64; ni::Float64
-	me :: Float64; ne::Float64
-	lD :: Float64; rL::Float64 
+	mi :: Float64
+	ni::Float64
+	me :: Float64
+	ne::Float64
+	lD :: Float64
+	rL::Float64 
 
-	sol :: Float64; χ :: Float64; ν :: Float64
-	A1p :: Array{Float64,2}; A1n :: Array{Float64,2}; D1 :: Array{Float64,1}
+	sol :: Float64
+	χ :: Float64
+	ν :: Float64
+	A1p :: Array{Float64,2}
+	A1n :: Array{Float64,2}
+	D1 :: Array{Float64,1}
 
     function PlasmaProperty( KN::Array{<:Real,1}, MA::Real, PR::Real, 
     			 		  	 INK::Real, GAMMA::Real, 
@@ -545,8 +560,8 @@ mutable struct Interface1D1F{A, B} <: AbstractInterface1D
 
 	function Interface1D1F(f::AbstractArray{<:Real,1}) # for ghost cell
 
-		fw = zeros(3)
-		ff = zeros(axes(f))
+		fw = zeros(typeof(f, 1), 3)
+		ff = zeros(typeof(f, 1), axes(f))
 
 		new{typeof(fw), typeof(ff)}(fw, ff)
 
@@ -554,8 +569,8 @@ mutable struct Interface1D1F{A, B} <: AbstractInterface1D
 
 	function Interface1D1F(f::AbstractArray{<:Real,3})
 
-		fw = zeros(5)
-		ff = zeros(axes(f))
+		fw = zeros(typeof(f, 1), 5)
+		ff = zeros(typeof(f, 1), axes(f))
 
 		new{typeof(fw), typeof(ff)}(fw, ff)
 

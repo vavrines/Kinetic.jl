@@ -3,9 +3,92 @@
 # ============================================================
 
 
-export flux_kfvs,
+export flux_gks,
+       flux_kfvs,
        flux_kcu,
        flux_em
+
+
+"""
+Gas kinetic scheme (GKS)
+
+# >@param[in] : conservative variables and their slopes at left/right sides of interface
+# >@param[in] : thermodynamic parameters
+# >@param[in] : time step and cell size
+
+# >@return : flux of conservative variables
+"""
+
+function flux_gks( wL::Array{<:AbstractFloat,1}, wR::Array{<:AbstractFloat,1}, dx::AbstractFloat, dt::AbstractFloat, γ::Real, inK::Real, μᵣ::AbstractFloat, ω::Real,
+                   swL=zeros(axes(wL))::AbstractArray{<:AbstractFloat,1}, swR=zeros(axes(wR))::AbstractArray{<:AbstractFloat,1} )
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+
+    w = primL[1] .* moments_conserve(MuL1, Mxi1, 0, 0) .+ primR[1] .* moments_conserve(MuR2, Mxi2, 0, 0)
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, μᵣ, ω) + 
+          2. * dt * abs(primL[1] / primL[end] - primR[1] / primR[end]) / (primL[1] / primL[end] + primR[1] / primR[end])
+    
+    faL = pdf_slope(primL, swL, inK)
+    sw = -primL[1] .* moments_conserve_slope(faL, Mu1, Mxi1, 1)
+    faTL = pdf_slope(primL, sw, inK)
+
+    faR = pdf_slope(primR, swR, inK)
+    sw = -primR[1] .* moments_conserve_slope(faR, Mu2, Mxi2, 1)
+    faTR = pdf_slope(primR, sw, inK)
+
+    Mu, Mxi, MuL, MuR = gauss_moments(prim, inK) 
+    swL = (w .- wL) ./ (0.5 * dx)
+    swR = (wR .- w) ./ (0.5 * dx)
+    gaL = pdf_slope(prim, swL, inK)
+    gaR = pdf_slope(prim, swR, inK)
+    sw = -prim[1] .* (moments_conserve_slope(gaL, MuL, Mxi, 1) .+ moments_conserve_slope(gaR, MuR, Mxi, 1))
+    #sw = (wR .- wL) ./ dx
+    #ga = pdf_slope(prim, sw, inK)
+    #sw = -prim[1] .* moments_conserve_slope(ga, Mu, Mxi, 1)
+    gaT = pdf_slope(prim, sw, inK)
+
+    # time-integration constants
+    Mt = zeros(5)
+    Mt[4] = dt#tau * (1.0 - exp(-dt / tau))
+    Mt[5] = -tau * dt * exp(-dt / tau) + tau * Mt[4]
+    Mt[1] = dt - Mt[4]
+    Mt[2] = -tau * Mt[1] + Mt[5] 
+    Mt[3] = 0.5 * dt^2 - tau * Mt[1]
+
+    # flux related to central distribution
+    Muv = moments_conserve(Mu, Mxi, 1, 0)
+    MauL = moments_conserve_slope(gaL, MuL, Mxi, 2)
+    MauR = moments_conserve_slope(gaR, MuR, Mxi, 2)
+    #Mau = moments_conserve_slope(ga, MuR, Mxi, 2)
+    MauT = moments_conserve_slope(gaT, Mu, Mxi, 1)
+
+    flux = similar(wL); flux .= 0.
+    #flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* (MauL .+ MauR) .+ Mt[3] .* prim[1] .* MauT
+    #flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* Mau .+ Mt[3] .* prim[1] .* MauT
+
+    # flux related to upwind distribution
+    MuvL = moments_conserve(MuL1, Mxi1, 1, 0)
+    MauL = moments_conserve_slope(faL, MuL1, Mxi1, 2)
+    MauLT = moments_conserve_slope(faTL, MuL1, Mxi1, 1)
+
+    MuvR = moments_conserve(MuR2, Mxi2, 1, 0)
+    MauR = moments_conserve_slope(faR, MuR2, Mxi2, 2)
+    MauRT = moments_conserve_slope(faTR, MuR2, Mxi2, 1)
+
+    #@. flux += Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL - tau * Mt[4] * primL[1] * MauLT + 
+    #           Mt[4] * primR[1] * MuvR - (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
+    @. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
+
+
+    return flux
+
+end
+
 
 
 """

@@ -32,6 +32,8 @@ struct SolverSet <: AbstractSolverSet
 	# constructor
 	#SolverSet() = SolverSet("./config/config.txt")
 
+	SolverSet(set, pSpace, vSpace, gas, ib, outputFolder) = new(set, pSpace, vSpace, gas, ib, outputFolder)
+
 	function SolverSet(configfilename::String)
 		
 		#=
@@ -208,7 +210,7 @@ end # function
 # ------------------------------------------------------------
 # Calculate time step
 # ------------------------------------------------------------
-function timestep(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, simTime::Float64)
+function timestep(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, simTime::Real)
 
     tmax = 0.0
 
@@ -297,7 +299,7 @@ end
 # ------------------------------------------------------------
 # Evolution
 # ------------------------------------------------------------
-function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{Interface1D1F,1}, dt::Float64)
+function evolve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{Interface1D1F,1}, dt::Real)
 
     #if KS.set.case == "heat"
 #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
@@ -372,7 +374,7 @@ end
 # ------------------------------------------------------------
 # Update
 # ------------------------------------------------------------
-function update!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Float64, residual::Array{Float64,1})
+function update!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1}, face::Array{<:AbstractInterface1D,1}, dt::Real, residual::Array{<:AbstractFloat,1})
 
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
@@ -405,11 +407,11 @@ end
 # ------------------------------------------------------------
 # Time stepping 
 # ------------------------------------------------------------
-function step!( fwL::Array{Float64,1}, ffL::AbstractArray{Float64,1}, 
-				w::Array{Float64,1}, prim::Array{Float64,1}, f::AbstractArray{Float64,1}, 
-				fwR::Array{Float64,1}, ffR::AbstractArray{Float64,1}, 
-				γ::Float64, u::AbstractArray{Float64,1}, μᵣ::Float64, ω::Float64,
-				dx::Float64, dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
+function step!( fwL::Array{<:AbstractFloat,1}, ffL::AbstractArray{<:AbstractFloat,1}, 
+				w::Array{<:AbstractFloat,1}, prim::Array{<:AbstractFloat,1}, f::AbstractArray{<:AbstractFloat,1}, 
+				fwR::Array{<:AbstractFloat,1}, ffR::AbstractArray{<:AbstractFloat,1}, 
+				γ::Real, u::AbstractArray{<:AbstractFloat,1}, μᵣ::Real, ω::Real,
+				dx::Real, dt::Real, RES::Array{<:AbstractFloat,1}, AVG::Array{<:AbstractFloat,1} )
 
 	#--- store W^n and calculate H^n,\tau^n ---#
 	w_old = deepcopy(w)
@@ -437,8 +439,8 @@ end
 function step!( fwL::Array{<:AbstractFloat,1}, ffL::AbstractArray{<:AbstractFloat,3}, 
 				w::Array{<:AbstractFloat,1}, prim::Array{<:AbstractFloat,1}, f::AbstractArray{<:AbstractFloat,3}, 
 				fwR::Array{<:AbstractFloat,1}, ffR::AbstractArray{<:AbstractFloat,3}, 
-				γ::Float64, uVelo::AbstractArray{Float64,3}, vVelo::AbstractArray{Float64,3}, wVelo::AbstractArray{Float64,3}, μᵣ::Float64, ω::Float64,
-				dx::Float64, dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
+				γ::Real, uVelo::AbstractArray{<:AbstractFloat,3}, vVelo::AbstractArray{<:AbstractFloat,3}, wVelo::AbstractArray{<:AbstractFloat,3}, μᵣ::Real, ω::Real,
+				dx::Real, dt::Real, RES::Array{<:AbstractFloat,1}, AVG::Array{<:AbstractFloat,1} )
 
 	#--- store W^n and calculate H^n,\tau^n ---#
 	w_old = deepcopy(w)
@@ -463,11 +465,11 @@ function step!( fwL::Array{<:AbstractFloat,1}, ffL::AbstractArray{<:AbstractFloa
 end
 
 
-function step!( fwL::Array{Float64,1}, fhL::AbstractArray{Float64,1}, fbL::AbstractArray{Float64,1},
-				w::Array{Float64,1}, prim::Array{Float64,1}, h::AbstractArray{Float64,1}, b::AbstractArray{Float64,1}, 
-				fwR::Array{Float64,1}, fhR::AbstractArray{Float64,1}, fbR::AbstractArray{Float64,1}, 
-				K::Float64, γ::Float64, u::AbstractArray{Float64,1}, μᵣ::Float64, ω::Float64,
-				dx::Float64, dt::Float64, RES::Array{Float64,1}, AVG::Array{Float64,1} )
+function step!( fwL::Array{<:AbstractFloat,1}, fhL::AbstractArray{<:AbstractFloat,1}, fbL::AbstractArray{<:AbstractFloat,1},
+				w::Array{<:AbstractFloat,1}, prim::Array{<:AbstractFloat,1}, h::AbstractArray{<:AbstractFloat,1}, b::AbstractArray{<:AbstractFloat,1}, 
+				fwR::Array{<:AbstractFloat,1}, fhR::AbstractArray{<:AbstractFloat,1}, fbR::AbstractArray{<:AbstractFloat,1}, 
+				K::Real, γ::Real, u::AbstractArray{<:AbstractFloat,1}, μᵣ::Real, ω::Real,
+				dx::Real, dt::Real, RES::Array{<:AbstractFloat,1}, AVG::Array{<:AbstractFloat,1} )
 
 	#--- store W^n and calculate H^n,\tau^n ---#
 	w_old = deepcopy(w)
