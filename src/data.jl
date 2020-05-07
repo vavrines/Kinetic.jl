@@ -370,10 +370,10 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 
 		w = deepcopy(W)
 		prim = deepcopy(PRIM)
-		sw = zeros(axes(w))
+		sw = zeros(typeof(W[1]), axes(w))
 
 		f = deepcopy(F)
-		sf = zeros(axes(f))
+		sf = zeros(typeof(F[1]), axes(f))
 
 		new{typeof(x), typeof(w), typeof(f)}(x, dx, w, prim, sw, f, sf)
 
@@ -386,10 +386,10 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 
 		w = deepcopy(W)
 		prim = deepcopy(PRIM)
-		sw = zeros(axes(w))
+		sw = zeros(typeof(W[1]), axes(w))
 
 		f = deepcopy(F)
-		sf = zeros(axes(f))
+		sf = zeros(typeof(F[1]), axes(f))
 
 		new{typeof(x), typeof(w), typeof(f)}(x, dx, w, prim, sw, f, sf)
 
