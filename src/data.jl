@@ -20,7 +20,9 @@ export Setup,
 	   Interface1D2F,
 	   MInterface1D1F,
 	   MInterface1D2F,
-	   MInterface1D4F
+	   MInterface1D4F,
+	   Solution1D1F,
+	   Solution1D2F
 
 
 # ------------------------------------------------------------
@@ -656,6 +658,68 @@ mutable struct MInterface1D4F <: AbstractInterface1D
 
 		new(fw, fh0, fh1, fh2, fh3, femL, femR)
 
+	end
+
+end
+
+
+mutable struct Solution1D1F{A, B} <: AbstractSolution
+
+	w :: A
+	prim :: A
+	sw :: A
+	f :: B
+	sf :: B
+
+	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, f::AbstractArray{<:AbstractFloat,2} )
+		sw = zeros(typeof(w[1]), axes(w))
+		sf = zeros(typeof(f[1]), axes(f))
+
+		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
+	end
+
+	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, sw::Array{<:AbstractFloat,2}, 
+						   f::AbstractArray{<:AbstractFloat,2}, sf::AbstractArray{<:AbstractFloat,2} )
+		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
+	end
+
+	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, f::AbstractArray{<:AbstractFloat,4} )
+		sw = zeros(typeof(w[1]), axes(w))
+		sf = zeros(typeof(f[1]), axes(f))
+
+		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
+	end
+
+
+	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, sw::Array{<:AbstractFloat,2}, 
+						   f::AbstractArray{<:AbstractFloat,2}, sf::AbstractArray{<:AbstractFloat,4} )
+		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
+	end
+
+end
+
+
+mutable struct Solution1D2F{A, B} <: AbstractSolution
+
+	w :: A
+	prim :: A
+	sw :: A
+	h :: B
+	b :: B
+	sh :: B
+	sb :: B
+
+	function Solution1D2F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, h::AbstractArray{<:AbstractFloat,2}, b::AbstractArray{<:AbstractFloat,2} )
+		sw = zeros(typeof(w[1]), axes(w))
+		sh = zeros(typeof(h[1]), axes(h))
+		sb = zeros(typeof(b[1]), axes(b))
+
+		new{typeof(w), typeof(h)}(w, prim, sw, h, b, sh, sb)
+	end
+
+	function Solution1D2F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, sw::Array{<:AbstractFloat,2}, h::AbstractArray{<:AbstractFloat,2}, 
+						   b::AbstractArray{<:AbstractFloat,2}, sh::AbstractArray{<:AbstractFloat,2}, sb::AbstractArray{<:AbstractFloat,2} )
+		new{typeof(w), typeof(h)}(w, prim, sw, h, b, sh, sb)
 	end
 
 end

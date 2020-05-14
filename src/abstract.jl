@@ -12,7 +12,8 @@ export AbstractVelocitySpace,
        AbstractControlVolume,
        AbstractControlVolume1D,
        AbstractInterface,
-       AbstractInterface1D
+       AbstractInterface1D,
+       AbstractSolution
 
 
 abstract type AbstractPhysicalSpace end      
@@ -26,3 +27,5 @@ abstract type AbstractInterface end
 
 abstract type AbstractControlVolume1D <: AbstractControlVolume end
 abstract type AbstractInterface1D <: AbstractInterface end
+
+abstract type AbstractSolution end
