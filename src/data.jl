@@ -365,7 +365,7 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 	f :: B
 	sf :: B
 
-	function ControlVolume1D1F(X::Real, DX::Real, W::Array{<:Real,1}, PRIM::Array{<:Real,1}, F::AbstractArray{<:Real,1})
+	function ControlVolume1D1F(X::Real, DX::Real, W::Array, PRIM::Array, F::AbstractArray)
 
 		x = deepcopy(X)
 		dx = deepcopy(DX)
@@ -377,23 +377,7 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 		f = deepcopy(F)
 		sf = zeros(typeof(F[1]), axes(f))
 
-		new{typeof(x), typeof(w), typeof(f)}(x, dx, w, prim, sw, f, sf)
-
-	end
-
-	function ControlVolume1D1F(X::Real, DX::Real, W::Array{<:Real,1}, PRIM::Array{<:Real,1}, F::AbstractArray{<:Real,3})
-
-		x = deepcopy(X)
-		dx = deepcopy(DX)
-
-		w = deepcopy(W)
-		prim = deepcopy(PRIM)
-		sw = zeros(typeof(W[1]), axes(w))
-
-		f = deepcopy(F)
-		sf = zeros(typeof(F[1]), axes(f))
-
-		new{typeof(x), typeof(w), typeof(f)}(x, dx, w, prim, sw, f, sf)
+		new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
 
 	end
 
@@ -663,7 +647,7 @@ mutable struct MInterface1D4F <: AbstractInterface1D
 end
 
 
-mutable struct Solution1D1F{A, B} <: AbstractSolution
+mutable struct Solution1D1F{A,B} <: AbstractSolution
 
 	w :: A
 	prim :: A
@@ -671,35 +655,21 @@ mutable struct Solution1D1F{A, B} <: AbstractSolution
 	f :: B
 	sf :: B
 
-	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, f::AbstractArray{<:AbstractFloat,2} )
+	function Solution1D1F(w::Array, prim::Array, f::AbstractArray)
 		sw = zeros(typeof(w[1]), axes(w))
 		sf = zeros(typeof(f[1]), axes(f))
 
 		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
 	end
 
-	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, sw::Array{<:AbstractFloat,2}, 
-						   f::AbstractArray{<:AbstractFloat,2}, sf::AbstractArray{<:AbstractFloat,2} )
-		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
-	end
-
-	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, f::AbstractArray{<:AbstractFloat,4} )
-		sw = zeros(typeof(w[1]), axes(w))
-		sf = zeros(typeof(f[1]), axes(f))
-
-		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
-	end
-
-
-	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, sw::Array{<:AbstractFloat,2}, 
-						   f::AbstractArray{<:AbstractFloat,4}, sf::AbstractArray{<:AbstractFloat,4} )
+	function Solution1D1F(w::Array, prim::Array, sw::Array, f::AbstractArray, sf::AbstractArray)
 		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
 	end
 
 end
 
 
-mutable struct Solution1D2F{A, B} <: AbstractSolution
+mutable struct Solution1D2F{A,B} <: AbstractSolution
 
 	w :: A
 	prim :: A
@@ -709,7 +679,7 @@ mutable struct Solution1D2F{A, B} <: AbstractSolution
 	sh :: B
 	sb :: B
 
-	function Solution1D2F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, h::AbstractArray{<:AbstractFloat,2}, b::AbstractArray{<:AbstractFloat,2} )
+	function Solution1D2F(w::Array, prim::Array, h::AbstractArray, b::AbstractArray)
 		sw = zeros(typeof(w[1]), axes(w))
 		sh = zeros(typeof(h[1]), axes(h))
 		sb = zeros(typeof(b[1]), axes(b))
@@ -717,8 +687,7 @@ mutable struct Solution1D2F{A, B} <: AbstractSolution
 		new{typeof(w), typeof(h)}(w, prim, sw, h, b, sh, sb)
 	end
 
-	function Solution1D2F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, sw::Array{<:AbstractFloat,2}, h::AbstractArray{<:AbstractFloat,2}, 
-						   b::AbstractArray{<:AbstractFloat,2}, sh::AbstractArray{<:AbstractFloat,2}, sb::AbstractArray{<:AbstractFloat,2} )
+	function Solution1D2F(w::Array, prim::Array, sw::Array, h::AbstractArray, b::AbstractArray, sh::AbstractArray, sb::AbstractArray)
 		new{typeof(w), typeof(h)}(w, prim, sw, h, b, sh, sb)
 	end
 
