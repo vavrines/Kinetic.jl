@@ -3,47 +3,47 @@
 # ============================================================
 
 
-export Setup,
-	   GasProperty,
-	   PlasmaProperty,
-       IB1D1F,
-	   IB1D2F,
-	   MIB1D1F,
-	   MIB1D2F,
-	   MIB1D4F,
-	   ControlVolume1D1F,
-	   ControlVolume1D2F,
-	   MControlVolume1D1F,
-	   MControlVolume1D2F,
-	   MControlVolume1D4F,
-	   Interface1D1F,
-	   Interface1D2F,
-	   MInterface1D1F,
-	   MInterface1D2F,
-	   MInterface1D4F,
-	   Solution1D1F,
-	   Solution1D2F
+export Setup
+export GasProperty, PlasmaProperty
+export IB1D1F, IB1D2F, IB1D4F
+export ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
+export Interface1D1F, Interface1D2F, Interface1D4F
+export Solution1D1F, Solution1D2F
 
 
 # ------------------------------------------------------------
 # Structure of computational setup
 # ------------------------------------------------------------
-struct Setup{S, I, E, F} <: AbstractSetup
+struct Setup{S,I,E,F} <: AbstractSetup
 
-    case :: S
-	space :: S
-	nSpecies :: I
-	interpOrder :: I
-	limiter :: S
-	cfl :: E
-	maxTime :: F
+    case::S
+    space::S
+    nSpecies::I
+    interpOrder::I
+    limiter::S
+    cfl::E
+    maxTime::F
 
-	function Setup( case::AbstractString, space::AbstractString, nSpecies::Int, interpOrder::Int, 
-					limiter::AbstractString, cfl::Real, maxTime::Real )
+    function Setup(
+        case::AbstractString,
+        space::AbstractString,
+        nSpecies::Int,
+        interpOrder::Int,
+        limiter::AbstractString,
+        cfl::Real,
+        maxTime::Real,
+    )
 
-		new{typeof(case), typeof(nSpecies), typeof(cfl), typeof(maxTime)}(
-			case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
-    
+        new{typeof(case),typeof(nSpecies),typeof(cfl),typeof(maxTime)}(
+            case,
+            space,
+            nSpecies,
+            interpOrder,
+            limiter,
+            cfl,
+            maxTime,
+        )
+
     end
 
 end
@@ -52,125 +52,175 @@ end
 # ------------------------------------------------------------
 # Structure of property
 # ------------------------------------------------------------
-struct GasProperty <: AbstractProperty
+struct GasProperty{A,B,C,D,E,F,G,H,I} <: AbstractProperty
 
-	Kn :: Float64
-	Ma :: Float64
-	Pr :: Float64
-	K :: Float64
-	γ :: Float64
-	ω :: Float64
-	αᵣ :: Float64
-	ωᵣ :: Float64
-	μᵣ :: Float64
+    Kn::A
+    Ma::B
+    Pr::C
+    K::D
+    γ::E
+    ω::F
+    αᵣ::G
+    ωᵣ::H
+    μᵣ::I
 
-    function GasProperty( KN::Real, MA::Real, PR::Real, INK::Real, GAMMA::Real, OMEGA::Real,
-    			 		  ALPHAREF::Real, OMEGAREF::Real, MUREF::Real )
+    function GasProperty(
+        Kn::Real,
+        Ma::Real,
+        Pr::Real,
+        K::Real,
+        γ::Real,
+        ω::Real,
+        αᵣ::Real,
+        ωᵣ::Real,
+        μᵣ::Real,
+    )
 
-    	Kn = Float64(KN)
-    	Ma = Float64(MA)
-    	Pr = Float64(PR)
+        # inner constructor method
+        new{
+            typeof(Kn),
+            typeof(Ma),
+            typeof(Pr),
+            typeof(K),
+            typeof(γ),
+            typeof(ω),
+            typeof(αᵣ),
+            typeof(ωᵣ),
+            typeof(μᵣ),
+        }(
+            Kn,
+            Ma,
+            Pr,
+            K,
+            γ,
+            ω,
+            αᵣ,
+            ωᵣ,
+            μᵣ,
+        )
 
-		K = Float64(INK)
-		γ = Float64(GAMMA)
-		ω = Float64(OMEGA)
-
-		αᵣ = Float64(ALPHAREF)
-		ωᵣ = Float64(OMEGAREF)
-		μᵣ = Float64(MUREF)
-
-		# inner constructor method
-		new(Kn, Ma, Pr, K, γ, ω, αᵣ, ωᵣ, μᵣ)
-    
     end
 
 end
 
 
-struct PlasmaProperty <: AbstractProperty
+struct PlasmaProperty{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P} <: AbstractProperty
 
-	Kn :: Array{Float64,1}
-	Ma :: Float64
-	Pr :: Float64
-	K :: Float64
-	γ :: Float64
-	
-	mi :: Float64
-	ni::Float64
-	me :: Float64
-	ne::Float64
-	lD :: Float64
-	rL::Float64 
+    Kn::A
+    Ma::B
+    Pr::C
+    K::D
+    γ::E
 
-	sol :: Float64
-	χ :: Float64
-	ν :: Float64
-	A1p :: Array{Float64,2}
-	A1n :: Array{Float64,2}
-	D1 :: Array{Float64,1}
+    mi::F
+    ni::G
+    me::H
+    ne::I
+    lD::J
+    rL::K
 
-    function PlasmaProperty( KN::Array{<:Real,1}, MA::Real, PR::Real, 
-    			 		  	 INK::Real, GAMMA::Real, 
-    			 		  	 MI::Real, NI::Real, ME::Real, NE::Real,
-    			 		  	 LD::Real, RL::Real, SOL::Real, CHI::Real, NU::Real )
+    sol::L
+    χ::M
+    ν::N
+    A1p::O
+    A1n::O
+    D1::P
 
-    	Kn = Float64.(KN)
-    	Ma = Float64(MA)
-    	Pr = Float64(PR)
-		K = Float64(INK)
-		γ = Float64(GAMMA)
+    function PlasmaProperty(
+        Kn::Array{<:Real,1},
+        Ma::Real,
+        Pr::Real,
+        K::Real,
+        γ::Real,
+        mi::Real,
+        ni::Real,
+        me::Real,
+        ne::Real,
+        lD::Real,
+        rL::Real,
+        sol::Real,
+        χ::Real,
+        ν::Real,
+    )
 
-		mi = Float64(MI); ni = Float64(NI)
-		me = Float64(ME); ne = Float64(NE)
-		lD = Float64(LD); rL = Float64(RL)
+        # A^+
+        A1p = Array{typeof(sol)}(undef, 8, 8)
+        A1p[1, 1] = (sol * χ) / 2.0
+        A1p[7, 1] = χ / 2.0
+        A1p[2, 2] = sol / 2.0
+        A1p[6, 2] = 0.5
+        A1p[3, 3] = sol / 2.0
+        A1p[5, 3] = -1.0 / 2.0
+        A1p[4, 4] = (sol * ν) / 2.0
+        A1p[8, 4] = (sol^2 * ν) / 2.0
+        A1p[3, 5] = -sol^2 / 2.0
+        A1p[5, 5] = sol / 2.0
+        A1p[2, 6] = sol^2 / 2.0
+        A1p[6, 6] = sol / 2.0
+        A1p[1, 7] = (sol^2 * χ) / 2.0
+        A1p[7, 7] = (sol * χ) / 2.0
+        A1p[4, 8] = ν / 2.0
+        A1p[8, 8] = (sol * ν) / 2.0
 
-		sol = Float64(SOL)
-		χ = Float64(CHI)
-		ν = Float64(NU)
-		
-		# A^+
-		A1p = Array{Float64}(undef, 8, 8)
-		A1p[1,1] = (sol * χ) / 2.
-		A1p[7,1] = χ / 2.
-		A1p[2,2] = sol / 2.
-		A1p[6,2] = 0.5
-		A1p[3,3] = sol / 2.
-		A1p[5,3] = -1. / 2.
-		A1p[4,4] = (sol * ν) / 2.
-		A1p[8,4] = (sol^2 * ν) / 2.
-		A1p[3,5] = -sol^2 / 2.
-		A1p[5,5] = sol / 2.
-		A1p[2,6] = sol^2 / 2.
-		A1p[6,6] = sol / 2.
-		A1p[1,7] = (sol^2 * χ) / 2.
-		A1p[7,7] = (sol * χ) / 2.
-		A1p[4,8] = ν / 2.
-		A1p[8,8] = (sol * ν) / 2.
+        # A^-
+        A1n = Array{typeof(sol)}(undef, 8, 8)
+        A1n[1, 1] = -(sol * χ) / 2.0
+        A1n[7, 1] = χ / 2.0
+        A1n[2, 2] = -sol / 2.0
+        A1n[6, 2] = 1.0 / 2.0
+        A1n[3, 3] = -sol / 2.0
+        A1n[5, 3] = -1.0 / 2.0
+        A1n[4, 4] = -(sol * ν) / 2.0
+        A1n[8, 4] = (sol^2 * ν) / 2.0
+        A1n[3, 5] = -sol^2 / 2.0
+        A1n[5, 5] = -sol / 2.0
+        A1n[2, 6] = sol^2 / 2.0
+        A1n[6, 6] = -sol / 2.0
+        A1n[1, 7] = (sol^2 * χ) / 2.0
+        A1n[7, 7] = -(sol * χ) / 2.0
+        A1n[4, 8] = ν / 2.0
+        A1n[8, 8] = -(sol * ν) / 2.0
 
-		# A^-
-		A1n = Array{Float64}(undef, 8, 8)
-		A1n[1,1] = -(sol * χ) / 2.
-		A1n[7,1] = χ / 2.
-		A1n[2,2] = -sol / 2.
-		A1n[6,2] = 1. / 2.
-		A1n[3,3] = -sol / 2.
-		A1n[5,3] = -1. / 2.
-		A1n[4,4] = -(sol * ν) / 2.
-		A1n[8,4] = (sol^2 * ν) / 2.
-		A1n[3,5] = -sol^2 / 2.
-		A1n[5,5] = -sol / 2.
-		A1n[2,6] = sol^2 / 2.
-		A1n[6,6] = -sol / 2.
-		A1n[1,7] = (sol^2 * χ) / 2.
-		A1n[7,7] = -(sol * χ) / 2.
-		A1n[4,8] = ν / 2.
-		A1n[8,8] = -(sol * ν) / 2.
+        D1 = [sol, sol, sol * χ, sol * ν, -sol, -sol, -sol * χ, -sol * ν]
 
-		D1 = [sol, sol, sol * χ, sol * ν, -sol, -sol, -sol * χ, -sol * ν]
+        # inner constructor method
+        new{
+            typeof(Kn),
+            typeof(Ma),
+            typeof(Pr),
+            typeof(K),
+            typeof(γ),
+            typeof(mi),
+            typeof(ni),
+            typeof(me),
+            typeof(ne),
+            typeof(lD),
+            typeof(rL),
+            typeof(sol),
+            typeof(χ),
+            typeof(ν),
+            typeof(A1p),
+            typeof(D1),
+        }(
+            Kn,
+            Ma,
+            Pr,
+            K,
+            γ,
+            mi,
+            ni,
+            me,
+            ne,
+            lD,
+            rL,
+            sol,
+            χ,
+            ν,
+            A1p,
+            A1n,
+            D1,
+        )
 
-		# inner constructor method
-		new(Kn, Ma, Pr, K, γ, mi, ni, me, ne, lD, rL, sol, χ, ν, A1p, A1n, D1)
-    
     end
 
 end
@@ -181,170 +231,151 @@ end
 # ------------------------------------------------------------
 struct IB1D1F{A,B} <: AbstractCondition
 
-	wL :: A
-	primL :: A
-	fL :: B
-	bcL :: A
+    wL::A
+    primL::A
+    fL::B
+    bcL::A
 
-	wR :: A
-	primR :: A
-	fR :: B
-	bcR :: A
+    wR::A
+    primR::A
+    fR::B
+    bcR::A
 
-	# 1D1F1V
-    function IB1D1F( wL::Array{<:Real,1}, primL::Array{<:Real,1}, 
-    			     fL::AbstractArray{<:Real,1}, bcL::Array{<:Real,1}, 
-    			     wR::Array{<:Real,1}, primR::Array{<:Real,1}, 
-    			     fR::AbstractArray{<:Real,1}, bcR::Array{<:Real,1} )
+    # works for both 1V/3V and single-/multi-component gases
+    function IB1D1F(
+        wL::Array,
+        primL::Array,
+        fL::AbstractArray,
+        bcL::Array,
+        wR::Array,
+        primR::Array,
+        fR::AbstractArray,
+        bcR::Array,
+    )
 
-		new{typeof(wL), typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
-    
-	end
-	
-	# 1D1F3V
-	function IB1D1F( wL::Array{<:Real,1}, primL::Array{<:Real,1}, 
-					 fL::AbstractArray{Float64,3}, bcL::Array{<:Real,1}, 
-					 wR::Array{<:Real,1}, primR::Array{<:Real,1}, 
-					 fR::AbstractArray{Float64,3}, bcR::Array{<:Real,1} )
+        new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
 
-		new{typeof(wL), typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
-
-	end
+    end
 
 end
 
-struct IB1D2F <: AbstractCondition
+struct IB1D2F{A,B} <: AbstractCondition
 
-	# initial condition
-	wL :: Array{Float64,1}
-	primL :: Array{Float64,1}
-    hL :: AbstractArray{Float64,1}
-    bL :: AbstractArray{Float64,1}
-	bcL :: Array{Float64,1}
+    # initial condition
+    wL::A
+    primL::A
+    hL::B
+    bL::B
+    bcL::A
 
-	wR :: Array{Float64,1}
-	primR :: Array{Float64,1}
-    hR :: AbstractArray{Float64,1}
-    bR :: AbstractArray{Float64,1}
-	bcR :: Array{Float64,1}
+    wR::A
+    primR::A
+    hR::B
+    bR::B
+    bcR::A
 
-    function IB1D2F( WL::Array{<:Real,1}, PRIML::Array{<:Real,1}, 
-    			     HL::AbstractArray{Float64,1}, BL::AbstractArray{<:Real,1}, BCL::Array{<:Real,1}, 
-    			     WR::Array{<:Real,1}, PRIMR::Array{<:Real,1}, 
-    			     HR::AbstractArray{Float64,1}, BR::AbstractArray{<:Real,1}, BCR::Array{<:Real,1} )
+    function IB1D2F(
+        wL::Array,
+        primL::Array,
+        hL::AbstractArray,
+        bL::AbstractArray,
+        bcL::Array,
+        wR::Array,
+        primR::Array,
+        hR::AbstractArray,
+        bR::AbstractArray,
+        bcR::Array,
+    )
 
-    	wL = Float64.(WL); primL = Float64.(PRIML); hL = deepcopy(HL); bL = Float64.(BL); bcL = Float64.(BCL)
-    	wR = Float64.(WR); primR = Float64.(PRIMR); hR = deepcopy(HR); bR = Float64.(BR); bcR = Float64.(BCR)
+        new{typeof(wL),typeof(hL)}(
+            wL,
+            primL,
+            hL,
+            bL,
+            bcL,
+            wR,
+            primR,
+            hR,
+            bR,
+            bcR,
+        )
 
-		# inner constructor
-		new(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
-    
     end
 
 end
 
 
-struct MIB1D1F <: AbstractCondition
+struct IB1D4F{A,B,C,D} <: AbstractCondition
 
-	# initial/boundary condition
-	wL :: Array{Float64,2}
-	primL :: Array{Float64,2}
-    fL :: AbstractArray{Float64,2}
-	bcL :: Array{Float64,2}
+    # initial/boundary condition
+    wL::A
+    primL::A
+    h0L::B
+    h1L::B
+    h2L::B
+    h3L::B
+    bcL::A
+    EL::C
+    BL::C
+    lorenzL::D
 
-	wR :: Array{Float64,2}
-	primR :: Array{Float64,2}
-    fR :: AbstractArray{Float64,2}
-	bcR :: Array{Float64,2}
+    wR::A
+    primR::A
+    h0R::B
+    h1R::B
+    h2R::B
+    h3R::B
+    bcR::A
+    ER::C
+    BR::C
+    lorenzR::D
 
-	function MIB1D1F( WL::Array{<:Real,2}, PRIML::Array{<:Real,2}, FL::AbstractArray{Float64,2}, BCL::Array{<:Real,2}, 
-					  WR::Array{<:Real,2}, PRIMR::Array{<:Real,2}, FR::AbstractArray{Float64,2}, BCR::Array{<:Real,2} )
+    function IB1D4F(
+        wL::Array,
+        primL::Array,
+        h0L::AbstractArray,
+        h1L::AbstractArray,
+        h2L::AbstractArray,
+        h3L::AbstractArray,
+        bcL::Array,
+        EL::Array,
+        BL::Array,
+        lorenzL::Array,
+        wR::Array,
+        primR::Array,
+        h0R::AbstractArray,
+        h1R::AbstractArray,
+        h2R::AbstractArray,
+        h3R::AbstractArray,
+        bcR::Array,
+        ER::Array,
+        BR::Array,
+        lorenzR::Array,
+    )
 
-		wL = Float64.(WL); primL = Float64.(PRIML); fL = deepcopy(FL); bcL = Float64.(BCL); 
-		wR = Float64.(WR); primR = Float64.(PRIMR); fR = deepcopy(FR); bcR = Float64.(BCR); 
+        new{typeof(wL),typeof(h0L),typeof(EL),typeof(lorenzL)}(
+            wL,
+            primL,
+            h0L,
+            h1L,
+            h2L,
+            h3L,
+            bcL,
+            EL,
+            BL,
+            lorenzL,
+            wR,
+            primR,
+            h0R,
+            h1R,
+            h2R,
+            h3R,
+            bcR,
+            ER,
+            BR,
+            lorenzR,
+        )
 
-		# inner constructor
-		new(wL, primL, fL, bcL, wR, primR, fR, bcR)
-    
-    end
-
-end
-
-
-struct MIB1D2F <: AbstractCondition
-
-	# initial/boundary condition
-	wL :: Array{Float64,2}
-	primL :: Array{Float64,2}
-    hL :: AbstractArray{Float64,2}
-	bL :: AbstractArray{Float64,2}
-	bcL :: Array{Float64,2}
-
-	wR :: Array{Float64,2}
-	primR :: Array{Float64,2}
-    hR :: AbstractArray{Float64,2}
-	bR :: AbstractArray{Float64,2}
-	bcR :: Array{Float64,2}
-
-	function MIB1D2F( WL::Array{<:Real,2}, PRIML::Array{<:Real,2}, HL::AbstractArray{Float64,2}, 
-					  BL::AbstractArray{Float64,2}, BCL::Array{<:Real,2}, 
-					  WR::Array{<:Real,2}, PRIMR::Array{<:Real,2}, HR::AbstractArray{Float64,2}, 
-					  BR::AbstractArray{Float64,2}, BCR::Array{<:Real,2} )
-
-						
-		wL = Float64.(WL); primL = Float64.(PRIML); hL = deepcopy(HL); bL = Float64.(BL); bcL = Float64.(BCL); 
-		wR = Float64.(WR); primR = Float64.(PRIMR); hR = deepcopy(HR); bR = Float64.(BR); bcR = Float64.(BCR); 
-
-		# inner constructor
-		new(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
-    
-    end
-
-end
-
-
-struct MIB1D4F <: AbstractCondition
-
-	# initial/boundary condition
-	wL :: Array{Float64,2}
-	primL :: Array{Float64,2}
-    h0L :: AbstractArray{Float64,2}
-	h1L :: AbstractArray{Float64,2}
-	h2L :: AbstractArray{Float64,2}
-	h3L :: AbstractArray{Float64,2}
-	bcL :: Array{Float64,2}
-	EL :: Array{Float64,1}
-	BL :: Array{Float64,1}
-	lorenzL :: Array{Float64,2}
-
-	wR :: Array{Float64,2}
-	primR :: Array{Float64,2}
-    h0R :: AbstractArray{Float64,2}
-	h1R :: AbstractArray{Float64,2}
-	h2R :: AbstractArray{Float64,2}
-	h3R :: AbstractArray{Float64,2}
-	bcR :: Array{Float64,2}
-	ER :: Array{Float64,1}
-	BR :: Array{Float64,1}
-	lorenzR :: Array{Float64,2}
-
-	function MIB1D4F( WL::Array{<:Real,2}, PRIML::Array{<:Real,2}, H0L::AbstractArray{Float64,2}, 
-					  H1L::AbstractArray{Float64,2}, H2L::AbstractArray{Float64,2}, H3L::AbstractArray{Float64,2}, 
-					  BCL::Array{<:Real,2}, EFIELDL::Array{<:Real,1}, BFIELDL::Array{<:Real,1}, LL::Array{<:Real,2}, 
-					  WR::Array{<:Real,2}, PRIMR::Array{<:Real,2}, H0R::AbstractArray{Float64,2}, 
-					  H1R::AbstractArray{Float64,2}, H2R::AbstractArray{Float64,2}, H3R::AbstractArray{Float64,2}, 
-					  BCR::Array{<:Real,2}, EFIELDR::Array{<:Real,1}, BFIELDR::Array{<:Real,1}, LR::Array{<:Real,2} )
-
-						
-		wL = Float64.(WL); primL = Float64.(PRIML); h0L = deepcopy(H0L); h1L = Float64.(H1L); h2L = Float64.(H2L); h3L = Float64.(H3L)
-		bcL = Float64.(BCL); EL = Float64.(EFIELDL); BL = Float64.(BFIELDL); lorenzL = Float64.(LL)
-		wR = Float64.(WR); primR = Float64.(PRIMR); h0R = deepcopy(H0R); h1R = Float64.(H1R); h2R = Float64.(H2R); h3R = Float64.(H3R); 
-		bcR = Float64.(BCR); ER = Float64.(EFIELDR); BR = Float64.(BFIELDR); lorenzR = Float64.(LR)
-
-		# inner constructor
-		new( wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 
-			 wR, primR, h0R, h1R, h2R, h3R, bcR, ER, BR, lorenzR )
-    
     end
 
 end
@@ -355,183 +386,226 @@ end
 # ------------------------------------------------------------
 mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 
-	x :: F
-	dx :: F
+    x::F
+    dx::F
 
-	w :: A
-	prim :: A
-	sw :: A
+    w::A
+    prim::A
+    sw::A
 
-	f :: B
-	sf :: B
+    f::B
+    sf::B
 
-	function ControlVolume1D1F(X::Real, DX::Real, W::Array, PRIM::Array, F::AbstractArray)
+    function ControlVolume1D1F(
+        X::Real,
+        DX::Real,
+        W::Array,
+        PRIM::Array,
+        F::AbstractArray,
+    )
 
-		x = deepcopy(X)
-		dx = deepcopy(DX)
+        x = deepcopy(X)
+        dx = deepcopy(DX)
 
-		w = deepcopy(W)
-		prim = deepcopy(PRIM)
-		sw = zeros(typeof(W[1]), axes(w))
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(typeof(W[1]), axes(w))
 
-		f = deepcopy(F)
-		sf = zeros(typeof(F[1]), axes(f))
+        f = deepcopy(F)
+        sf = zeros(typeof(F[1]), axes(f))
 
-		new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
+        new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
 
-	end
-
-end
-
-
-mutable struct ControlVolume1D2F <: AbstractControlVolume1D
-
-	x :: Float64
-	dx :: Float64
-
-	w :: Array{Float64,1}
-	prim :: Array{Float64,1}
-	sw :: Array{Float64,1}
-
-	h :: AbstractArray{Float64,1}
-	b :: AbstractArray{Float64,1}
-	sh :: AbstractArray{Float64,1}
-	sb :: AbstractArray{Float64,1}
-
-	function ControlVolume1D2F( X::Real, DX::Real, 
-								w0::Array{<:Real,1}, prim0::Array{<:Real,1}, 
-								h0::AbstractArray{Float64,1}, b0::AbstractArray{Float64,1} )
-
-		x = Float64(X)
-		dx = Float64(DX)
-
-		w = Float64.(w0)
-		prim = Float64.(prim0)
-		sw = zeros(axes(w))
-
-		h = deepcopy(h0)
-		b = deepcopy(b0)
-		sh = zeros(axes(h))
-		sb = zeros(axes(b))
-
-		new(x, dx, w, prim, sw, h, b, sh, sb)
-
-	end
+    end
 
 end
 
 
-mutable struct MControlVolume1D1F <: AbstractControlVolume1D
+mutable struct ControlVolume1D2F{F,A,B} <: AbstractControlVolume1D
 
-	x :: Float64
-	dx :: Float64
+    x::F
+    dx::F
 
-	w :: Array{Float64,2}
-	prim :: Array{Float64,2}
-	sw :: Array{Float64,2}
+    w::A
+    prim::A
+    sw::A
 
-	f :: AbstractArray{Float64,2}
-	sf :: AbstractArray{Float64,2}
+    h::B
+    b::B
+    sh::B
+    sb::B
 
-	function MControlVolume1D1F( X::Real, DX::Real, 
-								 w0::Array{<:Real,2}, prim0::Array{<:Real,2}, 
-								 F0::AbstractArray{Float64,2} )
+    function ControlVolume1D2F(
+        X::Real,
+        DX::Real,
+        W::Array,
+        PRIM::Array,
+        H::AbstractArray,
+        B::AbstractArray,
+    )
 
-		x = Float64(X)
-		dx = Float64(DX)
+        x = deepcopy(X)
+        dx = deepcopy(DX)
 
-		w = Float64.(w0)
-		prim = Float64.(prim0)
-		sw = zeros(axes(w))
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(typeof(W[1]), axes(W))
 
-		f = deepcopy(F0)
-		sf = zeros(axes(F0))
+        h = deepcopy(H)
+        b = deepcopy(B)
+        sh = zeros(typeof(H[1]), axes(H))
+        sb = zeros(typeof(B[1]), axes(B))
 
-		new(x, dx, w, prim, sw, f, sf)
+        new{typeof(x),typeof(w),typeof(h)}(x, dx, w, prim, sw, h, b, sh, sb)
 
-	end
-
-end
-
-
-mutable struct MControlVolume1D2F <: AbstractControlVolume1D
-
-	x :: Float64
-	dx :: Float64
-
-	w :: Array{Float64,2}
-	prim :: Array{Float64,2}
-	sw :: Array{Float64,2}
-
-	h :: AbstractArray{Float64,2}
-	b :: AbstractArray{Float64,2}
-	sh :: AbstractArray{Float64,2}
-	sb :: AbstractArray{Float64,2}
-
-	function MControlVolume1D2F( X::Real, DX::Real, 
-								 w0::Array{<:Real,2}, prim0::Array{<:Real,2}, 
-								 H0::AbstractArray{Float64,2}, B0::AbstractArray{Float64,2} )
-
-		x = Float64(X)
-		dx = Float64(DX)
-
-		w = Float64.(w0)
-		prim = Float64.(prim0)
-		sw = zeros(axes(w))
-
-		h = deepcopy(H0)
-		b = deepcopy(B0)
-		sh = zeros(axes(H0))
-		sb = zeros(axes(B0))
-
-		new(x, dx, w, prim, sw, h, b, sh, sb)
-
-	end
+    end
 
 end
 
 
-mutable struct MControlVolume1D4F <: AbstractControlVolume1D
+mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
 
-	x :: Float64
-	dx :: Float64
+    x::F
+    dx::F
 
-	w :: Array{Float64,2}
-	prim :: Array{Float64,2}
-	sw :: Array{Float64,2}
+    w::A
+    prim::A
+    sw::A
 
-	h0 :: AbstractArray{Float64,2}; h1 :: AbstractArray{Float64,2}
-	h2 :: AbstractArray{Float64,2}; h3 :: AbstractArray{Float64,2}
-	sh0 :: AbstractArray{Float64,2}; sh1 :: AbstractArray{Float64,2}
-	sh2 :: AbstractArray{Float64,2}; sh3 :: AbstractArray{Float64,2}
+    h0::B
+    h1::B
+    h2::B
+    h3::B
+    sh0::B
+    sh1::B
+    sh2::B
+    sh3::B
 
-	E :: Array{Float64,1}; B :: Array{Float64,1}
-	ϕ :: Float64; ψ :: Float64
-	lorenz :: Array{Float64,2}
+    E::C
+    B::C
+    ϕ::D
+    ψ::D
+    lorenz::E
 
-	function MControlVolume1D4F( X::Real, DX::Real, 
-								 w0::Array{<:Real,2}, prim0::Array{<:Real,2}, 
-								 H0::AbstractArray{Float64,2}, H1::AbstractArray{Float64,2}, 
-								 H2::AbstractArray{Float64,2}, H3::AbstractArray{Float64,2},
-							 	 E0::Array{Float64,1}, B0::Array{Float64,1}, L::Array{Float64,2} )
+    # deterministic
+    function ControlVolume1D4F(
+        X::Real,
+        DX::Real,
+        W::Array{<:Real,2},
+        PRIM::Array{<:Real,2},
+        H0::AbstractArray{<:AbstractFloat,2},
+        H1::AbstractArray{Float64,2},
+        H2::AbstractArray{Float64,2},
+        H3::AbstractArray{Float64,2},
+        E0::Array{Float64,1},
+        B0::Array{Float64,1},
+        L::Array{Float64,2},
+    )
 
-		x = Float64(X)
-		dx = Float64(DX)
+        x = deepcopy(X)
+        dx = deepcopy(DX)
 
-		w = Float64.(w0)
-		prim = Float64.(prim0)
-		sw = zeros(axes(w))
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(typeof(W[1]), axes(W))
 
-		h0 = deepcopy(H0); h1 = deepcopy(H1); h2 = deepcopy(H2); h3 = deepcopy(H3)
-		sh0 = zeros(axes(H0)); sh1 = zeros(axes(H1)); sh2 = zeros(axes(H2)); sh3 = zeros(axes(H3))
+        h0 = deepcopy(H0)
+        h1 = deepcopy(H1)
+        h2 = deepcopy(H2)
+        h3 = deepcopy(H3)
+        sh0 = zeros(typeof(H0[1]), axes(H0))
+        sh1 = zeros(typeof(H1[1]), axes(H1))
+        sh2 = zeros(typeof(H2[1]), axes(H2))
+        sh3 = zeros(typeof(H3[1]), axes(H3))
 
-		E = deepcopy(E0); B = deepcopy(B0); 
-		ϕ = 0.; ψ = 0.
-		lorenz = deepcopy(L)
+        E = deepcopy(E0)
+        B = deepcopy(B0)
+        ϕ = 0.0
+        ψ = 0.0
+        lorenz = deepcopy(L)
 
-		new(x, dx, w, prim, sw, h0, h1, h2, h3, sh0, sh1, sh2, sh3, E, B, ϕ, ψ, lorenz)
+        new{typeof(x),typeof(w),typeof(h0),typeof(E),typeof(ϕ),typeof(lorenz)}(
+            x,
+            dx,
+            w,
+            prim,
+            sw,
+            h0,
+            h1,
+            h2,
+            h3,
+            sh0,
+            sh1,
+            sh2,
+            sh3,
+            E,
+            B,
+            ϕ,
+            ψ,
+            lorenz,
+        )
 
-	end
+    end
+
+    # uncertainty quantification
+    function ControlVolume1D4F(
+        X::Real,
+        DX::Real,
+        W::Array{<:Real,3},
+        PRIM::Array{<:Real,3},
+        H0::AbstractArray{<:AbstractFloat,3},
+        H1::AbstractArray{Float64,3},
+        H2::AbstractArray{Float64,3},
+        H3::AbstractArray{Float64,3},
+        E0::Array{Float64,2},
+        B0::Array{Float64,2},
+        L::Array{Float64,3},
+    )
+
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(typeof(W[1]), axes(W))
+
+        h0 = deepcopy(H0)
+        h1 = deepcopy(H1)
+        h2 = deepcopy(H2)
+        h3 = deepcopy(H3)
+        sh0 = zeros(typeof(H0[1]), axes(H0))
+        sh1 = zeros(typeof(H1[1]), axes(H1))
+        sh2 = zeros(typeof(H2[1]), axes(H2))
+        sh3 = zeros(typeof(H3[1]), axes(H3))
+
+        E = deepcopy(E0)
+        B = deepcopy(B0)
+        ϕ = zeros(axes(E, 2))
+        ψ = zeros(axes(B, 2))
+        lorenz = deepcopy(L)
+
+        new{typeof(x),typeof(w),typeof(h0),typeof(E),typeof(ϕ),typeof(lorenz)}(
+            x,
+            dx,
+            w,
+            prim,
+            sw,
+            h0,
+            h1,
+            h2,
+            h3,
+            sh0,
+            sh1,
+            sh2,
+            sh3,
+            E,
+            B,
+            ϕ,
+            ψ,
+            lorenz,
+        )
+
+    end
 
 end
 
@@ -539,156 +613,160 @@ end
 # ------------------------------------------------------------
 # Structure of cell interface
 # ------------------------------------------------------------
-mutable struct Interface1D1F{A, B} <: AbstractInterface1D
+mutable struct Interface1D1F{A,B} <: AbstractInterface1D
 
-	fw :: A
-	ff :: B
+    fw::A
+    ff::B
 
-	function Interface1D1F(f::AbstractArray{<:Real,1}) # for ghost cell
+    function Interface1D1F(w::Array, f::AbstractArray)
 
-		fw = zeros(typeof(f[1]), 3)
-		ff = zeros(typeof(f[1]), axes(f))
+        fw = zeros(typeof(w[1]), axes(w))
+        ff = zeros(typeof(f[1]), axes(f))
 
-		new{typeof(fw), typeof(ff)}(fw, ff)
+        new{typeof(fw),typeof(ff)}(fw, ff)
 
-	end
-
-	function Interface1D1F(f::AbstractArray{<:Real,3})
-
-		fw = zeros(typeof(f[1]), 5)
-		ff = zeros(typeof(f[1]), axes(f))
-
-		new{typeof(fw), typeof(ff)}(fw, ff)
-
-	end
+    end
 
 end
 
 
-mutable struct Interface1D2F <: AbstractInterface1D
+mutable struct Interface1D2F{A,B} <: AbstractInterface1D
 
-	fw :: Array{Float64,1}
-	fh :: AbstractArray{Float64,1}
-	fb :: AbstractArray{Float64,1}
+    fw::A
+    fh::B
+    fb::B
 
-	function Interface1D2F(f::AbstractArray{Float64,1}) # for ghost cell
+    function Interface1D2F(w::Array, f::AbstractArray)
 
-		fw = zeros(3)
-		fh = zeros(axes(f))
-		fb = zeros(axes(f))
+        fw = zeros(typeof(w[1]), axes(w))
+        fh = zeros(typeof(f[1]), axes(f))
+        fb = zeros(typeof(f[1]), axes(f))
 
-		new(fw, fh, fb)
+        new{typeof(fw),typeof(fh)}(fw, fh, fb)
 
-	end
-
-end
-
-
-mutable struct MInterface1D1F <: AbstractInterface1D
-
-	fw :: Array{Float64,2}
-	ff :: AbstractArray{Float64,2}
-
-	function MInterface1D1F(f::AbstractArray{Float64,2})
-
-		fw = zeros(5, axes(f, 2))
-		ff = zeros(axes(f))
-
-		new(fw, ff)
-
-	end
+    end
 
 end
 
 
-mutable struct MInterface1D2F <: AbstractInterface1D
+mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
 
-	fw :: Array{Float64,2}
-	fh :: AbstractArray{Float64,2}
-	fb :: AbstractArray{Float64,2}
+    fw::A
+    fh0::B
+    fh1::B
+    fh2::B
+    fh3::B
+    femL::C
+    femR::C
 
-	function MInterface1D2F(f::AbstractArray{Float64,2})
+    function Interface1D4F(w::Array, f::AbstractArray, E::Array{<:Real,1})
 
-		fw = zeros(5, axes(f, 2))
-		fh = zeros(axes(f))
-		fb = zeros(axes(f))
+        fw = zeros(typeof(w[1]), axes(w))
+        fh0 = zeros(typeof(f[1]), axes(f))
+        fh1 = zeros(typeof(f[1]), axes(f))
+        fh2 = zeros(typeof(f[1]), axes(f))
+        fh3 = zeros(typeof(f[1]), axes(f))
+        femL = zeros(typeof(E), 8)
+        femR = zeros(typeof(E), 8)
 
-		new(fw, fh, fb)
+        new{typeof(fw),typeof(fh0),typeof(femL)}(
+            fw,
+            fh0,
+            fh1,
+            fh2,
+            fh3,
+            femL,
+            femR,
+        )
 
-	end
+    end
 
-end
+    function Interface1D4F(w::Array, f::AbstractArray, E::Array{<:Real,2})
 
+        fw = zeros(typeof(w[1]), axes(w))
+        fh0 = zeros(typeof(f[1]), axes(f))
+        fh1 = zeros(typeof(f[1]), axes(f))
+        fh2 = zeros(typeof(f[1]), axes(f))
+        fh3 = zeros(typeof(f[1]), axes(f))
+        femL = zeros(typeof(E), 8, axes(E, 2))
+        femR = zeros(typeof(E), 8, axes(E, 2))
 
-mutable struct MInterface1D4F <: AbstractInterface1D
+        new{typeof(fw),typeof(fh0),typeof(femL)}(
+            fw,
+            fh0,
+            fh1,
+            fh2,
+            fh3,
+            femL,
+            femR,
+        )
 
-	fw :: Array{Float64,2}
-	fh0 :: AbstractArray{Float64,2}
-	fh1 :: AbstractArray{Float64,2}
-	fh2 :: AbstractArray{Float64,2}
-	fh3 :: AbstractArray{Float64,2}
-	femL :: Array{Float64,1}
-	femR :: Array{Float64,1}
-
-	function MInterface1D4F(f::AbstractArray{Float64,2})
-
-		fw = zeros(5, axes(f, 2))
-		fh0 = zeros(axes(f))
-		fh1 = zeros(axes(f))
-		fh2 = zeros(axes(f))
-		fh3 = zeros(axes(f))
-		femL = zeros(8)
-		femR = zeros(8)
-
-		new(fw, fh0, fh1, fh2, fh3, femL, femR)
-
-	end
+    end
 
 end
 
 
 mutable struct Solution1D1F{A,B} <: AbstractSolution
 
-	w :: A
-	prim :: A
-	sw :: A
-	f :: B
-	sf :: B
+    w::A
+    prim::A
+    sw::A
+    f::B
+    sf::B
 
-	function Solution1D1F(w::Array, prim::Array, f::AbstractArray)
-		sw = zeros(typeof(w[1]), axes(w))
-		sf = zeros(typeof(f[1]), axes(f))
+    function Solution1D1F(w::Array, prim::Array, f::AbstractArray)
+        sw = zeros(typeof(w[1]), axes(w))
+        sf = zeros(typeof(f[1]), axes(f))
 
-		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
-	end
+        new{typeof(w),typeof(f)}(w, prim, sw, f, sf)
+    end
 
-	function Solution1D1F(w::Array, prim::Array, sw::Array, f::AbstractArray, sf::AbstractArray)
-		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
-	end
+    function Solution1D1F(
+        w::Array,
+        prim::Array,
+        sw::Array,
+        f::AbstractArray,
+        sf::AbstractArray,
+    )
+        new{typeof(w),typeof(f)}(w, prim, sw, f, sf)
+    end
 
 end
 
 
 mutable struct Solution1D2F{A,B} <: AbstractSolution
 
-	w :: A
-	prim :: A
-	sw :: A
-	h :: B
-	b :: B
-	sh :: B
-	sb :: B
+    w::A
+    prim::A
+    sw::A
+    h::B
+    b::B
+    sh::B
+    sb::B
 
-	function Solution1D2F(w::Array, prim::Array, h::AbstractArray, b::AbstractArray)
-		sw = zeros(typeof(w[1]), axes(w))
-		sh = zeros(typeof(h[1]), axes(h))
-		sb = zeros(typeof(b[1]), axes(b))
+    function Solution1D2F(
+        w::Array,
+        prim::Array,
+        h::AbstractArray,
+        b::AbstractArray,
+    )
+        sw = zeros(typeof(w[1]), axes(w))
+        sh = zeros(typeof(h[1]), axes(h))
+        sb = zeros(typeof(b[1]), axes(b))
 
-		new{typeof(w), typeof(h)}(w, prim, sw, h, b, sh, sb)
-	end
+        new{typeof(w),typeof(h)}(w, prim, sw, h, b, sh, sb)
+    end
 
-	function Solution1D2F(w::Array, prim::Array, sw::Array, h::AbstractArray, b::AbstractArray, sh::AbstractArray, sb::AbstractArray)
-		new{typeof(w), typeof(h)}(w, prim, sw, h, b, sh, sb)
-	end
+    function Solution1D2F(
+        w::Array,
+        prim::Array,
+        sw::Array,
+        h::AbstractArray,
+        b::AbstractArray,
+        sh::AbstractArray,
+        sb::AbstractArray,
+    )
+        new{typeof(w),typeof(h)}(w, prim, sw, h, b, sh, sb)
+    end
 
 end
