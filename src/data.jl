@@ -692,7 +692,7 @@ mutable struct Solution1D1F{A, B} <: AbstractSolution
 
 
 	function Solution1D1F( w::Array{<:AbstractFloat,2}, prim::Array{<:AbstractFloat,2}, sw::Array{<:AbstractFloat,2}, 
-						   f::AbstractArray{<:AbstractFloat,2}, sf::AbstractArray{<:AbstractFloat,4} )
+						   f::AbstractArray{<:AbstractFloat,4}, sf::AbstractArray{<:AbstractFloat,4} )
 		new{typeof(w), typeof(f)}(w, prim, sw, f, sf)
 	end
 
