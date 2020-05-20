@@ -3,8 +3,7 @@
 # ============================================================
 
 
-export ib_rh,
-       ib_briowu
+export ib_rh, ib_briowu
 
 
 # ------------------------------------------------------------
@@ -17,12 +16,16 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1})
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
 
     MaR = sqrt((MaL^2 * (gam - 1.0) + 2.0) / (2.0 * gam * MaL^2 - (gam - 1.0)))
-	ratioT = (1.0 + (gam - 1.0) / 2.0 * MaL^2) * (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) / 
-		     (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
+    ratioT =
+        (1.0 + (gam - 1.0) / 2.0 * MaL^2) *
+        (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
+        (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
 
-    primR = [ primL[1] * (gam + 1.0) * MaL^2 / ((gam - 1.0) * MaL^2 + 2.0),
-              MaR * sqrt(gam / 2.0) * sqrt(ratioT),
-              primL[3] / ratioT ]
+    primR = [
+        primL[1] * (gam + 1.0) * MaL^2 / ((gam - 1.0) * MaL^2 + 2.0),
+        MaR * sqrt(gam / 2.0) * sqrt(ratioT),
+        primL[3] / ratioT,
+    ]
 
     wL = prim_conserve(primL, gam)
     wR = prim_conserve(primR, gam)
@@ -44,12 +47,16 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1}, K::Real)
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
 
     MaR = sqrt((MaL^2 * (gam - 1.0) + 2.0) / (2.0 * gam * MaL^2 - (gam - 1.0)))
-	ratioT = (1.0 + (gam - 1.0) / 2.0 * MaL^2) * (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) / 
-		     (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
+    ratioT =
+        (1.0 + (gam - 1.0) / 2.0 * MaL^2) *
+        (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
+        (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
 
-    primR = [ primL[1] * (gam + 1.0) * MaL^2 / ((gam - 1.0) * MaL^2 + 2.0),
-              MaR * sqrt(gam / 2.0) * sqrt(ratioT),
-              primL[3] / ratioT ]
+    primR = [
+        primL[1] * (gam + 1.0) * MaL^2 / ((gam - 1.0) * MaL^2 + 2.0),
+        MaR * sqrt(gam / 2.0) * sqrt(ratioT),
+        primL[3] / ratioT,
+    ]
 
     wL = prim_conserve(primL, gam)
     wR = prim_conserve(primR, gam)
@@ -68,20 +75,30 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1}, K::Real)
 end
 
 #--- 1D1F3V ---#
-function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3})
+function ib_rh(
+    MaL::Real,
+    gam::Real,
+    u::AbstractArray{Float64,3},
+    v::AbstractArray{Float64,3},
+    w::AbstractArray{Float64,3},
+)
 
     #--- calculate Rankine-Hugoniot relation ---#
-    primL = [1., MaL * sqrt(gam / 2.), 0., 0., 1.]
+    primL = [1.0, MaL * sqrt(gam / 2.0), 0.0, 0.0, 1.0]
 
     MaR = sqrt((MaL^2 * (gam - 1.0) + 2.0) / (2.0 * gam * MaL^2 - (gam - 1.0)))
-	ratioT = (1.0 + (gam - 1.0) / 2.0 * MaL^2) * (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) / 
-		     (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
+    ratioT =
+        (1.0 + (gam - 1.0) / 2.0 * MaL^2) *
+        (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
+        (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
 
-    primR = [ primL[1] * (gam + 1.0) * MaL^2 / ((gam - 1.0) * MaL^2 + 2.0),
-              MaR * sqrt(gam / 2.0) * sqrt(ratioT),
-              0.,
-              0.,
-              primL[end] / ratioT ]
+    primR = [
+        primL[1] * (gam + 1.0) * MaL^2 / ((gam - 1.0) * MaL^2 + 2.0),
+        MaR * sqrt(gam / 2.0) * sqrt(ratioT),
+        0.0,
+        0.0,
+        primL[end] / ratioT,
+    ]
 
     wL = prim_conserve(primL, gam)
     wR = prim_conserve(primR, gam)
@@ -100,64 +117,101 @@ end
 # ------------------------------------------------------------
 # Initialize Brio-Wu MHD shock
 # ------------------------------------------------------------
-function ib_briowu(gam::Real, uspace::AbstractArray{Float64,2}, mi::Real, me::Real)
+function ib_briowu(
+    gam::Real,
+    uspace::AbstractArray{Float64,2},
+    mi::Real,
+    me::Real,
+)
 
     # upstream
     primL = zeros(5, 2)
-    primL[1,1] = 1. * mi
-    primL[2,1] = 0.
-    primL[3,1] = 0.
-    primL[4,1] = 0.
-    primL[5,1] = mi / 1.
-    primL[1,2] = 1. * me
-    primL[2,2] = 0.
-    primL[3,2] = 0.
-    primL[4,2] = 0.
-    primL[5,2] = me / 1.
+    primL[1, 1] = 1.0 * mi
+    primL[2, 1] = 0.0
+    primL[3, 1] = 0.0
+    primL[4, 1] = 0.0
+    primL[5, 1] = mi / 1.0
+    primL[1, 2] = 1.0 * me
+    primL[2, 2] = 0.0
+    primL[3, 2] = 0.0
+    primL[4, 2] = 0.0
+    primL[5, 2] = me / 1.0
 
     wL = mixture_prim_conserve(primL, gam)
     h0L = mixture_maxwellian(uspace, primL)
-    
-    h1L = similar(h0L); h2L = similar(h0L); h3L = similar(h0L)    
+
+    h1L = similar(h0L)
+    h2L = similar(h0L)
+    h3L = similar(h0L)
     for j in axes(h0L, 2)
-        h1L[:,j] .= primL[3,j] .* h0L[:,j]
-        h2L[:,j] .= primL[4,j] .* h0L[:,j]
-        h3L[:,j] .= (primL[3,j]^2 + primL[4,j]^2 + 2. / (2. * primL[end,j])) .* h0L[:,j]
+        h1L[:, j] .= primL[3, j] .* h0L[:, j]
+        h2L[:, j] .= primL[4, j] .* h0L[:, j]
+        h3L[:, j] .=
+            (primL[3, j]^2 + primL[4, j]^2 + 2.0 / (2.0 * primL[end, j])) .*
+            h0L[:, j]
     end
 
     EL = zeros(3)
-    BL = zeros(3); BL[1] = 0.75; BL[2] = 1.
+    BL = zeros(3)
+    BL[1] = 0.75
+    BL[2] = 1.0
 
     # downstream
     primR = zeros(5, 2)
-    primR[1,1] = 0.125 * mi
-    primR[2,1] = 0.
-    primR[3,1] = 0.
-    primR[4,1] = 0.
-    primR[5,1] = mi * 1.25
-    primR[1,2] = 0.125 * me
-    primR[2,2] = 0.
-    primR[3,2] = 0.
-    primR[4,2] = 0.
-    primR[5,2] = me * 1.25
+    primR[1, 1] = 0.125 * mi
+    primR[2, 1] = 0.0
+    primR[3, 1] = 0.0
+    primR[4, 1] = 0.0
+    primR[5, 1] = mi * 1.25
+    primR[1, 2] = 0.125 * me
+    primR[2, 2] = 0.0
+    primR[3, 2] = 0.0
+    primR[4, 2] = 0.0
+    primR[5, 2] = me * 1.25
 
     wR = mixture_prim_conserve(primR, gam)
     h0R = mixture_maxwellian(uspace, primR)
-    
-    h1R = similar(h0R); h2R = similar(h0R); h3R = similar(h0R)    
+
+    h1R = similar(h0R)
+    h2R = similar(h0R)
+    h3R = similar(h0R)
     for j in axes(h0L, 2)
-        h1R[:,j] .= primR[3,j] .* h0R[:,j]
-        h2R[:,j] .= primR[4,j] .* h0R[:,j]
-        h3R[:,j] .= (primR[3,j]^2 + primR[4,j]^2 + 2. / (2. * primR[end,j])) .* h0R[:,j]
+        h1R[:, j] .= primR[3, j] .* h0R[:, j]
+        h2R[:, j] .= primR[4, j] .* h0R[:, j]
+        h3R[:, j] .=
+            (primR[3, j]^2 + primR[4, j]^2 + 2.0 / (2.0 * primR[end, j])) .*
+            h0R[:, j]
     end
 
     ER = zeros(3)
-    BR = zeros(3); BR[1] = 0.75; BR[2] = -1.
+    BR = zeros(3)
+    BR[1] = 0.75
+    BR[2] = -1.0
 
-    lorenzL = zeros(3, 2); lorenzR = zeros(3, 2)
-    bcL = zeros(5, 2); bcR = zeros(5, 2)
-    
-    return wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, 
-           wR, primR, h0R, h1R, h2R, h3R, bcR, ER, BR, lorenzR
+    lorenzL = zeros(3, 2)
+    lorenzR = zeros(3, 2)
+    bcL = zeros(5, 2)
+    bcR = zeros(5, 2)
+
+    return wL,
+    primL,
+    h0L,
+    h1L,
+    h2L,
+    h3L,
+    bcL,
+    EL,
+    BL,
+    lorenzL,
+    wR,
+    primR,
+    h0R,
+    h1R,
+    h2R,
+    h3R,
+    bcR,
+    ER,
+    BR,
+    lorenzR
 
 end

@@ -4,19 +4,19 @@
 
 
 export AbstractVelocitySpace,
-       AbstractPhysicalSpace,
-       AbstractSetup,
-       AbstractProperty,
-       AbstractCondition,
-       AbstractSolverSet,
-       AbstractControlVolume,
-       AbstractControlVolume1D,
-       AbstractInterface,
-       AbstractInterface1D,
-       AbstractSolution
+    AbstractPhysicalSpace,
+    AbstractSetup,
+    AbstractProperty,
+    AbstractCondition,
+    AbstractSolverSet,
+    AbstractControlVolume,
+    AbstractControlVolume1D,
+    AbstractInterface,
+    AbstractInterface1D,
+    AbstractSolution
 
 
-abstract type AbstractPhysicalSpace end      
+abstract type AbstractPhysicalSpace end
 abstract type AbstractVelocitySpace end
 abstract type AbstractSetup end
 abstract type AbstractProperty end

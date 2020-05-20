@@ -3,9 +3,7 @@
 # ============================================================
 
 
-export read_dict,
-       write_jld,
-       plot_line
+export read_dict, write_jld, plot_line
 
 
 """
@@ -20,11 +18,11 @@ function read_dict(filename::String, allowed)
 
     #println("Reading config from $filename")
     f = open(filename)
-    vars = Dict{String, Any}()
+    vars = Dict{String,Any}()
 
     for line in eachline(f)
         # skip comments
-        if length(line) == 0 || line[1] == '#' 
+        if length(line) == 0 || line[1] == '#'
             #println("skip comment line")
             continue
         end
@@ -56,11 +54,11 @@ end
 function read_dict(filename::String)
 
     f = open(filename)
-    vars = Dict{String, Any}()
+    vars = Dict{String,Any}()
 
     for line in eachline(f)
         # skip comments
-        if length(line) == 0 || line[1] == '#' 
+        if length(line) == 0 || line[1] == '#'
             continue
         end
 
@@ -85,7 +83,11 @@ end
 # ------------------------------------------------------------
 # Write output data with JLD2
 # ------------------------------------------------------------
-function write_jld(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVolume,1}, t::Real)
+function write_jld(
+    KS::AbstractSolverSet,
+    ctr::AbstractArray{<:AbstractControlVolume,1},
+    t::Real,
+)
 
     strIter = string(t)
     fileOut = KS.outputFolder * "data/t=" * strIter * ".jld2"
@@ -98,17 +100,20 @@ end
 # ------------------------------------------------------------
 # Plot line
 # ------------------------------------------------------------
-function plot_line(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
+function plot_line(
+    KS::AbstractSolverSet,
+    ctr::AbstractArray{<:AbstractControlVolume1D,1},
+)
 
     pltx = deepcopy(KS.pSpace.x)
     plty = zeros(KS.pSpace.nx, 6)
 
     for i in eachindex(pltx)
-        for j=1:2
-            plty[i,j] = ctr[i].prim[j]
+        for j = 1:2
+            plty[i, j] = ctr[i].prim[j]
         end
 
-        plty[i,3] = 1. / ctr[i].prim[end]
+        plty[i, 3] = 1.0 / ctr[i].prim[end]
     end
 
     # GR
@@ -118,9 +123,9 @@ function plot_line(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVo
     #display(p1)
 
     # Plots
-    p1 = plot(pltx, plty[:,1], label="Density", lw=2, xlabel="X")
-    p1 = plot!(pltx, plty[:,2], label="Velocity", lw=2)
-    p1 = plot!(pltx, plty[:,3], label="Temperature", lw=2)
+    p1 = plot(pltx, plty[:, 1], label = "Density", lw = 2, xlabel = "X")
+    p1 = plot!(pltx, plty[:, 2], label = "Velocity", lw = 2)
+    p1 = plot!(pltx, plty[:, 3], label = "Temperature", lw = 2)
     display(p1)
 
 end
