@@ -9,7 +9,7 @@ export VSpace1D, VSpace2D, VSpace3D, MVSpace1D, MVSpace2D, newton_cotes
 # ------------------------------------------------------------
 # Structure of velocity space
 # ------------------------------------------------------------
-mutable struct VSpace1D <: AbstractVelocitySpace
+struct VSpace1D <: AbstractVelocitySpace
 
     u0::Float64
     u1::Float64
@@ -63,7 +63,7 @@ mutable struct VSpace1D <: AbstractVelocitySpace
 end # struct
 
 
-mutable struct VSpace2D <: AbstractVelocitySpace
+struct VSpace2D <: AbstractVelocitySpace
 
     u0::Float64
     u1::Float64
@@ -145,7 +145,7 @@ mutable struct VSpace2D <: AbstractVelocitySpace
 end # struct
 
 
-mutable struct VSpace3D <: AbstractVelocitySpace
+struct VSpace3D <: AbstractVelocitySpace
 
     u0::Float64
     u1::Float64
@@ -252,7 +252,7 @@ end # struct
 # ------------------------------------------------------------
 # Structure of multi-component velocity space
 # ------------------------------------------------------------
-mutable struct MVSpace1D <: AbstractVelocitySpace
+struct MVSpace1D <: AbstractVelocitySpace
 
     u0::Array{Float64,1}
     u1::Array{Float64,1}
@@ -309,7 +309,7 @@ mutable struct MVSpace1D <: AbstractVelocitySpace
 end # struct
 
 
-mutable struct MVSpace2D <: AbstractVelocitySpace
+struct MVSpace2D <: AbstractVelocitySpace
 
     u0::Array{Float64,1}
     u1::Array{Float64,1}

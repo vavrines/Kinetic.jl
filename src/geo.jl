@@ -9,7 +9,7 @@ export PSpace1D, PSpace2D, uniform_mesh, global_frame, local_frame
 # ------------------------------------------------------------
 # Structure of mesh
 # ------------------------------------------------------------
-mutable struct PSpace1D <: AbstractPhysicalSpace
+struct PSpace1D <: AbstractPhysicalSpace
 
     x0::Float64
     x1::Float64
@@ -50,7 +50,7 @@ mutable struct PSpace1D <: AbstractPhysicalSpace
 end # struct
 
 
-mutable struct PSpace2D <: AbstractPhysicalSpace
+struct PSpace2D <: AbstractPhysicalSpace
 
     x0::Float64
     x1::Float64

@@ -112,6 +112,7 @@ struct SolverSet <: AbstractSolverSet
         end
 
         if case == "shock"
+
             μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
             gas = GasProperty(
                 knudsen,
@@ -158,7 +159,9 @@ struct SolverSet <: AbstractSolverSet
                     ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
                 ib = IB1D1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
             end
+
         elseif case == "brio-wu"
+
             v0 = umin * sqrt(mi / me)
             v1 = umax * sqrt(mi / me)
             kne = knudsen * (me / mi)
@@ -223,6 +226,7 @@ struct SolverSet <: AbstractSolverSet
                 BR,
                 lorenzR,
             )
+
         end
 
         # create working directory

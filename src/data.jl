@@ -9,6 +9,7 @@ export IB1D1F, IB1D2F, IB1D4F
 export ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
 export Interface1D1F, Interface1D2F, Interface1D4F
 export Solution1D1F, Solution1D2F
+export Flux1D1F, Flux1D2F
 
 
 # ------------------------------------------------------------
@@ -714,17 +715,21 @@ mutable struct Solution1D1F{A,B} <: AbstractSolution
     f::B
     sf::B
 
-    function Solution1D1F(w::Array, prim::Array, f::AbstractArray)
-        sw = zeros(typeof(w[1]), axes(w))
-        sf = zeros(typeof(f[1]), axes(f))
+    function Solution1D1F(
+        w::AbstractArray,
+        prim::AbstractArray,
+        f::AbstractArray,
+    )
+        sw = [zeros(axes(w[1])) for i in axes(w, 1)]
+        sf = [zeros(axes(f[1])) for i in axes(f, 1)]
 
         new{typeof(w),typeof(f)}(w, prim, sw, f, sf)
     end
 
     function Solution1D1F(
-        w::Array,
-        prim::Array,
-        sw::Array,
+        w::AbstractArray,
+        prim::AbstractArray,
+        sw::AbstractArray,
         f::AbstractArray,
         sf::AbstractArray,
     )
@@ -745,28 +750,60 @@ mutable struct Solution1D2F{A,B} <: AbstractSolution
     sb::B
 
     function Solution1D2F(
-        w::Array,
-        prim::Array,
+        w::AbstractArray,
+        prim::AbstractArray,
         h::AbstractArray,
         b::AbstractArray,
     )
-        sw = zeros(typeof(w[1]), axes(w))
-        sh = zeros(typeof(h[1]), axes(h))
-        sb = zeros(typeof(b[1]), axes(b))
+        sw = [zeros(axes(w[1])) for i in axes(w, 1)]
+        sh = [zeros(axes(h[1])) for i in axes(h, 1)]
+        sb = [zeros(axes(b[1])) for i in axes(b, 1)]
 
         new{typeof(w),typeof(h)}(w, prim, sw, h, b, sh, sb)
     end
 
     function Solution1D2F(
-        w::Array,
-        prim::Array,
-        sw::Array,
+        w::AbstractArray,
+        prim::AbstractArray,
+        sw::AbstractArray,
         h::AbstractArray,
         b::AbstractArray,
         sh::AbstractArray,
         sb::AbstractArray,
     )
         new{typeof(w),typeof(h)}(w, prim, sw, h, b, sh, sb)
+    end
+
+end
+
+
+mutable struct Flux1D1F{A,B,C} <: AbstractSolution
+
+    w::A
+    fw::B
+    ff::C
+
+    function Flux1D1F(w::AbstractArray, fw::AbstractArray, ff::AbstractArray)
+        new{typeof(w),typeof(fw),typeof(ff)}(w, fw, ff)
+    end
+
+end
+
+
+mutable struct Flux1D2F{A,B,C} <: AbstractSolution
+
+    w::A
+    fw::B
+    fh::C
+    fb::C
+
+    function Flux1D2F(
+        w::AbstractArray,
+        fw::AbstractArray,
+        fh::AbstractArray,
+        fb::AbstractArray,
+    )
+        new{typeof(w),typeof(fw),typeof(fh)}(w, fw, fh, fb)
     end
 
 end
