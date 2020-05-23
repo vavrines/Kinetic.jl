@@ -14,6 +14,7 @@ export gauss_moments,
     maxwellian,
     mixture_maxwellian,
     reduce_distribution,
+    full_distribution,
     conserve_prim,
     mixture_conserve_prim,
     prim_conserve,
@@ -683,9 +684,9 @@ Reduced distribution function
 """
 
 function reduce_distribution(
-    f::AbstractArray{<:Real,3},
-    w::AbstractArray{<:Real,3},
-    dim::Int,
+    f::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+    dim=1::Int,
 )
 
     if dim == 1
@@ -708,6 +709,33 @@ function reduce_distribution(
 
     return h
 end
+
+
+function full_distribution(
+    λ::Real,
+    h::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+)
+
+    @assert length(h) == size(u, 1) throw(DimensionMismatch("reduced and full distribution function mismatch"))
+
+    f = similar(u)
+    for k in axes(f, 3), j in axes(f, 2), i in axes(f, 1)
+        f[i,j,k] = h[i] * (λ / π) * exp(-λ * v[i,j,k]^2) * exp(-λ * w[i,j,k]^2)
+    end
+
+    return f
+end
+
+full_distribution(
+    prim::Array{<:Real,1},
+    h::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+) = full_distribution(prim[end], h, u, v, w)
 
 
 """
