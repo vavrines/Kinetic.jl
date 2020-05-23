@@ -524,6 +524,18 @@ moments_conserve(
     0.5 * discrete_moments(f, u, ω, 2),
 ]
 
+moments_conserve(
+    h::AbstractArray{<:Real,1},
+    b::AbstractArray{<:Real,1},
+    u::AbstractArray{<:Real,1},
+    ω::AbstractArray{<:Real,1},
+) = [
+    discrete_moments(h, u, ω, 0),
+    discrete_moments(h, u, ω, 1),
+    0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(b, u, ω, 0)),
+]
+
+
 # --- 2D ---#
 moments_conserve(
     f::AbstractArray{<:Real,2},
@@ -536,6 +548,20 @@ moments_conserve(
     discrete_moments(f, v, ω, 1),
     0.5 * (discrete_moments(f, u, ω, 2) + discrete_moments(f, v, ω, 2)),
 ]
+
+moments_conserve(
+    h::AbstractArray{<:Real,2},
+    b::AbstractArray{<:Real,2},
+    u::AbstractArray{<:Real,2},
+    v::AbstractArray{<:Real,2},
+    ω::AbstractArray{<:Real,2},
+) = [
+    discrete_moments(h, u, ω, 0),
+    discrete_moments(h, u, ω, 1),
+    discrete_moments(h, v, ω, 1),
+    0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(h, v, ω, 2) + discrete_moments(b, u, ω, 0)),
+]
+
 
 # --- 3D ---#
 moments_conserve(

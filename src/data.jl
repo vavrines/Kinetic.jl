@@ -707,7 +707,7 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
 end
 
 
-mutable struct Solution1D1F{A,B} <: AbstractSolution
+mutable struct Solution1D1F{A,B} <: AbstractSolution1D
 
     w::A
     prim::A
@@ -739,7 +739,7 @@ mutable struct Solution1D1F{A,B} <: AbstractSolution
 end
 
 
-mutable struct Solution1D2F{A,B} <: AbstractSolution
+mutable struct Solution1D2F{A,B} <: AbstractSolution1D
 
     w::A
     prim::A
@@ -777,7 +777,7 @@ mutable struct Solution1D2F{A,B} <: AbstractSolution
 end
 
 
-mutable struct Flux1D1F{A,B,C} <: AbstractSolution
+mutable struct Flux1D1F{A,B,C} <: AbstractFlux1D
 
     w::A
     fw::B
@@ -790,7 +790,7 @@ mutable struct Flux1D1F{A,B,C} <: AbstractSolution
 end
 
 
-mutable struct Flux1D2F{A,B,C} <: AbstractSolution
+mutable struct Flux1D2F{A,B,C} <: AbstractFlux1D
 
     w::A
     fw::B
