@@ -105,7 +105,7 @@ function plot_line(
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
 )
 
-    pltx = deepcopy(KS.pSpace.x)
+    pltx = KS.pSpace.x[1:KS.pSpace.nx]
     plty = zeros(KS.pSpace.nx, 6)
 
     for i in eachindex(pltx)

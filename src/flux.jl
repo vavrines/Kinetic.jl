@@ -69,7 +69,7 @@ function flux_gks(
 
     # time-integration constants
     Mt = zeros(5)
-    Mt[4] = dt#tau * (1.0 - exp(-dt / tau))
+    Mt[4] = tau * (1.0 - exp(-dt / tau))
     Mt[5] = -tau * dt * exp(-dt / tau) + tau * Mt[4]
     Mt[1] = dt - Mt[4]
     Mt[2] = -tau * Mt[1] + Mt[5]
@@ -82,9 +82,7 @@ function flux_gks(
     #Mau = moments_conserve_slope(ga, MuR, Mxi, 2)
     MauT = moments_conserve_slope(gaT, Mu, Mxi, 1)
 
-    flux = similar(wL)
-    flux .= 0.0
-    #flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* (MauL .+ MauR) .+ Mt[3] .* prim[1] .* MauT
+    flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* (MauL .+ MauR) .+ Mt[3] .* prim[1] .* MauT
     #flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* Mau .+ Mt[3] .* prim[1] .* MauT
 
     # flux related to upwind distribution
@@ -96,10 +94,9 @@ function flux_gks(
     MauR = moments_conserve_slope(faR, MuR2, Mxi2, 2)
     MauRT = moments_conserve_slope(faTR, MuR2, Mxi2, 1)
 
-    #@. flux += Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL - tau * Mt[4] * primL[1] * MauLT +
-    #           Mt[4] * primR[1] * MuvR - (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
-    @. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
-
+    @. flux += Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL - tau * Mt[4] * primL[1] * MauLT +
+               Mt[4] * primR[1] * MuvR - (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
+    #@. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
     return flux
 
@@ -157,15 +154,15 @@ end
 # 1D1F3V flux
 # ------------------------------------------------------------
 function flux_kfvs(
-    fL::AbstractArray{Float64,3},
-    fR::AbstractArray{Float64,3},
-    u::AbstractArray{Float64,3},
-    v::AbstractArray{Float64,3},
-    w::AbstractArray{Float64,3},
-    ω::AbstractArray{Float64,3},
-    dt::Float64,
-    sfL = zeros(axes(fL))::AbstractArray{Float64,3},
-    sfR = zeros(axes(fR))::AbstractArray{Float64,3},
+    fL::AbstractArray{<:AbstractFloat,3},
+    fR::AbstractArray{<:AbstractFloat,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+    ω::AbstractArray{<:AbstractFloat,3},
+    dt::AbstractFloat,
+    sfL = zeros(axes(fL))::AbstractArray{<:AbstractFloat,3},
+    sfR = zeros(axes(fR))::AbstractArray{<:AbstractFloat,3},
 )
 
     # --- upwind reconstruction ---#
@@ -175,7 +172,7 @@ function flux_kfvs(
     sf = @. sfL * δ + sfR * (1.0 - δ)
 
     # --- calculate fluxes ---#
-    fw = zeros(5)
+    fw = similar(fL, 5)
     ff = similar(fL)
 
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
@@ -202,17 +199,17 @@ end
 # 1D2F flux
 # ------------------------------------------------------------
 function flux_kfvs(
-    hL::AbstractArray{Float64,1},
-    bL::AbstractArray{Float64,1},
-    hR::AbstractArray{Float64,1},
-    bR::AbstractArray{Float64,1},
-    u::AbstractArray{Float64,1},
-    ω::AbstractArray{Float64,1},
-    dt::Float64,
-    shL = zeros(axes(hL))::AbstractArray{Float64,1},
-    sbL = zeros(axes(bL))::AbstractArray{Float64,1},
-    shR = zeros(axes(hR))::AbstractArray{Float64,1},
-    sbR = zeros(axes(bR))::AbstractArray{Float64,1},
+    hL::AbstractArray{<:AbstractFloat,1},
+    bL::AbstractArray{<:AbstractFloat,1},
+    hR::AbstractArray{<:AbstractFloat,1},
+    bR::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    dt::AbstractFloat,
+    shL = zeros(axes(hL))::AbstractArray{<:AbstractFloat,1},
+    sbL = zeros(axes(bL))::AbstractArray{<:AbstractFloat,1},
+    shR = zeros(axes(hR))::AbstractArray{<:AbstractFloat,1},
+    sbR = zeros(axes(bR))::AbstractArray{<:AbstractFloat,1},
 )
 
     # --- upwind reconstruction ---#
@@ -225,7 +222,7 @@ function flux_kfvs(
     sb = @. sbL * δ + sbR * (1.0 - δ)
 
     # --- calculate fluxes ---#
-    fw = zeros(5)
+    fw = similar(hL, 3)
     fh = similar(h)
     fb = similar(b)
 
@@ -247,25 +244,25 @@ end
 # 1D4F flux
 # ------------------------------------------------------------
 function flux_kfvs(
-    h0L::AbstractArray{Float64,1},
-    h1L::AbstractArray{Float64,1},
-    h2L::AbstractArray{Float64,1},
-    h3L::AbstractArray{Float64,1},
-    h0R::AbstractArray{Float64,1},
-    h1R::AbstractArray{Float64,1},
-    h2R::AbstractArray{Float64,1},
-    h3R::AbstractArray{Float64,1},
-    u::AbstractArray{Float64,1},
-    ω::AbstractArray{Float64,1},
-    dt::Float64,
-    sh0L = zeros(axes(h0L))::AbstractArray{Float64,1},
-    sh1L = zeros(axes(h1L))::AbstractArray{Float64,1},
-    sh2L = zeros(axes(h2L))::AbstractArray{Float64,1},
-    sh3L = zeros(axes(h3L))::AbstractArray{Float64,1},
-    sh0R = zeros(axes(h0R))::AbstractArray{Float64,1},
-    sh1R = zeros(axes(h1R))::AbstractArray{Float64,1},
-    sh2R = zeros(axes(h2R))::AbstractArray{Float64,1},
-    sh3R = zeros(axes(h3R))::AbstractArray{Float64,1},
+    h0L::AbstractArray{<:AbstractFloat,1},
+    h1L::AbstractArray{<:AbstractFloat,1},
+    h2L::AbstractArray{<:AbstractFloat,1},
+    h3L::AbstractArray{<:AbstractFloat,1},
+    h0R::AbstractArray{<:AbstractFloat,1},
+    h1R::AbstractArray{<:AbstractFloat,1},
+    h2R::AbstractArray{<:AbstractFloat,1},
+    h3R::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    dt::AbstractFloat,
+    sh0L = zeros(axes(h0L))::AbstractArray{<:AbstractFloat,1},
+    sh1L = zeros(axes(h1L))::AbstractArray{<:AbstractFloat,1},
+    sh2L = zeros(axes(h2L))::AbstractArray{<:AbstractFloat,1},
+    sh3L = zeros(axes(h3L))::AbstractArray{<:AbstractFloat,1},
+    sh0R = zeros(axes(h0R))::AbstractArray{<:AbstractFloat,1},
+    sh1R = zeros(axes(h1R))::AbstractArray{<:AbstractFloat,1},
+    sh2R = zeros(axes(h2R))::AbstractArray{<:AbstractFloat,1},
+    sh3R = zeros(axes(h3R))::AbstractArray{<:AbstractFloat,1},
 )
 
     # --- upwind reconstruction ---#
@@ -282,7 +279,7 @@ function flux_kfvs(
     sh3 = @. sh3L * δ + sh3R * (1.0 - δ)
 
     # --- calculate fluxes ---#
-    fw = zeros(5)
+    fw = similar(h0L, 5)
     fh0 = similar(h0L)
     fh1 = similar(h1L)
     fh2 = similar(h2L)
@@ -310,15 +307,15 @@ end
 # 2D1F flux
 # ------------------------------------------------------------
 function flux_kfvs(
-    fL::AbstractArray{Float64,2},
-    fR::AbstractArray{Float64,2},
-    u::AbstractArray{Float64,2},
-    v::AbstractArray{Float64,2},
-    ω::AbstractArray{Float64,2},
-    dt::Float64,
-    len::Float64,
-    sfL = zeros(axes(fL))::AbstractArray{Float64,2},
-    sfR = zeros(axes(fR))::AbstractArray{Float64,2},
+    fL::AbstractArray{<:AbstractFloat,2},
+    fR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    dt::AbstractFloat,
+    len::Real,
+    sfL = zeros(axes(fL))::AbstractArray{<:AbstractFloat,2},
+    sfR = zeros(axes(fR))::AbstractArray{<:AbstractFloat,2},
 )
 
     # --- upwind reconstruction ---#
@@ -328,7 +325,7 @@ function flux_kfvs(
     sf = @. sfL * δ + sfR * (1.0 - δ)
 
     # --- calculate fluxes ---#
-    fw = zeros(4)
+    fw = similar(fL, 4)
     ff = similar(fL)
 
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
@@ -360,18 +357,18 @@ Kinetic central-upwind (KCU) method
 # 1D1F flux
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{Float64,1},
-    fL::AbstractArray{Float64,1},
-    wR::Array{Float64,1},
-    fR::AbstractArray{Float64,1},
-    u::AbstractArray{Float64,1},
-    ω::AbstractArray{Float64,1},
-    inK::Union{Int64,Float64},
-    γ::Float64,
-    visRef::Float64,
-    visIdx::Float64,
-    pr::Float64,
-    dt::Float64,
+    wL::Array{<:Real,1},
+    fL::AbstractArray{<:AbstractFloat,1},
+    wR::Array{<:Real,1},
+    fR::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
 )
 
     # --- upwind reconstruction ---#
@@ -387,7 +384,7 @@ function flux_kcu(
     Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
     Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
 
-    w = zeros(3)
+    w = similar(wL, 3)
     @. w = primL[1] * Muv1 + primR[1] * Muv2
 
     prim = conserve_prim(w, γ)
@@ -424,20 +421,20 @@ end
 # 1D2F flux
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{Float64,1},
-    hL::AbstractArray{Float64,1},
-    bL::AbstractArray{Float64,1},
-    wR::Array{Float64,1},
-    hR::AbstractArray{Float64,1},
-    bR::AbstractArray{Float64,1},
-    u::AbstractArray{Float64,1},
-    ω::AbstractArray{Float64,1},
-    inK::Union{Int64,Float64},
-    γ::Float64,
-    visRef::Float64,
-    visIdx::Float64,
-    pr::Float64,
-    dt::Float64,
+    wL::Array{<:Real,1},
+    hL::AbstractArray{<:AbstractFloat,1},
+    bL::AbstractArray{<:AbstractFloat,1},
+    wR::Array{<:Real,1},
+    hR::AbstractArray{<:AbstractFloat,1},
+    bR::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
 )
 
     # --- upwind reconstruction ---#
@@ -454,8 +451,7 @@ function flux_kcu(
     Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
     Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
 
-    w = zeros(3)
-    @. w = primL[1] * Muv1 + primR[1] * Muv2
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
 
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
@@ -493,20 +489,20 @@ end
 # 2D1F flux
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{Float64,1},
-    fL::AbstractArray{Float64,2},
-    wR::Array{Float64,1},
-    fR::AbstractArray{Float64,2},
-    u::AbstractArray{Float64,2},
-    v::AbstractArray{Float64,2},
-    ω::AbstractArray{Float64,2},
-    inK::Union{Int64,Float64},
-    γ::Float64,
-    visRef::Float64,
-    visIdx::Float64,
-    pr::Float64,
-    dt::Float64,
-    len::Float64,
+    wL::Array{<:Real,1},
+    fL::AbstractArray{<:AbstractFloat,2},
+    wR::Array{<:Real,1},
+    fR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+    len::Real,
 )
 
     # --- prepare ---#
@@ -571,20 +567,20 @@ Kinetic central-upwind (KCU) method for multi-component gas
 # 1D1F flux with AAP model
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{Float64,2},
-    fL::AbstractArray{Float64,2},
-    wR::Array{Float64,2},
-    fR::AbstractArray{Float64,2},
-    u::AbstractArray{Float64,2},
-    ω::AbstractArray{Float64,2},
-    inK::Union{Int64,Float64},
-    γ::Float64,
-    mi::Float64,
-    ni::Float64,
-    me::Float64,
-    ne::Float64,
-    kn::Float64,
-    dt::Float64,
+    wL::Array{<:Real,2},
+    fL::AbstractArray{<:AbstractFloat,2},
+    wR::Array{<:Real,2},
+    fR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    kn::Real,
+    dt::Real,
 )
 
     # --- upwind reconstruction ---#
@@ -619,8 +615,8 @@ function flux_kcu(
         Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
     end
 
-    w = zeros(axes(wL))
-    prim = zeros(axes(wL))
+    w = similar(wL)
+    prim = similar(wL)
     for j = 1:2
         @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
         prim[:, j] .= conserve_prim(w[:, j], γ)
@@ -678,22 +674,22 @@ end
 # 1D2F flux with AAP model
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{Float64,2},
-    hL::AbstractArray{Float64,2},
-    bL::AbstractArray{Float64,2},
-    wR::Array{Float64,2},
-    hR::AbstractArray{Float64,2},
-    bR::AbstractArray{Float64,2},
-    u::AbstractArray{Float64,2},
-    ω::AbstractArray{Float64,2},
-    inK::Union{Int64,Float64},
-    γ::Float64,
-    mi::Float64,
-    ni::Float64,
-    me::Float64,
-    ne::Float64,
-    kn::Float64,
-    dt::Float64,
+    wL::Array{<:Real,2},
+    hL::AbstractArray{<:AbstractFloat,2},
+    bL::AbstractArray{<:AbstractFloat,2},
+    wR::Array{<:Real,2},
+    hR::AbstractArray{<:AbstractFloat,2},
+    bR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    kn::Real,
+    dt::Real,
 )
 
     # --- upwind reconstruction ---#
@@ -702,7 +698,7 @@ function flux_kcu(
     h = @. hL * δ + hR * (1.0 - δ)
     b = @. bL * δ + bR * (1.0 - δ)
 
-    primL = zeros(axes(wL))
+    primL = similar(wL)
     primR = similar(primL)
     for j = 1:2
         primL[:, j] .= conserve_prim(wL[:, j], γ)
@@ -729,8 +725,8 @@ function flux_kcu(
         Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
     end
 
-    w = zeros(axes(wL))
-    prim = zeros(axes(wL))
+    w = similar(wL)
+    prim = similar(wL)
     for j = 1:2
         @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
         prim[:, j] .= conserve_prim(w[:, j], γ)
@@ -799,26 +795,26 @@ end
 # 1D4F flux with AAP model
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{Float64,2},
-    h0L::AbstractArray{Float64,2},
-    h1L::AbstractArray{Float64,2},
-    h2L::AbstractArray{Float64,2},
-    h3L::AbstractArray{Float64,2},
-    wR::Array{Float64,2},
-    h0R::AbstractArray{Float64,2},
-    h1R::AbstractArray{Float64,2},
-    h2R::AbstractArray{Float64,2},
-    h3R::AbstractArray{Float64,2},
-    u::AbstractArray{Float64,2},
-    ω::AbstractArray{Float64,2},
-    inK::Union{Int64,Float64},
-    γ::Float64,
-    mi::Float64,
-    ni::Float64,
-    me::Float64,
-    ne::Float64,
-    kn::Float64,
-    dt::Float64,
+    wL::Array{<:Real,2},
+    h0L::AbstractArray{<:AbstractFloat,2},
+    h1L::AbstractArray{<:AbstractFloat,2},
+    h2L::AbstractArray{<:AbstractFloat,2},
+    h3L::AbstractArray{<:AbstractFloat,2},
+    wR::Array{<:Real,2},
+    h0R::AbstractArray{<:AbstractFloat,2},
+    h1R::AbstractArray{<:AbstractFloat,2},
+    h2R::AbstractArray{<:AbstractFloat,2},
+    h3R::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    kn::Real,
+    dt::Real,
 )
 
     # --- upwind reconstruction ---#
@@ -838,7 +834,7 @@ function flux_kcu(
     Mu2, Mv2, Mw2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
     Muv2 = mixture_moments_conserve(MuR2, Mv2, Mw2, 0, 0, 0)
 
-    w = zeros(axes(wL))
+    w = similar(wL)
     for j = 1:2
         @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
     end

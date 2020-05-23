@@ -440,7 +440,7 @@ end
 function evolve!(
     KS::SolverSet,
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
-    face::Array{Interface1D1F,1},
+    face::Array{<:AbstractInterface1D,1},
     dt::Real,
 )
 
@@ -450,7 +450,7 @@ function evolve!(
 
     if KS.set.space == "1d1f1v"
 
-        Threads.@threads for i = 2:KS.pSpace.nx
+        Threads.@threads for i = 1:KS.pSpace.nx+1
             @inbounds face[i].fw, face[i].ff = flux_kfvs(
                 ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf,
                 ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
@@ -460,16 +460,11 @@ function evolve!(
                 ctr[i-1].sf,
                 ctr[i].sf,
             )
-
-            #	@inbounds face[i].fw, face[i].ff =
-            #	flux_kcu( ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw, ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf,
-            #	ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw, ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
-            #	KS.vSpace.u, KS.vSpace.weights, KS.gas.K, KS.gas.γ, KS.gas.μᵣ, KS.gas.ω, KS.gas.Pr, dt )
         end
 
     elseif KS.set.space == "1d1f3v"
 
-        Threads.@threads for i = 2:KS.pSpace.nx
+        Threads.@threads for i = 1:KS.pSpace.nx+1
             @inbounds face[i].fw, face[i].ff = flux_kfvs(
                 ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf,
                 ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
@@ -485,7 +480,7 @@ function evolve!(
 
     elseif KS.set.space[1:4] == "1d2f"
 
-        Threads.@threads for i = 2:KS.pSpace.nx
+        Threads.@threads for i = 1:KS.pSpace.nx+1
             @inbounds face[i].fw, face[i].fh, face[i].fb = flux_kcu(
                 ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
                 ctr[i-1].h .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh,
@@ -581,7 +576,8 @@ function update!(
     sumAvg = zeros(axes(KS.ib.wL))
 
     Threads.@threads for i = 2:KS.pSpace.nx-1
-        if length(sumRes) == 3
+
+        if KS.set.space == "1d1f1v"
             @inbounds step!(
                 face[i].fw,
                 face[i].ff,
@@ -599,7 +595,7 @@ function update!(
                 sumRes,
                 sumAvg,
             )
-        else
+        elseif KS.set.space == "1d1f3v"
             @inbounds step!(
                 face[i].fw,
                 face[i].ff,
@@ -612,6 +608,28 @@ function update!(
                 KS.vSpace.u,
                 KS.vSpace.v,
                 KS.vSpace.w,
+                KS.gas.μᵣ,
+                KS.gas.ω,
+                ctr[i].dx,
+                dt,
+                sumRes,
+                sumAvg,
+            )
+        elseif KS.set.space == "1d2f1v"
+            @inbounds step!(
+                face[i].fw,
+                face[i].fh,
+                face[i].fb,
+                ctr[i].w,
+                ctr[i].prim,
+                ctr[i].h,
+                ctr[i].b,
+                face[i+1].fw,
+                face[i+1].fh,
+                face[i+1].fb,
+                KS.gas.K,
+                KS.gas.γ,
+                KS.vSpace.u,
                 KS.gas.μᵣ,
                 KS.gas.ω,
                 ctr[i].dx,
