@@ -710,36 +710,81 @@ function reduce_distribution(
     return h
 end
 
-
-function full_distribution(
-    λ::Real,
-    h::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,3},
+function reduce_distribution(
+    f::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
+    weights::AbstractArray{<:AbstractFloat,3},
+    dim=1::Int,
 )
 
-    @assert length(h) == size(u, 1) throw(DimensionMismatch("reduced and full distribution function mismatch"))
+    if dim == 1
+        h = similar(f, axes(f, 1))
+        b = similar(h)
+        for i in eachindex(h)
+            h[i] = sum(@. weights[i, :, :] * f[i, :, :])
+            b[i] = sum(@. weights[i, :, :] * (v[i, :, :]^2 + w[i, :, :]^2) * f[i, :, :])
+        end
+    elseif dim == 2
+        h = similar(f, axes(f, 2))
+        b = similar(h)
+        for j in eachindex(h)
+            h[j] = sum(@. weights[:, j, :] * f[:, j, :])
+            b[j] = sum(@. weights[:, j, :] * (v[:, j, :]^2 + w[:, j, :]^2) * f[:, j, :])
+        end
+    elseif dim == 3
+        h = similar(f, axes(f, 3))
+        b = similar(h)
+        for k in eachindex(h)
+            h[k] = sum(@. w[:, :, k] * f[:, :, k])
+            b[k] = sum(@. weights[:, :, k] * (v[:, :, k]^2 + w[:, :, k]^2) * f[:, :, k])
+        end
+    else
+    end
 
-    f = similar(u)
+    return h, b
+end
+
+
+function full_distribution(
+    h::AbstractArray{<:AbstractFloat,1},
+    b::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    weights::AbstractArray{<:AbstractFloat,1},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+    ρ::Real,
+    γ=5/3::Real,
+)
+
+    @assert length(h) == size(v, 1) throw(DimensionMismatch("reduced and full distribution function mismatch"))
+
+    Ei = 0.5 * discrete_moments(b, u, weights, 0)
+    λi = 0.5 * ρ / (γ - 1.) / Ei / 3. * 2.
+
+    f = similar(v)
     for k in axes(f, 3), j in axes(f, 2), i in axes(f, 1)
-        f[i,j,k] = h[i] * (λ / π) * exp(-λ * v[i,j,k]^2) * exp(-λ * w[i,j,k]^2)
+        f[i,j,k] = h[i] * (λi / π) * exp(-λi * v[i,j,k]^2) * exp(-λi * w[i,j,k]^2)
     end
 
     return f
 end
 
 full_distribution(
-    prim::Array{<:Real,1},
     h::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,3},
+    b::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    weights::AbstractArray{<:AbstractFloat,1},
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
-) = full_distribution(prim[end], h, u, v, w)
+    prim::Array{<:Real,1},
+    γ=5/3::Real,
+) = full_distribution(h, b, u, weights, v, w, prim[1], γ)
 
 
 """
-Flow variables with conservative and primitive forms
+Transforms between conservative and primitive variables
+
 """
 
 # ------------------------------------------------------------
