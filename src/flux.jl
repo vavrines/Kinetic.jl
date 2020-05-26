@@ -62,9 +62,9 @@ function flux_gks(
             moments_conserve_slope(gaL, MuL, Mxi, 1) .+
             moments_conserve_slope(gaR, MuR, Mxi, 1)
         )
-    #sw = (wR .- wL) ./ dx
-    #ga = pdf_slope(prim, sw, inK)
-    #sw = -prim[1] .* moments_conserve_slope(ga, Mu, Mxi, 1)
+    # sw = (wR .- wL) ./ dx
+    # ga = pdf_slope(prim, sw, inK)
+    # sw = -prim[1] .* moments_conserve_slope(ga, Mu, Mxi, 1)
     gaT = pdf_slope(prim, sw, inK)
 
     # time-integration constants
@@ -79,11 +79,11 @@ function flux_gks(
     Muv = moments_conserve(Mu, Mxi, 1, 0)
     MauL = moments_conserve_slope(gaL, MuL, Mxi, 2)
     MauR = moments_conserve_slope(gaR, MuR, Mxi, 2)
-    #Mau = moments_conserve_slope(ga, MuR, Mxi, 2)
+    # Mau = moments_conserve_slope(ga, MuR, Mxi, 2)
     MauT = moments_conserve_slope(gaT, Mu, Mxi, 1)
 
     flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* (MauL .+ MauR) .+ Mt[3] .* prim[1] .* MauT
-    #flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* Mau .+ Mt[3] .* prim[1] .* MauT
+    # flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* Mau .+ Mt[3] .* prim[1] .* MauT
 
     # flux related to upwind distribution
     MuvL = moments_conserve(MuL1, Mxi1, 1, 0)
@@ -96,7 +96,7 @@ function flux_gks(
 
     @. flux += Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL - tau * Mt[4] * primL[1] * MauLT +
                Mt[4] * primR[1] * MuvR - (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
-    #@. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
+    # @. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
     return flux
 
@@ -137,11 +137,11 @@ function flux_kfvs(
     fw = similar(fL, 3)
     ff = similar(fL)
 
-    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
-    fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
+    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* sf)
+    fw[2] = dt * sum(ω .* u.^2 .* f) - 0.5 * dt^2 * sum(ω .* u.^3 .* sf)
     fw[3] =
-        dt * 0.5 * sum(ω .* u .^ 3 .* f) -
-        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
+        dt * 0.5 * sum(ω .* u.^3 .* f) -
+        0.5 * dt^2 * 0.5 * sum(ω .* u.^4 .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -175,18 +175,18 @@ function flux_kfvs(
     fw = similar(fL, 5)
     ff = similar(fL)
 
-    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
-    fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
+    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* sf)
+    fw[2] = dt * sum(ω .* u.^2 .* f) - 0.5 * dt^2 * sum(ω .* u.^3 .* sf)
     fw[3] =
-        dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
+        dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* v .* sf)
     fw[4] =
-        dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
+        dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* w .* sf)
     fw[5] =
-        dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* f) -
+        dt * 0.5 * sum(ω .* u .* (u.^2 .+ v.^2 .+ w.^2) .* f) -
         0.5 *
         dt^2 *
         0.5 *
-        sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
+        sum(ω .* u.^2 .* (u.^2 .+ v.^2 .+ w.^2) .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -226,11 +226,11 @@ function flux_kfvs(
     fh = similar(h)
     fb = similar(b)
 
-    fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh)
-    fw[2] = dt * sum(ω .* u .^ 2 .* h) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh)
+    fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh)
+    fw[2] = dt * sum(ω .* u.^2 .* h) - 0.5 * dt^2 * sum(ω .* u.^3 .* sh)
     fw[3] =
-        dt * 0.5 * (sum(ω .* u .^ 3 .* h) + sum(ω .* u .* b)) -
-        0.5 * dt^2 * 0.5 * (sum(ω .* u .^ 4 .* sh) + sum(ω .* u .^ 2 .* sb))
+        dt * 0.5 * (sum(ω .* u.^3 .* h) + sum(ω .* u .* b)) -
+        0.5 * dt^2 * 0.5 * (sum(ω .* u.^4 .* sh) + sum(ω .* u.^2 .* sb))
 
     @. fh = dt * u * h - 0.5 * dt^2 * u^2 * sh
     @. fb = dt * u * b - 0.5 * dt^2 * u^2 * sb
@@ -285,13 +285,13 @@ function flux_kfvs(
     fh2 = similar(h2L)
     fh3 = similar(h3L)
 
-    fw[1] = dt * sum(ω .* u .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh0)
-    fw[2] = dt * sum(ω .* u .^ 2 .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh0)
-    fw[3] = dt * sum(ω .* u .* h1) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh1)
-    fw[4] = dt * sum(ω .* u .* h2) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh2)
+    fw[1] = dt * sum(ω .* u .* h0) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh0)
+    fw[2] = dt * sum(ω .* u.^2 .* h0) - 0.5 * dt^2 * sum(ω .* u.^3 .* sh0)
+    fw[3] = dt * sum(ω .* u .* h1) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh1)
+    fw[4] = dt * sum(ω .* u .* h2) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh2)
     fw[5] =
-        dt * 0.5 * (sum(ω .* u .^ 3 .* h0) + sum(ω .* u .* h3)) -
-        0.5 * dt^2 * 0.5 * (sum(ω .* u .^ 4 .* sh0) + sum(ω .* u .^ 2 .* sh3))
+        dt * 0.5 * (sum(ω .* u.^3 .* h0) + sum(ω .* u .* h3)) -
+        0.5 * dt^2 * 0.5 * (sum(ω .* u.^4 .* sh0) + sum(ω .* u.^2 .* sh3))
 
     @. fh0 = dt * u * h0 - 0.5 * dt^2 * u^2 * sh0
     @. fh1 = dt * u * h1 - 0.5 * dt^2 * u^2 * sh1
@@ -328,13 +328,13 @@ function flux_kfvs(
     fw = similar(fL, 4)
     ff = similar(fL)
 
-    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
-    fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
+    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u.^2 .* sf)
+    fw[2] = dt * sum(ω .* u.^2 .* f) - 0.5 * dt^2 * sum(ω .* u.^3 .* sf)
     fw[3] =
-        dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sf)
+        dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u.^2 .* sf)
     fw[4] =
-        dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* f) -
-        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sf)
+        dt * 0.5 * sum(ω .* u .* (u.^2 .+ v.^2) .* f) -
+        0.5 * dt^2 * 0.5 * sum(ω .* u.^2 .* (u.^2 .+ v.^2) .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -389,7 +389,7 @@ function flux_kcu(
 
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    #tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+    # tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
     #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
 
     Mt = zeros(2)
@@ -407,8 +407,8 @@ function flux_kcu(
     g = maxwellian(u, prim)
 
     fw[1] += Mt[2] * sum(ω .* u .* f)
-    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* f)
-    fw[3] += Mt[2] * 0.5 * (sum(ω .* u .^ 3 .* f))
+    fw[2] += Mt[2] * sum(ω .* u.^2 .* f)
+    fw[3] += Mt[2] * 0.5 * (sum(ω .* u.^3 .* f))
 
     ff = @. Mt[1] * u * g + Mt[2] * u * f
 
@@ -455,7 +455,7 @@ function flux_kcu(
 
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    #tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+    # tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
     #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
 
     Mt = zeros(2)
@@ -474,8 +474,8 @@ function flux_kcu(
     Mb = Mh .* inK ./ (2.0 * prim[end])
 
     fw[1] += Mt[2] * sum(ω .* u .* h)
-    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h)
-    fw[3] += Mt[2] * 0.5 * (sum(ω .* u .^ 3 .* h) + sum(ω .* u .* b))
+    fw[2] += Mt[2] * sum(ω .* u.^2 .* h)
+    fw[3] += Mt[2] * 0.5 * (sum(ω .* u.^3 .* h) + sum(ω .* u .* b))
 
     fh = @. Mt[1] * u * Mh + Mt[2] * u * h
     fb = @. Mt[1] * u * Mb + Mt[2] * u * b
@@ -524,7 +524,7 @@ function flux_kcu(
     w = @. primL[1] * Muv1 + primR[1] * Muv2
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    #tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+    # tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
     #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
 
     Mt = zeros(2)
@@ -542,9 +542,9 @@ function flux_kcu(
     g = maxwellian(u, v, prim)
 
     fw[1] += Mt[2] * sum(ω .* u .* f)
-    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* f)
+    fw[2] += Mt[2] * sum(ω .* u.^2 .* f)
     fw[3] += Mt[2] * sum(ω .* v .* u .* f)
-    fw[4] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* f))
+    fw[4] += Mt[2] * 0.5 * (sum(ω .* u .* (u.^2 .+ v.^2) .* f))
 
     ff = @. Mt[1] * u * g + Mt[2] * u * f
 
@@ -623,7 +623,7 @@ function flux_kcu(
     end
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
-    #@. tau += abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) /
+    # @. tau += abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) /
     #          (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
 
@@ -658,8 +658,8 @@ function flux_kcu(
     ff = similar(f)
     for j = 1:2
         fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* f[:, j])
-        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* f[:, j])
-        fw[3, j] += Mt[2, j] * 0.5 * sum(ω[:, j] .* u[:, j] .^ 3 .* f[:, j])
+        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j].^2 .* f[:, j])
+        fw[3, j] += Mt[2, j] * 0.5 * sum(ω[:, j] .* u[:, j].^3 .* f[:, j])
 
         @. ff[:, j] =
             Mt[1, j] * u[:, j] * g[:, j] + Mt[2, j] * u[:, j] * f[:, j]
@@ -733,7 +733,7 @@ function flux_kcu(
     end
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
-    #@. tau += abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) /
+    # @. tau += abs(cellL.prim[1,:] / cellL.prim[end,:] - cellR.prim[1,:] / cellR.prim[end,:]) /
     #          (cellL.prim[1,:] / cellL.prim[end,:] + cellR.prim[1,:] / cellR.prim[end,:]) * dt * 2.
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
 
@@ -771,12 +771,12 @@ function flux_kcu(
     fb = similar(b)
     for j = 1:2
         fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h[:, j])
-        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h[:, j])
+        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j].^2 .* h[:, j])
         fw[3, j] +=
             Mt[2, j] *
             0.5 *
             (
-                sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) +
+                sum(ω[:, j] .* u[:, j].^3 .* h[:, j]) +
                 sum(ω[:, j] .* u[:, j] .* b[:, j])
             )
 
@@ -846,7 +846,7 @@ function flux_kcu(
         (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
         dt *
         5.0
-    #prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
+    # prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
 
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -880,14 +880,14 @@ function flux_kcu(
     fh3 = similar(h0)
     for j = 1:2
         fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h0[:, j])
-        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h0[:, j])
+        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j].^2 .* h0[:, j])
         fw[3, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h1[:, j])
         fw[4, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h2[:, j])
         fw[5, j] +=
             Mt[2, j] *
             0.5 *
             (
-                sum(ω[:, j] .* u[:, j] .^ 3 .* h0[:, j]) +
+                sum(ω[:, j] .* u[:, j].^3 .* h0[:, j]) +
                 sum(ω[:, j] .* u[:, j] .* h3[:, j])
             )
 
@@ -983,7 +983,7 @@ function flux_em(
 
     for i = 1:8
         limiter_theta =
-            sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
+            sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i].^2) + 1.e-7)
         slop[:, i] .*= max(
             0.0,
             min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta),
