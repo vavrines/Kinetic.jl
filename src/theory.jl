@@ -681,28 +681,32 @@ end
 
 """
 Reduced distribution function
+
+>@param[in] : particle distribution function with 3D velocity space
+>@param[in] : quadrature weights with 2D setting (v & w by default)
+
 """
 
 function reduce_distribution(
     f::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
+    weights::AbstractArray{<:AbstractFloat,2},
     dim=1::Int,
 )
 
     if dim == 1
         h = similar(f, axes(f, 1))
         for i in eachindex(h)
-            h[i] = sum(@. w[i, :, :] * f[i, :, :])
+            h[i] = sum(@. weights * f[i, :, :])
         end
     elseif dim == 2
         h = similar(f, axes(f, 2))
         for j in eachindex(h)
-            h[j] = sum(@. w[:, j, :] * f[:, j, :])
+            h[j] = sum(@. weights * f[:, j, :])
         end
     elseif dim == 3
         h = similar(f, axes(f, 3))
         for k in eachindex(h)
-            h[k] = sum(@. w[:, :, k] * f[:, :, k])
+            h[k] = sum(@. weights * f[:, :, k])
         end
     else
     end
@@ -714,7 +718,7 @@ function reduce_distribution(
     f::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
-    weights::AbstractArray{<:AbstractFloat,3},
+    weights::AbstractArray{<:AbstractFloat,2},
     dim=1::Int,
 )
 
@@ -722,22 +726,22 @@ function reduce_distribution(
         h = similar(f, axes(f, 1))
         b = similar(h)
         for i in eachindex(h)
-            h[i] = sum(@. weights[i, :, :] * f[i, :, :])
-            b[i] = sum(@. weights[i, :, :] * (v[i, :, :]^2 + w[i, :, :]^2) * f[i, :, :])
+            h[i] = sum(@. weights * f[i, :, :])
+            b[i] = sum(@. weights * (v[i, :, :]^2 + w[i, :, :]^2) * f[i, :, :])
         end
     elseif dim == 2
         h = similar(f, axes(f, 2))
         b = similar(h)
         for j in eachindex(h)
-            h[j] = sum(@. weights[:, j, :] * f[:, j, :])
-            b[j] = sum(@. weights[:, j, :] * (v[:, j, :]^2 + w[:, j, :]^2) * f[:, j, :])
+            h[j] = sum(@. weights * f[:, j, :])
+            b[j] = sum(@. weights * (v[:, j, :]^2 + w[:, j, :]^2) * f[:, j, :])
         end
     elseif dim == 3
         h = similar(f, axes(f, 3))
         b = similar(h)
         for k in eachindex(h)
-            h[k] = sum(@. w[:, :, k] * f[:, :, k])
-            b[k] = sum(@. weights[:, :, k] * (v[:, :, k]^2 + w[:, :, k]^2) * f[:, :, k])
+            h[k] = sum(@. weights * f[:, :, k])
+            b[k] = sum(@. weights * (v[:, :, k]^2 + w[:, :, k]^2) * f[:, :, k])
         end
     else
     end
@@ -745,6 +749,18 @@ function reduce_distribution(
     return h, b
 end
 
+
+"""
+Recover full distribution function from reduced ones
+
+>@param[in] h & b : reduced particle distribution function with 1D velocity space
+>@param[in] u : quadrature nodes in 1D velocity space
+>@param[in] weights : quadrature weights in 1D velocity space
+>@param[in] v & w : quadrature nodes in the rest velocity space (with 3D setting)
+
+>@param[out] f : particle distribution function with 3D velocity space
+
+"""
 
 function full_distribution(
     h::AbstractArray{<:AbstractFloat,1},
