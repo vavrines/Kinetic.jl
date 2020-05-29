@@ -66,15 +66,15 @@ struct GasProperty{A,B,C,D,E,F,G,H,I} <: AbstractProperty
     μᵣ::I
 
     function GasProperty(
-        Kn::Real,
-        Ma::Real,
-        Pr::Real,
-        K::Real,
-        γ::Real,
-        ω::Real,
-        αᵣ::Real,
-        ωᵣ::Real,
-        μᵣ::Real,
+        Kn::Union{Real,Array}, # unified consideration of
+        Ma::Union{Real,Array}, # 1. deterministic solution, and
+        Pr::Union{Real,Array}, # 2. uncertainty quantification
+        K::Union{Real,Array},
+        γ::Union{Real,Array},
+        ω::Union{Real,Array},
+        αᵣ::Union{Real,Array},
+        ωᵣ::Union{Real,Array},
+        μᵣ::Union{Real,Array},
     )
 
         # inner constructor method
@@ -127,18 +127,20 @@ struct PlasmaProperty{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P} <: AbstractProperty
     A1n::O
     D1::P
 
+    # unified consideration of deterministic and stochastic conditions
+    # {mi, ni, me, ne, sol, χ, ν} keep the same as before
     function PlasmaProperty(
-        Kn::Array{<:Real,1},
-        Ma::Real,
-        Pr::Real,
-        K::Real,
-        γ::Real,
+        Kn::Array,
+        Ma::Union{Real,Array},
+        Pr::Union{Real,Array},
+        K::Union{Real,Array},
+        γ::Union{Real,Array},
         mi::Real,
         ni::Real,
         me::Real,
         ne::Real,
-        lD::Real,
-        rL::Real,
+        lD::Union{Real,Array},
+        rL::Union{Real,Array},
         sol::Real,
         χ::Real,
         ν::Real,
