@@ -3,7 +3,7 @@
 # ============================================================
 
 
-export PSpace1D, PSpace2D, uniform_mesh, global_frame, local_frame
+export PSpace1D, PSpace2D, uniform_mesh, global_frame, local_frame, meshgrid
 
 
 # ------------------------------------------------------------
@@ -150,4 +150,24 @@ function local_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
 
     return L
 
+end
+
+
+function meshgrid(x, y)
+    @assert ndims(x) == ndims(y) == 1
+
+    X = [ i for j in y, i in x]
+    Y = [ j for j in y, i in x]
+
+    return X, Y
+end
+
+function meshgrid(x, y, z)
+    @assert ndims(x) == ndims(y) == ndims(z) == 1
+
+    X = [ i for k in z, j in y, i in x]
+    Y = [ j for k in z, j in y, i in x]
+    Z = [ k for k in z, j in y, i in x]
+
+    return X, Y, Z
 end
