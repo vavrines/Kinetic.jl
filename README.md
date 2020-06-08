@@ -12,7 +12,7 @@
 **Install:**  
 ```
 julia> ]  
-pkg> add https://github.com/vavrines/Kinetic.jl
+pkg> add Kinetic
 ```
 
 **Usage:**  
