@@ -37,48 +37,10 @@ struct SolverSet <: AbstractSolverSet
 
     function SolverSet(configfilename::String)
 
-        #=
-        		#--- with allowrance ---#
-        		# read following data from text file
-        		allowed = [ "case", "space", "nSpecies", "interpOrder", "limiter", "cfl", "maxTime",
-        				    "x0", "x1", "nx", "nxg", "pMeshType",
-        				    "umin", "umax", "nu", "nug", "vMeshType",
-        				    "knudsen", "mach", "prandtl", "inK", "omega", "alphaRef", "omegaRef" ]
-        		D = read_dict(configfilename, allowed)
-
-        		# define variables
-        		case = D["case"]
-                space = D["space"]
-        		interpOrder = D["interpOrder"]
-        		limiter = D["limiter"]
-        		cfl = D["cfl"]
-        		maxTime = D["maxTime"]
-
-        		x0 = D["x0"]
-        		x1 = D["x1"]
-        		nx = D["nx"]
-                nxg = D["nxg"]
-                pMeshType = D["pMeshType"]
-
-        		umin = D["umin"]
-        		umax = D["umax"]
-                nu = D["nu"]
-                nug = D["nug"]
-        		vMeshType = D["vMeshType"]
-
-        		knudsen = D["knudsen"]
-        		mach = D["mach"]
-        		prandtl = D["prandtl"]
-                inK = D["inK"]
-                omega = D["omega"]
-        		alphaRef = D["alphaRef"]
-                omegaRef = D["omegaRef"]
-        		=#
-
-        #--- without allowrance ---#
+        # read settings from configuration file
         D = read_dict(configfilename)
 
-        # automatically generate variables from dictionary
+        # generate variables from dictionary
         for key in keys(D)
             s = Symbol(key)
             @eval $s = $(D[key])
@@ -105,106 +67,82 @@ struct SolverSet <: AbstractSolverSet
         set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
 
         if dim == 1
+
             pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
-        elseif dim == 2
-            pSpace = PSpace2D(x0, x1, nx, y0, y1, ny, pMeshType, nxg, nyg)
-        else
-        end
 
-        if case == "shock"
+            if case == "shock"
 
-            μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
-            gas = GasProperty(
-                knudsen,
-                mach,
-                prandtl,
-                inK,
-                γ,
-                omega,
-                alphaRef,
-                omegaRef,
-                μᵣ,
-            )
-
-            if space == "1d1f1v"
-                vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
-
-                wL, primL, hL, bcL, wR, primR, hR, bcR =
-                    ib_rh(mach, γ, vSpace.u)
-                ib = IB1D1F(wL, primL, hL, bcL, wR, primR, hR, bcR)
-            elseif space == "1d2f1v"
-                vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
-
-                wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
-                    ib_rh(mach, γ, vSpace.u, inK)
-                ib = IB1D2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
-            elseif space == "1d1f3v"
-                vSpace = VSpace3D(
-                    umin,
-                    umax,
-                    nu,
-                    vmin,
-                    vmax,
-                    nv,
-                    wmin,
-                    wmax,
-                    nw,
-                    vMeshType,
-                    nug,
-                    nvg,
-                    nwg,
+                μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
+                gas = GasProperty(
+                    knudsen,
+                    mach,
+                    prandtl,
+                    inK,
+                    γ,
+                    omega,
+                    alphaRef,
+                    omegaRef,
+                    μᵣ,
                 )
 
-                wL, primL, fL, bcL, wR, primR, fR, bcR =
-                    ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
-                ib = IB1D1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
-            end
+                if space == "1d1f1v"
+                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
-        elseif case == "brio-wu"
+                    wL, primL, fL, bcL, wR, primR, fR, bcR =
+                        ib_rh(mach, γ, vSpace.u)
+                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
+                elseif space == "1d2f1v"
+                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
-            v0 = umin * sqrt(mi / me)
-            v1 = umax * sqrt(mi / me)
-            kne = knudsen * (me / mi)
+                    wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
+                        ib_rh(mach, γ, vSpace.u, inK)
+                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
+                elseif space == "1d1f3v"
+                    vSpace = VSpace3D(
+                        umin,
+                        umax,
+                        nu,
+                        vmin,
+                        vmax,
+                        nv,
+                        wmin,
+                        wmax,
+                        nw,
+                        vMeshType,
+                        nug,
+                        nvg,
+                        nwg,
+                    )
 
-            vSpace = MVSpace1D(umin, umax, v0, v1, nu, vMeshType, nug)
-            gas = PlasmaProperty(
-                [knudsen, kne],
-                mach,
-                prandtl,
-                inK,
-                γ,
-                mi,
-                ni,
-                me,
-                ne,
-                lD,
-                rL,
-                sol,
-                echi,
-                bnu,
-            )
+                    wL, primL, fL, bcL, wR, primR, fR, bcR =
+                        ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
+                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
+                end
 
-            wL,
-            primL,
-            h0L,
-            h1L,
-            h2L,
-            h3L,
-            bcL,
-            EL,
-            BL,
-            lorenzL,
-            wR,
-            primR,
-            h0R,
-            h1R,
-            h2R,
-            h3R,
-            bcR,
-            ER,
-            BR,
-            lorenzR = ib_briowu(γ, vSpace.u, mi, me)
-            ib = MIB1D4F(
+            elseif case == "brio-wu"
+
+                v0 = umin * sqrt(mi / me)
+                v1 = umax * sqrt(mi / me)
+                kne = knudsen * (me / mi)
+
+                vSpace = MVSpace1D(umin, umax, v0, v1, nu, vMeshType, nug)
+                gas = PlasmaProperty(
+                    [knudsen, kne],
+                    mach,
+                    prandtl,
+                    inK,
+                    γ,
+                    mi,
+                    ni,
+                    me,
+                    ne,
+                    lD,
+                    rL,
+                    sol,
+                    echi,
+                    bnu,
+                )
+
                 wL,
                 primL,
                 h0L,
@@ -224,9 +162,68 @@ struct SolverSet <: AbstractSolverSet
                 bcR,
                 ER,
                 BR,
-                lorenzR,
-            )
+                lorenzR = ib_briowu(γ, vSpace.u, mi, me)
+                ib = IB4F(
+                    wL,
+                    primL,
+                    h0L,
+                    h1L,
+                    h2L,
+                    h3L,
+                    bcL,
+                    EL,
+                    BL,
+                    lorenzL,
+                    wR,
+                    primR,
+                    h0R,
+                    h1R,
+                    h2R,
+                    h3R,
+                    bcR,
+                    ER,
+                    BR,
+                    lorenzR,
+                )
 
+            end
+        
+        elseif dim == 2
+
+            pSpace = PSpace2D(x0, x1, nx, y0, y1, ny, pMeshType, nxg, nyg)
+        
+            if case == "cavity"
+
+                μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
+                gas = GasProperty(
+                    knudsen,
+                    mach,
+                    prandtl,
+                    inK,
+                    γ,
+                    omega,
+                    alphaRef,
+                    omegaRef,
+                    μᵣ,
+                )
+
+                if space == "2d1f2v"
+                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
+
+                    wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD =
+                        ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v)
+                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
+                elseif space == "2d2f2v"
+                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
+
+                    wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD =
+                        ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v, inK)
+                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
+                end
+                
+            end
+        
+        else
         end
 
         # create working directory

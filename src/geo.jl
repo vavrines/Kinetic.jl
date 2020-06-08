@@ -32,10 +32,10 @@ struct PSpace1D <: AbstractPhysicalSpace
         x1 = Float64(X1)
         nx = XNUM
         δ = (x1 - x0) / nx
-        x = OffsetArray{Float64}(undef, 1-NG:nx+NG)
+        x = OffsetArray{Float64}(undef, 1 - NG:nx + NG)
         dx = similar(x)
 
-        if TYPE == "uniform" #// uniform mesh
+        if TYPE == "uniform" # // uniform mesh
             for i in eachindex(x)
                 x[i] = x0 + (i - 0.5) * δ
                 dx[i] = δ
@@ -58,10 +58,10 @@ struct PSpace2D <: AbstractPhysicalSpace
     y0::Float64
     y1::Float64
     ny::Int64
-    x::Array{Float64,2}
-    y::Array{Float64,2}
-    dx::Array{Float64,2}
-    dy::Array{Float64,2}
+    x::AbstractArray{Float64,2}
+    y::AbstractArray{Float64,2}
+    dx::AbstractArray{Float64,2}
+    dy::AbstractArray{Float64,2}
 
     PSpace2D() = PSpace2D(0, 1, 45, 0, 1, 45)
     PSpace2D(X0::Real, X1::Real, Y0::Real, Y1::Real) =
@@ -87,10 +87,10 @@ struct PSpace2D <: AbstractPhysicalSpace
         y1 = Float64(Y1)
         ny = YNUM
         δy = (y1 - y0) / ny
-        x = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
-        y = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
-        dx = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
-        dy = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+        x = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
+        y = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
+        dx = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
+        dy = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
 
         if TYPE == "uniform" # rectangular formula
             for j in axes(x, 2)
@@ -137,6 +137,28 @@ function global_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
 
 end
 
+function global_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
+
+    if length(w) == 3
+        G = [w[1] * dirccos[1,1] + w[2] * dirccos[2,1] + w[3] * dirccos[3,1], 
+            w[1] * dirccos[1,2] + w[2] * dirccos[2,2] + w[3] * dirccos[3,2],
+            w[1] * dirccos[1,3] + w[2] * dirccos[2,3] + w[3] * dirccos[3,3]
+        ]
+    elseif length(w) == 5
+        G = [w[1], 
+            w[2] * dirccos[1,1] + w[3] * dirccos[2,1] + w[4] * dirccos[3,1], 
+            w[2] * dirccos[1,2] + w[3] * dirccos[2,2] + w[4] * dirccos[3,2],
+            w[2] * dirccos[1,3] + w[3] * dirccos[2,3] + w[4] * dirccos[3,3],
+            w[5]
+        ]
+    else
+        println("error: local -> global")
+    end
+
+    return G
+
+end
+
 
 function local_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
 
@@ -144,6 +166,28 @@ function local_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
         L = [w[1] * cosa + w[2] * sina, w[2] * cosa - w[1] * sina]
     elseif length(w) == 4
         L = [w[1], w[2] * cosa + w[3] * sina, w[3] * cosa - w[2] * sina, w[4]]
+    else
+        println("error: global -> local")
+    end
+
+    return L
+
+end
+
+function local_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
+
+    if length(w) == 3
+        L = [w[1] * dirccos[1,1] + w[2] * dirccos[1,2] + w[3] * dirccos[1,3], 
+            w[1] * dirccos[2,1] + w[2] * dirccos[2,2] + w[3] * dirccos[2,3],
+            w[1] * dirccos[3,1] + w[2] * dirccos[3,2] + w[3] * dirccos[3,3]
+        ]
+    elseif length(w) == 5
+        L = [w[1], 
+            w[2] * dirccos[1,1] + w[3] * dirccos[1,2] + w[4] * dirccos[1,3], 
+            w[2] * dirccos[2,1] + w[3] * dirccos[2,2] + w[4] * dirccos[2,3],
+            w[2] * dirccos[3,1] + w[3] * dirccos[3,2] + w[4] * dirccos[3,3],
+            w[5]
+        ]
     else
         println("error: global -> local")
     end

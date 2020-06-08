@@ -15,8 +15,10 @@ export AbstractVelocitySpace,
     AbstractInterface1D,
     AbstractSolution,
     AbstractSolution1D,
+    AbstractSolution2D,
     AbstractFlux,
-    AbstractFlux1D
+    AbstractFlux1D,
+    AbstractFlux2D
 
 
 abstract type AbstractPhysicalSpace end
@@ -34,4 +36,6 @@ abstract type AbstractInterface1D <: AbstractInterface end
 abstract type AbstractSolution end
 abstract type AbstractFlux end
 abstract type AbstractSolution1D <: AbstractSolution end
+abstract type AbstractSolution2D <: AbstractSolution end
 abstract type AbstractFlux1D <: AbstractFlux end
+abstract type AbstractFlux2D <: AbstractFlux end

@@ -6,11 +6,15 @@
 export ib_rh, ib_briowu
 
 
+```
+Initialize Rankine-Hugoniot relation
+
+```
+
 # ------------------------------------------------------------
-# Initialize Rankine-Hugoniot relation
+# 1D1F1V
 # ------------------------------------------------------------
-#--- 1D1F1V ---#
-function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1})
+function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1})
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
@@ -41,7 +45,7 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1})
 end
 
 #--- 1D2F1V ---#
-function ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,1}, K::Real)
+function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
@@ -114,9 +118,81 @@ function ib_rh(
 end
 
 
+```
+Initialize lid-driven cavity
+
+```
+
 # ------------------------------------------------------------
-# Initialize Brio-Wu MHD shock
+# 2D1F2V
 # ------------------------------------------------------------
+function ib_cavity(
+    gam::Real, 
+    Um::Real, 
+    Vm::Real,
+    Tm::Real, 
+    u::AbstractArray{Float64,2},
+    v::AbstractArray{Float64,2},
+)
+
+    primL = [1., 0., 0., 1.]
+    primR = deepcopy(primL)
+
+    wL = prim_conserve(primL, gam)
+    wR = prim_conserve(primR, gam)
+
+    fL = maxwellian(u, v, primL)
+    fR = maxwellian(u, v, primR)
+
+    bcU = [1., Um, Vm, Tm]
+    bcD = deepcopy(primR)
+    bcL = deepcopy(primR)
+    bcR = deepcopy(primR)
+
+    return wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD
+
+end
+
+# ------------------------------------------------------------
+# 2D2F2V
+# ------------------------------------------------------------
+function ib_cavity(
+    gam::Real, 
+    Um::Real, 
+    Vm::Real,
+    Tm::Real, 
+    u::AbstractArray{Float64,2},
+    v::AbstractArray{Float64,2},
+    K::Real,
+)
+
+    primL = [1., 0., 0., 1.]
+    primR = deepcopy(primL)
+
+    wL = prim_conserve(primL, gam)
+    wR = prim_conserve(primR, gam)
+
+    hL = maxwellian(u, v, primL)
+    hR = maxwellian(u, v, primR)
+
+    bL = hL .* K ./ (2. * primL[end])
+    bR = hR .* K ./ (2. * primR[end])
+
+    bcU = [1., Um, Vm, Tm]
+    bcD = deepcopy(primR)
+    bcL = deepcopy(primR)
+    bcR = deepcopy(primR)
+
+    return wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD
+
+end
+
+
+```
+Initialize Brio-Wu MHD shock
+
+```
+
 function ib_briowu(
     gam::Real,
     uspace::AbstractArray{Float64,2},

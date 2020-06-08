@@ -5,11 +5,11 @@
 
 export Setup
 export GasProperty, PlasmaProperty
-export IB1D1F, IB1D2F, IB1D4F
+export IB1F, IB2F, IB4F
 export ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
 export Interface1D1F, Interface1D2F, Interface1D4F
-export Solution1D1F, Solution1D2F
-export Flux1D1F, Flux1D2F
+export Solution1D1F, Solution1D2F, Solution2D1F, Solution2D2F
+export Flux1D1F, Flux1D2F, Flux2D1F, Flux2D2F
 
 
 # ------------------------------------------------------------
@@ -232,7 +232,7 @@ end
 # ------------------------------------------------------------
 # Structure of initial and boundary conditions
 # ------------------------------------------------------------
-struct IB1D1F{A,B} <: AbstractCondition
+struct IB1F{A,B} <: AbstractCondition
 
     wL::A
     primL::A
@@ -244,8 +244,11 @@ struct IB1D1F{A,B} <: AbstractCondition
     fR::B
     bcR::A
 
+    bcU::A
+    bcD::A
+
     # works for both 1V/3V and single-/multi-component gases
-    function IB1D1F(
+    function IB1F(
         wL::Array,
         primL::Array,
         fL::AbstractArray,
@@ -254,15 +257,17 @@ struct IB1D1F{A,B} <: AbstractCondition
         primR::Array,
         fR::AbstractArray,
         bcR::Array,
+        bcU = deepcopy(bcR)::Array,
+        bcD = deepcopy(bcR)::Array,
     )
 
-        new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR)
+        new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
 
     end
 
 end
 
-struct IB1D2F{A,B} <: AbstractCondition
+struct IB2F{A,B} <: AbstractCondition
 
     # initial condition
     wL::A
@@ -277,7 +282,10 @@ struct IB1D2F{A,B} <: AbstractCondition
     bR::B
     bcR::A
 
-    function IB1D2F(
+    bcU::A
+    bcD::A
+
+    function IB2F(
         wL::Array,
         primL::Array,
         hL::AbstractArray,
@@ -288,6 +296,8 @@ struct IB1D2F{A,B} <: AbstractCondition
         hR::AbstractArray,
         bR::AbstractArray,
         bcR::Array,
+        bcU = deepcopy(bcR)::Array,
+        bcD = deepcopy(bcR)::Array,
     )
 
         new{typeof(wL),typeof(hL)}(
@@ -301,6 +311,8 @@ struct IB1D2F{A,B} <: AbstractCondition
             hR,
             bR,
             bcR,
+            bcU,
+            bcD,
         )
 
     end
@@ -308,7 +320,7 @@ struct IB1D2F{A,B} <: AbstractCondition
 end
 
 
-struct IB1D4F{A,B,C,D} <: AbstractCondition
+struct IB4F{A,B,C,D} <: AbstractCondition
 
     # initial/boundary condition
     wL::A
@@ -333,7 +345,10 @@ struct IB1D4F{A,B,C,D} <: AbstractCondition
     BR::C
     lorenzR::D
 
-    function IB1D4F(
+    bcU::A
+    bcD::A
+
+    function IB4F(
         wL::Array,
         primL::Array,
         h0L::AbstractArray,
@@ -354,6 +369,8 @@ struct IB1D4F{A,B,C,D} <: AbstractCondition
         ER::Array,
         BR::Array,
         lorenzR::Array,
+        bcU = deepcopy(bcR)::Array,
+        bcD = deepcopy(bcR)::Array,
     )
 
         new{typeof(wL),typeof(h0L),typeof(EL),typeof(lorenzL)}(
@@ -377,6 +394,8 @@ struct IB1D4F{A,B,C,D} <: AbstractCondition
             ER,
             BR,
             lorenzR,
+            bcU,
+            bcD,
         )
 
     end
@@ -779,6 +798,91 @@ mutable struct Solution1D2F{A,B} <: AbstractSolution1D
 end
 
 
+mutable struct Solution2D1F{A,B,C,D} <: AbstractSolution2D
+
+    w::A
+    prim::A
+    sw::B
+    f::C
+    sf::D
+
+    function Solution2D1F(
+        w::AbstractArray,
+        prim::AbstractArray,
+        f::AbstractArray,
+    )
+        sw = [
+            zeros((axes(w[1])..., Base.OneTo(2)))
+            for i in axes(w, 1), j in axes(w, 2)
+        ]
+        sf = [
+            zeros((axes(f[1])..., Base.OneTo(2)))
+            for i in axes(f, 1), j in axes(f, 2)
+        ]
+
+        new{typeof(w),typeof(sw),typeof(f),typeof(sf)}(w, prim, sw, f, sf)
+    end
+
+    function Solution2D1F(
+        w::AbstractArray,
+        prim::AbstractArray,
+        sw::AbstractArray,
+        f::AbstractArray,
+        sf::AbstractArray,
+    )
+        new{typeof(w),typeof(sw),typeof(f),typeof(sf)}(w, prim, sw, f, sf)
+    end
+
+end
+
+
+mutable struct Solution2D2F{A,B,C,D} <: AbstractSolution2D
+
+    w::A
+    prim::A
+    sw::B
+    h::C
+    b::C
+    sh::D
+    sb::D
+
+    function Solution2D2F(
+        w::AbstractArray,
+        prim::AbstractArray,
+        h::AbstractArray,
+        b::AbstractArray,
+    )
+        sw = [
+            zeros((axes(w[1])..., Base.OneTo(2)))
+            for i in axes(w, 1), j in axes(w, 2)
+        ]
+        sh = [
+            zeros((axes(h[1])..., Base.OneTo(2)))
+            for i in axes(h, 1), j in axes(h, 2)
+        ]
+        sb = [
+            zeros((axes(b[1])..., Base.OneTo(2)))
+            for i in axes(b, 1), j in axes(b, 2)
+        ]
+
+        new{typeof(w),typeof(sw),typeof(h),typeof(sh)}(w, prim, sw, h, b, sh, sb)
+    end
+
+    function Solution2D2F(
+        w::AbstractArray,
+        prim::AbstractArray,
+        sw::AbstractArray,
+        h::AbstractArray,
+        b::AbstractArray,
+        sh::AbstractArray,
+        sb::AbstractArray,
+    )
+        new{typeof(w),typeof(sw),typeof(h),typeof(sh)}(w, prim, sw, h, b, sh, sb)
+    end
+
+end
+
+
 mutable struct Flux1D1F{A,B,C} <: AbstractFlux1D
 
     w::A
@@ -806,6 +910,66 @@ mutable struct Flux1D2F{A,B,C} <: AbstractFlux1D
         fb::AbstractArray,
     )
         new{typeof(w),typeof(fw),typeof(fh)}(w, fw, fh, fb)
+    end
+
+end
+
+
+mutable struct Flux2D1F{A,B,C,D} <: AbstractFlux2D
+
+    n1::A
+    w1::B
+    fw1::C
+    ff1::D
+
+    n2::A
+    w2::B
+    fw2::C
+    ff2::D
+
+    function Flux2D1F(
+        n1::AbstractArray,
+        w1::AbstractArray, 
+        fw1::AbstractArray, 
+        ff1::AbstractArray,
+        n2::AbstractArray, 
+        w2::AbstractArray, 
+        fw2::AbstractArray, 
+        ff2::AbstractArray,
+    )
+        new{typeof(n1),typeof(w1),typeof(fw1),typeof(ff1)}(n1, w1, fw1, ff1, n2, w2, fw2, ff2)
+    end
+
+end
+
+
+mutable struct Flux2D2F{A,B,C,D} <: AbstractFlux2D
+
+    n1::A
+    w1::B
+    fw1::C
+    fh1::D
+    fb1::D
+
+    n2::A
+    w2::B
+    fw2::C
+    fh2::D
+    fb2::D
+
+    function Flux2D2F(
+        n1::AbstractArray,
+        w1::AbstractArray,
+        fw1::AbstractArray,
+        fh1::AbstractArray,
+        fb1::AbstractArray,
+        n2::AbstractArray,
+        w2::AbstractArray,
+        fw2::AbstractArray,
+        fh2::AbstractArray,
+        fb2::AbstractArray,
+    )
+        new{typeof(n1),typeof(w1),typeof(fw1),typeof(fh1)}(n1, w1, fw1, fh1, fb1, n2, w2, fw2, fh2, fb2)
     end
 
 end

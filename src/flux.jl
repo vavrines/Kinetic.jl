@@ -3,19 +3,23 @@
 # ============================================================
 
 
-export flux_gks, flux_kfvs, flux_kcu, flux_em
+export flux_gks, flux_kfvs, flux_kcu, flux_boundary_maxwell, flux_em
 
 
 """
 Gas kinetic scheme (GKS)
 
-# >@param[in] : conservative variables and their slopes at left/right sides of interface
-# >@param[in] : thermodynamic parameters
-# >@param[in] : time step and cell size
+> @param[in] : conservative variables and their slopes at left/right sides of interface
+> @param[in] : thermodynamic parameters
+> @param[in] : time step and cell size
 
-# >@return : flux of conservative variables
+< @return : flux of conservative variables
+
 """
 
+# ------------------------------------------------------------
+# 1D flux
+# ------------------------------------------------------------
 function flux_gks(
     wL::Array{<:AbstractFloat,1},
     wR::Array{<:AbstractFloat,1},
@@ -82,7 +86,9 @@ function flux_gks(
     # Mau = moments_conserve_slope(ga, MuR, Mxi, 2)
     MauT = moments_conserve_slope(gaT, Mu, Mxi, 1)
 
-    flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* (MauL .+ MauR) .+ Mt[3] .* prim[1] .* MauT
+    flux =
+        Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* (MauL .+ MauR) .+
+        Mt[3] .* prim[1] .* MauT
     # flux = Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* Mau .+ Mt[3] .* prim[1] .* MauT
 
     # flux related to upwind distribution
@@ -94,8 +100,10 @@ function flux_gks(
     MauR = moments_conserve_slope(faR, MuR2, Mxi2, 2)
     MauRT = moments_conserve_slope(faTR, MuR2, Mxi2, 1)
 
-    @. flux += Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL - tau * Mt[4] * primL[1] * MauLT +
-               Mt[4] * primR[1] * MuvR - (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
+    @. flux +=
+        Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL -
+        tau * Mt[4] * primL[1] * MauLT + Mt[4] * primR[1] * MuvR -
+        (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
     # @. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
     return flux
@@ -107,11 +115,12 @@ end
 """
 Kinetic flux vector splitting (KFVS) method
 
-# >@param[in] : particle distribution functions and their slopes at left/right sides of interface
-# >@param[in] : particle velocity quadrature points and weights
-# >@param[in] : time step
+> @param[in] : particle distribution functions and their slopes at left/right sides of interface
+> @param[in] : particle velocity quadrature points and weights
+> @param[in] : time step
 
-# >@return : flux of particle distribution function and its velocity moments on conservative variables
+< @return : flux of particle distribution function and its velocity moments on conservative variables
+
 """
 
 # ------------------------------------------------------------
@@ -343,14 +352,66 @@ function flux_kfvs(
 end
 
 
+# ------------------------------------------------------------
+# 2D2F flux
+# ------------------------------------------------------------
+function flux_kfvs(
+    hL::AbstractArray{<:AbstractFloat,2},
+    bL::AbstractArray{<:AbstractFloat,2},
+    hR::AbstractArray{<:AbstractFloat,2},
+    bR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    dt::AbstractFloat,
+    len::Real,
+    shL = zeros(axes(hL))::AbstractArray{<:AbstractFloat,2},
+    sbL = zeros(axes(bL))::AbstractArray{<:AbstractFloat,2},
+    shR = zeros(axes(hR))::AbstractArray{<:AbstractFloat,2},
+    sbR = zeros(axes(bR))::AbstractArray{<:AbstractFloat,2},
+)
+
+    # --- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    h = @. hL * δ + hR * (1.0 - δ)
+    b = @. bL * δ + bR * (1.0 - δ)
+    sh = @. shL * δ + shR * (1.0 - δ)
+    sb = @. sbL * δ + sbR * (1.0 - δ)
+
+    # --- calculate fluxes ---#
+    fw = similar(hL, 4)
+    fh = similar(hL)
+    fb = similar(bL)
+
+    fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh)
+    fw[2] = dt * sum(ω .* u.^2 .* h) - 0.5 * dt^2 * sum(ω .* u.^3 .* sh)
+    fw[3] =
+        dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u.^2 .* sh)
+    fw[4] =
+        dt * 0.5 * (sum(ω .* u .* (u.^2 .+ v.^2) .* h) + sum(ω .* u .* b)) -
+        0.5 *
+        dt^2 *
+        0.5 *
+        (sum(ω .* u.^2 .* (u.^2 .+ v.^2) .* sh) + sum(ω .* u.^2 .* sb))
+
+    @. fh = dt * u * h - 0.5 * dt^2 * u^2 * sh
+    @. fb = dt * u * b - 0.5 * dt^2 * u^2 * sb
+
+    return fw .* len, fh .* len, fb .* len
+
+end
+
+
 """
 Kinetic central-upwind (KCU) method
 
-# >@param[in] : particle distribution functions and their slopes at left/right sides of interface
-# >@param[in] : particle velocity quadrature points and weights
-# >@param[in] : time step
+> @param[in] : particle distribution functions and their slopes at left/right sides of interface
+> @param[in] : particle velocity quadrature points and weights
+> @param[in] : time step
 
-# >@return : flux of particle distribution function and its velocity moments on conservative variables
+< @return : flux of particle distribution function and its velocity moments on conservative variables
+
 """
 
 # ------------------------------------------------------------
@@ -389,8 +450,11 @@ function flux_kcu(
 
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    # tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
-    #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
 
     Mt = zeros(2)
     Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -455,8 +519,11 @@ function flux_kcu(
 
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    # tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
-    #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
 
     Mt = zeros(2)
     Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -524,8 +591,11 @@ function flux_kcu(
     w = @. primL[1] * Muv1 + primR[1] * Muv2
     prim = conserve_prim(w, γ)
     tau = vhs_collision_time(prim, visRef, visIdx)
-    # tau += abs(primL[1] / primL[end] - primR[1] / primR[end]) /
-    #       (primL[1] / primL[end] + primR[1] / primR[end]) * dt * 2.
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
 
     Mt = zeros(2)
     Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -553,14 +623,94 @@ function flux_kcu(
 end
 
 
+# ------------------------------------------------------------
+# 2D2F flux
+# ------------------------------------------------------------
+function flux_kcu(
+    wL::Array{<:Real,1},
+    hL::AbstractArray{<:AbstractFloat,2},
+    bL::AbstractArray{<:AbstractFloat,2},
+    wR::Array{<:Real,1},
+    hR::AbstractArray{<:AbstractFloat,2},
+    bR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+    len::Real,
+)
+
+    # --- prepare ---#
+    delta = heaviside.(u)
+
+    # --- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+    h = @. hL * δ + hR * (1.0 - δ)
+    b = @. bL * δ + bR * (1.0 - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    # --- construct interface distribution ---#
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    # --- calculate interface flux ---#
+    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    fw = @. Mt[1] * prim[1] * Muv
+
+    # flux from f0
+    H = maxwellian(u, v, prim)
+    B = H .* inK ./ (2.0 * prim[end])
+
+    fw[1] += Mt[2] * sum(ω .* u .* h)
+    fw[2] += Mt[2] * sum(ω .* u.^2 .* h)
+    fw[3] += Mt[2] * sum(ω .* v .* u .* h)
+    fw[4] +=
+        Mt[2] *
+        0.5 *
+        (sum(ω .* u .* (u.^2 .+ v.^2) .* h) + sum(ω .* u .* b))
+
+    fh = @. Mt[1] * u * H + Mt[2] * u * h
+    fb = @. Mt[1] * u * B + Mt[2] * u * b
+
+    return fw .* len, fh .* len, fb .* len
+
+end
+
+
 """
 Kinetic central-upwind (KCU) method for multi-component gas
 
-# >@param[in] : particle distribution functions and their slopes at left/right sides of interface
-# >@param[in] : particle velocity quadrature points and weights
-# >@param[in] : time step
+> @param[in] : particle distribution functions and their slopes at left/right sides of interface
+> @param[in] : particle velocity quadrature points and weights
+> @param[in] : time step
 
-# >@return : flux of particle distribution function and its velocity moments on conservative variables
+< @return : flux of particle distribution function and its velocity moments on conservative variables
+
 """
 
 # ------------------------------------------------------------
@@ -907,14 +1057,72 @@ end
 
 
 """
+Maxwell's diffusive boundary flux
+
+> @param[in] : particle distribution functions and their slopes at left/right sides of interface
+> @param[in] : particle velocity quadrature points and weights
+> @param[in] : time step
+
+< @return : flux of particle distribution function and its velocity moments on conservative variables
+
+"""
+
+function flux_boundary_maxwell(
+    bc::Array{<:Real,1},
+    h::AbstractArray{<:AbstractFloat,2},
+    b::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    dt::Real,
+    len::Real,
+    rot = 1::Real,
+)
+
+    @assert length(bc) == 4
+
+    δ = heaviside.(u .* rot)
+    SF = sum(ω .* u .* h .* (1. .- δ))
+    SG =
+        (bc[end] / π) * sum(
+            ω .* u .*
+            exp.(-bc[end] .* ((u .- bc[2]).^2 .+ (v .- bc[3]).^2)) .* δ,
+        )
+    prim = [-SF / SG; bc[2:end]]
+
+    H = maxwellian(u, v, prim)
+    B = H .* inK ./ (2.0 * prim[end])
+
+    hWall = H .* δ .+ h .* (1.0 .- δ)
+    bWall = B .* δ .+ b .* (1.0 .- δ)
+
+    fw = [
+            discrete_moments(hWall, u, ω, 1),
+            discrete_moments(hWall, u, ω, 2),
+            discrete_moments(hWall .* u, v, ω, 1),
+            0.5 * discrete_moments(hWall .* (u.^2 .+ v.^2), u, ω, 1) +
+            0.5 * discrete_moments(bWall, u, ω, 1),
+        ] .* len .* dt
+
+    fh = u .* hWall .* len .* dt
+    fb = u .* bWall .* len .* dt
+
+    return fw, fh, fb
+
+end
+
+
+"""
 Wave propagation method for the Maxwell's equations
 
-# >@param[in] : variables in left-left, left, right, and right-right cells
-# >@param[in] : eigenmatrix (A), eigenvalue (D)
-# >@param[in] : speed of light (sol)
-# >@param[in] : auxiliary parameters (χₑ, νᵦ)
+> @param[in] : variables in left-left, left, right, and right-right cells
+> @param[in] : eigenmatrix (A), eigenvalue (D)
+> @param[in] : speed of light (sol)
+> @param[in] : auxiliary parameters (χₑ, νᵦ)
 
-# >@return : flux of electromagnetic fields
+< @return : flux of electromagnetic fields
+
 """
 
 function flux_em(
