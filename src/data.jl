@@ -6,7 +6,7 @@
 export Setup
 export GasProperty, PlasmaProperty
 export IB1F, IB2F, IB4F
-export ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
+export ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F, ControlVolume2D1F, ControlVolume2D2F
 export Interface1D1F, Interface1D2F, Interface1D4F
 export Solution1D1F, Solution1D2F, Solution2D1F, Solution2D2F
 export Flux1D1F, Flux1D2F, Flux2D1F, Flux2D2F
@@ -626,6 +626,97 @@ mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
             ψ,
             lorenz,
         )
+
+    end
+
+end
+
+
+mutable struct ControlVolume2D1F{F,A,B,C,D} <: AbstractControlVolume2D
+
+    x::F
+    y::F
+    dx::F
+    dy::F
+
+    w::A
+    prim::A
+    sw::B
+
+    f::C
+    sf::D
+
+    function ControlVolume2D1F(
+        X::Real,
+        DX::Real,
+        Y::Real,
+        DY::Real,
+        W::Array,
+        PRIM::Array,
+        F::AbstractArray,
+    )
+
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+        y = deepcopy(Y)
+        dy = deepcopy(DY)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(eltype(W), (axes(W)..., Base.OneTo(2)))
+
+        f = deepcopy(F)
+        sf = zeros(eltype(F), (axes(F)..., Base.OneTo(2)))
+
+        new{typeof(x),typeof(w),typeof(sw),typeof(f),typeof(sf)}(x, dx, y, dy, w, prim, sw, f, sf)
+
+    end
+
+end
+
+
+mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
+
+    x::F
+    y::F
+    dx::F
+    dy::F
+
+    w::A
+    prim::A
+    sw::B
+
+    h::C
+    b::C
+    sh::D
+    sb::D
+
+    function ControlVolume2D2F(
+        X::Real,
+        DX::Real,
+        Y::Real,
+        DY::Real,
+        W::Array,
+        PRIM::Array,
+        H::AbstractArray,
+        B::AbstractArray,
+    )
+
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+        y = deepcopy(Y)
+        dy = deepcopy(DY)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(eltype(W), (axes(W)..., Base.OneTo(2)))
+
+        h = deepcopy(H)
+        b = deepcopy(B)
+        sh = zeros(eltype(H), (axes(H)..., Base.OneTo(2)))
+        sb = zeros(eltype(B), (axes(B)..., Base.OneTo(2)))
+
+        new{typeof(x),typeof(w),typeof(sw),typeof(h),typeof(sh)}(x, dx, y, dy, w, prim, sw, h, b, sh, sb)
 
     end
 

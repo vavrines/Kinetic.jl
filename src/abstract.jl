@@ -11,8 +11,10 @@ export AbstractVelocitySpace,
     AbstractSolverSet,
     AbstractControlVolume,
     AbstractControlVolume1D,
+    AbstractControlVolume2D,
     AbstractInterface,
     AbstractInterface1D,
+    AbstractInterface2D,
     AbstractSolution,
     AbstractSolution1D,
     AbstractSolution2D,
@@ -31,7 +33,9 @@ abstract type AbstractSolverSet end
 abstract type AbstractControlVolume end
 abstract type AbstractInterface end
 abstract type AbstractControlVolume1D <: AbstractControlVolume end
+abstract type AbstractControlVolume2D <: AbstractControlVolume end
 abstract type AbstractInterface1D <: AbstractInterface end
+abstract type AbstractInterface2D <: AbstractInterface end
 
 abstract type AbstractSolution end
 abstract type AbstractFlux end

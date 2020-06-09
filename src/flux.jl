@@ -1,5 +1,5 @@
 # ============================================================
-# Numerical flux functions for finite volume method
+# Flux functions for finite volume method
 # ============================================================
 
 
