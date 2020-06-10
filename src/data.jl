@@ -849,7 +849,7 @@ mutable struct Interface2D2F{A,B,C,D} <: AbstractInterface2D
 
     fw::C
     fh::D
-    fh::D
+    fb::D
 
     function Interface2D2F(L::Real, C::Real, S::Real, w::Array, f::AbstractArray)
 
