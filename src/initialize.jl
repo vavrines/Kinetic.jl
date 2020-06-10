@@ -84,8 +84,8 @@ function init_fvm(KS::SolverSet)
 
         if KS.set.space == "1d4f1v"
             #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx)
-            ctr = OffsetArray{MControlVolume1D4F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
-            face = Array{MInterface1D4F}(undef, KS.pSpace.nx + 1)
+            ctr = OffsetArray{ControlVolume1D4F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
+            face = Array{Interface1D4F}(undef, KS.pSpace.nx + 1)
 
             for i in eachindex(ctr)
                 # shock problems
