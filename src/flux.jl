@@ -3,7 +3,11 @@
 # ============================================================
 
 
-export flux_gks, flux_kfvs, flux_kcu, flux_boundary_maxwell, flux_em
+export flux_gks
+export flux_kfvs, flux_kfvs!
+export flux_kcu
+export flux_boundary_maxwell
+export flux_em
 
 
 """
@@ -399,6 +403,52 @@ function flux_kfvs(
     @. fb = dt * u * b - 0.5 * dt^2 * u^2 * sb
 
     return fw .* len, fh .* len, fb .* len
+
+end
+
+
+function flux_kfvs!(
+    fw::Array{<:AbstractFloat,1},
+    fh::AbstractArray{<:AbstractFloat,2},
+    fb::AbstractArray{<:AbstractFloat,2},
+    hL::AbstractArray{<:AbstractFloat,2},
+    bL::AbstractArray{<:AbstractFloat,2},
+    hR::AbstractArray{<:AbstractFloat,2},
+    bR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    dt::AbstractFloat,
+    len::Real,
+    shL = zeros(axes(hL))::AbstractArray{<:AbstractFloat,2},
+    sbL = zeros(axes(bL))::AbstractArray{<:AbstractFloat,2},
+    shR = zeros(axes(hR))::AbstractArray{<:AbstractFloat,2},
+    sbR = zeros(axes(bR))::AbstractArray{<:AbstractFloat,2},
+)
+
+    # --- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    h = @. hL * δ + hR * (1.0 - δ)
+    b = @. bL * δ + bR * (1.0 - δ)
+    sh = @. shL * δ + shR * (1.0 - δ)
+    sb = @. sbL * δ + sbR * (1.0 - δ)
+
+    # --- calculate fluxes ---#
+    fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u.^2 .* sh)
+    fw[2] = dt * sum(ω .* u.^2 .* h) - 0.5 * dt^2 * sum(ω .* u.^3 .* sh)
+    fw[3] =
+        dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u.^2 .* sh)
+    fw[4] =
+        dt * 0.5 * (sum(ω .* u .* (u.^2 .+ v.^2) .* h) + sum(ω .* u .* b)) -
+        0.5 *
+        dt^2 *
+        0.5 *
+        (sum(ω .* u.^2 .* (u.^2 .+ v.^2) .* sh) + sum(ω .* u.^2 .* sb))
+    fw .*= len
+
+    @. fh = (dt * u * h - 0.5 * dt^2 * u^2 * sh) * len
+    @. fb = (dt * u * b - 0.5 * dt^2 * u^2 * sb) * len
 
 end
 
