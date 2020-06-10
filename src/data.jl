@@ -7,7 +7,7 @@ export Setup
 export GasProperty, PlasmaProperty
 export IB1F, IB2F, IB4F
 export ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F, ControlVolume2D1F, ControlVolume2D2F
-export Interface1D1F, Interface1D2F, Interface1D4F
+export Interface1D1F, Interface1D2F, Interface1D4F, Interface2D1F, Interface2D2F
 export Solution1D1F, Solution1D2F, Solution2D1F, Solution2D2F
 export Flux1D1F, Flux1D2F, Flux2D1F, Flux2D2F
 
@@ -813,6 +813,54 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
             femL,
             femR,
         )
+
+    end
+
+end
+
+
+mutable struct Interface2D1F{A,B,C,D} <: AbstractInterface2D
+
+    len::A
+    n::B
+
+    fw::C
+    ff::D
+
+    function Interface2D1F(L::Real, C::Real, S::Real, w::Array, f::AbstractArray)
+
+        len = L
+        n = [C, S]
+
+        fw = zeros(eltype(w), axes(w))
+        ff = zeros(eltype(f), axes(f))
+
+        new{typeof(len),typeof(n),typeof(fw),typeof(ff)}(len, n, fw, ff)
+
+    end
+
+end
+
+
+mutable struct Interface2D2F{A,B,C,D} <: AbstractInterface2D
+
+    len::A
+    n::B
+
+    fw::C
+    fh::D
+    fh::D
+
+    function Interface2D2F(L::Real, C::Real, S::Real, w::Array, f::AbstractArray)
+
+        len = L
+        n = [C, S]
+
+        fw = zeros(eltype(w), axes(w))
+        fh = zeros(eltype(f), axes(f))
+        fb = zeros(eltype(f), axes(f))
+
+        new{typeof(len),typeof(n),typeof(fw),typeof(fh)}(len, n, fw, fh, fb)
 
     end
 

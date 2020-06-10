@@ -43,33 +43,30 @@ end
 # ------------------------------------------------------------
 function init_fvm(KS::SolverSet)
 
-    if KS.set.nSpecies == 1
+    if KS.set.space[1:2] == "1d"
 
-        if KS.set.space[1:4] == "1d1f"
-            #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx) # without ghost cells
-            ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
+        if KS.set.space[3:4] == "1f"
+            
+            ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pSpace.x))
             face = Array{Interface1D1F}(undef, KS.pSpace.nx + 1)
 
             for i in eachindex(ctr)
-                # shock problems
-                if KS.set.case == "shock"
-                    if i <= KS.pSpace.nx ÷ 2
-                        ctr[i] = ControlVolume1D1F(
-                            KS.pSpace.x[i],
-                            KS.pSpace.dx[i],
-                            KS.ib.wL,
-                            KS.ib.primL,
-                            KS.ib.fL,
-                        )
-                    else
-                        ctr[i] = ControlVolume1D1F(
-                            KS.pSpace.x[i],
-                            KS.pSpace.dx[i],
-                            KS.ib.wR,
-                            KS.ib.primR,
-                            KS.ib.fR,
-                        )
-                    end
+                if i <= KS.pSpace.nx ÷ 2
+                    ctr[i] = ControlVolume1D1F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wL,
+                        KS.ib.primL,
+                        KS.ib.fL,
+                    )
+                else
+                    ctr[i] = ControlVolume1D1F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wR,
+                        KS.ib.primR,
+                        KS.ib.fR,
+                    )
                 end
             end
 
@@ -77,48 +74,71 @@ function init_fvm(KS::SolverSet)
                 face[i] = Interface1D1F(KS.ib.wL, KS.ib.fL)
             end
 
-        else
-        end
+        elseif KS.set.space[3:4] == "2f"
 
-    elseif KS.set.nSpecies == 2
+            ctr = OffsetArray{ControlVolume1D2F}(undef, eachindex(KS.pSpace.x))
+            face = Array{Interface1D2F}(undef, KS.pSpace.nx + 1)
 
-        if KS.set.space == "1d4f1v"
-            #ctr = Array{ControlVolume1D1F}(undef, KS.pSpace.nx)
-            ctr = OffsetArray{ControlVolume1D4F}(undef, eachindex(KS.pSpace.x)) # with ghost cells
+            for i in eachindex(ctr)
+                if i <= KS.pSpace.nx ÷ 2
+                    ctr[i] = ControlVolume1D2F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wL,
+                        KS.ib.primL,
+                        KS.ib.hL,
+                        KS.ib.bL,
+                    )
+                else
+                    ctr[i] = ControlVolume1D2F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wR,
+                        KS.ib.primR,
+                        KS.ib.hR,
+                        KS.ib.bR,
+                    )
+                end
+            end
+
+            for i = 1:KS.pSpace.nx+1
+                face[i] = Interface1D2F(KS.ib.wL, KS.ib.hL)
+            end
+        
+        elseif KS.set.space[3:4] == "4f"
+
+            ctr = OffsetArray{ControlVolume1D4F}(undef, eachindex(KS.pSpace.x))
             face = Array{Interface1D4F}(undef, KS.pSpace.nx + 1)
 
             for i in eachindex(ctr)
-                # shock problems
-                if KS.set.case == "brio-wu"
-                    if i <= KS.pSpace.nx ÷ 2
-                        ctr[i] = ControlVolume1D4F(
-                            KS.pSpace.x[i],
-                            KS.pSpace.dx[i],
-                            KS.ib.wL,
-                            KS.ib.primL,
-                            KS.ib.h0L,
-                            KS.ib.h1L,
-                            KS.ib.h2L,
-                            KS.ib.h3L,
-                            KS.ib.EL,
-                            KS.ib.BL,
-                            KS.ib.lorenzL,
-                        )
-                    else
-                        ctr[i] = ControlVolume1D4F(
-                            KS.pSpace.x[i],
-                            KS.pSpace.dx[i],
-                            KS.ib.wR,
-                            KS.ib.primR,
-                            KS.ib.h0R,
-                            KS.ib.h1R,
-                            KS.ib.h2R,
-                            KS.ib.h3R,
-                            KS.ib.ER,
-                            KS.ib.BR,
-                            KS.ib.lorenzR,
-                        )
-                    end
+                if i <= KS.pSpace.nx ÷ 2
+                    ctr[i] = ControlVolume1D4F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wL,
+                        KS.ib.primL,
+                        KS.ib.h0L,
+                        KS.ib.h1L,
+                        KS.ib.h2L,
+                        KS.ib.h3L,
+                        KS.ib.EL,
+                        KS.ib.BL,
+                        KS.ib.lorenzL,
+                    )
+                else
+                    ctr[i] = ControlVolume1D4F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wR,
+                        KS.ib.primR,
+                        KS.ib.h0R,
+                        KS.ib.h1R,
+                        KS.ib.h2R,
+                        KS.ib.h3R,
+                        KS.ib.ER,
+                        KS.ib.BR,
+                        KS.ib.lorenzR,
+                    )
                 end
             end
 
@@ -126,11 +146,92 @@ function init_fvm(KS::SolverSet)
                 face[i] = Interface1D4F(KS.ib.wL, KS.ib.h0L, KS.ib.EL)
             end
 
-        else
         end
 
-    end
+        return ctr, face
 
-    return ctr, face
+    elseif KS.set.space[1:2] == "2d"
+
+        if KS.set.space[3:4] == "1f"
+
+            ctr = OffsetArray{ControlVolume2D1F}(undef, axes(KS.pSpace.x, 1), axes(KS.pSpace.y, 2))
+            a1face = Array{Interface2D1F}(undef, KS.pSpace.nx+1, KS.pSpace.ny)
+            a2face = Array{Interface2D1F}(undef, KS.pSpace.nx, KS.pSpace.ny+1)
+
+            for j in axes(ctr, 2), i in axes(ctr, 1)
+                if i <= KS.pSpace.nx ÷ 2
+                    ctr[i, j] = ControlVolume2D1F(
+                        KS.pSpace.x[i, j],
+                        KS.pSpace.y[i, j],
+                        KS.pSpace.dx[i, j],
+                        KS.pSpace.dy[i, j],
+                        KS.ib.wL,
+                        KS.ib.primL,
+                        KS.ib.fL,
+                    )
+                else
+                    ctr[i] = ControlVolume2D1F(
+                        KS.pSpace.x[i, j],
+                        KS.pSpace.y[i, j],
+                        KS.pSpace.dx[i, j],
+                        KS.pSpace.dy[i, j],
+                        KS.ib.wR,
+                        KS.ib.primR,
+                        KS.ib.fR,
+                    )
+                end
+            end
+
+            for j in 1:KS.pSpace.ny, i = 1:KS.pSpace.nx+1
+                a1face[i] = Interface2D1F(KS.pSpace.dy[i, j], 0., 1., KS.ib.wL, KS.ib.hL)
+            end
+            for j in 1:KS.pSpace.ny+1, i = 1:KS.pSpace.nx
+                a2face[i] = Interface2D1F(KS.pSpace.dx[i, j], 1., 0., KS.ib.wL, KS.ib.hL)
+            end
+
+        elseif KS.set.space[3:4] == "2f"
+
+            ctr = OffsetArray{ControlVolume2D2F}(undef, axes(KS.pSpace.x, 1), axes(KS.pSpace.y, 2))
+            a1face = Array{Interface2D2F}(undef, KS.pSpace.nx+1, KS.pSpace.ny)
+            a2face = Array{Interface2D2F}(undef, KS.pSpace.nx, KS.pSpace.ny+1)
+
+            for j in axes(ctr, 2), i in axes(ctr, 1)
+                if i <= KS.pSpace.nx ÷ 2
+                    ctr[i, j] = ControlVolume2D2F(
+                        KS.pSpace.x[i, j],
+                        KS.pSpace.y[i, j],
+                        KS.pSpace.dx[i, j],
+                        KS.pSpace.dy[i, j],
+                        KS.ib.wL,
+                        KS.ib.primL,
+                        KS.ib.hL,
+                        KS.ib.bL,
+                    )
+                else
+                    ctr[i] = ControlVolume2D2F(
+                        KS.pSpace.x[i, j],
+                        KS.pSpace.y[i, j],
+                        KS.pSpace.dx[i, j],
+                        KS.pSpace.dy[i, j],
+                        KS.ib.wR,
+                        KS.ib.primR,
+                        KS.ib.hR,
+                        KS.ib.bR,
+                    )
+                end
+            end
+
+            for j in 1:KS.pSpace.ny, i = 1:KS.pSpace.nx+1
+                a1face[i] = Interface2D2F(KS.pSpace.dy[i, j], 0., 1., KS.ib.wL, KS.ib.hL)
+            end
+            for j in 1:KS.pSpace.ny+1, i = 1:KS.pSpace.nx
+                a2face[i] = Interface2D2F(KS.pSpace.dx[i, j], 1., 0., KS.ib.wL, KS.ib.hL)
+            end
+
+        end
+
+        return ctr, a1face, a2face
+
+    end
 
 end
