@@ -5,11 +5,15 @@
 
 export Setup
 export GasProperty, PlasmaProperty
-export IB1F, IB2F, IB4F
-export ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F, ControlVolume2D1F, ControlVolume2D2F
-export Interface1D1F, Interface1D2F, Interface1D4F, Interface2D1F, Interface2D2F
-export Solution1D1F, Solution1D2F, Solution2D1F, Solution2D2F
-export Flux1D1F, Flux1D2F, Flux2D1F, Flux2D2F
+export IB, IB1F, IB2F, IB4F
+export ControlVolume1D, ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
+export ControlVolume2D, ControlVolume2D1F, ControlVolume2D2F
+export Interface1D, Interface1D1F, Interface1D2F, Interface1D4F
+export Interface2D, Interface2D1F, Interface2D2F
+export Solution1D, Solution1D1F, Solution1D2F
+export Solution2D, Solution2D1F, Solution2D2F
+export Flux1D, Flux1D1F, Flux1D2F
+export Flux2D, Flux2D1F, Flux2D2F
 
 
 # ------------------------------------------------------------
@@ -232,6 +236,38 @@ end
 # ------------------------------------------------------------
 # Structure of initial and boundary conditions
 # ------------------------------------------------------------
+struct IB{A} <: AbstractCondition
+
+    wL::A
+    primL::A
+    bcL::A
+
+    wR::A
+    primR::A
+    bcR::A
+
+    bcU::A
+    bcD::A
+
+    # works for both 1V/3V and single-/multi-component gases
+    function IB(
+        wL::Array,
+        primL::Array,
+        bcL::Array,
+        wR::Array,
+        primR::Array,
+        bcR::Array,
+        bcU = deepcopy(bcR)::Array,
+        bcD = deepcopy(bcR)::Array,
+    )
+
+        new{typeof(wL)}(wL, primL, bcL, wR, primR, bcR, bcU, bcD)
+
+    end
+
+end
+
+
 struct IB1F{A,B} <: AbstractCondition
 
     wL::A
@@ -406,6 +442,36 @@ end
 # ------------------------------------------------------------
 # Structure of control volume
 # ------------------------------------------------------------
+mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
+
+    x::F
+    dx::F
+
+    w::A
+    prim::A
+    sw::A
+
+    function ControlVolume1D(
+        X::Real,
+        DX::Real,
+        W::Array,
+        PRIM::Array,
+    )
+
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(typeof(W[1]), axes(w))
+
+        new{typeof(x),typeof(w)}(x, dx, w, prim, sw)
+
+    end
+
+end
+
+
 mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 
     x::F
@@ -632,6 +698,42 @@ mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
 end
 
 
+mutable struct ControlVolume2D{F,A,B} <: AbstractControlVolume2D
+
+    x::F
+    y::F
+    dx::F
+    dy::F
+
+    w::A
+    prim::A
+    sw::B
+
+    function ControlVolume2D(
+        X::Real,
+        DX::Real,
+        Y::Real,
+        DY::Real,
+        W::Array,
+        PRIM::Array,
+    )
+
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+        y = deepcopy(Y)
+        dy = deepcopy(DY)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(eltype(W), (axes(W)..., Base.OneTo(2)))
+
+        new{typeof(x),typeof(w),typeof(sw)}(x, dx, y, dy, w, prim, sw)
+
+    end
+
+end
+
+
 mutable struct ControlVolume2D1F{F,A,B,C,D} <: AbstractControlVolume2D
 
     x::F
@@ -726,6 +828,21 @@ end
 # ------------------------------------------------------------
 # Structure of cell interface
 # ------------------------------------------------------------
+mutable struct Interface1D{A} <: AbstractInterface1D
+
+    fw::A
+
+    function Interface1D(w::Array)
+
+        fw = zeros(eltype(w), axes(w))
+
+        new{typeof(fw)}(fw)
+
+    end
+
+end
+
+
 mutable struct Interface1D1F{A,B} <: AbstractInterface1D
 
     fw::A
@@ -819,6 +936,26 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
 end
 
 
+mutable struct Interface2D{A,B,C} <: AbstractInterface2D
+
+    len::A
+    n::B
+    fw::C
+
+    function Interface2D(L::Real, C::Real, S::Real, w::Array)
+
+        len = L
+        n = [C, S]
+
+        fw = zeros(eltype(w), axes(w))
+
+        new{typeof(len),typeof(n),typeof(fw)}(len, n, fw)
+
+    end
+
+end
+
+
 mutable struct Interface2D1F{A,B,C,D} <: AbstractInterface2D
 
     len::A
@@ -862,6 +999,23 @@ mutable struct Interface2D2F{A,B,C,D} <: AbstractInterface2D
 
         new{typeof(len),typeof(n),typeof(fw),typeof(fh)}(len, n, fw, fh, fb)
 
+    end
+
+end
+
+
+mutable struct Solution1D{A} <: AbstractSolution1D
+
+    w::A
+    prim::A
+    sw::A
+
+    function Solution1D(
+        w::AbstractArray,
+        prim::AbstractArray,
+        sw = [zeros(axes(w[1])) for i in axes(w, 1)]::AbstractArray,
+    )
+        new{typeof(w)}(w, prim, sw)
     end
 
 end
@@ -932,6 +1086,27 @@ mutable struct Solution1D2F{A,B} <: AbstractSolution1D
         sb::AbstractArray,
     )
         new{typeof(w),typeof(h)}(w, prim, sw, h, b, sh, sb)
+    end
+
+end
+
+
+mutable struct Solution2D{A,B} <: AbstractSolution2D
+
+    w::A
+    prim::A
+    sw::B
+
+    function Solution2D(
+        w::AbstractArray,
+        prim::AbstractArray,
+        sw = [
+            zeros((axes(w[1])..., Base.OneTo(2)))
+            for i in axes(w, 1), j in axes(w, 2)
+        ]::AbstractArray,
+    )
+
+        new{typeof(w),typeof(sw)}(w, prim, sw)
     end
 
 end
@@ -1022,6 +1197,18 @@ mutable struct Solution2D2F{A,B,C,D} <: AbstractSolution2D
 end
 
 
+mutable struct Flux1D{A,B} <: AbstractFlux1D
+
+    w::A
+    fw::B
+
+    function Flux1D(w::AbstractArray, fw::AbstractArray)
+        new{typeof(w),typeof(fw)}(w, fw)
+    end
+
+end
+
+
 mutable struct Flux1D1F{A,B,C} <: AbstractFlux1D
 
     w::A
@@ -1049,6 +1236,30 @@ mutable struct Flux1D2F{A,B,C} <: AbstractFlux1D
         fb::AbstractArray,
     )
         new{typeof(w),typeof(fw),typeof(fh)}(w, fw, fh, fb)
+    end
+
+end
+
+
+mutable struct Flux2D{A,B,C} <: AbstractFlux2D
+
+    n1::A
+    w1::B
+    fw1::C
+
+    n2::A
+    w2::B
+    fw2::C
+
+    function Flux2D(
+        n1::AbstractArray,
+        w1::AbstractArray, 
+        fw1::AbstractArray, 
+        n2::AbstractArray, 
+        w2::AbstractArray, 
+        fw2::AbstractArray, 
+    )
+        new{typeof(n1),typeof(w1),typeof(fw1)}(n1, w1, fw1, n2, w2, fw2)
     end
 
 end

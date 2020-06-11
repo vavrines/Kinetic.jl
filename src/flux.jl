@@ -5,8 +5,8 @@
 
 export flux_gks
 export flux_kfvs, flux_kfvs!
-export flux_kcu
-export flux_boundary_maxwell
+export flux_kcu, flux_kcu!
+export flux_boundary_maxwell, flux_boundary_maxwell!
 export flux_em
 
 
@@ -22,16 +22,16 @@ Gas kinetic Navier-Stokes flux
 """
 
 function flux_gks(
-    wL::Array{<:AbstractFloat,1},
-    wR::Array{<:AbstractFloat,1},
+    wL::AbstractArray{<:AbstractFloat,1},
+    wR::AbstractArray{<:AbstractFloat,1},
     dx::AbstractFloat,
     dt::AbstractFloat,
     γ::Real,
     inK::Real,
     μᵣ::AbstractFloat,
     ω::Real,
-    swL = zeros(axes(wL))::Array{<:AbstractFloat,1},
-    swR = zeros(axes(wR))::Array{<:AbstractFloat,1},
+    swL = zeros(axes(wL))::AbstractArray{<:AbstractFloat,1},
+    swR = zeros(axes(wR))::AbstractArray{<:AbstractFloat,1},
 )
 
     primL = conserve_prim(wL, γ)
@@ -244,7 +244,7 @@ end
 
 
 function flux_kfvs!(
-    fw::Array{<:AbstractFloat,1},
+    fw::AbstractArray{<:AbstractFloat,1},
     ff::AbstractArray{<:AbstractFloat,1},
     fL::AbstractArray{<:AbstractFloat,1},
     fR::AbstractArray{<:AbstractFloat,1},
@@ -319,7 +319,7 @@ end
 
 
 function flux_kfvs!(
-    fw::Array{<:AbstractFloat,1},
+    fw::AbstractArray{<:AbstractFloat,1},
     ff::AbstractArray{<:AbstractFloat,3},
     fL::AbstractArray{<:AbstractFloat,3},
     fR::AbstractArray{<:AbstractFloat,3},
@@ -403,7 +403,7 @@ end
 
 
 function flux_kfvs!(
-    fw::Array{<:AbstractFloat,1},
+    fw::AbstractArray{<:AbstractFloat,1},
     fh::AbstractArray{<:AbstractFloat,1},
     fb::AbstractArray{<:AbstractFloat,1},
     hL::AbstractArray{<:AbstractFloat,1},
@@ -505,7 +505,7 @@ end
 
 
 function flux_kfvs!(
-    fw::Array{<:AbstractFloat,1},
+    fw::AbstractArray{<:AbstractFloat,1},
     fh0::AbstractArray{<:AbstractFloat,1},
     fh1::AbstractArray{<:AbstractFloat,1},
     fh2::AbstractArray{<:AbstractFloat,1},
@@ -602,7 +602,7 @@ end
 
 
 function flux_kfvs!(
-    fw::Array{<:AbstractFloat,1},
+    fw::AbstractArray{<:AbstractFloat,1},
     ff::AbstractArray{<:AbstractFloat,2},
     fL::AbstractArray{<:AbstractFloat,2},
     fR::AbstractArray{<:AbstractFloat,2},
@@ -688,7 +688,7 @@ end
 
 
 function flux_kfvs!(
-    fw::Array{<:AbstractFloat,1},
+    fw::AbstractArray{<:AbstractFloat,1},
     fh::AbstractArray{<:AbstractFloat,2},
     fb::AbstractArray{<:AbstractFloat,2},
     hL::AbstractArray{<:AbstractFloat,2},
@@ -748,9 +748,9 @@ Kinetic central-upwind (KCU) method
 # 1D1F flux
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{<:Real,1},
+    wL::AbstractArray{<:Real,1},
     fL::AbstractArray{<:AbstractFloat,1},
-    wR::Array{<:Real,1},
+    wR::AbstractArray{<:Real,1},
     fR::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
@@ -811,14 +811,78 @@ function flux_kcu(
 end
 
 
+function flux_kcu!(
+    fw::AbstractArray{<:Real,1},
+    ff::AbstractArray{<:AbstractFloat,1},
+    wL::AbstractArray{<:Real,1},
+    fL::AbstractArray{<:AbstractFloat,1},
+    wR::AbstractArray{<:Real,1},
+    fR::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+)
+
+    # --- upwind reconstruction ---#
+    δ = heaviside.(u)
+    f = @. fL * δ + fR * (1.0 - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    # --- construct interface distribution ---#
+    Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mxi1, 0, 0)
+    Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
+
+    w = similar(wL, 3)
+    @. w = primL[1] * Muv1 + primR[1] * Muv2
+
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    # --- calculate fluxes ---#
+    Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mxi, 1, 0)
+    @. fw = Mt[1] * prim[1] * Muv
+
+    # flux from f0
+    g = maxwellian(u, prim)
+
+    fw[1] += Mt[2] * sum(ω .* u .* f)
+    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* f)
+    fw[3] += Mt[2] * 0.5 * (sum(ω .* u .^ 3 .* f))
+
+    @. ff = Mt[1] * u * g + Mt[2] * u * f
+
+end
+
+
 # ------------------------------------------------------------
 # 1D2F flux
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{<:Real,1},
+    wL::AbstractArray{<:Real,1},
     hL::AbstractArray{<:AbstractFloat,1},
     bL::AbstractArray{<:AbstractFloat,1},
-    wR::Array{<:Real,1},
+    wR::AbstractArray{<:Real,1},
     hR::AbstractArray{<:AbstractFloat,1},
     bR::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
@@ -882,13 +946,82 @@ function flux_kcu(
 end
 
 
+function flux_kcu!(
+    fw::AbstractArray{<:Real,1},
+    fh::AbstractArray{<:AbstractFloat,1},
+    fb::AbstractArray{<:AbstractFloat,1},
+    wL::AbstractArray{<:Real,1},
+    hL::AbstractArray{<:AbstractFloat,1},
+    bL::AbstractArray{<:AbstractFloat,1},
+    wR::AbstractArray{<:Real,1},
+    hR::AbstractArray{<:AbstractFloat,1},
+    bR::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+)
+
+    # --- upwind reconstruction ---#
+    δ = heaviside.(u)
+    h = @. hL * δ + hR * (1.0 - δ)
+    b = @. bL * δ + bR * (1.0 - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    # --- construct interface distribution ---#
+    Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mxi1, 0, 0)
+    Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    # --- calculate fluxes ---#
+    Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mxi, 1, 0)
+    @. fw = Mt[1] * prim[1] * Muv
+
+    # flux from f0
+    Mh = maxwellian(u, prim)
+    Mb = Mh .* inK ./ (2.0 * prim[end])
+
+    fw[1] += Mt[2] * sum(ω .* u .* h)
+    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h)
+    fw[3] += Mt[2] * 0.5 * (sum(ω .* u .^ 3 .* h) + sum(ω .* u .* b))
+
+    @. fh = Mt[1] * u * Mh + Mt[2] * u * h
+    @. fb = Mt[1] * u * Mb + Mt[2] * u * b
+
+end
+
+
 # ------------------------------------------------------------
 # 2D1F flux
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{<:Real,1},
+    wL::AbstractArray{<:Real,1},
     fL::AbstractArray{<:AbstractFloat,2},
-    wR::Array{<:Real,1},
+    wR::AbstractArray{<:Real,1},
     fR::AbstractArray{<:AbstractFloat,2},
     u::AbstractArray{<:AbstractFloat,2},
     v::AbstractArray{<:AbstractFloat,2},
@@ -953,14 +1086,82 @@ function flux_kcu(
 end
 
 
+function flux_kcu!(
+    fw::AbstractArray{<:Real,1},
+    ff::AbstractArray{<:AbstractFloat,2},
+    wL::AbstractArray{<:Real,1},
+    fL::AbstractArray{<:AbstractFloat,2},
+    wR::AbstractArray{<:Real,1},
+    fR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+    len::Real,
+)
+
+    # --- prepare ---#
+    delta = heaviside.(u)
+
+    # --- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+    f = @. fL * δ + fR * (1.0 - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    # --- construct interface distribution ---#
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    # --- calculate interface flux ---#
+    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    @. fw = Mt[1] * prim[1] * Muv * len
+
+    # flux from f0
+    g = maxwellian(u, v, prim)
+
+    fw[1] += Mt[2] * sum(ω .* u .* f) * len
+    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* f) * len
+    fw[3] += Mt[2] * sum(ω .* v .* u .* f) * len
+    fw[4] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* f)) * len
+
+    @. ff = (Mt[1] * u * g + Mt[2] * u * f) * len
+
+end
+
+
 # ------------------------------------------------------------
 # 2D2F flux
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{<:Real,1},
+    wL::AbstractArray{<:Real,1},
     hL::AbstractArray{<:AbstractFloat,2},
     bL::AbstractArray{<:AbstractFloat,2},
-    wR::Array{<:Real,1},
+    wR::AbstractArray{<:Real,1},
     hR::AbstractArray{<:AbstractFloat,2},
     bR::AbstractArray{<:AbstractFloat,2},
     u::AbstractArray{<:AbstractFloat,2},
@@ -1032,6 +1233,83 @@ function flux_kcu(
 end
 
 
+function flux_kcu!(
+    fw::AbstractArray{<:Real,1},
+    fh::AbstractArray{<:AbstractFloat,2},
+    fb::AbstractArray{<:AbstractFloat,2},
+    wL::AbstractArray{<:Real,1},
+    hL::AbstractArray{<:AbstractFloat,2},
+    bL::AbstractArray{<:AbstractFloat,2},
+    wR::AbstractArray{<:Real,1},
+    hR::AbstractArray{<:AbstractFloat,2},
+    bR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+    len::Real,
+)
+
+    # --- prepare ---#
+    delta = heaviside.(u)
+
+    # --- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+    h = @. hL * δ + hR * (1.0 - δ)
+    b = @. bL * δ + bR * (1.0 - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    # --- construct interface distribution ---#
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    # --- calculate interface flux ---#
+    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    @. fw = Mt[1] * prim[1] * Muv * len
+
+    # flux from f0
+    H = maxwellian(u, v, prim)
+    B = H .* inK ./ (2.0 * prim[end])
+
+    fw[1] += Mt[2] * sum(ω .* u .* h) * len
+    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h) * len
+    fw[3] += Mt[2] * sum(ω .* v .* u .* h) * len
+    fw[4] +=
+        Mt[2] *
+        0.5 *
+        (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) * len
+
+    @. fh = (Mt[1] * u * H + Mt[2] * u * h) * len
+    @. fb = (Mt[1] * u * B + Mt[2] * u * b) * len
+
+end
+
+
 """
 Kinetic central-upwind (KCU) method for multi-component gas
 
@@ -1047,9 +1325,9 @@ Kinetic central-upwind (KCU) method for multi-component gas
 # 1D1F flux with AAP model
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{<:Real,2},
+    wL::AbstractArray{<:Real,2},
     fL::AbstractArray{<:AbstractFloat,2},
-    wR::Array{<:Real,2},
+    wR::AbstractArray{<:Real,2},
     fR::AbstractArray{<:AbstractFloat,2},
     u::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
@@ -1154,10 +1432,10 @@ end
 # 1D2F flux with AAP model
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{<:Real,2},
+    wL::AbstractArray{<:Real,2},
     hL::AbstractArray{<:AbstractFloat,2},
     bL::AbstractArray{<:AbstractFloat,2},
-    wR::Array{<:Real,2},
+    wR::AbstractArray{<:Real,2},
     hR::AbstractArray{<:AbstractFloat,2},
     bR::AbstractArray{<:AbstractFloat,2},
     u::AbstractArray{<:AbstractFloat,2},
@@ -1275,12 +1553,12 @@ end
 # 1D4F flux with AAP model
 # ------------------------------------------------------------
 function flux_kcu(
-    wL::Array{<:Real,2},
+    wL::AbstractArray{<:Real,2},
     h0L::AbstractArray{<:AbstractFloat,2},
     h1L::AbstractArray{<:AbstractFloat,2},
     h2L::AbstractArray{<:AbstractFloat,2},
     h3L::AbstractArray{<:AbstractFloat,2},
-    wR::Array{<:Real,2},
+    wR::AbstractArray{<:Real,2},
     h0R::AbstractArray{<:AbstractFloat,2},
     h1R::AbstractArray{<:AbstractFloat,2},
     h2R::AbstractArray{<:AbstractFloat,2},
@@ -1440,6 +1718,51 @@ function flux_boundary_maxwell(
     fb = u .* bWall .* len .* dt
 
     return fw, fh, fb
+
+end
+
+
+function flux_boundary_maxwell!(
+    fw::AbstractArray{<:AbstractFloat,1},
+    fh::AbstractArray{<:AbstractFloat,2},
+    fb::AbstractArray{<:AbstractFloat,2},
+    bc::Array{<:Real,1},
+    h::AbstractArray{<:AbstractFloat,2},
+    b::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    dt::Real,
+    len::Real,
+    rot = 1::Real,
+)
+
+    @assert length(bc) == 4
+
+    δ = heaviside.(u .* rot)
+    SF = sum(ω .* u .* h .* (1.0 .- δ))
+    SG =
+        (bc[end] / π) * sum(
+            ω .* u .*
+            exp.(-bc[end] .* ((u .- bc[2]) .^ 2 .+ (v .- bc[3]) .^ 2)) .* δ,
+        )
+    prim = [-SF / SG; bc[2:end]]
+
+    H = maxwellian(u, v, prim)
+    B = H .* inK ./ (2.0 * prim[end])
+
+    hWall = H .* δ .+ h .* (1.0 .- δ)
+    bWall = B .* δ .+ b .* (1.0 .- δ)
+
+    fw[1] = discrete_moments(hWall, u, ω, 1) * len * dt
+    fw[2] = discrete_moments(hWall, u, ω, 2) * len * dt
+    fw[3] = discrete_moments(hWall .* u, v, ω, 1) * len * dt
+    fw[4] = (0.5 * discrete_moments(hWall .* (u .^ 2 .+ v .^ 2), u, ω, 1) +
+        0.5 * discrete_moments(bWall, u, ω, 1)) * len * dt
+
+    @. fh = u * hWall * len * dt
+    @. fb = u * bWall * len * dt
 
 end
 
