@@ -208,7 +208,7 @@ function init_fvm(KS::SolverSet)
                         KS.ib.bL,
                     )
                 else
-                    ctr[i] = ControlVolume2D2F(
+                    ctr[i, j] = ControlVolume2D2F(
                         KS.pSpace.x[i, j],
                         KS.pSpace.y[i, j],
                         KS.pSpace.dx[i, j],
