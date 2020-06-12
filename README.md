@@ -12,7 +12,7 @@ or their upscaling moment system
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" title="\frac{\partial \mathbf W}{\partial t} + \nabla_\mathbf x \cdot \mathbf F = \mathbf S" /></a>
 
-It employs the finite volume method (FVM) to solve the Boltzmann and its related model equations with the following form, 
+The finite volume method (FVM) is employed in all cases. 
 
 The package is compatible with Julia 1.3 or newer version. 
 To make use of it, execute `Julia` and type
