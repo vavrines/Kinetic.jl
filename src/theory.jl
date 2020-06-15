@@ -59,8 +59,8 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
         0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
 
     Threads.@threads for i = 2:6
-        MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i - 1) * MuL[i-2] / prim[end]
-        MuR[i] = prim[2] * MuR[i-1] + 0.5 * (i - 1) * MuR[i-2] / prim[end]
+        MuL[i] = prim[2] * MuL[i - 1] + 0.5 * (i - 1) * MuL[i - 2] / prim[end]
+        MuR[i] = prim[2] * MuR[i - 1] + 0.5 * (i - 1) * MuR[i - 2] / prim[end]
     end
 
     @. Mu = MuL + MuR
@@ -80,7 +80,7 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
         Mv[0] = 1.0
         Mv[1] = prim[3]
         Threads.@threads for i = 2:6
-            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
+            Mv[i] = prim[3] * Mv[i - 1] + 0.5 * (i - 1) * Mv[i - 2] / prim[end]
         end
 
         Mxi = OffsetArray{Float64}(undef, 0:2)
@@ -96,14 +96,14 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
         Mv[0] = 1.0
         Mv[1] = prim[3]
         Threads.@threads for i = 2:6
-            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
+            Mv[i] = prim[3] * Mv[i - 1] + 0.5 * (i - 1) * Mv[i - 2] / prim[end]
         end
 
         Mw = OffsetArray{Float64}(undef, 0:6)
         Mw[0] = 1.0
         Mw[1] = prim[4]
         Threads.@threads for i = 2:6
-            Mw[i] = prim[4] * Mw[i-1] + 0.5 * (i - 1) * Mw[i-2] / prim[end]
+            Mw[i] = prim[4] * Mw[i - 1] + 0.5 * (i - 1) * Mw[i - 2] / prim[end]
         end
 
         return Mu, Mv, Mw, MuL, MuR
@@ -182,9 +182,9 @@ function moments_conserve(
 )
 
     uv = zeros(3)
-    uv[1] = Mu[alpha] * Mxi[delta÷2]
-    uv[2] = Mu[alpha+1] * Mxi[delta÷2]
-    uv[3] = 0.5 * (Mu[alpha+2] * Mxi[delta÷2] + Mu[alpha] * Mxi[(delta+2)÷2])
+    uv[1] = Mu[alpha] * Mxi[delta ÷ 2]
+    uv[2] = Mu[alpha + 1] * Mxi[delta ÷ 2]
+    uv[3] = 0.5 * (Mu[alpha + 2] * Mxi[delta ÷ 2] + Mu[alpha] * Mxi[(delta + 2) ÷ 2])
 
     return uv
 
@@ -203,28 +203,28 @@ function moments_conserve(
     if length(Mw) == 3 # internal motion
 
         uv = zeros(4)
-        uv[1] = Mu[alpha] * Mv[beta] * Mw[delta÷2]
-        uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta÷2]
-        uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta÷2]
+        uv[1] = Mu[alpha] * Mv[beta] * Mw[delta ÷ 2]
+        uv[2] = Mu[alpha + 1] * Mv[beta] * Mw[delta ÷ 2]
+        uv[3] = Mu[alpha] * Mv[beta + 1] * Mw[delta ÷ 2]
         uv[4] =
             0.5 * (
-                Mu[alpha+2] * Mv[beta] * Mw[delta÷2] +
-                Mu[alpha] * Mv[beta+2] * Mw[delta÷2] +
-                Mu[alpha] * Mv[beta] * Mw[(delta+2)÷2]
+                Mu[alpha + 2] * Mv[beta] * Mw[delta ÷ 2] +
+                Mu[alpha] * Mv[beta + 2] * Mw[delta ÷ 2] +
+                Mu[alpha] * Mv[beta] * Mw[(delta + 2) ÷ 2]
             )
 
     else
 
         uv = zeros(5)
         uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
-        uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta]
-        uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta]
-        uv[4] = Mu[alpha] * Mv[beta] * Mw[delta+1]
+        uv[2] = Mu[alpha + 1] * Mv[beta] * Mw[delta]
+        uv[3] = Mu[alpha] * Mv[beta + 1] * Mw[delta]
+        uv[4] = Mu[alpha] * Mv[beta] * Mw[delta + 1]
         uv[5] =
             0.5 * (
-                Mu[alpha+2] * Mv[beta] * Mw[delta] +
-                Mu[alpha] * Mv[beta+2] * Mw[delta] +
-                Mu[alpha] * Mv[beta] * Mw[delta+2]
+                Mu[alpha + 2] * Mv[beta] * Mw[delta] +
+                Mu[alpha] * Mv[beta + 2] * Mw[delta] +
+                Mu[alpha] * Mv[beta] * Mw[delta + 2]
             )
 
     end
@@ -280,6 +280,7 @@ function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
     sl = zeros(axes(prim))
 
     if length(prim) == 3
+
         sl[3] =
             4.0 * prim[3]^2 / (inK + 1.0) / prim[1] * (
                 2.0 * sw[3] - 2.0 * prim[2] * sw[2] +
@@ -293,6 +294,7 @@ function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
             0.5 * (prim[2]^2 + 0.5 * (inK + 1.0) / prim[3]) * sl[3]
 
     elseif length(prim) == 4
+
         sl[4] =
             4.0 * prim[4]^2 / (inK + 2.0) / prim[1] * (
                 2.0 * sw[4] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] +
@@ -307,7 +309,9 @@ function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
         sl[1] =
             sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] -
             0.5 * (prim[2]^2 + prim[3]^2 + 0.5 * (inK + 2.0) / prim[4]) * sl[4]
+
     elseif length(prim) == 5
+
         sl[5] =
             4.0 * prim[5]^2 / (inK + 3.0) / prim[1] * (
                 2.0 * sw[5] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] -
@@ -332,6 +336,7 @@ function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
             0.5 *
             (prim[2]^2 + prim[3]^2 + prim[4]^2 + 0.5 * (inK + 3.0) / prim[5]) *
             sl[5]
+            
     end
 
     return sl
@@ -343,22 +348,17 @@ end
 # Calculate slope-related conservative moments
 # a = a1 + u * a2 + 0.5 * u^2 * a3
 # ------------------------------------------------------------
-function moments_conserve_slope(
+moments_conserve_slope(
     a::Array{<:Real,1},
     Mu::OffsetArray{<:Real,1},
     Mxi::OffsetArray{<:Real,1},
-    alpha::Int,
-)
+    alpha::Int
+) = a[1] .* moments_conserve(Mu, Mxi, alpha + 0, 0) .+
+    a[2] .* moments_conserve(Mu, Mxi, alpha + 1, 0) .+
+    0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 2, 0) .+
+    0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 0, 2)
 
-    au =
-        a[1] .* moments_conserve(Mu, Mxi, alpha + 0, 0) .+
-        a[2] .* moments_conserve(Mu, Mxi, alpha + 1, 0) .+
-        0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 2, 0) .+
-        0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 0, 2)
 
-    return au
-
-end
 
 function moments_conserve_slope(
     a::Array{<:Real,1},
@@ -516,9 +516,9 @@ discrete_moments(
 # ------------------------------------------------------------
 # --- 1D ---#
 moments_conserve(
-    f::AbstractArray{<:Real,1},
-    u::AbstractArray{<:Real,1},
-    ω::AbstractArray{<:Real,1},
+    f::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
 ) = [
     discrete_moments(f, u, ω, 0),
     discrete_moments(f, u, ω, 1),
@@ -526,23 +526,50 @@ moments_conserve(
 ]
 
 moments_conserve(
-    h::AbstractArray{<:Real,1},
-    b::AbstractArray{<:Real,1},
-    u::AbstractArray{<:Real,1},
-    ω::AbstractArray{<:Real,1},
+    h::AbstractArray{<:AbstractFloat,1},
+    b::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
 ) = [
     discrete_moments(h, u, ω, 0),
     discrete_moments(h, u, ω, 1),
     0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(b, u, ω, 0)),
 ]
 
+function mixture_moments_conserve(
+    f::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+)
+    w = zeros(eltype(f), 3, size(f, 2))
+    for j in axes(w, 2)
+        w[:, j] .= moments_conserve(f[:, j], u, ω)
+    end
+
+    return w
+end
+
+function mixture_moments_conserve(
+    h::AbstractArray{<:AbstractFloat,2},
+    b::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+)
+    w = zeros(eltype(h), 3, size(h, 2))
+    for j in axes(w, 2)
+        w[:, j] .= moments_conserve(h[:, j], b[:, j], u, ω)
+    end
+
+    return w
+end
+
 
 # --- 2D ---#
 moments_conserve(
-    f::AbstractArray{<:Real,2},
-    u::AbstractArray{<:Real,2},
-    v::AbstractArray{<:Real,2},
-    ω::AbstractArray{<:Real,2},
+    f::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
 ) = [
     discrete_moments(f, u, ω, 0),
     discrete_moments(f, u, ω, 1),
@@ -551,11 +578,11 @@ moments_conserve(
 ]
 
 moments_conserve(
-    h::AbstractArray{<:Real,2},
-    b::AbstractArray{<:Real,2},
-    u::AbstractArray{<:Real,2},
-    v::AbstractArray{<:Real,2},
-    ω::AbstractArray{<:Real,2},
+    h::AbstractArray{<:AbstractFloat,2},
+    b::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
 ) = [
     discrete_moments(h, u, ω, 0),
     discrete_moments(h, u, ω, 1),
@@ -563,6 +590,34 @@ moments_conserve(
     0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(h, v, ω, 2) + discrete_moments(b, u, ω, 0)),
 ]
 
+function mixture_moments_conserve(
+    f::AbstractArray{<:AbstractFloat,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    ω::AbstractArray{<:AbstractFloat,3},
+)
+    w = zeros(eltype(f), 4, size(f, 3))
+    for j in axes(w, 2)
+        w[:, j] .= moments_conserve(f[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
+    end
+
+    return w
+end
+
+function mixture_moments_conserve(
+    h::AbstractArray{<:AbstractFloat,2},
+    b::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+)
+    w = zeros(eltype(h), 4, size(h, 3))
+    for j in axes(w, 2)
+        w[:, j] .= moments_conserve(h[:, :, j], b[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
+    end
+
+    return w
+end
 
 # --- 3D ---#
 moments_conserve(
@@ -582,6 +637,52 @@ moments_conserve(
         discrete_moments(f, w, ω, 2)
     ),
 ]
+
+moments_conserve(
+    h0::AbstractArray{<:AbstractFloat,1},
+    h1::AbstractArray{<:AbstractFloat,1},
+    h2::AbstractArray{<:AbstractFloat,1},
+    h3::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+) = [
+    discrete_moments(h0, u, ω, 0),
+    discrete_moments(h0, u, ω, 1),
+    discrete_moments(h1, u, ω, 0),
+    discrete_moments(h2, u, ω, 0),
+    0.5 * discrete_moments(h0, u, ω, 2) + 0.5 * discrete_moments(h3, u, ω, 0),
+]
+
+function mixture_moments_conserve(
+    f::AbstractArray{<:Real,4},
+    u::AbstractArray{<:Real,4},
+    v::AbstractArray{<:Real,4},
+    w::AbstractArray{<:Real,4},
+    ω::AbstractArray{<:Real,4},
+)
+    w = zeros(eltype(f), 5, size(f, 4))
+    for j in axes(w, 2)
+        w[:, j] .= moments_conserve(f[:, :, :, j], u[:, :, :, j], v[:, :, :, j], w[:, :, :, j], ω[:, :, :, j])
+    end
+
+    return w
+end
+
+function mixture_moments_conserve(
+    h0::AbstractArray{<:AbstractFloat,2},
+    h1::AbstractArray{<:AbstractFloat,2},
+    h2::AbstractArray{<:AbstractFloat,2},
+    h3::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:Real,2},
+    ω::AbstractArray{<:Real,2},
+)
+    w = zeros(eltype(h0), 5, size(h0, 2))
+    for j in axes(w, 2)
+        w[:, j] .= moments_conserve(h0[:, j], h1[:, j], h2[:, j], h3[:, j], u[:, j], ω[:, j])
+    end
+
+    return w
+end
 
 
 """
@@ -603,7 +704,7 @@ maxwellian(u::AbstractArray{<:Real,1}, prim::Array{<:Real,1}) =
 
 
 function mixture_maxwellian(u::AbstractArray{<:Real,2}, prim::Array{<:Real,2})
-    mixM = zeros(axes(u))
+    mixM = similar(u)
     for j in axes(mixM, 2)
         mixM[:, j] .= maxwellian(u[:, j], prim[:, j])
     end
@@ -690,7 +791,7 @@ Reduced distribution function
 function reduce_distribution(
     f::AbstractArray{<:AbstractFloat,3},
     weights::AbstractArray{<:AbstractFloat,2},
-    dim=1::Int,
+    dim = 1::Int,
 )
 
     if dim == 1
@@ -719,7 +820,7 @@ function reduce_distribution(
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
     weights::AbstractArray{<:AbstractFloat,2},
-    dim=1::Int,
+    dim = 1::Int,
 )
 
     if dim == 1
@@ -770,7 +871,7 @@ function full_distribution(
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
     ρ::Real,
-    γ=5/3::Real,
+    γ = 5 / 3::Real,
 )
 
     @assert length(h) == size(v, 1) throw(DimensionMismatch("reduced and full distribution function mismatch"))
@@ -794,7 +895,7 @@ full_distribution(
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
     prim::Array{<:Real,1},
-    γ=5/3::Real,
+    γ = 5 / 3::Real,
 ) = full_distribution(h, b, u, weights, v, w, prim[1], γ)
 
 
@@ -1005,21 +1106,21 @@ function kernel_mode(
     fre_vy = range(-π / dv, (vnum ÷ 2 - 1) * 2.0 * π / vnum / dv, length = vnum)
     fre_vz = range(-π / dw, (wnum ÷ 2 - 1) * 2.0 * π / wnum / dw, length = wnum)
 
-    #abscissa, gweight = gausslegendre(quad_num)
-    #@. abscissa = (0. * (1. - abscissa) + supp * (1. + abscissa)) / 2
-    #@. gweight *= (supp - 0.) / 2
+    # abscissa, gweight = gausslegendre(quad_num)
+    # @. abscissa = (0. * (1. - abscissa) + supp * (1. + abscissa)) / 2
+    # @. gweight *= (supp - 0.) / 2
 
     abscissa, gweight = lgwt(quad_num, 0, supp)
 
     phi = zeros(unum, vnum, wnum, M * (M - 1))
     psi = zeros(unum, vnum, wnum, M * (M - 1))
     phipsi = zeros(unum, vnum, wnum)
-    for loop = 1:M-1
+    for loop = 1:M - 1
         theta = π / M * loop
         for loop2 = 1:M
             theta2 = π / M * loop2
             idx = (loop - 1) * M + loop2
-            for k = 1:wnum, j = 1:vnum, i = 1:unum
+            for k in 1:wnum, j in 1:vnum, i in 1:unum
                 s =
                     fre_vx[i] * sin(theta) * cos(theta2) +
                     fre_vy[j] * sin(theta) * sin(theta2) +
@@ -1072,9 +1173,9 @@ function boltzmann_fft(
     f_spec ./= size(f, 1) * size(f, 2) * size(f, 3)
     f_spec .= fftshift(f_spec)
 
-    #--- gain term ---#
+    # --- gain term ---#
     f_temp = zeros(axes(f_spec)) .+ 0im
-    for i = 1:M*(M-1)
+    for i = 1:M * (M - 1)
         fg1 = f_spec .* ϕ[:, :, :, i]
         fg2 = f_spec .* ψ[:, :, :, i]
         fg11 = fft(fg1)
@@ -1082,7 +1183,7 @@ function boltzmann_fft(
         f_temp .+= fg11 .* fg22
     end
 
-    #--- loss term ---#
+    # --- loss term ---#
     fl1 = f_spec .* phipsi
     fl2 = f_spec
     fl11 = fft(fl1)
@@ -1406,32 +1507,32 @@ function shift_pdf!(f::AbstractArray{<:Real,1}, a::Real, du::Real, dt::Real)
 
     if a > 0
         shift = Int(floor(a * dt / du)) # only for uniform velocity grid
-        for k = q1:-1:q0+shift
-            f[k] = f[k-shift]
+        for k = q1:-1:q0 + shift
+            f[k] = f[k - shift]
         end
-        for k = q0:shift+q0-1
+        for k = q0:shift + q0 - 1
             f[k] = 0.0
         end
 
-        for k = q0+1:q1
-            f[k] += (dt * a - du * shift) * (f[k-1] - f[k]) / du
+        for k = q0 + 1:q1
+            f[k] += (dt * a - du * shift) * (f[k - 1] - f[k]) / du
         end
     else
         shift = Int(floor(-a * dt / du))
-        for k = q0:q1-shift
-            f[k] = f[k+shift]
+        for k = q0:q1 - shift
+            f[k] = f[k + shift]
         end
-        for k = q1-shift+1:q1
+        for k = q1 - shift + 1:q1
             f[k] = 0.0
         end
 
-        for k = q0:q1-1
-            f[k] += (dt * a + du * shift) * (f[k] - f[k+1]) / du
+        for k = q0:q1 - 1
+            f[k] += (dt * a + du * shift) * (f[k] - f[k + 1]) / du
         end
     end
 
-    f[q0] = f[q0+1]
-    f[q1] = f[q1-1]
+    f[q0] = f[q0 + 1]
+    f[q1] = f[q1 - 1]
 
 end
 
