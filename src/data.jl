@@ -336,20 +336,7 @@ struct IB2F{A,B} <: AbstractCondition
         bcD = deepcopy(bcR)::Array,
     )
 
-        new{typeof(wL),typeof(hL)}(
-            wL,
-            primL,
-            hL,
-            bL,
-            bcL,
-            wR,
-            primR,
-            hR,
-            bR,
-            bcR,
-            bcU,
-            bcD,
-        )
+        new{typeof(wL),typeof(hL)}(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
 
     end
 
@@ -451,12 +438,7 @@ mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
     prim::A
     sw::A
 
-    function ControlVolume1D(
-        X::Real,
-        DX::Real,
-        W::Array,
-        PRIM::Array,
-    )
+    function ControlVolume1D(X::Real, DX::Real, W::Array, PRIM::Array)
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -484,13 +466,7 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
     f::B
     sf::B
 
-    function ControlVolume1D1F(
-        X::Real,
-        DX::Real,
-        W::Array,
-        PRIM::Array,
-        F::AbstractArray,
-    )
+    function ControlVolume1D1F(X::Real, DX::Real, W::Array, PRIM::Array, F::AbstractArray)
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -709,14 +685,7 @@ mutable struct ControlVolume2D{F,A,B} <: AbstractControlVolume2D
     prim::A
     sw::B
 
-    function ControlVolume2D(
-        X::Real,
-        DX::Real,
-        Y::Real,
-        DY::Real,
-        W::Array,
-        PRIM::Array,
-    )
+    function ControlVolume2D(X::Real, DX::Real, Y::Real, DY::Real, W::Array, PRIM::Array)
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -770,7 +739,17 @@ mutable struct ControlVolume2D1F{F,A,B,C,D} <: AbstractControlVolume2D
         f = deepcopy(F)
         sf = zeros(eltype(F), (axes(F)..., Base.OneTo(2)))
 
-        new{typeof(x),typeof(w),typeof(sw),typeof(f),typeof(sf)}(x, dx, y, dy, w, prim, sw, f, sf)
+        new{typeof(x),typeof(w),typeof(sw),typeof(f),typeof(sf)}(
+            x,
+            dx,
+            y,
+            dy,
+            w,
+            prim,
+            sw,
+            f,
+            sf,
+        )
 
     end
 
@@ -818,7 +797,19 @@ mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
         sh = zeros(eltype(H), (axes(H)..., Base.OneTo(2)))
         sb = zeros(eltype(B), (axes(B)..., Base.OneTo(2)))
 
-        new{typeof(x),typeof(w),typeof(sw),typeof(h),typeof(sh)}(x, dx, y, dy, w, prim, sw, h, b, sh, sb)
+        new{typeof(x),typeof(w),typeof(sw),typeof(h),typeof(sh)}(
+            x,
+            dx,
+            y,
+            dy,
+            w,
+            prim,
+            sw,
+            h,
+            b,
+            sh,
+            sb,
+        )
 
     end
 
@@ -899,15 +890,7 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
         femL = zeros(typeof(E), 8)
         femR = zeros(typeof(E), 8)
 
-        new{typeof(fw),typeof(fh0),typeof(femL)}(
-            fw,
-            fh0,
-            fh1,
-            fh2,
-            fh3,
-            femL,
-            femR,
-        )
+        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, fh3, femL, femR)
 
     end
 
@@ -921,15 +904,7 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
         femL = zeros(typeof(E), 8, axes(E, 2))
         femR = zeros(typeof(E), 8, axes(E, 2))
 
-        new{typeof(fw),typeof(fh0),typeof(femL)}(
-            fw,
-            fh0,
-            fh1,
-            fh2,
-            fh3,
-            femL,
-            femR,
-        )
+        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, fh3, femL, femR)
 
     end
 
@@ -1029,11 +1004,7 @@ mutable struct Solution1D1F{A,B} <: AbstractSolution1D
     f::B
     sf::B
 
-    function Solution1D1F(
-        w::AbstractArray,
-        prim::AbstractArray,
-        f::AbstractArray,
-    )
+    function Solution1D1F(w::AbstractArray, prim::AbstractArray, f::AbstractArray)
         sw = [zeros(axes(w[1])) for i in axes(w, 1)]
         sf = [zeros(axes(f[1])) for i in axes(f, 1)]
 
@@ -1101,8 +1072,7 @@ mutable struct Solution2D{A,B} <: AbstractSolution2D
         w::AbstractArray,
         prim::AbstractArray,
         sw = [
-            zeros((axes(w[1])..., Base.OneTo(2)))
-            for i in axes(w, 1), j in axes(w, 2)
+            zeros((axes(w[1])..., Base.OneTo(2))) for i in axes(w, 1), j in axes(w, 2)
         ]::AbstractArray,
     )
 
@@ -1120,19 +1090,9 @@ mutable struct Solution2D1F{A,B,C,D} <: AbstractSolution2D
     f::C
     sf::D
 
-    function Solution2D1F(
-        w::AbstractArray,
-        prim::AbstractArray,
-        f::AbstractArray,
-    )
-        sw = [
-            zeros((axes(w[1])..., Base.OneTo(2)))
-            for i in axes(w, 1), j in axes(w, 2)
-        ]
-        sf = [
-            zeros((axes(f[1])..., Base.OneTo(2)))
-            for i in axes(f, 1), j in axes(f, 2)
-        ]
+    function Solution2D1F(w::AbstractArray, prim::AbstractArray, f::AbstractArray)
+        sw = [zeros((axes(w[1])..., Base.OneTo(2))) for i in axes(w, 1), j in axes(w, 2)]
+        sf = [zeros((axes(f[1])..., Base.OneTo(2))) for i in axes(f, 1), j in axes(f, 2)]
 
         new{typeof(w),typeof(sw),typeof(f),typeof(sf)}(w, prim, sw, f, sf)
     end
@@ -1166,18 +1126,9 @@ mutable struct Solution2D2F{A,B,C,D} <: AbstractSolution2D
         h::AbstractArray,
         b::AbstractArray,
     )
-        sw = [
-            zeros((axes(w[1])..., Base.OneTo(2)))
-            for i in axes(w, 1), j in axes(w, 2)
-        ]
-        sh = [
-            zeros((axes(h[1])..., Base.OneTo(2)))
-            for i in axes(h, 1), j in axes(h, 2)
-        ]
-        sb = [
-            zeros((axes(b[1])..., Base.OneTo(2)))
-            for i in axes(b, 1), j in axes(b, 2)
-        ]
+        sw = [zeros((axes(w[1])..., Base.OneTo(2))) for i in axes(w, 1), j in axes(w, 2)]
+        sh = [zeros((axes(h[1])..., Base.OneTo(2))) for i in axes(h, 1), j in axes(h, 2)]
+        sb = [zeros((axes(b[1])..., Base.OneTo(2))) for i in axes(b, 1), j in axes(b, 2)]
 
         new{typeof(w),typeof(sw),typeof(h),typeof(sh)}(w, prim, sw, h, b, sh, sb)
     end
@@ -1253,11 +1204,11 @@ mutable struct Flux2D{A,B,C} <: AbstractFlux2D
 
     function Flux2D(
         n1::AbstractArray,
-        w1::AbstractArray, 
-        fw1::AbstractArray, 
-        n2::AbstractArray, 
-        w2::AbstractArray, 
-        fw2::AbstractArray, 
+        w1::AbstractArray,
+        fw1::AbstractArray,
+        n2::AbstractArray,
+        w2::AbstractArray,
+        fw2::AbstractArray,
     )
         new{typeof(n1),typeof(w1),typeof(fw1)}(n1, w1, fw1, n2, w2, fw2)
     end
@@ -1279,15 +1230,24 @@ mutable struct Flux2D1F{A,B,C,D} <: AbstractFlux2D
 
     function Flux2D1F(
         n1::AbstractArray,
-        w1::AbstractArray, 
-        fw1::AbstractArray, 
+        w1::AbstractArray,
+        fw1::AbstractArray,
         ff1::AbstractArray,
-        n2::AbstractArray, 
-        w2::AbstractArray, 
-        fw2::AbstractArray, 
+        n2::AbstractArray,
+        w2::AbstractArray,
+        fw2::AbstractArray,
         ff2::AbstractArray,
     )
-        new{typeof(n1),typeof(w1),typeof(fw1),typeof(ff1)}(n1, w1, fw1, ff1, n2, w2, fw2, ff2)
+        new{typeof(n1),typeof(w1),typeof(fw1),typeof(ff1)}(
+            n1,
+            w1,
+            fw1,
+            ff1,
+            n2,
+            w2,
+            fw2,
+            ff2,
+        )
     end
 
 end
@@ -1319,7 +1279,18 @@ mutable struct Flux2D2F{A,B,C,D} <: AbstractFlux2D
         fh2::AbstractArray,
         fb2::AbstractArray,
     )
-        new{typeof(n1),typeof(w1),typeof(fw1),typeof(fh1)}(n1, w1, fw1, fh1, fb1, n2, w2, fw2, fh2, fb2)
+        new{typeof(n1),typeof(w1),typeof(fw1),typeof(fh1)}(
+            n1,
+            w1,
+            fw1,
+            fh1,
+            fb1,
+            n2,
+            w2,
+            fw2,
+            fh2,
+            fb2,
+        )
     end
 
 end

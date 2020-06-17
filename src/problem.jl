@@ -21,8 +21,7 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1})
 
     MaR = sqrt((MaL^2 * (gam - 1.0) + 2.0) / (2.0 * gam * MaL^2 - (gam - 1.0)))
     ratioT =
-        (1.0 + (gam - 1.0) / 2.0 * MaL^2) *
-        (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
+        (1.0 + (gam - 1.0) / 2.0 * MaL^2) * (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
         (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
 
     primR = [
@@ -52,8 +51,7 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}, K::Rea
 
     MaR = sqrt((MaL^2 * (gam - 1.0) + 2.0) / (2.0 * gam * MaL^2 - (gam - 1.0)))
     ratioT =
-        (1.0 + (gam - 1.0) / 2.0 * MaL^2) *
-        (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
+        (1.0 + (gam - 1.0) / 2.0 * MaL^2) * (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
         (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
 
     primR = [
@@ -92,8 +90,7 @@ function ib_rh(
 
     MaR = sqrt((MaL^2 * (gam - 1.0) + 2.0) / (2.0 * gam * MaL^2 - (gam - 1.0)))
     ratioT =
-        (1.0 + (gam - 1.0) / 2.0 * MaL^2) *
-        (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
+        (1.0 + (gam - 1.0) / 2.0 * MaL^2) * (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
         (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
 
     primR = [
@@ -127,15 +124,15 @@ Initialize lid-driven cavity
 # 2D1F2V
 # ------------------------------------------------------------
 function ib_cavity(
-    gam::Real, 
-    Um::Real, 
+    gam::Real,
+    Um::Real,
     Vm::Real,
-    Tm::Real, 
+    Tm::Real,
     u::AbstractArray{Float64,2},
     v::AbstractArray{Float64,2},
 )
 
-    primL = [1., 0., 0., 1.]
+    primL = [1.0, 0.0, 0.0, 1.0]
     primR = deepcopy(primL)
 
     wL = prim_conserve(primL, gam)
@@ -144,7 +141,7 @@ function ib_cavity(
     fL = maxwellian(u, v, primL)
     fR = maxwellian(u, v, primR)
 
-    bcU = [1., Um, Vm, Tm]
+    bcU = [1.0, Um, Vm, Tm]
     bcD = deepcopy(primR)
     bcL = deepcopy(primR)
     bcR = deepcopy(primR)
@@ -157,16 +154,16 @@ end
 # 2D2F2V
 # ------------------------------------------------------------
 function ib_cavity(
-    gam::Real, 
-    Um::Real, 
+    gam::Real,
+    Um::Real,
     Vm::Real,
-    Tm::Real, 
+    Tm::Real,
     u::AbstractArray{Float64,2},
     v::AbstractArray{Float64,2},
     K::Real,
 )
 
-    primL = [1., 0., 0., 1.]
+    primL = [1.0, 0.0, 0.0, 1.0]
     primR = deepcopy(primL)
 
     wL = prim_conserve(primL, gam)
@@ -175,10 +172,10 @@ function ib_cavity(
     hL = maxwellian(u, v, primL)
     hR = maxwellian(u, v, primR)
 
-    bL = hL .* K ./ (2. * primL[end])
-    bR = hR .* K ./ (2. * primR[end])
+    bL = hL .* K ./ (2.0 * primL[end])
+    bR = hR .* K ./ (2.0 * primR[end])
 
-    bcU = [1., Um, Vm, Tm]
+    bcU = [1.0, Um, Vm, Tm]
     bcD = deepcopy(primR)
     bcL = deepcopy(primR)
     bcR = deepcopy(primR)
@@ -193,12 +190,7 @@ Initialize Brio-Wu MHD shock
 
 ```
 
-function ib_briowu(
-    gam::Real,
-    uspace::AbstractArray{Float64,2},
-    mi::Real,
-    me::Real,
-)
+function ib_briowu(gam::Real, uspace::AbstractArray{Float64,2}, mi::Real, me::Real)
 
     # upstream
     primL = zeros(5, 2)
@@ -223,8 +215,7 @@ function ib_briowu(
         h1L[:, j] .= primL[3, j] .* h0L[:, j]
         h2L[:, j] .= primL[4, j] .* h0L[:, j]
         h3L[:, j] .=
-            (primL[3, j]^2 + primL[4, j]^2 + 2.0 / (2.0 * primL[end, j])) .*
-            h0L[:, j]
+            (primL[3, j]^2 + primL[4, j]^2 + 2.0 / (2.0 * primL[end, j])) .* h0L[:, j]
     end
 
     EL = zeros(3)
@@ -255,8 +246,7 @@ function ib_briowu(
         h1R[:, j] .= primR[3, j] .* h0R[:, j]
         h2R[:, j] .= primR[4, j] .* h0R[:, j]
         h3R[:, j] .=
-            (primR[3, j]^2 + primR[4, j]^2 + 2.0 / (2.0 * primR[end, j])) .*
-            h0R[:, j]
+            (primR[3, j]^2 + primR[4, j]^2 + 2.0 / (2.0 * primR[end, j])) .* h0R[:, j]
     end
 
     ER = zeros(3)

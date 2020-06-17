@@ -11,17 +11,13 @@ vanleer(sL, sR) =
     (abs(sL) + abs(sR) + 1.e-7)
 
 
-minmod(sL, sR) =
-    0.5 * (fortsign(1.0, sL) + fortsign(1.0, sR)) * min(abs(sR), abs(sL))
+minmod(sL, sR) = 0.5 * (fortsign(1.0, sL) + fortsign(1.0, sR)) * min(abs(sR), abs(sL))
 
 
 reconstruct2(wL::Float64, wR::Float64, Δx::Float64) = (wR - wL) / Δx
 
-reconstruct2(
-    wL::AbstractArray{Float64,1},
-    wR::AbstractArray{Float64,1},
-    Δx::Float64,
-) = (wR .- wL) ./ Δx
+reconstruct2(wL::AbstractArray{Float64,1}, wR::AbstractArray{Float64,1}, Δx::Float64) =
+    (wR .- wL) ./ Δx
 
 function reconstruct2(
     wL::AbstractArray{Float64,2},
@@ -131,14 +127,7 @@ function reconstruct3(
     s = zeros(axes(wL))
 
     for k in axes(s, 3), j in axes(s, 2)
-        s[:, j, k] .= reconstruct3(
-            wL[:, j, k],
-            wN[:, j, k],
-            wR[:, j, k],
-            ΔxL,
-            ΔxR,
-            limiter,
-        )
+        s[:, j, k] .= reconstruct3(wL[:, j, k], wN[:, j, k], wR[:, j, k], ΔxL, ΔxR, limiter)
     end
 
     return s

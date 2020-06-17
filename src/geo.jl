@@ -20,19 +20,13 @@ struct PSpace1D <: AbstractPhysicalSpace
     PSpace1D() = PSpace1D(0, 1, 100)
     PSpace1D(X0::Real, X1::Real) = PSpace1D(X0, X1, 100)
 
-    function PSpace1D(
-        X0::Real,
-        X1::Real,
-        XNUM::Int,
-        TYPE = "uniform"::String,
-        NG = 0::Int,
-    )
+    function PSpace1D(X0::Real, X1::Real, XNUM::Int, TYPE = "uniform"::String, NG = 0::Int)
 
         x0 = Float64(X0)
         x1 = Float64(X1)
         nx = XNUM
         δ = (x1 - x0) / nx
-        x = OffsetArray{Float64}(undef, 1 - NG:nx + NG)
+        x = OffsetArray{Float64}(undef, 1-NG:nx+NG)
         dx = similar(x)
 
         if TYPE == "uniform" # // uniform mesh
@@ -64,8 +58,7 @@ struct PSpace2D <: AbstractPhysicalSpace
     dy::AbstractArray{Float64,2}
 
     PSpace2D() = PSpace2D(0, 1, 45, 0, 1, 45)
-    PSpace2D(X0::Real, X1::Real, Y0::Real, Y1::Real) =
-        PSpace2D(X0, X1, 45, Y0, Y1, 45)
+    PSpace2D(X0::Real, X1::Real, Y0::Real, Y1::Real) = PSpace2D(X0, X1, 45, Y0, Y1, 45)
 
     function PSpace2D(
         X0::Real,
@@ -87,10 +80,10 @@ struct PSpace2D <: AbstractPhysicalSpace
         y1 = Float64(Y1)
         ny = YNUM
         δy = (y1 - y0) / ny
-        x = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
-        y = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
-        dx = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
-        dy = OffsetArray{Float64}(undef, 1 - NGX:nx + NGX, 1 - NGY:ny + NGY)
+        x = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+        y = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+        dx = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
+        dy = OffsetArray{Float64}(undef, 1-NGX:nx+NGX, 1-NGY:ny+NGY)
 
         if TYPE == "uniform" # rectangular formula
             for j in axes(x, 2)
@@ -140,16 +133,18 @@ end
 function global_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
 
     if length(w) == 3
-        G = [w[1] * dirccos[1,1] + w[2] * dirccos[2,1] + w[3] * dirccos[3,1], 
-            w[1] * dirccos[1,2] + w[2] * dirccos[2,2] + w[3] * dirccos[3,2],
-            w[1] * dirccos[1,3] + w[2] * dirccos[2,3] + w[3] * dirccos[3,3]
+        G = [
+            w[1] * dirccos[1, 1] + w[2] * dirccos[2, 1] + w[3] * dirccos[3, 1],
+            w[1] * dirccos[1, 2] + w[2] * dirccos[2, 2] + w[3] * dirccos[3, 2],
+            w[1] * dirccos[1, 3] + w[2] * dirccos[2, 3] + w[3] * dirccos[3, 3],
         ]
     elseif length(w) == 5
-        G = [w[1], 
-            w[2] * dirccos[1,1] + w[3] * dirccos[2,1] + w[4] * dirccos[3,1], 
-            w[2] * dirccos[1,2] + w[3] * dirccos[2,2] + w[4] * dirccos[3,2],
-            w[2] * dirccos[1,3] + w[3] * dirccos[2,3] + w[4] * dirccos[3,3],
-            w[5]
+        G = [
+            w[1],
+            w[2] * dirccos[1, 1] + w[3] * dirccos[2, 1] + w[4] * dirccos[3, 1],
+            w[2] * dirccos[1, 2] + w[3] * dirccos[2, 2] + w[4] * dirccos[3, 2],
+            w[2] * dirccos[1, 3] + w[3] * dirccos[2, 3] + w[4] * dirccos[3, 3],
+            w[5],
         ]
     else
         println("error: local -> global")
@@ -177,16 +172,18 @@ end
 function local_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
 
     if length(w) == 3
-        L = [w[1] * dirccos[1,1] + w[2] * dirccos[1,2] + w[3] * dirccos[1,3], 
-            w[1] * dirccos[2,1] + w[2] * dirccos[2,2] + w[3] * dirccos[2,3],
-            w[1] * dirccos[3,1] + w[2] * dirccos[3,2] + w[3] * dirccos[3,3]
+        L = [
+            w[1] * dirccos[1, 1] + w[2] * dirccos[1, 2] + w[3] * dirccos[1, 3],
+            w[1] * dirccos[2, 1] + w[2] * dirccos[2, 2] + w[3] * dirccos[2, 3],
+            w[1] * dirccos[3, 1] + w[2] * dirccos[3, 2] + w[3] * dirccos[3, 3],
         ]
     elseif length(w) == 5
-        L = [w[1], 
-            w[2] * dirccos[1,1] + w[3] * dirccos[1,2] + w[4] * dirccos[1,3], 
-            w[2] * dirccos[2,1] + w[3] * dirccos[2,2] + w[4] * dirccos[2,3],
-            w[2] * dirccos[3,1] + w[3] * dirccos[3,2] + w[4] * dirccos[3,3],
-            w[5]
+        L = [
+            w[1],
+            w[2] * dirccos[1, 1] + w[3] * dirccos[1, 2] + w[4] * dirccos[1, 3],
+            w[2] * dirccos[2, 1] + w[3] * dirccos[2, 2] + w[4] * dirccos[2, 3],
+            w[2] * dirccos[3, 1] + w[3] * dirccos[3, 2] + w[4] * dirccos[3, 3],
+            w[5],
         ]
     else
         println("error: global -> local")
@@ -200,8 +197,8 @@ end
 function meshgrid(x, y)
     @assert ndims(x) == ndims(y) == 1
 
-    X = [ i for j in y, i in x]
-    Y = [ j for j in y, i in x]
+    X = [i for j in y, i in x]
+    Y = [j for j in y, i in x]
 
     return X, Y
 end
@@ -209,9 +206,9 @@ end
 function meshgrid(x, y, z)
     @assert ndims(x) == ndims(y) == ndims(z) == 1
 
-    X = [ i for k in z, j in y, i in x]
-    Y = [ j for k in z, j in y, i in x]
-    Z = [ k for k in z, j in y, i in x]
+    X = [i for k in z, j in y, i in x]
+    Y = [j for k in z, j in y, i in x]
+    Z = [k for k in z, j in y, i in x]
 
     return X, Y, Z
 end

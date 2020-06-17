@@ -78,8 +78,7 @@ struct VSpace2D <: AbstractVelocitySpace
     weights::AbstractArray{Float64,2}
 
     VSpace2D() = VSpace2D(-5, 5, 28, -5, 5, 28)
-    VSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) =
-        VSpace2D(U0, U1, 28, V0, V1, 28)
+    VSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = VSpace2D(U0, U1, 28, V0, V1, 28)
 
     function VSpace2D(
         U0::Real,
@@ -196,12 +195,7 @@ struct VSpace3D <: AbstractVelocitySpace
         w1 = Float64(W1)
         nw = WNUM
         δw = (w1 - w0) / nw
-        u = OffsetArray{Float64}(
-            undef,
-            1-NGU:nu+NGU,
-            1-NGV:nv+NGV,
-            1-NGW:nw+NGW,
-        )
+        u = OffsetArray{Float64}(undef, 1-NGU:nu+NGU, 1-NGV:nv+NGV, 1-NGW:nw+NGW)
         v = similar(u)
         w = similar(u)
         du = similar(u)
@@ -262,8 +256,7 @@ struct MVSpace1D <: AbstractVelocitySpace
     weights::AbstractArray{Float64,2}
 
     MVSpace1D() = MVSpace1D(-5, 5, -10, 10, 28)
-    MVSpace1D(U0::Real, U1::Real, V0::Real, V1::Real) =
-        MVSpace1D(U0, U1, V0, V1, 28)
+    MVSpace1D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace1D(U0, U1, V0, V1, 28)
 
     function MVSpace1D(
         Ui0::Real,
@@ -324,8 +317,7 @@ struct MVSpace2D <: AbstractVelocitySpace
     weights::AbstractArray{Float64,3}
 
     MVSpace2D() = MVSpace2D(-5, 5, -10, 10, 28, -5, 5, -10, 10, 28)
-    MVSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) =
-        MVSpace2D(U0, U1, 28, V0, V1, 28)
+    MVSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace2D(U0, U1, 28, V0, V1, 28)
 
     function MVSpace2D(
         Ui0::Real,

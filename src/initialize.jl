@@ -46,7 +46,7 @@ function init_fvm(KS::SolverSet)
     if KS.set.space[1:2] == "1d"
 
         if KS.set.space[3:4] == "1f"
-            
+
             ctr = OffsetArray{ControlVolume1D1F}(undef, eachindex(KS.pSpace.x))
             face = Array{Interface1D1F}(undef, KS.pSpace.nx + 1)
 
@@ -104,7 +104,7 @@ function init_fvm(KS::SolverSet)
             for i = 1:KS.pSpace.nx+1
                 face[i] = Interface1D2F(KS.ib.wL, KS.ib.hL)
             end
-        
+
         elseif KS.set.space[3:4] == "4f"
 
             ctr = OffsetArray{ControlVolume1D4F}(undef, eachindex(KS.pSpace.x))
@@ -154,9 +154,13 @@ function init_fvm(KS::SolverSet)
 
         if KS.set.space[3:4] == "1f"
 
-            ctr = OffsetArray{ControlVolume2D1F}(undef, axes(KS.pSpace.x, 1), axes(KS.pSpace.y, 2))
-            a1face = Array{Interface2D1F}(undef, KS.pSpace.nx+1, KS.pSpace.ny)
-            a2face = Array{Interface2D1F}(undef, KS.pSpace.nx, KS.pSpace.ny+1)
+            ctr = OffsetArray{ControlVolume2D1F}(
+                undef,
+                axes(KS.pSpace.x, 1),
+                axes(KS.pSpace.y, 2),
+            )
+            a1face = Array{Interface2D1F}(undef, KS.pSpace.nx + 1, KS.pSpace.ny)
+            a2face = Array{Interface2D1F}(undef, KS.pSpace.nx, KS.pSpace.ny + 1)
 
             for j in axes(ctr, 2), i in axes(ctr, 1)
                 if i <= KS.pSpace.nx ÷ 2
@@ -182,18 +186,22 @@ function init_fvm(KS::SolverSet)
                 end
             end
 
-            for j in 1:KS.pSpace.ny, i = 1:KS.pSpace.nx+1
-                a1face[i] = Interface2D1F(KS.pSpace.dy[i, j], 0., 1., KS.ib.wL, KS.ib.hL)
+            for j = 1:KS.pSpace.ny, i = 1:KS.pSpace.nx+1
+                a1face[i] = Interface2D1F(KS.pSpace.dy[i, j], 0.0, 1.0, KS.ib.wL, KS.ib.hL)
             end
-            for j in 1:KS.pSpace.ny+1, i = 1:KS.pSpace.nx
-                a2face[i] = Interface2D1F(KS.pSpace.dx[i, j], 1., 0., KS.ib.wL, KS.ib.hL)
+            for j = 1:KS.pSpace.ny+1, i = 1:KS.pSpace.nx
+                a2face[i] = Interface2D1F(KS.pSpace.dx[i, j], 1.0, 0.0, KS.ib.wL, KS.ib.hL)
             end
 
         elseif KS.set.space[3:4] == "2f"
 
-            ctr = OffsetArray{ControlVolume2D2F}(undef, axes(KS.pSpace.x, 1), axes(KS.pSpace.y, 2))
-            a1face = Array{Interface2D2F}(undef, KS.pSpace.nx+1, KS.pSpace.ny)
-            a2face = Array{Interface2D2F}(undef, KS.pSpace.nx, KS.pSpace.ny+1)
+            ctr = OffsetArray{ControlVolume2D2F}(
+                undef,
+                axes(KS.pSpace.x, 1),
+                axes(KS.pSpace.y, 2),
+            )
+            a1face = Array{Interface2D2F}(undef, KS.pSpace.nx + 1, KS.pSpace.ny)
+            a2face = Array{Interface2D2F}(undef, KS.pSpace.nx, KS.pSpace.ny + 1)
 
             for j in axes(ctr, 2), i in axes(ctr, 1)
                 if i <= KS.pSpace.nx ÷ 2
@@ -221,11 +229,11 @@ function init_fvm(KS::SolverSet)
                 end
             end
 
-            for j in 1:KS.pSpace.ny, i = 1:KS.pSpace.nx+1
-                a1face[i] = Interface2D2F(KS.pSpace.dy[i, j], 0., 1., KS.ib.wL, KS.ib.hL)
+            for j = 1:KS.pSpace.ny, i = 1:KS.pSpace.nx+1
+                a1face[i] = Interface2D2F(KS.pSpace.dy[i, j], 0.0, 1.0, KS.ib.wL, KS.ib.hL)
             end
-            for j in 1:KS.pSpace.ny+1, i = 1:KS.pSpace.nx
-                a2face[i] = Interface2D2F(KS.pSpace.dx[i, j], 1., 0., KS.ib.wL, KS.ib.hL)
+            for j = 1:KS.pSpace.ny+1, i = 1:KS.pSpace.nx
+                a2face[i] = Interface2D2F(KS.pSpace.dx[i, j], 1.0, 0.0, KS.ib.wL, KS.ib.hL)
             end
 
         end

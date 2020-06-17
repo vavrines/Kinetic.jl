@@ -100,10 +100,7 @@ end
 # ------------------------------------------------------------
 # Plot line
 # ------------------------------------------------------------
-function plot_line(
-    KS::AbstractSolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1},
-)
+function plot_line(KS::AbstractSolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
 
     pltx = KS.pSpace.x[1:KS.pSpace.nx]
     plty = zeros(KS.pSpace.nx, 6)

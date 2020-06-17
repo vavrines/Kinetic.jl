@@ -88,8 +88,7 @@ struct SolverSet <: AbstractSolverSet
                 if space == "1d1f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
-                    wL, primL, fL, bcL, wR, primR, fR, bcR =
-                        ib_rh(mach, γ, vSpace.u)
+                    wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(mach, γ, vSpace.u)
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
                 elseif space == "1d2f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
@@ -187,11 +186,11 @@ struct SolverSet <: AbstractSolverSet
                 )
 
             end
-        
+
         elseif dim == 2
 
             pSpace = PSpace2D(x0, x1, nx, y0, y1, ny, pMeshType, nxg, nyg)
-        
+
             if case == "cavity"
 
                 μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
@@ -220,9 +219,9 @@ struct SolverSet <: AbstractSolverSet
                         ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v, inK)
                     ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
                 end
-                
+
             end
-        
+
         else
         end
 
@@ -339,10 +338,7 @@ end
 # ------------------------------------------------------------
 # Reconstruction
 # ------------------------------------------------------------
-function reconstruct!(
-    KS::SolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1},
-)
+function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
 
     if KS.set.interpOrder == 1
         return
@@ -500,32 +496,29 @@ function evolve!(
 
         if KS.set.nSpecies == 2
             Threads.@threads for i = 2:KS.pSpace.nx
-                @inbounds face[i].fw,
-                face[i].fh0,
-                face[i].fh1,
-                face[i].fh2,
-                face[i].fh3 = flux_kcu(
-                    ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
-                    ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
-                    ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
-                    ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
-                    ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3,
-                    ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw,
-                    ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
-                    ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
-                    ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
-                    ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
-                    KS.vSpace.u,
-                    KS.vSpace.weights,
-                    KS.gas.K,
-                    KS.gas.γ,
-                    KS.gas.mi,
-                    KS.gas.ni,
-                    KS.gas.me,
-                    KS.gas.ne,
-                    KS.gas.knudsen[1],
-                    dt,
-                )
+                @inbounds face[i].fw, face[i].fh0, face[i].fh1, face[i].fh2, face[i].fh3 =
+                    flux_kcu(
+                        ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
+                        ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
+                        ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
+                        ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
+                        ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3,
+                        ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw,
+                        ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
+                        ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
+                        ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
+                        ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
+                        KS.vSpace.u,
+                        KS.vSpace.weights,
+                        KS.gas.K,
+                        KS.gas.γ,
+                        KS.gas.mi,
+                        KS.gas.ni,
+                        KS.gas.me,
+                        KS.gas.ne,
+                        KS.gas.knudsen[1],
+                        dt,
+                    )
 
                 @inbounds face[i].femL, face[i].femR = flux_em(
                     ctr[i-2].E,
@@ -573,7 +566,6 @@ function update!(
     sumAvg = zeros(axes(KS.ib.wL))
 
     Threads.@threads for i = 2:KS.pSpace.nx-1
-
         if KS.set.space == "1d1f1v"
             @inbounds step!(
                 face[i].fw,
@@ -732,11 +724,8 @@ function step!(
     #--- update distribution function ---#
     for k in axes(wVelo, 3), j in axes(vVelo, 2), i in axes(uVelo, 1)
         f[i, j, k] =
-            (
-                f[i, j, k] +
-                (ffL[i, j, k] - ffR[i, j, k]) / dx +
-                dt / τ * M[i, j, k]
-            ) / (1.0 + dt / τ)
+            (f[i, j, k] + (ffL[i, j, k] - ffR[i, j, k]) / dx + dt / τ * M[i, j, k]) /
+            (1.0 + dt / τ)
     end
 
 end
