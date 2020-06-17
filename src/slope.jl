@@ -3,26 +3,44 @@
 # ------------------------------------------------------------
 
 
-export vanleer, minmod, reconstruct2, reconstruct3
+export vanleer, minmod, superbee, vanalbaba
+export reconstruct2, reconstruct3
 
 
-vanleer(sL, sR) =
-    (fortsign(1.0, sL) + fortsign(1.0, sR)) * abs(sL) * abs(sR) /
+vanleer(sL::Real, sR::Real) =
+    (fortsign(1., sL) + fortsign(1., sR)) * abs(sL) * abs(sR) /
     (abs(sL) + abs(sR) + 1.e-7)
 
 
-minmod(sL, sR) = 0.5 * (fortsign(1.0, sL) + fortsign(1.0, sR)) * min(abs(sR), abs(sL))
+minmod(sL::Real, sR::Real) =
+    0.5 * (fortsign(1., sL) + fortsign(1., sR)) * min(abs(sR), abs(sL))
 
 
-reconstruct2(wL::Float64, wR::Float64, Δx::Float64) = (wR - wL) / Δx
+function superbee(sL::Real, sR::Real)
 
-reconstruct2(wL::AbstractArray{Float64,1}, wR::AbstractArray{Float64,1}, Δx::Float64) =
+    if sR >= 0.5 * sL && sR <= 2. * sL
+        return 0.5 * (fortsign(1., sL) + fortsign(1., sR)) * max(abs(sL), abs(sR))
+    elseif sR < 0.5 * sL && sR > 2. * sL
+        return (fortsign(1., sL) + fortsign(1., sR)) * min(abs(sL), abs(sR))
+    else
+        return 0.
+    end
+
+end
+
+
+vanalbaba(sL, sR) = (sL^2 * sR + sL * sR^2) / (sL^2 + sR^2 + 1.e-7)
+
+
+reconstruct2(wL::Real, wR::Real, Δx::Real) = (wR - wL) / Δx
+
+reconstruct2(wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1}, Δx::Real) =
     (wR .- wL) ./ Δx
 
 function reconstruct2(
-    wL::AbstractArray{Float64,2},
-    wR::AbstractArray{Float64,2},
-    Δx::Float64,
+    wL::AbstractArray{<:Real,2},
+    wR::AbstractArray{<:Real,2},
+    Δx::Real,
 )
     s = zeros(axes(wL))
     for j in axes(s, 2)
@@ -33,9 +51,9 @@ function reconstruct2(
 end
 
 function reconstruct2(
-    wL::AbstractArray{Float64,3},
-    wR::AbstractArray{Float64,3},
-    Δx::Float64,
+    wL::AbstractArray{<:Real,3},
+    wR::AbstractArray{<:Real,3},
+    Δx::Real,
 )
     s = zeros(axes(wL))
     for k in axes(s, 3), j in axes(s, 2)
@@ -47,11 +65,11 @@ end
 
 
 function reconstruct3(
-    wL::Float64,
-    wN::Float64,
-    wR::Float64,
-    ΔxL::Float64,
-    ΔxR::Float64,
+    wL::Real,
+    wN::Real,
+    wR::Real,
+    ΔxL::Real,
+    ΔxR::Real,
     limiter = "vanleer"::AbstractString,
 )
 
@@ -72,11 +90,11 @@ function reconstruct3(
 end
 
 function reconstruct3(
-    wL::AbstractArray{Float64,1},
-    wN::AbstractArray{Float64,1},
-    wR::AbstractArray{Float64,1},
-    ΔxL::Float64,
-    ΔxR::Float64,
+    wL::AbstractArray{<:Real,1},
+    wN::AbstractArray{<:Real,1},
+    wR::AbstractArray{<:Real,1},
+    ΔxL::Real,
+    ΔxR::Real,
     limiter = "vanleer"::AbstractString,
 )
 
@@ -97,11 +115,11 @@ function reconstruct3(
 end
 
 function reconstruct3(
-    wL::AbstractArray{Float64,2},
-    wN::AbstractArray{Float64,2},
-    wR::AbstractArray{Float64,2},
-    ΔxL::Float64,
-    ΔxR::Float64,
+    wL::AbstractArray{<:Real,2},
+    wN::AbstractArray{<:Real,2},
+    wR::AbstractArray{<:Real,2},
+    ΔxL::Real,
+    ΔxR::Real,
     limiter = "vanleer"::AbstractString,
 )
 
@@ -116,11 +134,11 @@ function reconstruct3(
 end
 
 function reconstruct3(
-    wL::AbstractArray{Float64,3},
-    wN::AbstractArray{Float64,3},
-    wR::AbstractArray{Float64,3},
-    ΔxL::Float64,
-    ΔxR::Float64,
+    wL::AbstractArray{<:Real,3},
+    wN::AbstractArray{<:Real,3},
+    wR::AbstractArray{<:Real,3},
+    ΔxL::Real,
+    ΔxR::Real,
     limiter = "vanleer"::AbstractString,
 )
 
