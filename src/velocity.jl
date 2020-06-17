@@ -317,7 +317,7 @@ struct MVSpace2D <: AbstractVelocitySpace
     weights::AbstractArray{Float64,3}
 
     MVSpace2D() = MVSpace2D(-5, 5, -10, 10, 28, -5, 5, -10, 10, 28)
-    MVSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace2D(U0, U1, 28, V0, V1, 28)
+    MVSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace2D(U0, U1, U0, U1, 28, V0, V1, V0, V1, 28)
 
     function MVSpace2D(
         Ui0::Real,
