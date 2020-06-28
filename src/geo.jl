@@ -116,7 +116,7 @@ function uniform_mesh(x0::Real, xnum::Int, dx::Real)
 end
 
 
-function global_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
+function global_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
 
     if length(w) == 2
         G = [w[1] * cosa - w[2] * sina, w[1] * sina + w[2] * cosa]
@@ -130,7 +130,7 @@ function global_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
 
 end
 
-function global_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
+function global_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})
 
     if length(w) == 3
         G = [
@@ -155,7 +155,7 @@ function global_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
 end
 
 
-function local_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
+function local_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
 
     if length(w) == 2
         L = [w[1] * cosa + w[2] * sina, w[2] * cosa - w[1] * sina]
@@ -169,7 +169,7 @@ function local_frame(w::Array{<:Real,1}, cosa::Real, sina::Real)
 
 end
 
-function local_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
+function local_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})
 
     if length(w) == 3
         L = [
@@ -194,7 +194,7 @@ function local_frame(w::Array{<:Real,1}, dirccos::Array{<:Real,2})
 end
 
 
-function meshgrid(x, y)
+function meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1})
     @assert ndims(x) == ndims(y) == 1
 
     X = [i for j in y, i in x]
@@ -203,7 +203,7 @@ function meshgrid(x, y)
     return X, Y
 end
 
-function meshgrid(x, y, z)
+function meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1}, z::AbstractArray{<:Real,1})
     @assert ndims(x) == ndims(y) == ndims(z) == 1
 
     X = [i for k in z, j in y, i in x]
