@@ -2098,10 +2098,7 @@ function flux_ugks!(
     Mt[2] = -tau * Mt[1] + Mt[5]
     Mt[3] = dt^2 / 2.0 - tau * Mt[1]
 
-    # --- calculate interface flux ---#
-    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
-
-    # flux from M0
+    # --- calculate flux from M0 ---#
     Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
     MauL = moments_conserve_slope(aL, MuL, Mv, Mxi, 2, 0)
     MauR = moments_conserve_slope(aR, MuR, Mv, Mxi, 2, 0)
@@ -2112,7 +2109,7 @@ function flux_ugks!(
         Mt[2] * prim[1] * (MauL + MauR) +
         Mt[3] * prim[1] * MauT
 
-    # flux from f0
+    # --- calculate flux from f0 ---#
     H = maxwellian(u, v, prim)
     B = H .* inK ./ (2.0 * prim[end])
 
@@ -2125,7 +2122,7 @@ function flux_ugks!(
         (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) -
         Mt[5] *
         0.5 *
-        (sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sh) + sum(ω .* v .^ 2 .* sb))
+        (sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sh) + sum(ω .* u .^ 2 .* sb))
 
     @. fh =
         Mt[1] * u * H +
@@ -2186,6 +2183,7 @@ function flux_ugks!(
         ) +
         Mt[4] * u * b - Mt[5] * u^2 * sb
 
+    # multiply interface length
     fw .*= len
     fh .*= len
     fb .*= len
