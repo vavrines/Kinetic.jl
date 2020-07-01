@@ -11,6 +11,7 @@ export gauss_moments,
     moments_conserve_slope,
     mixture_moments_conserve_slope,
     discrete_moments,
+    heat_flux,
     maxwellian,
     mixture_maxwellian,
     reduce_distribution,
@@ -337,7 +338,6 @@ moments_conserve_slope(
     0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 0, 2)
 
 
-
 function moments_conserve_slope(
     a::Array{<:Real,1},
     Mu::OffsetArray{<:Real,1},
@@ -358,6 +358,7 @@ function moments_conserve_slope(
     return au
 
 end
+
 
 function moments_conserve_slope(
     a::Array{<:Real,1},
@@ -464,6 +465,7 @@ discrete_moments(
     n::Int,
 ) = sum(@. ω * u^n * f)
 
+
 # --- 2D ---#
 discrete_moments(
     f::AbstractArray{<:AbstractFloat,2},
@@ -472,6 +474,7 @@ discrete_moments(
     n::Int,
 ) = sum(@. ω * u^n * f)
 
+
 # --- 3D ---#
 discrete_moments(
     f::AbstractArray{<:AbstractFloat,3},
@@ -479,6 +482,7 @@ discrete_moments(
     ω::AbstractArray{<:AbstractFloat,3},
     n::Int,
 ) = sum(@. ω * u^n * f)
+
 
 # ------------------------------------------------------------
 # Conservative moments
@@ -494,6 +498,7 @@ moments_conserve(
     0.5 * discrete_moments(f, u, ω, 2),
 ]
 
+
 moments_conserve(
     h::AbstractArray{<:AbstractFloat,1},
     b::AbstractArray{<:AbstractFloat,1},
@@ -504,6 +509,7 @@ moments_conserve(
     discrete_moments(h, u, ω, 1),
     0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(b, u, ω, 0)),
 ]
+
 
 function mixture_moments_conserve(
     f::AbstractArray{<:AbstractFloat,2},
@@ -517,6 +523,7 @@ function mixture_moments_conserve(
 
     return w
 end
+
 
 function mixture_moments_conserve(
     h::AbstractArray{<:AbstractFloat,2},
@@ -546,6 +553,7 @@ moments_conserve(
     0.5 * (discrete_moments(f, u, ω, 2) + discrete_moments(f, v, ω, 2)),
 ]
 
+
 moments_conserve(
     h::AbstractArray{<:AbstractFloat,2},
     b::AbstractArray{<:AbstractFloat,2},
@@ -563,6 +571,7 @@ moments_conserve(
     ),
 ]
 
+
 function mixture_moments_conserve(
     f::AbstractArray{<:AbstractFloat,3},
     u::AbstractArray{<:AbstractFloat,3},
@@ -576,6 +585,7 @@ function mixture_moments_conserve(
 
     return w
 end
+
 
 function mixture_moments_conserve(
     h::AbstractArray{<:AbstractFloat,2},
@@ -593,13 +603,14 @@ function mixture_moments_conserve(
     return w
 end
 
+
 # --- 3D ---#
 moments_conserve(
-    f::AbstractArray{<:Real,3},
-    u::AbstractArray{<:Real,3},
-    v::AbstractArray{<:Real,3},
-    w::AbstractArray{<:Real,3},
-    ω::AbstractArray{<:Real,3},
+    f::AbstractArray{<:AbstractFloat,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+    ω::AbstractArray{<:AbstractFloat,3},
 ) = [
     discrete_moments(f, u, ω, 0),
     discrete_moments(f, u, ω, 1),
@@ -611,6 +622,7 @@ moments_conserve(
         discrete_moments(f, w, ω, 2)
     ),
 ]
+
 
 moments_conserve(
     h0::AbstractArray{<:AbstractFloat,1},
@@ -626,6 +638,7 @@ moments_conserve(
     discrete_moments(h2, u, ω, 0),
     0.5 * discrete_moments(h0, u, ω, 2) + 0.5 * discrete_moments(h3, u, ω, 0),
 ]
+
 
 function mixture_moments_conserve(
     f::AbstractArray{<:Real,4},
@@ -648,6 +661,7 @@ function mixture_moments_conserve(
     return w
 end
 
+
 function mixture_moments_conserve(
     h0::AbstractArray{<:AbstractFloat,2},
     h1::AbstractArray{<:AbstractFloat,2},
@@ -667,6 +681,94 @@ end
 
 
 """
+Stress tensor from particle distribution function
+
+"""
+
+function stress_tensor(
+    f::AbstractArray{<:AbstractFloat,2},
+    prim::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+)
+    P = zeros(eltype(prim), 2, 2)
+
+    P[1, 1] = sum(@. ω * (u - prim[2]) * (u - prim[2]) * f)
+    P[1, 2] = sum(@. ω * (u - prim[2]) * (v - prim[3]) * f)
+    P[2, 1] = P[1, 2]
+    P[1, 2] = sum(@. ω * (v - prim[3]) * (v - prim[3]) * f)
+
+    return P
+end
+
+
+"""
+Heat flux from particle distribution function
+
+"""
+
+# --- 1D ---#
+heat_flux(
+    h::AbstractArray{<:AbstractFloat,1},
+    prim::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+) = 0.5 * sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h)
+
+
+heat_flux(
+    h::AbstractArray{<:AbstractFloat,1},
+    b::AbstractArray{<:AbstractFloat,1},
+    prim::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+) = 0.5 * (sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h) + sum(@. ω * (u - prim[2]) * b))
+
+
+# --- 2D ---#
+function heat_flux(
+    h::AbstractArray{<:AbstractFloat,2},
+    prim::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+)
+    q = zeros(eltype(prim), 2)
+
+    q[1] = 0.5 * sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
+    q[2] = 0.5 * sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
+
+    return q
+end
+
+
+function heat_flux(
+    h::AbstractArray{<:AbstractFloat,2},
+    b::AbstractArray{<:AbstractFloat,2},
+    prim::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+)
+    q = zeros(eltype(prim), 2)
+
+    q[1] =
+        0.5 * (
+            sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h) +
+            sum(@. ω * (u - prim[2]) * b)
+        )
+    q[2] =
+        0.5 * (
+            sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h) +
+            sum(@. ω * (v - prim[3]) * b)
+        )
+
+    return q
+end
+
+
+"""
 Equilibrium in discrete form
 1. Gas: Maxwellian
 
@@ -679,6 +781,7 @@ Equilibrium in discrete form
 # --- 1D ---#
 maxwellian(u::AbstractArray{<:Real,1}, ρ::Real, U::Real, λ::Real) =
     @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
+
 
 maxwellian(u::AbstractArray{<:Real,1}, prim::Array{<:Real,1}) =
     maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
@@ -703,6 +806,7 @@ maxwellian(
     V::Real,
     λ::Real,
 ) = @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
+
 
 maxwellian(u::AbstractArray{<:Real,2}, v::AbstractArray{<:Real,2}, prim::Array{<:Real,1}) =
     maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
@@ -733,6 +837,7 @@ maxwellian(
     W::Real,
     λ::Real,
 ) = @. ρ * (λ / π)^1.5 * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
+
 
 maxwellian(
     u::AbstractArray{<:Real,3},
@@ -792,6 +897,7 @@ function reduce_distribution(
 
     return h
 end
+
 
 function reduce_distribution(
     f::AbstractArray{<:AbstractFloat,3},
@@ -865,6 +971,7 @@ function full_distribution(
     return f
 end
 
+
 full_distribution(
     h::AbstractArray{<:AbstractFloat,1},
     b::AbstractArray{<:AbstractFloat,1},
@@ -914,7 +1021,9 @@ function prim_conserve(prim::Array{<:Real,1}, γ::Real)
 
 end
 
+
 prim_conserve(ρ::Real, U::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, λ], γ)
+
 
 prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, V, λ], γ)
 
@@ -959,7 +1068,9 @@ function conserve_prim(W::Array{<:Real,1}, γ::Real)
 
 end
 
+
 conserve_prim(ρ::Real, M::Real, E::Real, gamma::Real) = conserve_prim([ρ, M, E], gamma)
+
 
 conserve_prim(ρ::Real, MX::Real, MY::Real, E::Real, gamma::Real) =
     conserve_prim([ρ, MX, MY, E], gamma)
@@ -1002,7 +1113,9 @@ end
 # ------------------------------------------------------------
 sound_speed(λ::Real, γ::Real) = (0.5 * γ / λ)^0.5
 
+
 sound_speed(prim::Array{<:Real,1}, γ::Real) = sound_speed(prim[end], γ)
+
 
 function sound_speed(prim::Array{<:Real,2}, γ::Real)
     c = zeros(axes(prim, 2))
@@ -1159,7 +1272,6 @@ function boltzmann_fft(
     return Q
 
 end
-
 
 
 """
@@ -1493,6 +1605,7 @@ function shift_pdf!(f::AbstractArray{<:Real,1}, a::Real, du::Real, dt::Real)
     f[q1] = f[q1-1]
 
 end
+
 
 # ------------------------------------------------------------
 # Multi-component gas

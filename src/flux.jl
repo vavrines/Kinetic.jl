@@ -2077,7 +2077,16 @@ function flux_ugks!(
     sb = @. sbL * δ + sbR * (1.0 - δ)
 
     #--- construct interface variables ---#
-    w = moments_conserve(h, b, u, v, ω)
+    #w = moments_conserve(h, b, u, v, ω)
+    #prim = conserve_prim(w, γ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
     prim = conserve_prim(w, γ)
 
     aL = pdf_slope(prim, (w .- wL) ./ dxL, inK)
