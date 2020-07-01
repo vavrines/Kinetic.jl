@@ -6,6 +6,7 @@
 export flux_gks
 export flux_kfvs, flux_kfvs!
 export flux_kcu, flux_kcu!
+export flux_ugks!
 export flux_boundary_maxwell, flux_boundary_maxwell!
 export flux_em
 
@@ -106,7 +107,8 @@ function flux_gks(
         @. flux +=
             Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL -
             tau * Mt[4] * primL[1] * MauLT + Mt[4] * primR[1] * MuvR -
-            (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
+            (Mt[5] + tau * Mt[4]) * primR[1] * MauR -
+            tau * Mt[4] * primR[1] * MauRT
         # @. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
         return flux
@@ -180,7 +182,8 @@ function flux_gks(
         @. flux +=
             Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL -
             tau * Mt[4] * primL[1] * MauLT + Mt[4] * primR[1] * MuvR -
-            (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
+            (Mt[5] + tau * Mt[4]) * primR[1] * MauR -
+            tau * Mt[4] * primR[1] * MauRT
         # @. flux += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
         return flux
@@ -230,7 +233,9 @@ function flux_kfvs(
 
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * 0.5 * sum(ω .* u .^ 3 .* f) - 0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
+    fw[3] =
+        dt * 0.5 * sum(ω .* u .^ 3 .* f) -
+        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -260,7 +265,9 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * 0.5 * sum(ω .* u .^ 3 .* f) - 0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
+    fw[3] =
+        dt * 0.5 * sum(ω .* u .^ 3 .* f) -
+        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -294,11 +301,16 @@ function flux_kfvs(
 
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
-    fw[4] = dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
+    fw[3] =
+        dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
+    fw[4] =
+        dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
     fw[5] =
         dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* f) -
-        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
+        0.5 *
+        dt^2 *
+        0.5 *
+        sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -330,11 +342,16 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
-    fw[4] = dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
+    fw[3] =
+        dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
+    fw[4] =
+        dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
     fw[5] =
         dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* f) -
-        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
+        0.5 *
+        dt^2 *
+        0.5 *
+        sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -572,7 +589,8 @@ function flux_kfvs(
 
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sf)
+    fw[3] =
+        dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sf)
     fw[4] =
         dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* f) -
         0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sf)
@@ -607,7 +625,8 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sf)
+    fw[3] =
+        dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sf)
     fw[4] =
         dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* f) -
         0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sf)
@@ -652,7 +671,8 @@ function flux_kfvs(
 
     fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh)
     fw[2] = dt * sum(ω .* u .^ 2 .* h) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh)
-    fw[3] = dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sh)
+    fw[3] =
+        dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sh)
     fw[4] =
         dt * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) -
         0.5 *
@@ -698,7 +718,8 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh)
     fw[2] = dt * sum(ω .* u .^ 2 .* h) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh)
-    fw[3] = dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sh)
+    fw[3] =
+        dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sh)
     fw[4] =
         dt * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) -
         0.5 *
@@ -1200,7 +1221,10 @@ function flux_kcu(
     fw[1] += Mt[2] * sum(ω .* u .* h)
     fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h)
     fw[3] += Mt[2] * sum(ω .* v .* u .* h)
-    fw[4] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b))
+    fw[4] +=
+        Mt[2] *
+        0.5 *
+        (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b))
 
     fh = @. Mt[1] * u * H + Mt[2] * u * h
     fb = @. Mt[1] * u * B + Mt[2] * u * b
@@ -1211,7 +1235,7 @@ end
 
 
 function flux_kcu!(
-    fw::AbstractArray{<:Real,1},
+    fw::AbstractArray{<:AbstractFloat,1},
     fh::AbstractArray{<:AbstractFloat,2},
     fb::AbstractArray{<:AbstractFloat,2},
     wL::AbstractArray{<:Real,1},
@@ -1276,7 +1300,11 @@ function flux_kcu!(
     fw[1] += Mt[2] * sum(ω .* u .* h) * len
     fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h) * len
     fw[3] += Mt[2] * sum(ω .* v .* u .* h) * len
-    fw[4] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) * len
+    fw[4] +=
+        Mt[2] *
+        0.5 *
+        (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) *
+        len
 
     @. fh = (Mt[1] * u * H + Mt[2] * u * h) * len
     @. fb = (Mt[1] * u * B + Mt[2] * u * b) * len
@@ -1339,9 +1367,11 @@ function flux_kcu(
     Muv1 = similar(wL)
     Muv2 = similar(wL)
     for j = 1:2
-        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] = gauss_moments(primL[:, j], inK)
+        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] =
+            gauss_moments(primL[:, j], inK)
         Muv1[:, j] = moments_conserve(MuL1[:, j], Mxi1[:, j], 0, 0)
-        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] = gauss_moments(primR[:, j], inK)
+        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] =
+            gauss_moments(primR[:, j], inK)
         Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
     end
 
@@ -1354,8 +1384,13 @@ function flux_kcu(
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
     @. tau +=
-        abs(cellL.prim[1, :] / cellL.prim[end, :] - cellR.prim[1, :] / cellR.prim[end, :]) /
-        (cellL.prim[1, :] / cellL.prim[end, :] + cellR.prim[1, :] / cellR.prim[end, :]) *
+        abs(
+            cellL.prim[1, :] / cellL.prim[end, :] -
+            cellR.prim[1, :] / cellR.prim[end, :],
+        ) / (
+            cellL.prim[1, :] / cellL.prim[end, :] +
+            cellR.prim[1, :] / cellR.prim[end, :]
+        ) *
         dt *
         2.0
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
@@ -1371,7 +1406,8 @@ function flux_kcu(
     MuR = similar(Mu1)
     Muv = similar(wL)
     for j in axes(Mu1, 2)
-        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] = gauss_moments(prim[:, j], inK)
+        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] =
+            gauss_moments(prim[:, j], inK)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], 1, 0)
     end
 
@@ -1393,7 +1429,8 @@ function flux_kcu(
         fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* f[:, j])
         fw[3, j] += Mt[2, j] * 0.5 * sum(ω[:, j] .* u[:, j] .^ 3 .* f[:, j])
 
-        @. ff[:, j] = Mt[1, j] * u[:, j] * g[:, j] + Mt[2, j] * u[:, j] * f[:, j]
+        @. ff[:, j] =
+            Mt[1, j] * u[:, j] * g[:, j] + Mt[2, j] * u[:, j] * f[:, j]
     end
 
     return fw, ff
@@ -1444,9 +1481,11 @@ function flux_kcu!(
     Muv1 = similar(wL)
     Muv2 = similar(wL)
     for j = 1:2
-        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] = gauss_moments(primL[:, j], inK)
+        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] =
+            gauss_moments(primL[:, j], inK)
         Muv1[:, j] = moments_conserve(MuL1[:, j], Mxi1[:, j], 0, 0)
-        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] = gauss_moments(primR[:, j], inK)
+        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] =
+            gauss_moments(primR[:, j], inK)
         Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
     end
 
@@ -1459,8 +1498,13 @@ function flux_kcu!(
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
     @. tau +=
-        abs(cellL.prim[1, :] / cellL.prim[end, :] - cellR.prim[1, :] / cellR.prim[end, :]) /
-        (cellL.prim[1, :] / cellL.prim[end, :] + cellR.prim[1, :] / cellR.prim[end, :]) *
+        abs(
+            cellL.prim[1, :] / cellL.prim[end, :] -
+            cellR.prim[1, :] / cellR.prim[end, :],
+        ) / (
+            cellL.prim[1, :] / cellL.prim[end, :] +
+            cellR.prim[1, :] / cellR.prim[end, :]
+        ) *
         dt *
         2.0
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
@@ -1476,7 +1520,8 @@ function flux_kcu!(
     MuR = similar(Mu1)
     Muv = similar(wL)
     for j in axes(Mu1, 2)
-        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] = gauss_moments(prim[:, j], inK)
+        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] =
+            gauss_moments(prim[:, j], inK)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], 1, 0)
     end
 
@@ -1496,7 +1541,8 @@ function flux_kcu!(
         fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* f[:, j])
         fw[3, j] += Mt[2, j] * 0.5 * sum(ω[:, j] .* u[:, j] .^ 3 .* f[:, j])
 
-        @. ff[:, j] = Mt[1, j] * u[:, j] * g[:, j] + Mt[2, j] * u[:, j] * f[:, j]
+        @. ff[:, j] =
+            Mt[1, j] * u[:, j] * g[:, j] + Mt[2, j] * u[:, j] * f[:, j]
     end
 
 end
@@ -1549,9 +1595,11 @@ function flux_kcu(
     Muv1 = similar(wL)
     Muv2 = similar(wL)
     for j = 1:2
-        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] = gauss_moments(primL[:, j], inK)
+        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] =
+            gauss_moments(primL[:, j], inK)
         Muv1[:, j] = moments_conserve(MuL1[:, j], Mxi1[:, j], 0, 0)
-        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] = gauss_moments(primR[:, j], inK)
+        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] =
+            gauss_moments(primR[:, j], inK)
         Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
     end
 
@@ -1564,8 +1612,13 @@ function flux_kcu(
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
     @. tau +=
-        abs(cellL.prim[1, :] / cellL.prim[end, :] - cellR.prim[1, :] / cellR.prim[end, :]) /
-        (cellL.prim[1, :] / cellL.prim[end, :] + cellR.prim[1, :] / cellR.prim[end, :]) *
+        abs(
+            cellL.prim[1, :] / cellL.prim[end, :] -
+            cellR.prim[1, :] / cellR.prim[end, :],
+        ) / (
+            cellL.prim[1, :] / cellL.prim[end, :] +
+            cellR.prim[1, :] / cellR.prim[end, :]
+        ) *
         dt *
         2.0
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
@@ -1581,7 +1634,8 @@ function flux_kcu(
     MuR = similar(Mu1)
     Muv = similar(wL)
     for j in axes(Mu1, 2)
-        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] = gauss_moments(prim[:, j], inK)
+        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] =
+            gauss_moments(prim[:, j], inK)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], 1, 0)
     end
 
@@ -1607,10 +1661,15 @@ function flux_kcu(
         fw[3, j] +=
             Mt[2, j] *
             0.5 *
-            (sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) + sum(ω[:, j] .* u[:, j] .* b[:, j]))
+            (
+                sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) +
+                sum(ω[:, j] .* u[:, j] .* b[:, j])
+            )
 
-        @. fh[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h[:, j]
-        @. fb[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * b[:, j]
+        @. fh[:, j] =
+            Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h[:, j]
+        @. fb[:, j] =
+            Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * b[:, j]
     end
 
     return fw, fh, fb
@@ -1665,9 +1724,11 @@ function flux_kcu!(
     Muv1 = similar(wL)
     Muv2 = similar(wL)
     for j = 1:2
-        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] = gauss_moments(primL[:, j], inK)
+        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] =
+            gauss_moments(primL[:, j], inK)
         Muv1[:, j] = moments_conserve(MuL1[:, j], Mxi1[:, j], 0, 0)
-        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] = gauss_moments(primR[:, j], inK)
+        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] =
+            gauss_moments(primR[:, j], inK)
         Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
     end
 
@@ -1680,8 +1741,13 @@ function flux_kcu!(
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
     @. tau +=
-        abs(cellL.prim[1, :] / cellL.prim[end, :] - cellR.prim[1, :] / cellR.prim[end, :]) /
-        (cellL.prim[1, :] / cellL.prim[end, :] + cellR.prim[1, :] / cellR.prim[end, :]) *
+        abs(
+            cellL.prim[1, :] / cellL.prim[end, :] -
+            cellR.prim[1, :] / cellR.prim[end, :],
+        ) / (
+            cellL.prim[1, :] / cellL.prim[end, :] +
+            cellR.prim[1, :] / cellR.prim[end, :]
+        ) *
         dt *
         2.0
     prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
@@ -1697,7 +1763,8 @@ function flux_kcu!(
     MuR = similar(Mu1)
     Muv = similar(wL)
     for j in axes(Mu1, 2)
-        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] = gauss_moments(prim[:, j], inK)
+        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] =
+            gauss_moments(prim[:, j], inK)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], 1, 0)
     end
 
@@ -1720,10 +1787,15 @@ function flux_kcu!(
         fw[3, j] +=
             Mt[2, j] *
             0.5 *
-            (sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) + sum(ω[:, j] .* u[:, j] .* b[:, j]))
+            (
+                sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) +
+                sum(ω[:, j] .* u[:, j] .* b[:, j])
+            )
 
-        @. fh[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h[:, j]
-        @. fb[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * b[:, j]
+        @. fh[:, j] =
+            Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h[:, j]
+        @. fb[:, j] =
+            Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * b[:, j]
     end
 
 end
@@ -1829,10 +1901,14 @@ function flux_kcu(
                 sum(ω[:, j] .* u[:, j] .* h3[:, j])
             )
 
-        @. fh0[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
-        @. fh1[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
-        @. fh2[:, j] = Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
-        @. fh3[:, j] = Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
+        @. fh0[:, j] =
+            Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
+        @. fh1[:, j] =
+            Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
+        @. fh2[:, j] =
+            Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
+        @. fh3[:, j] =
+            Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
     end
 
     return fw, fh0, fh1, fh2, fh3
@@ -1937,11 +2013,182 @@ function flux_kcu!(
                 sum(ω[:, j] .* u[:, j] .* h3[:, j])
             )
 
-        @. fh0[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
-        @. fh1[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
-        @. fh2[:, j] = Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
-        @. fh3[:, j] = Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
+        @. fh0[:, j] =
+            Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
+        @. fh1[:, j] =
+            Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
+        @. fh2[:, j] =
+            Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
+        @. fh3[:, j] =
+            Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
     end
+
+end
+
+
+"""
+Unified gas kinetic scheme (UGKS) flux
+
+> @param[in] : particle distribution functions and their slopes at left/right sides of interface
+> @param[in] : particle velocity quadrature points and weights
+> @param[in] : time step
+
+< @return : flux of particle distribution function and its velocity moments on conservative variables
+
+"""
+
+# ------------------------------------------------------------
+# 2D2F flux
+# ------------------------------------------------------------
+function flux_ugks!(
+    fw::AbstractArray{<:AbstractFloat,1},
+    fh::AbstractArray{<:AbstractFloat,2},
+    fb::AbstractArray{<:AbstractFloat,2},
+    wL::AbstractArray{<:Real,1},
+    hL::AbstractArray{<:AbstractFloat,2},
+    bL::AbstractArray{<:AbstractFloat,2},
+    wR::AbstractArray{<:Real,1},
+    hR::AbstractArray{<:AbstractFloat,2},
+    bR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+    dxL::Real,
+    dxR::Real,
+    len::Real,
+    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,2},
+    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,2},
+    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,2},
+    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,2},
+)
+
+    #--- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+
+    h = @. hL * δ + hR * (1.0 - δ)
+    b = @. bL * δ + bR * (1.0 - δ)
+    sh = @. shL * δ + shR * (1.0 - δ)
+    sb = @. sbL * δ + sbR * (1.0 - δ)
+
+    #--- construct interface variables ---#
+    w = moments_conserve(h, b, u, v, ω)
+    prim = conserve_prim(w, γ)
+
+    aL = pdf_slope(prim, (w .- wL) ./ dxL, inK)
+    aR = pdf_slope(prim, (wR .- w) ./ dxR, inK)
+
+    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
+    MauL = moments_conserve_slope(aL, MuL, Mv, Mxi, 1, 0)
+    MauR = moments_conserve_slope(aR, MuR, Mv, Mxi, 1, 0)
+    aT = pdf_slope(prim, -prim[1] .* (MauL .+ MauR), inK)
+
+    #--- calculate integral time constants ---#
+    tau = vhs_collision_time(prim, visRef, visIdx)
+
+    Mt = zeros(5)
+    Mt[4] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[5] = -tau * dt * exp(-dt / tau) + tau * Mt[4]
+    Mt[1] = dt - Mt[4] # M0
+    Mt[2] = -tau * Mt[1] + Mt[5]
+    Mt[3] = dt^2 / 2.0 - tau * Mt[1]
+
+    # --- calculate interface flux ---#
+    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    MauL = moments_conserve_slope(aL, MuL, Mv, Mxi, 2, 0)
+    MauR = moments_conserve_slope(aR, MuR, Mv, Mxi, 2, 0)
+    MauT = moments_conserve_slope(aT, Mu, Mv, Mxi, 1, 0)
+
+    @. fw =
+        Mt[1] * prim[1] * Muv +
+        Mt[2] * prim[1] * (MauL + MauR) +
+        Mt[3] * prim[1] * MauT
+
+    # flux from f0
+    H = maxwellian(u, v, prim)
+    B = H .* inK ./ (2.0 * prim[end])
+
+    fw[1] += Mt[4] * sum(ω .* u .* h) - Mt[5] * sum(ω .* u .^ 2 .* sh)
+    fw[2] += Mt[4] * sum(ω .* u .^ 2 .* h) - Mt[5] * sum(ω .* u .^ 2 .* sh)
+    fw[3] += Mt[4] * sum(ω .* v .* u .* h) - Mt[5] * sum(ω .* v .* u .^ 2 .* sh)
+    fw[4] +=
+        Mt[4] *
+        0.5 *
+        (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) -
+        Mt[5] *
+        0.5 *
+        (sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sh) + sum(ω .* v .^ 2 .* sb))
+
+    @. fh =
+        Mt[1] * u * H +
+        Mt[2] *
+        u^2 *
+        (
+            aL[1] * H +
+            aL[2] * u * H +
+            aL[3] * v * H +
+            0.5 * aL[4] * ((u^2 + v^2) * H + B)
+        ) *
+        δ +
+        Mt[2] *
+        u^2 *
+        (
+            aR[1] * H +
+            aR[2] * u * H +
+            aR[3] * v * H +
+            0.5 * aR[4] * ((u^2 + v^2) * H + B)
+        ) *
+        (1.0 - δ) +
+        Mt[3] *
+        u *
+        (
+            aT[1] * H +
+            aT[2] * u * H +
+            aT[3] * v * H +
+            0.5 * aT[4] * ((u^2 + v^2) * H + B)
+        ) +
+        Mt[4] * u * h - Mt[5] * u^2 * sh
+    @. fb =
+        Mt[1] * u * B +
+        Mt[2] *
+        u^2 *
+        (
+            aL[1] * B +
+            aL[2] * u * B +
+            aL[3] * v * B +
+            0.5 * aL[4] * ((u^2 + v^2) * B + Mxi[2] * H)
+        ) *
+        δ +
+        Mt[2] *
+        u^2 *
+        (
+            aR[1] * B +
+            aR[2] * u * B +
+            aR[3] * v * B +
+            0.5 * aR[4] * ((u^2 + v^2) * B + Mxi[2] * H)
+        ) *
+        (1.0 - δ) +
+        Mt[3] *
+        u *
+        (
+            aT[1] * B +
+            aT[2] * u * B +
+            aT[3] * v * B +
+            0.5 * aT[4] * ((u^2 + v^2) * B + Mxi[2] * H)
+        ) +
+        Mt[4] * u * b - Mt[5] * u^2 * sb
+
+    fw .*= len
+    fh .*= len
+    fb .*= len
 
 end
 
@@ -1975,8 +2222,10 @@ function flux_boundary_maxwell(
     δ = heaviside.(u .* rot)
     SF = sum(ω .* u .* h .* (1.0 .- δ))
     SG =
-        (bc[end] / π) *
-        sum(ω .* u .* exp.(-bc[end] .* ((u .- bc[2]) .^ 2 .+ (v .- bc[3]) .^ 2)) .* δ)
+        (bc[end] / π) * sum(
+            ω .* u .*
+            exp.(-bc[end] .* ((u .- bc[2]) .^ 2 .+ (v .- bc[3]) .^ 2)) .* δ,
+        )
     prim = [-SF / SG; bc[2:end]]
 
     H = maxwellian(u, v, prim)
@@ -2023,8 +2272,10 @@ function flux_boundary_maxwell!(
     δ = heaviside.(u .* rot)
     SF = sum(ω .* u .* h .* (1.0 .- δ))
     SG =
-        (bc[end] / π) *
-        sum(ω .* u .* exp.(-bc[end] .* ((u .- bc[2]) .^ 2 .+ (v .- bc[3]) .^ 2)) .* δ)
+        (bc[end] / π) * sum(
+            ω .* u .*
+            exp.(-bc[end] .* ((u .- bc[2]) .^ 2 .+ (v .- bc[3]) .^ 2)) .* δ,
+        )
     prim = [-SF / SG; bc[2:end]]
 
     H = maxwellian(u, v, prim)
@@ -2105,17 +2356,21 @@ function flux_em(
     slop[8, 8] = 0.5 * sol^2 * χ * (BR[1] - BR[1])
 
     limiter = zeros(8, 8)
-    limiter[3, 1] = -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
+    limiter[3, 1] =
+        -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
     limiter[5, 1] = 0.5 * sol * (BL[2] - BLL[2]) - 0.5 * (EL[3] - ELL[3])
-    limiter[2, 2] = 0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[2] - ELL[2])
+    limiter[2, 2] =
+        0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[2] - ELL[2])
     limiter[6, 2] = 0.5 * sol * (BL[3] - BLL[3]) + 0.5 * (EL[2] - ELL[2])
     limiter[1, 3] = 0.5 * sol * χ * (EL[1] - ELL[1])
     limiter[7, 3] = 0.5 * χ * (EL[1] - ELL[1])
     limiter[4, 4] = 0.5 * sol * ν * (BL[1] - BL[1])
     limiter[8, 4] = 0.5 * sol^2 * χ * (BL[1] - BL[1])
-    limiter[3, 5] = -0.5 * sol^2 * (BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
+    limiter[3, 5] =
+        -0.5 * sol^2 * (BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
     limiter[5, 5] = -0.5 * sol * (BRR[2] - BR[2]) - 0.5 * (ERR[3] - ER[3])
-    limiter[2, 6] = 0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
+    limiter[2, 6] =
+        0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
     limiter[6, 6] = -0.5 * sol * (BRR[3] - BR[3]) + 0.5 * (ERR[2] - ER[2])
     limiter[1, 7] = -0.5 * sol * χ * (ERR[1] - ER[1])
     limiter[7, 7] = 0.5 * χ * (ERR[1] - ER[1])
@@ -2123,9 +2378,12 @@ function flux_em(
     limiter[8, 8] = 0.5 * sol^2 * χ * (BRR[1] - BRR[1])
 
     for i = 1:8
-        limiter_theta = sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
-        slop[:, i] .*=
-            max(0.0, min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta))
+        limiter_theta =
+            sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
+        slop[:, i] .*= max(
+            0.0,
+            min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta),
+        )
     end
 
     femL = zeros(8)
@@ -2137,8 +2395,8 @@ function flux_em(
             A1n[i, 7] * (ϕR - ϕL) +
             A1n[i, 8] * (ψR - ψL) +
             0.5 * sum(
-                fortsign.(1.0, D1) .* (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .*
-                slop[i, :],
+                fortsign.(1.0, D1) .*
+                (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i, :],
             )
         femR[i] =
             sum(A1p[i, 1:3] .* (ER .- EL)) +
@@ -2146,8 +2404,8 @@ function flux_em(
             A1p[i, 7] * (ϕR - ϕL) +
             A1p[i, 8] * (ψR - ψL) -
             0.5 * sum(
-                fortsign.(1.0, D1) .* (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .*
-                slop[i, :],
+                fortsign.(1.0, D1) .*
+                (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D1)) .* slop[i, :],
             )
     end
 
