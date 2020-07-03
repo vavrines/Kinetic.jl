@@ -25,14 +25,14 @@ Gas kinetic Navier-Stokes flux
 function flux_gks(
     wL::AbstractArray{<:AbstractFloat,1},
     wR::AbstractArray{<:AbstractFloat,1},
-    dx::AbstractFloat,
-    dt::AbstractFloat,
     γ::Real,
     inK::Real,
     μᵣ::AbstractFloat,
     ω::Real,
-    swL = zeros(axes(wL))::AbstractArray{<:AbstractFloat,1},
-    swR = zeros(axes(wR))::AbstractArray{<:AbstractFloat,1},
+    dt::AbstractFloat,
+    dx::AbstractFloat,
+    swL = zeros(eltype(wL), axes(wL))::AbstractArray{<:AbstractFloat,1},
+    swR = zeros(eltype(wR), axes(wR))::AbstractArray{<:AbstractFloat,1},
 )
 
     primL = conserve_prim(wL, γ)
