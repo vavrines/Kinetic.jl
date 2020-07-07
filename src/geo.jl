@@ -6,9 +6,11 @@
 export PSpace1D, PSpace2D, uniform_mesh, global_frame, local_frame, meshgrid
 
 
-# ------------------------------------------------------------
-# Structure of mesh
-# ------------------------------------------------------------
+```
+Structured mesh
+
+```
+
 struct PSpace1D <: AbstractPhysicalSpace
 
     x0::Float64
@@ -20,7 +22,13 @@ struct PSpace1D <: AbstractPhysicalSpace
     PSpace1D() = PSpace1D(0, 1, 100)
     PSpace1D(X0::Real, X1::Real) = PSpace1D(X0, X1, 100)
 
-    function PSpace1D(X0::Real, X1::Real, XNUM::Int, TYPE = "uniform"::String, NG = 0::Int)
+    function PSpace1D(
+        X0::Real,
+        X1::Real,
+        XNUM::Int,
+        TYPE = "uniform"::String,
+        NG = 0::Int,
+    )
 
         x0 = Float64(X0)
         x1 = Float64(X1)
@@ -58,7 +66,8 @@ struct PSpace2D <: AbstractPhysicalSpace
     dy::AbstractArray{Float64,2}
 
     PSpace2D() = PSpace2D(0, 1, 45, 0, 1, 45)
-    PSpace2D(X0::Real, X1::Real, Y0::Real, Y1::Real) = PSpace2D(X0, X1, 45, Y0, Y1, 45)
+    PSpace2D(X0::Real, X1::Real, Y0::Real, Y1::Real) =
+        PSpace2D(X0, X1, 45, Y0, Y1, 45)
 
     function PSpace2D(
         X0::Real,
@@ -123,14 +132,18 @@ function global_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
     elseif length(w) == 4
         G = [w[1], w[2] * cosa - w[3] * sina, w[2] * sina + w[3] * cosa, w[4]]
     else
-        println("error: local -> global")
+        throw("local -> global: dimension dismatch")
     end
 
     return G
 
 end
 
-function global_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})
+
+function global_frame(
+    w::AbstractArray{<:Real,1},
+    dirccos::AbstractArray{<:Real,2},
+)
 
     if length(w) == 3
         G = [
@@ -147,7 +160,7 @@ function global_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,
             w[5],
         ]
     else
-        println("error: local -> global")
+        throw("local -> global: dimension dismatch")
     end
 
     return G
@@ -162,14 +175,18 @@ function local_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
     elseif length(w) == 4
         L = [w[1], w[2] * cosa + w[3] * sina, w[3] * cosa - w[2] * sina, w[4]]
     else
-        println("error: global -> local")
+        throw("global -> local: dimension dismatch")
     end
 
     return L
 
 end
 
-function local_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})
+
+function local_frame(
+    w::AbstractArray{<:Real,1},
+    dirccos::AbstractArray{<:Real,2},
+)
 
     if length(w) == 3
         L = [
@@ -186,7 +203,7 @@ function local_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2
             w[5],
         ]
     else
-        println("error: global -> local")
+        throw("global -> local: dimension dismatch")
     end
 
     return L
@@ -203,7 +220,12 @@ function meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1})
     return X, Y
 end
 
-function meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1}, z::AbstractArray{<:Real,1})
+
+function meshgrid(
+    x::AbstractArray{<:Real,1},
+    y::AbstractArray{<:Real,1},
+    z::AbstractArray{<:Real,1},
+)
     @assert ndims(x) == ndims(y) == ndims(z) == 1
 
     X = [i for k in z, j in y, i in x]

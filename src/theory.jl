@@ -45,16 +45,20 @@ Velocity moments of particle distribution function
 # Calculate directional velocity moments of Gaussian
 # G = (λ / π)^(D / 2) * exp[-λ(c^2 + ξ^2)]
 # ------------------------------------------------------------
-function gauss_moments(prim::Array{<:Real,1}, inK::Real)
+function gauss_moments(prim::AbstractArray{<:Real,1}, inK::Real)
 
     MuL = OffsetArray{Float64}(undef, 0:6)
     MuR = similar(MuL)
     Mu = similar(MuL)
 
     MuL[0] = 0.5 * SpecialFunctions.erfc(-sqrt(prim[end]) * prim[2])
-    MuL[1] = prim[2] * MuL[0] + 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
+    MuL[1] =
+        prim[2] * MuL[0] +
+        0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
     MuR[0] = 0.5 * SpecialFunctions.erfc(sqrt(prim[end]) * prim[2])
-    MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
+    MuR[1] =
+        prim[2] * MuR[0] -
+        0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
 
     Threads.@threads for i = 2:6
         MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i - 1) * MuL[i-2] / prim[end]
@@ -111,7 +115,7 @@ function gauss_moments(prim::Array{<:Real,1}, inK::Real)
 end
 
 
-function mixture_gauss_moments(prim::Array{<:Real,2}, inK::Real)
+function mixture_gauss_moments(prim::AbstractArray{<:Real,2}, inK::Real)
 
     Mu = OffsetArray{Float64}(undef, 0:6, axes(prim, 2))
     MuL = similar(Mu)
@@ -260,7 +264,8 @@ function mixture_moments_conserve(
 
     Muv = ifelse(length(Mw) == 3, zeros(4, axes(Mu, 2)), zeros(5, axes(Mu, 2)))
     for j in axes(Muv, 2)
-        Muv[:, j] .= moments_conserve(Mu[:, j], Mv[:, j], Mw[:, j], alpha, beta, delta)
+        Muv[:, j] .=
+            moments_conserve(Mu[:, j], Mv[:, j], Mw[:, j], alpha, beta, delta)
     end
 
     return Muv
@@ -270,9 +275,13 @@ end
 
 # ------------------------------------------------------------
 # Calculate slope of particle distribution function
-# a = a1 + u * a2 + 0.5 * u^2 * a3
+# assuming a = a1 + u * a2 + 0.5 * u^2 * a3
 # ------------------------------------------------------------
-function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
+function pdf_slope(
+    prim::AbstractArray{<:Real,1},
+    sw::Array{<:Real,1},
+    inK::Real,
+)
 
     sl = zeros(axes(prim))
 
@@ -283,7 +292,9 @@ function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
                 2.0 * sw[3] - 2.0 * prim[2] * sw[2] +
                 sw[1] * (prim[2]^2 - 0.5 * (inK + 1.0) / prim[3])
             )
-        sl[2] = 2.0 * prim[3] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[3]
+        sl[2] =
+            2.0 * prim[3] / prim[1] * (sw[2] - prim[2] * sw[1]) -
+            prim[2] * sl[3]
         sl[1] =
             sw[1] / prim[1] - prim[2] * sl[2] -
             0.5 * (prim[2]^2 + 0.5 * (inK + 1.0) / prim[3]) * sl[3]
@@ -295,8 +306,12 @@ function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
                 2.0 * sw[4] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] +
                 sw[1] * (prim[2]^2 + prim[3]^2 - 0.5 * (inK + 2.0) / prim[4])
             )
-        sl[3] = 2.0 * prim[4] / prim[1] * (sw[3] - prim[3] * sw[1]) - prim[3] * sl[4]
-        sl[2] = 2.0 * prim[4] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[4]
+        sl[3] =
+            2.0 * prim[4] / prim[1] * (sw[3] - prim[3] * sw[1]) -
+            prim[3] * sl[4]
+        sl[2] =
+            2.0 * prim[4] / prim[1] * (sw[2] - prim[2] * sw[1]) -
+            prim[2] * sl[4]
         sl[1] =
             sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] -
             0.5 * (prim[2]^2 + prim[3]^2 + 0.5 * (inK + 2.0) / prim[4]) * sl[4]
@@ -307,14 +322,26 @@ function pdf_slope(prim::Array{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
             4.0 * prim[5]^2 / (inK + 3.0) / prim[1] * (
                 2.0 * sw[5] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] -
                 2.0 * prim[4] * sw[4] +
-                sw[1] * (prim[2]^2 + prim[3]^2 + prim[4]^2 - 0.5 * (inK + 3.0) / prim[5])
+                sw[1] * (
+                    prim[2]^2 + prim[3]^2 + prim[4]^2 -
+                    0.5 * (inK + 3.0) / prim[5]
+                )
             )
-        sl[4] = 2.0 * prim[5] / prim[1] * (sw[4] - prim[4] * sw[1]) - prim[4] * sl[5]
-        sl[3] = 2.0 * prim[5] / prim[1] * (sw[3] - prim[3] * sw[1]) - prim[3] * sl[5]
-        sl[2] = 2.0 * prim[5] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[5]
+        sl[4] =
+            2.0 * prim[5] / prim[1] * (sw[4] - prim[4] * sw[1]) -
+            prim[4] * sl[5]
+        sl[3] =
+            2.0 * prim[5] / prim[1] * (sw[3] - prim[3] * sw[1]) -
+            prim[3] * sl[5]
+        sl[2] =
+            2.0 * prim[5] / prim[1] * (sw[2] - prim[2] * sw[1]) -
+            prim[2] * sl[5]
         sl[1] =
-            sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] - prim[4] * sl[4] -
-            0.5 * (prim[2]^2 + prim[3]^2 + prim[4]^2 + 0.5 * (inK + 3.0) / prim[5]) * sl[5]
+            sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] -
+            prim[4] * sl[4] -
+            0.5 *
+            (prim[2]^2 + prim[3]^2 + prim[4]^2 + 0.5 * (inK + 3.0) / prim[5]) *
+            sl[5]
 
     end
 
@@ -325,10 +352,10 @@ end
 
 # ------------------------------------------------------------
 # Calculate slope-related conservative moments
-# a = a1 + u * a2 + 0.5 * u^2 * a3
+# assuming a = a1 + u * a2 + 0.5 * u^2 * a3
 # ------------------------------------------------------------
 moments_conserve_slope(
-    a::Array{<:Real,1},
+    a::AbstractArray{<:Real,1},
     Mu::OffsetArray{<:Real,1},
     Mxi::OffsetArray{<:Real,1},
     alpha::Int,
@@ -340,7 +367,7 @@ moments_conserve_slope(
 
 
 function moments_conserve_slope(
-    a::Array{<:Real,1},
+    a::AbstractArray{<:Real,1},
     Mu::OffsetArray{<:Real,1},
     Mv::OffsetArray{<:Real,1},
     Mxi::OffsetArray{<:Real,1},
@@ -362,7 +389,7 @@ end
 
 
 function moments_conserve_slope(
-    a::Array{<:Real,1},
+    a::AbstractArray{<:Real,1},
     Mu::OffsetArray{<:Real,1},
     Mv::OffsetArray{<:Real,1},
     Mw::OffsetArray{<:Real,1},
@@ -376,9 +403,12 @@ function moments_conserve_slope(
         a[2] .* moments_conserve(Mu, Mv, Mw, alpha + 1, beta + 0, delta + 0) .+
         a[3] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 1, delta + 0) .+
         a[4] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 1) .+
-        0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 2, beta + 0, delta + 0) .+
-        0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 2, delta + 0) .+
-        0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 2)
+        0.5 * a[5] .*
+        moments_conserve(Mu, Mv, Mw, alpha + 2, beta + 0, delta + 0) .+
+        0.5 * a[5] .*
+        moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 2, delta + 0) .+
+        0.5 * a[5] .*
+        moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 2)
 
     return au
 
@@ -386,7 +416,7 @@ end
 
 
 function mixture_moments_conserve_slope(
-    a::Array{<:Real,2},
+    a::AbstractArray{<:Real,2},
     Mu::OffsetArray{<:Real,2},
     Mxi::OffsetArray{<:Real,2},
     alpha::Int,
@@ -403,7 +433,7 @@ end
 
 
 function mixture_moments_conserve_slope(
-    a::Array{<:Real,2},
+    a::AbstractArray{<:Real,2},
     Mu::OffsetArray{<:Real,2},
     Mv::OffsetArray{<:Real,2},
     Mxi::OffsetArray{<:Real,2},
@@ -413,8 +443,14 @@ function mixture_moments_conserve_slope(
 
     au = zeros(4, axes(a, 2))
     for j in axes(au, 2)
-        au[:, j] .=
-            moments_conserve_slope(a[:, j], Mu[:, j], Mv[:, j], Mxi[:, j], alpha, beta)
+        au[:, j] .= moments_conserve_slope(
+            a[:, j],
+            Mu[:, j],
+            Mv[:, j],
+            Mxi[:, j],
+            alpha,
+            beta,
+        )
     end
 
     return au
@@ -423,7 +459,7 @@ end
 
 
 function mixture_moments_conserve_slope(
-    a::Array{<:Real,2},
+    a::AbstractArray{<:Real,2},
     Mu::OffsetArray{<:Real,2},
     Mv::OffsetArray{<:Real,2},
     Mw::OffsetArray{<:Real,2},
@@ -453,6 +489,7 @@ end
 """
 Velocity moments of particle distribution function
 2. discrete form
+
 """
 
 # ------------------------------------------------------------
@@ -581,7 +618,8 @@ function mixture_moments_conserve(
 )
     w = zeros(eltype(f), 4, size(f, 3))
     for j in axes(w, 2)
-        w[:, j] .= moments_conserve(f[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
+        w[:, j] .=
+            moments_conserve(f[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
     end
 
     return w
@@ -597,8 +635,13 @@ function mixture_moments_conserve(
 )
     w = zeros(eltype(h), 4, size(h, 3))
     for j in axes(w, 2)
-        w[:, j] .=
-            moments_conserve(h[:, :, j], b[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
+        w[:, j] .= moments_conserve(
+            h[:, :, j],
+            b[:, :, j],
+            u[:, :, j],
+            v[:, :, j],
+            ω[:, :, j],
+        )
     end
 
     return w
@@ -642,11 +685,11 @@ moments_conserve(
 
 
 function mixture_moments_conserve(
-    f::AbstractArray{<:Real,4},
-    u::AbstractArray{<:Real,4},
-    v::AbstractArray{<:Real,4},
-    w::AbstractArray{<:Real,4},
-    ω::AbstractArray{<:Real,4},
+    f::AbstractArray{<:AbstractFloat,4},
+    u::AbstractArray{<:AbstractFloat,4},
+    v::AbstractArray{<:AbstractFloat,4},
+    w::AbstractArray{<:AbstractFloat,4},
+    ω::AbstractArray{<:AbstractFloat,4},
 )
     w = zeros(eltype(f), 5, size(f, 4))
     for j in axes(w, 2)
@@ -668,13 +711,19 @@ function mixture_moments_conserve(
     h1::AbstractArray{<:AbstractFloat,2},
     h2::AbstractArray{<:AbstractFloat,2},
     h3::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:Real,2},
-    ω::AbstractArray{<:Real,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
 )
     w = zeros(eltype(h0), 5, size(h0, 2))
     for j in axes(w, 2)
-        w[:, j] .=
-            moments_conserve(h0[:, j], h1[:, j], h2[:, j], h3[:, j], u[:, j], ω[:, j])
+        w[:, j] .= moments_conserve(
+            h0[:, j],
+            h1[:, j],
+            h2[:, j],
+            h3[:, j],
+            u[:, j],
+            ω[:, j],
+        )
     end
 
     return w
@@ -724,7 +773,11 @@ heat_flux(
     prim::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
-) = 0.5 * (sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h) + sum(@. ω * (u - prim[2]) * b))
+) =
+    0.5 * (sum(@. ω *
+            (u - prim[2]) *
+            (u - prim[2])^2 *
+            h) + sum(@. ω * (u - prim[2]) * b))
 
 
 # --- 2D ---#
@@ -737,8 +790,16 @@ function heat_flux(
 )
     q = zeros(eltype(prim), 2)
 
-    q[1] = 0.5 * sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
-    q[2] = 0.5 * sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
+    q[1] =
+        0.5 * sum(@. ω *
+                     (u - prim[2]) *
+                     ((u - prim[2])^2 + (v - prim[3])^2) *
+                     h)
+    q[2] =
+        0.5 * sum(@. ω *
+                     (v - prim[3]) *
+                     ((u - prim[2])^2 + (v - prim[3])^2) *
+                     h)
 
     return q
 end
@@ -756,13 +817,17 @@ function heat_flux(
 
     q[1] =
         0.5 * (
-            sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h) +
-            sum(@. ω * (u - prim[2]) * b)
+            sum(@. ω *
+                   (u - prim[2]) *
+                   ((u - prim[2])^2 + (v - prim[3])^2) *
+                   h) + sum(@. ω * (u - prim[2]) * b)
         )
     q[2] =
         0.5 * (
-            sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h) +
-            sum(@. ω * (v - prim[3]) * b)
+            sum(@. ω *
+                   (v - prim[3]) *
+                   ((u - prim[2])^2 + (v - prim[3])^2) *
+                   h) + sum(@. ω * (v - prim[3]) * b)
         )
 
     return q
@@ -780,15 +845,18 @@ Equilibrium in discrete form
 """
 
 # --- 1D ---#
-maxwellian(u::AbstractArray{<:Real,1}, ρ::Real, U::Real, λ::Real) =
+maxwellian(u::AbstractArray{<:AbstractFloat,1}, ρ::Real, U::Real, λ::Real) =
     @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
 
 
-maxwellian(u::AbstractArray{<:Real,1}, prim::Array{<:Real,1}) =
+maxwellian(u::AbstractArray{<:AbstractFloat,1}, prim::Array{<:Real,1}) =
     maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 
-function mixture_maxwellian(u::AbstractArray{<:Real,2}, prim::Array{<:Real,2})
+function mixture_maxwellian(
+    u::AbstractArray{<:AbstractFloat,2},
+    prim::Array{<:Real,2},
+)
     mixM = similar(u)
     for j in axes(mixM, 2)
         mixM[:, j] .= maxwellian(u[:, j], prim[:, j])
@@ -800,8 +868,8 @@ end
 
 # --- 2D ---#
 maxwellian(
-    u::AbstractArray{<:Real,2},
-    v::AbstractArray{<:Real,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
     ρ::Real,
     U::Real,
     V::Real,
@@ -809,13 +877,16 @@ maxwellian(
 ) = @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
 
-maxwellian(u::AbstractArray{<:Real,2}, v::AbstractArray{<:Real,2}, prim::Array{<:Real,1}) =
-    maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
+maxwellian(
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    prim::Array{<:Real,1},
+) = maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
 
 
 function mixture_maxwellian(
-    u::AbstractArray{<:Real,3},
-    v::AbstractArray{<:Real,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
     prim::Array{<:Real,2},
 )
     mixM = zeros(axes(u))
@@ -829,9 +900,9 @@ end
 
 # --- 3D ---#
 maxwellian(
-    u::AbstractArray{<:Real,3},
-    v::AbstractArray{<:Real,3},
-    w::AbstractArray{<:Real,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
     ρ::Real,
     U::Real,
     V::Real,
@@ -841,20 +912,20 @@ maxwellian(
 
 
 maxwellian(
-    u::AbstractArray{<:Real,3},
-    v::AbstractArray{<:Real,3},
-    w::AbstractArray{<:Real,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
     prim::Array{<:Real,1},
 ) = maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
 
 
 function mixture_maxwellian(
-    u::AbstractArray{<:Real,4},
-    v::AbstractArray{<:Real,4},
-    w::AbstractArray{<:Real,4},
+    u::AbstractArray{<:AbstractFloat,4},
+    v::AbstractArray{<:AbstractFloat,4},
+    w::AbstractArray{<:AbstractFloat,4},
     prim::Array{<:Real,2},
 )
-    mixM = zeros(axes(u))
+    mixM = zeros(eltype(u), axes(u))
     for l in axes(mixM, 4)
         mixM[:, :, :, l] .=
             maxwellian(u[:, :, :, l], v[:, :, :, l], w[:, :, :, l], prim[:, l])
@@ -966,7 +1037,8 @@ function full_distribution(
 
     f = similar(v)
     for k in axes(f, 3), j in axes(f, 2), i in axes(f, 1)
-        f[i, j, k] = h[i] * (λi / π) * exp(-λi * v[i, j, k]^2) * exp(-λi * w[i, j, k]^2)
+        f[i, j, k] =
+            h[i] * (λi / π) * exp(-λi * v[i, j, k]^2) * exp(-λi * w[i, j, k]^2)
     end
 
     return f
@@ -1005,7 +1077,9 @@ function prim_conserve(prim::Array{<:Real,1}, γ::Real)
         W[1] = prim[1]
         W[2] = prim[1] * prim[2]
         W[3] = prim[1] * prim[3]
-        W[4] = 0.5 * prim[1] / prim[4] / (γ - 1.0) + 0.5 * prim[1] * (prim[2]^2 + prim[3]^2)
+        W[4] =
+            0.5 * prim[1] / prim[4] / (γ - 1.0) +
+            0.5 * prim[1] * (prim[2]^2 + prim[3]^2)
     elseif length(prim) == 5 # 3D
         W[1] = prim[1]
         W[2] = prim[1] * prim[2]
@@ -1026,7 +1100,8 @@ end
 prim_conserve(ρ::Real, U::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, λ], γ)
 
 
-prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, V, λ], γ)
+prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) =
+    prim_conserve([ρ, U, V, λ], γ)
 
 
 function mixture_prim_conserve(prim::Array{<:Real,2}, γ::Real)
@@ -1054,15 +1129,18 @@ function conserve_prim(W::Array{<:Real,1}, γ::Real)
         prim[1] = W[1]
         prim[2] = W[2] / W[1]
         prim[3] = W[3] / W[1]
-        prim[4] = 0.5 * W[1] / (γ - 1.0) / (W[4] - 0.5 * (W[2]^2 + W[3]^2) / W[1])
+        prim[4] =
+            0.5 * W[1] / (γ - 1.0) / (W[4] - 0.5 * (W[2]^2 + W[3]^2) / W[1])
     elseif length(W) == 5 # 3D
         prim[1] = W[1]
         prim[2] = W[2] / W[1]
         prim[3] = W[3] / W[1]
         prim[4] = W[4] / W[1]
-        prim[5] = 0.5 * W[1] / (γ - 1.0) / (W[5] - 0.5 * (W[2]^2 + W[3]^2 + W[4]^2) / W[1])
+        prim[5] =
+            0.5 * W[1] / (γ - 1.0) /
+            (W[5] - 0.5 * (W[2]^2 + W[3]^2 + W[4]^2) / W[1])
     else
-        println("w -> prim : dimension error")
+        throw("w -> prim : dimension dismatch")
     end
 
     return prim
@@ -1070,7 +1148,8 @@ function conserve_prim(W::Array{<:Real,1}, γ::Real)
 end
 
 
-conserve_prim(ρ::Real, M::Real, E::Real, gamma::Real) = conserve_prim([ρ, M, E], gamma)
+conserve_prim(ρ::Real, M::Real, E::Real, gamma::Real) =
+    conserve_prim([ρ, M, E], gamma)
 
 
 conserve_prim(ρ::Real, MX::Real, MY::Real, E::Real, gamma::Real) =
@@ -1154,8 +1233,12 @@ vhs_collision_time(prim::Array{<:Real,1}, muRef::Real, omega::Real) =
 # Calculate effective Knudsen number for fast spectral method
 # 1. hard sphere (HS) model
 # ------------------------------------------------------------
-hs_boltz_kn(mu_ref, alpha) =
-    64 * sqrt(2.0)^alpha / 5.0 * gamma((alpha + 3) / 2) * gamma(2.0) * sqrt(pi) * mu_ref
+hs_boltz_kn(mu_ref::Real, alpha::Real) =
+    64 * sqrt(2.0)^alpha / 5.0 *
+    gamma((alpha + 3) / 2) *
+    gamma(2.0) *
+    sqrt(pi) *
+    mu_ref
 
 
 ```
@@ -1210,7 +1293,10 @@ function kernel_mode(
                 int_temp = 0.0
                 for id = 1:quad_num
                     int_temp +=
-                        2.0 * gweight[id] * cos(s * abscissa[id]) * (abscissa[id]^alpha)
+                        2.0 *
+                        gweight[id] *
+                        cos(s * abscissa[id]) *
+                        (abscissa[id]^alpha)
                 end
                 phi[i, j, k, idx] = int_temp * sin(theta)
                 # psi
@@ -1277,6 +1363,7 @@ end
 
 """
 Multiple component gas models
+
 """
 
 # ------------------------------------------------------------
@@ -1325,30 +1412,32 @@ function aap_hs_prim(
     mixprim = similar(prim)
 
     if size(prim, 1) == 3
+
         mixprim[1, :] = deepcopy(prim[1, :])
         mixprim[2, 1] =
             prim[2, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 2] - prim[2, 1])
         mixprim[2, 2] =
             prim[2, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 1] - prim[2, 2])
         mixprim[3, 1] =
             1.0 / (
-                1.0 / prim[end, 1] - 2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 +
+                1.0 / prim[end, 1] -
+                2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 +
                 tau[1] / kn * 2.0 * mi / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 2] * me / mi - 1.0 / prim[end, 1] +
@@ -1357,59 +1446,63 @@ function aap_hs_prim(
             )
         mixprim[3, 2] =
             1.0 / (
-                1.0 / prim[end, 2] - 2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 +
+                1.0 / prim[end, 2] -
+                2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 +
                 tau[2] / kn * 2.0 * me / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 1] * mi / me - 1.0 / prim[end, 2] +
                     2.0 / 3.0 * mi / me * (prim[2, 1] - prim[2, 2])^2
                 )
             )
+
     elseif size(prim, 1) == 4
+
         mixprim[1, :] = deepcopy(prim[1, :])
         mixprim[2, 1] =
             prim[2, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 2] - prim[2, 1])
         mixprim[2, 2] =
             prim[2, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 1] - prim[2, 2])
         mixprim[3, 1] =
             prim[3, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 2] - prim[3, 1])
         mixprim[3, 2] =
             prim[3, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 1] - prim[3, 2])
         mixprim[4, 1] =
             1.0 / (
-                1.0 / prim[end, 1] - 2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
+                1.0 / prim[end, 1] -
+                2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
                 2.0 / 3.0 * (mixprim[3, 1] - prim[3, 1])^2 +
                 tau[1] / kn * 2.0 * mi / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 2] * me / mi - 1.0 / prim[end, 1] +
@@ -1419,12 +1512,13 @@ function aap_hs_prim(
             )
         mixprim[4, 2] =
             1.0 / (
-                1.0 / prim[end, 2] - 2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
+                1.0 / prim[end, 2] -
+                2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
                 2.0 / 3.0 * (mixprim[3, 2] - prim[3, 2])^2 +
                 tau[2] / kn * 2.0 * me / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 1] * mi / me - 1.0 / prim[end, 2] +
@@ -1432,65 +1526,68 @@ function aap_hs_prim(
                     2.0 / 3.0 * mi / me * (prim[3, 1] - prim[3, 2])^2
                 )
             )
+
     elseif size(prim, 1) == 5
+
         mixprim[1, :] = deepcopy(prim[1, :])
         mixprim[2, 1] =
             prim[2, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 2] - prim[2, 1])
         mixprim[2, 2] =
             prim[2, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 1] - prim[2, 2])
         mixprim[3, 1] =
             prim[3, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 2] - prim[3, 1])
         mixprim[3, 2] =
             prim[3, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 1] - prim[3, 2])
         mixprim[4, 1] =
             prim[4, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[4, 2] - prim[4, 1])
         mixprim[4, 2] =
             prim[4, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[4, 1] - prim[4, 2])
         mixprim[5, 1] =
             1.0 / (
-                1.0 / prim[end, 1] - 2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
+                1.0 / prim[end, 1] -
+                2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
                 2.0 / 3.0 * (mixprim[3, 1] - prim[3, 1])^2 -
                 2.0 / 3.0 * (mixprim[4, 1] - prim[4, 1])^2 +
                 tau[1] / kn * 2.0 * mi / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 2] * me / mi - 1.0 / prim[end, 1] +
@@ -1501,13 +1598,14 @@ function aap_hs_prim(
             )
         mixprim[5, 2] =
             1.0 / (
-                1.0 / prim[end, 2] - 2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
+                1.0 / prim[end, 2] -
+                2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
                 2.0 / 3.0 * (mixprim[3, 2] - prim[3, 2])^2 -
                 2.0 / 3.0 * (mixprim[4, 2] - prim[4, 2])^2 +
                 tau[2] / kn * 2.0 * me / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 1] * mi / me - 1.0 / prim[end, 2] +
@@ -1516,8 +1614,11 @@ function aap_hs_prim(
                     2.0 / 3.0 * mi / me * (prim[4, 1] - prim[4, 2])^2
                 )
             )
+
     else
-        println("AAP mixture : dimension error")
+
+        throw("AAP mixture : dimension dismatch")
+
     end
 
     return mixprim
@@ -1571,7 +1672,12 @@ Shift distribution function by external force
 # ------------------------------------------------------------
 # Single-component gas
 # ------------------------------------------------------------
-function shift_pdf!(f::AbstractArray{<:Real,1}, a::Real, du::Real, dt::Real)
+function shift_pdf!(
+    f::AbstractArray{<:AbstractFloat,1},
+    a::Real,
+    du::AbstractFloat,
+    dt::Real,
+)
 
     q0 = eachindex(f) |> first # for OffsetArray
     q1 = eachindex(f) |> last
@@ -1612,9 +1718,9 @@ end
 # Multi-component gas
 # ------------------------------------------------------------
 function shift_pdf!(
-    f::AbstractArray{<:Real,2},
+    f::AbstractArray{<:AbstractFloat,2},
     a::Array{<:Real,1},
-    du::AbstractArray{<:Real,1},
+    du::AbstractArray{<:AbstractFloat,1},
     dt::Real,
 )
     for j in axes(f, 2)
@@ -1682,13 +1788,16 @@ function em_coefficients(
         prim[4, 1] / (dt) + E[3] / (2.0 * rL) - B[1] * prim[3, 1] / (2.0 * rL) +
         B[2] * prim[2, 1] / (2.0 * rL)
     b[4] =
-        prim[2, 2] / (dt) - mr * E[1] / (2.0 * rL) + mr * B[2] * prim[4, 2] / (2.0 * rL) -
+        prim[2, 2] / (dt) - mr * E[1] / (2.0 * rL) +
+        mr * B[2] * prim[4, 2] / (2.0 * rL) -
         mr * B[3] * prim[3, 2] / (2.0 * rL)
     b[5] =
-        prim[3, 2] / (dt) - mr * E[2] / (2.0 * rL) + mr * B[3] * prim[2, 2] / (2.0 * rL) -
+        prim[3, 2] / (dt) - mr * E[2] / (2.0 * rL) +
+        mr * B[3] * prim[2, 2] / (2.0 * rL) -
         mr * B[1] * prim[4, 2] / (2.0 * rL)
     b[6] =
-        prim[4, 2] / (dt) - mr * E[3] / (2.0 * rL) + mr * B[1] * prim[3, 2] / (2.0 * rL) -
+        prim[4, 2] / (dt) - mr * E[3] / (2.0 * rL) +
+        mr * B[1] * prim[3, 2] / (2.0 * rL) -
         mr * B[2] * prim[2, 2] / (2.0 * rL)
     b[7] =
         E[1] / (dt) - prim[1, 1] * prim[2, 1] / (2.0 * rL * lD^2) +
