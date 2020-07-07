@@ -88,7 +88,8 @@ struct SolverSet <: AbstractSolverSet
                 if space == "1d1f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
-                    wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(mach, γ, vSpace.u)
+                    wL, primL, fL, bcL, wR, primR, fR, bcR =
+                        ib_rh(mach, γ, vSpace.u)
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
                 elseif space == "1d2f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
@@ -115,6 +116,55 @@ struct SolverSet <: AbstractSolverSet
 
                     wL, primL, fL, bcL, wR, primR, fR, bcR =
                         ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
+                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
+                end
+
+            elseif case == "sod"
+
+                μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
+                gas = GasProperty(
+                    knudsen,
+                    mach,
+                    prandtl,
+                    inK,
+                    γ,
+                    omega,
+                    alphaRef,
+                    omegaRef,
+                    μᵣ,
+                )
+
+                if space == "1d1f1v"
+                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
+
+                    wL, primL, fL, bcL, wR, primR, fR, bcR =
+                        ib_sod(γ, vSpace.u)
+                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
+                elseif space == "1d2f1v"
+                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
+
+                    wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
+                        ib_sod(γ, vSpace.u, inK)
+                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
+                elseif space == "1d1f3v"
+                    vSpace = VSpace3D(
+                        umin,
+                        umax,
+                        nu,
+                        vmin,
+                        vmax,
+                        nv,
+                        wmin,
+                        wmax,
+                        nw,
+                        vMeshType,
+                        nug,
+                        nvg,
+                        nwg,
+                    )
+
+                    wL, primL, fL, bcL, wR, primR, fR, bcR =
+                        ib_sod(γ, vSpace.u, vSpace.v, vSpace.w)
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
                 end
 
@@ -207,17 +257,50 @@ struct SolverSet <: AbstractSolverSet
                 )
 
                 if space == "2d1f2v"
-                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
+                    vSpace = VSpace2D(
+                        umin,
+                        umax,
+                        nu,
+                        vmin,
+                        vmax,
+                        nv,
+                        vMeshType,
+                        nug,
+                        nvg,
+                    )
 
                     wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD =
                         ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v)
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
                 elseif space == "2d2f2v"
-                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
+                    vSpace = VSpace2D(
+                        umin,
+                        umax,
+                        nu,
+                        vmin,
+                        vmax,
+                        nv,
+                        vMeshType,
+                        nug,
+                        nvg,
+                    )
 
                     wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD =
                         ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v, inK)
-                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
+                    ib = IB2F(
+                        wL,
+                        primL,
+                        hL,
+                        bL,
+                        bcL,
+                        wR,
+                        primR,
+                        hR,
+                        bR,
+                        bcR,
+                        bcU,
+                        bcD,
+                    )
                 end
 
             end
@@ -338,7 +421,10 @@ end
 # ------------------------------------------------------------
 # Reconstruction
 # ------------------------------------------------------------
-function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
+function reconstruct!(
+    KS::SolverSet,
+    ctr::AbstractArray{<:AbstractControlVolume1D,1},
+)
 
     if KS.set.interpOrder == 1
         return
@@ -496,29 +582,32 @@ function evolve!(
 
         if KS.set.nSpecies == 2
             Threads.@threads for i = 2:KS.pSpace.nx
-                @inbounds face[i].fw, face[i].fh0, face[i].fh1, face[i].fh2, face[i].fh3 =
-                    flux_kcu(
-                        ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
-                        ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
-                        ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
-                        ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
-                        ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3,
-                        ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw,
-                        ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
-                        ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
-                        ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
-                        ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
-                        KS.vSpace.u,
-                        KS.vSpace.weights,
-                        KS.gas.K,
-                        KS.gas.γ,
-                        KS.gas.mi,
-                        KS.gas.ni,
-                        KS.gas.me,
-                        KS.gas.ne,
-                        KS.gas.knudsen[1],
-                        dt,
-                    )
+                @inbounds face[i].fw,
+                face[i].fh0,
+                face[i].fh1,
+                face[i].fh2,
+                face[i].fh3 = flux_kcu(
+                    ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
+                    ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
+                    ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
+                    ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
+                    ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3,
+                    ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw,
+                    ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
+                    ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
+                    ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
+                    ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
+                    KS.vSpace.u,
+                    KS.vSpace.weights,
+                    KS.gas.K,
+                    KS.gas.γ,
+                    KS.gas.mi,
+                    KS.gas.ni,
+                    KS.gas.me,
+                    KS.gas.ne,
+                    KS.gas.knudsen[1],
+                    dt,
+                )
 
                 @inbounds face[i].femL, face[i].femR = flux_em(
                     ctr[i-2].E,
@@ -647,6 +736,31 @@ end
 # ------------------------------------------------------------
 function step!(
     fwL::Array{<:AbstractFloat,1},
+    w::Array{<:AbstractFloat,1},
+    prim::Array{<:AbstractFloat,1},
+    fwR::Array{<:AbstractFloat,1},
+    γ::Real,
+    dx::Real,
+    RES::Array{<:AbstractFloat,1},
+    AVG::Array{<:AbstractFloat,1},
+)
+
+    #--- store W^n and calculate H^n,\tau^n ---#
+    w_old = deepcopy(w)
+
+    #--- update W^{n+1} ---#
+    @. w += (fwL - fwR) / dx
+    prim .= conserve_prim(w, γ)
+
+    #--- record residuals ---#
+    @. RES += (w - w_old)^2
+    @. AVG += abs(w)
+
+end
+
+
+function step!(
+    fwL::Array{<:AbstractFloat,1},
     ffL::AbstractArray{<:AbstractFloat,1},
     w::Array{<:AbstractFloat,1},
     prim::Array{<:AbstractFloat,1},
@@ -724,8 +838,11 @@ function step!(
     #--- update distribution function ---#
     for k in axes(wVelo, 3), j in axes(vVelo, 2), i in axes(uVelo, 1)
         f[i, j, k] =
-            (f[i, j, k] + (ffL[i, j, k] - ffR[i, j, k]) / dx + dt / τ * M[i, j, k]) /
-            (1.0 + dt / τ)
+            (
+                f[i, j, k] +
+                (ffL[i, j, k] - ffR[i, j, k]) / dx +
+                dt / τ * M[i, j, k]
+            ) / (1.0 + dt / τ)
     end
 
 end

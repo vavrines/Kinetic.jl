@@ -3,7 +3,7 @@
 # ============================================================
 
 
-export ib_rh, ib_briowu, ib_cavity
+export ib_rh, ib_sod, ib_briowu, ib_cavity
 
 
 ```
@@ -43,7 +43,10 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1})
 
 end
 
-#--- 1D2F1V ---#
+
+# ------------------------------------------------------------
+# 1D2F1V
+# ------------------------------------------------------------
 function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)
 
     #--- calculate Rankine-Hugoniot relation ---#
@@ -76,7 +79,10 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}, K::Rea
 
 end
 
-#--- 1D1F3V ---#
+
+# ------------------------------------------------------------
+# 1D1F3V
+# ------------------------------------------------------------
 function ib_rh(
     MaL::Real,
     gam::Real,
@@ -103,6 +109,85 @@ function ib_rh(
 
     wL = prim_conserve(primL, gam)
     wR = prim_conserve(primR, gam)
+
+    fL = maxwellian(u, v, w, primL)
+    fR = maxwellian(u, v, w, primR)
+
+    bcL = deepcopy(primL)
+    bcR = deepcopy(primR)
+
+    return wL, primL, fL, bcL, wR, primR, fR, bcR
+
+end
+
+
+```
+Initialize Sod shock tube
+
+```
+
+# ------------------------------------------------------------
+# 1D1F1V
+# ------------------------------------------------------------
+function ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,1})
+
+    primL = [1.0, 0.0, 1.0]
+    primR = [0.125, 0.0, 0.625]
+
+    wL = prim_conserve(primL, γ)
+    wR = prim_conserve(primR, γ)
+
+    fL = maxwellian(u, primL)
+    fR = maxwellian(u, primR)
+
+    bcL = deepcopy(primL)
+    bcR = deepcopy(primR)
+
+    return wL, primL, fL, bcL, wR, primR, fR, bcR
+
+end
+
+
+# ------------------------------------------------------------
+# 1D2F1V
+# ------------------------------------------------------------
+function ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)
+
+    primL = [1.0, 0.0, 1.0]
+    primR = [0.125, 0.0, 0.625]
+
+    wL = prim_conserve(primL, γ)
+    wR = prim_conserve(primR, γ)
+
+    hL = maxwellian(u, primL)
+    hR = maxwellian(u, primR)
+
+    bL = hL .* K ./ (2.0 .* primL[end])
+    bR = hR .* K ./ (2.0 .* primR[end])
+
+    bcL = deepcopy(primL)
+    bcR = deepcopy(primR)
+
+    return wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR
+
+end
+
+
+# ------------------------------------------------------------
+# 1D1F3V
+# ------------------------------------------------------------
+function ib_rh(
+    γ::Real,
+    u::AbstractArray{Float64,3},
+    v::AbstractArray{Float64,3},
+    w::AbstractArray{Float64,3},
+)
+
+    primL = [1.0, 0.0, 1.0]
+    primR = [0.125, 0.0, 0.625]
+
+    wL = prim_conserve(primL, γ)
+    wR = prim_conserve(primR, γ)
 
     fL = maxwellian(u, v, w, primL)
     fR = maxwellian(u, v, w, primR)
