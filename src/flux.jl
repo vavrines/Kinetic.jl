@@ -60,10 +60,10 @@ function flux_gks!(
     faTR = pdf_slope(primR, sw, inK)
 
     Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
-    swL = (w .- wL) ./ (0.5 * dx)
-    swR = (wR .- w) ./ (0.5 * dx)
-    gaL = pdf_slope(prim, swL, inK)
-    gaR = pdf_slope(prim, swR, inK)
+    sw0L = (w .- wL) ./ (0.5 * dx)
+    sw0R = (wR .- w) ./ (0.5 * dx)
+    gaL = pdf_slope(prim, sw0L, inK)
+    gaR = pdf_slope(prim, sw0R, inK)
     sw =
         -prim[1] .* (
             moments_conserve_slope(gaL, MuL, Mxi, 1) .+
@@ -109,8 +109,6 @@ function flux_gks!(
         tau * Mt[4] * primR[1] * MauRT
     # @. fw += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
-    return fw
-
 end
 
 
@@ -150,10 +148,10 @@ function flux_gks!(
     faTR = pdf_slope(primR, sw, inK)
 
     Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
-    swL = (w .- wL) ./ (0.5 * dx)
-    swR = (wR .- w) ./ (0.5 * dx)
-    gaL = pdf_slope(prim, swL, inK)
-    gaR = pdf_slope(prim, swR, inK)
+    sw0L = (w .- wL) ./ (0.5 * dx)
+    sw0R = (wR .- w) ./ (0.5 * dx)
+    gaL = pdf_slope(prim, sw0L, inK)
+    gaR = pdf_slope(prim, sw0R, inK)
     sw =
         -prim[1] .* (
             moments_conserve_slope(gaL, MuL, Mv, Mxi, 1, 0) .+
@@ -199,7 +197,7 @@ function flux_gks!(
         tau * Mt[4] * primR[1] * MauRT
     # @. fw += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
-    return fw .* dy
+    fw .*= dy
 
 end
 
