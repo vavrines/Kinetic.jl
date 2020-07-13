@@ -530,7 +530,9 @@ function evolve!(
     if KS.set.space == "1d1f1v"
 
         Threads.@threads for i = 1:KS.pSpace.nx+1
-            @inbounds face[i].fw, face[i].ff = flux_kfvs(
+            @inbounds flux_kfvs!(
+                face[i].fw, 
+                face[i].ff,
                 ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf,
                 ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
                 KS.vSpace.u,
@@ -544,7 +546,9 @@ function evolve!(
     elseif KS.set.space == "1d1f3v"
 
         Threads.@threads for i = 1:KS.pSpace.nx+1
-            @inbounds face[i].fw, face[i].ff = flux_kfvs(
+            @inbounds flux_kfvs!(
+                face[i].fw, 
+                face[i].ff,
                 ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf,
                 ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
                 KS.vSpace.u,
@@ -560,7 +564,10 @@ function evolve!(
     elseif KS.set.space[1:4] == "1d2f"
 
         Threads.@threads for i = 1:KS.pSpace.nx+1
-            @inbounds face[i].fw, face[i].fh, face[i].fb = flux_kcu(
+            @inbounds flux_kcu!(
+                face[i].fw, 
+                face[i].fh,
+                face[i].fb,
                 ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
                 ctr[i-1].h .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh,
                 ctr[i-1].b .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sb,
@@ -582,11 +589,12 @@ function evolve!(
 
         if KS.set.nSpecies == 2
             Threads.@threads for i = 2:KS.pSpace.nx
-                @inbounds face[i].fw,
-                face[i].fh0,
-                face[i].fh1,
-                face[i].fh2,
-                face[i].fh3 = flux_kcu(
+                @inbounds flux_kcu!(
+                    face[i].fw,
+                    face[i].fh0,
+                    face[i].fh1,
+                    face[i].fh2,
+                    face[i].fh3,
                     ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
                     ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
                     ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
@@ -609,7 +617,9 @@ function evolve!(
                     dt,
                 )
 
-                @inbounds face[i].femL, face[i].femR = flux_em(
+                @inbounds flux_em!(
+                    face[i].femL, 
+                    face[i].femR,
                     ctr[i-2].E,
                     ctr[i-2].B,
                     ctr[i-1].E,
