@@ -32,7 +32,8 @@ export gauss_moments,
     em_coefficients,
     hs_boltz_kn,
     kernel_mode,
-    boltzmann_fft
+    boltzmann_fft,
+    boltzmann_fft!
 
 
 """
@@ -1357,6 +1358,43 @@ function boltzmann_fft(
     Q = @. 4.0 * π^2 / Kn / M^2 * real(f_temp)
 
     return Q
+
+end
+
+
+function boltzmann_fft!(
+    Q::AbstractArray{<:Real,3},
+    f::AbstractArray{<:Real,3},
+    Kn::Real,
+    M::Int,
+    ϕ::AbstractArray{<:Real,4},
+    ψ::AbstractArray{<:Real,4},
+    phipsi::AbstractArray{<:Real,3},
+)
+
+    f_spec = f .+ 0im
+    bfft!(f_spec)
+    f_spec ./= size(f, 1) * size(f, 2) * size(f, 3)
+    f_spec .= fftshift(f_spec)
+
+    # --- gain term ---#
+    f_temp = zeros(axes(f_spec)) .+ 0im
+    for i = 1:M*(M-1)
+        fg1 = f_spec .* ϕ[:, :, :, i]
+        fg2 = f_spec .* ψ[:, :, :, i]
+        fg11 = fft(fg1)
+        fg22 = fft(fg2)
+        f_temp .+= fg11 .* fg22
+    end
+
+    # --- loss term ---#
+    fl1 = f_spec .* phipsi
+    fl2 = f_spec
+    fl11 = fft(fl1)
+    fl22 = fft(fl2)
+    f_temp .-= fl11 .* fl22
+
+    @. Q = 4.0 * π^2 / Kn / M^2 * real(f_temp)
 
 end
 
