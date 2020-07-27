@@ -794,7 +794,7 @@ function step!(
     dx::Real,
     dt::Real,
     RES::Array{<:AbstractFloat,1},
-    AVG::Array{<:AbstractFloat,1};
+    AVG::Array{<:AbstractFloat,1},
 )
 
     #--- store W^n and calculate H^n,\tau^n ---#
@@ -938,7 +938,7 @@ function step!(
     dx::Real,
     dt::Real,
     RES::Array{<:AbstractFloat,1},
-    AVG::Array{<:AbstractFloat,1};
+    AVG::Array{<:AbstractFloat,1},
 )
 
     #--- store W^n and calculate H^n,\tau^n ---#
