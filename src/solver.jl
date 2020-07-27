@@ -791,7 +791,6 @@ function step!(
     u::AbstractArray{<:AbstractFloat,1},
     μᵣ::Real,
     ω::Real,
-    Pr::Real
     dx::Real,
     dt::Real,
     RES::Array{<:AbstractFloat,1},
