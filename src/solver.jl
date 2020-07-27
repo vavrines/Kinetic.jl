@@ -744,6 +744,12 @@ end
 # ------------------------------------------------------------
 # Time stepping
 # ------------------------------------------------------------
+
+```
+Macroscopic update
+> no distribution function needed
+
+```
 function step!(
     fwL::Array{<:AbstractFloat,1},
     w::Array{<:AbstractFloat,1},
@@ -769,6 +775,10 @@ function step!(
 end
 
 
+```
+Mesoscopic update based on BGK
+
+```
 function step!(
     fwL::Array{<:AbstractFloat,1},
     ffL::AbstractArray{<:AbstractFloat,1},
@@ -781,10 +791,11 @@ function step!(
     u::AbstractArray{<:AbstractFloat,1},
     μᵣ::Real,
     ω::Real,
+    Pr::Real
     dx::Real,
     dt::Real,
     RES::Array{<:AbstractFloat,1},
-    AVG::Array{<:AbstractFloat,1},
+    AVG::Array{<:AbstractFloat,1};
 )
 
     #--- store W^n and calculate H^n,\tau^n ---#
@@ -894,6 +905,173 @@ function step!(
     #--- calculate M^{n+1} and tau^{n+1} ---#
     MH = maxwellian(u, prim)
     MB = MH .* K ./ (2.0 * prim[end])
+    τ = vhs_collision_time(prim, μᵣ, ω)
+
+    #--- update distribution function ---#
+    for i in eachindex(u)
+        h[i] = (h[i] + (fhL[i] - fhR[i]) / dx + dt / τ * MH[i]) / (1.0 + dt / τ)
+        b[i] = (b[i] + (fbL[i] - fbR[i]) / dx + dt / τ * MB[i]) / (1.0 + dt / τ)
+    end
+
+end
+
+
+```
+Shakhov
+> @param : args quadrature weights and Prandtl number needed
+
+```
+#--- 1D1F1V ---#
+function step!(
+    fwL::Array{<:AbstractFloat,1},
+    ffL::AbstractArray{<:AbstractFloat,1},
+    w::Array{<:AbstractFloat,1},
+    prim::Array{<:AbstractFloat,1},
+    f::AbstractArray{<:AbstractFloat,1},
+    fwR::Array{<:AbstractFloat,1},
+    ffR::AbstractArray{<:AbstractFloat,1},
+    γ::Real,
+    u::AbstractArray{<:AbstractFloat,1},
+    weights::AbstractArray{<:AbstractFloat,1},
+    μᵣ::Real,
+    ω::Real,
+    Pr::Real,
+    dx::Real,
+    dt::Real,
+    RES::Array{<:AbstractFloat,1},
+    AVG::Array{<:AbstractFloat,1};
+)
+
+    #--- store W^n and calculate H^n,\tau^n ---#
+    w_old = deepcopy(w)
+
+    q = heat_flux(f, prim, u, weights)
+    M_old = maxwellian(u, prim)
+    S = shakhov(u, M_old, q, prim, Pr)
+
+    #--- update W^{n+1} ---#
+    @. w += (fwL - fwR) / dx
+    prim .= conserve_prim(w, γ)
+
+    #--- record residuals ---#
+    @. RES += (w - w_old)^2
+    @. AVG += abs(w)
+
+    #--- calculate M^{n+1} and tau^{n+1} ---#
+    M = maxwellian(u, prim)
+    M .+= S
+    τ = vhs_collision_time(prim, μᵣ, ω)
+
+    #--- update distribution function ---#
+    for i in eachindex(u)
+        f[i] = (f[i] + (ffL[i] - ffR[i]) / dx + dt / τ * M[i]) / (1.0 + dt / τ)
+    end
+
+end
+
+
+#--- 1D1F3V ---#
+function step!(
+    fwL::Array{<:AbstractFloat,1},
+    ffL::AbstractArray{<:AbstractFloat,3},
+    w::Array{<:AbstractFloat,1},
+    prim::Array{<:AbstractFloat,1},
+    f::AbstractArray{<:AbstractFloat,3},
+    fwR::Array{<:AbstractFloat,1},
+    ffR::AbstractArray{<:AbstractFloat,3},
+    γ::Real,
+    uVelo::AbstractArray{<:AbstractFloat,3},
+    vVelo::AbstractArray{<:AbstractFloat,3},
+    wVelo::AbstractArray{<:AbstractFloat,3}, # avoid conflict with w
+    weights::AbstractArray{<:AbstractFloat,3},
+    μᵣ::Real,
+    ω::Real,
+    Pr::Real,
+    dx::Real,
+    dt::Real,
+    RES::Array{<:AbstractFloat,1},
+    AVG::Array{<:AbstractFloat,1},
+)
+
+    #--- store W^n and calculate shakhov term ---#
+    w_old = deepcopy(w)
+
+    q = heat_flux(f, prim, uVelo, vVelo, wVelo, weights)
+    M_old = maxwellian(uVelo, vVelo, wVelo, prim)
+    S = shakhov(uVelo, vVelo, wVelo, M_old, q, prim, Pr, K)
+
+    #--- update W^{n+1} ---#
+    @. w += (fwL - fwR) / dx
+    prim .= conserve_prim(w, γ)
+
+    #--- record residuals ---#
+    @. RES += (w - w_old)^2
+    @. AVG += abs(w)
+
+    #--- calculate M^{n+1} and tau^{n+1} ---#
+    M = maxwellian(uVelo, vVelo, wVelo, prim)
+    M .+= S
+    τ = vhs_collision_time(prim, μᵣ, ω)
+
+    #--- update distribution function ---#
+    for k in axes(wVelo, 3), j in axes(vVelo, 2), i in axes(uVelo, 1)
+        f[i, j, k] =
+            (
+                f[i, j, k] +
+                (ffL[i, j, k] - ffR[i, j, k]) / dx +
+                dt / τ * M[i, j, k]
+            ) / (1.0 + dt / τ)
+    end
+
+end
+
+
+#--- 1D2F1V ---#
+function step!(
+    fwL::Array{<:AbstractFloat,1},
+    fhL::AbstractArray{<:AbstractFloat,1},
+    fbL::AbstractArray{<:AbstractFloat,1},
+    w::Array{<:AbstractFloat,1},
+    prim::Array{<:AbstractFloat,1},
+    h::AbstractArray{<:AbstractFloat,1},
+    b::AbstractArray{<:AbstractFloat,1},
+    fwR::Array{<:AbstractFloat,1},
+    fhR::AbstractArray{<:AbstractFloat,1},
+    fbR::AbstractArray{<:AbstractFloat,1},
+    K::Real,
+    γ::Real,
+    u::AbstractArray{<:AbstractFloat,1},
+    weights::AbstractArray{<:AbstractFloat,1},
+    μᵣ::Real,
+    ω::Real,
+    Pr::Real,
+    dx::Real,
+    dt::Real,
+    RES::Array{<:AbstractFloat,1},
+    AVG::Array{<:AbstractFloat,1},
+)
+
+    #--- store W^n and calculate shakhov term ---#
+    w_old = deepcopy(w)
+
+    q = heat_flux(h, b, prim, u, weights)
+    MH_old = maxwellian(u, prim)
+    MB_old = MH_old .* K ./ (2.0 * prim[end])
+    SH, SB = shakhov(u, MH_old, MB_old, q, prim, Pr, K)
+
+    #--- update W^{n+1} ---#
+    @. w += (fwL - fwR) / dx
+    prim .= conserve_prim(w, γ)
+
+    #--- record residuals ---#
+    @. RES += (w - w_old)^2
+    @. AVG += abs(w)
+
+    #--- calculate M^{n+1} and tau^{n+1} ---#
+    MH = maxwellian(u, prim)
+    MB = MH .* K ./ (2.0 * prim[end])
+    MH .+= SH
+    MB .+= SB
     τ = vhs_collision_time(prim, μᵣ, ω)
 
     #--- update distribution function ---#

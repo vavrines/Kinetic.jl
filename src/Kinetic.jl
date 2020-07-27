@@ -1,19 +1,17 @@
 # ============================================================
-# Kinetic.jl : Theory, Experiments and Simulations
+# Kinetic.jl : Kinetic Theory, Modeling and Simulation Toolbox
 # ============================================================
 
-
 module Kinetic
-
 
 using Dates
 using OffsetArrays
 using SpecialFunctions
 using FFTW
+using OrdinaryDiffEq
 using FileIO
 using JLD2
 using Plots
-
 
 include("abstract.jl")
 include("io.jl")
@@ -27,6 +25,5 @@ include("data.jl")
 include("problem.jl")
 include("solver.jl")
 include("initialize.jl")
-
 
 end

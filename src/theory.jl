@@ -39,7 +39,7 @@ export gauss_moments,
 
 """
 Velocity moments of particle distribution function
-1. theoretical form
+1) theoretical form
 
 """
 
@@ -454,7 +454,7 @@ end
 
 """
 Velocity moments of particle distribution function
-2. discrete form
+2) discrete form
 
 """
 
@@ -738,7 +738,7 @@ function heat_flux(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    q = zeros(eltype(prim), 2)
+    q = zeros(eltype(f), 2)
 
     q[1] = 0.5 * sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
     q[2] = 0.5 * sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
@@ -755,7 +755,7 @@ function heat_flux(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    q = zeros(eltype(prim), 2)
+    q = zeros(eltype(f), 2)
 
     q[1] =
         0.5 * (
@@ -772,9 +772,39 @@ function heat_flux(
 end
 
 
+# --- 3D ---#
+function heat_flux(
+    f::AbstractArray{<:AbstractFloat,3},
+    prim::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+    ω::AbstractArray{<:AbstractFloat,3},
+)
+    q = zeros(eltype(f), 3)
+
+    q[1] =
+        0.5 * sum(@. ω *
+               (u - prim[2]) *
+               ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) *
+               f)
+    q[2] =
+        0.5 * sum(@. ω *
+               (v - prim[3]) *
+               ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) *
+               f)
+    q[3] =
+        0.5 * sum(@. ω *
+               (w - prim[4]) *
+               ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) *
+               f)
+
+    return q
+end
+
+
 """
-Equilibrium in discrete form
-1. Gas: Maxwellian
+Maxwellian in discrete form
 
 >@param[in] : particle velocity quadrature points
 >@param[in] : density, velocity and inverse of temperature
@@ -873,12 +903,32 @@ end
 """
 Shakhov non-equilibrium part
 
->@param[in] : particle velocity quadrature points
->@param[in] : discrete Maxwellian
->@param[in] : primitive variables, Prandtl number, heat flux, inner degree of freedom
+> @param[in] : particle velocity quadrature points
+> @param[in] : discrete Maxwellian
+> @param[in] : primitive variables, Prandtl number, heat flux, inner degree of freedom
 
 """
+#--- 1F1V ---#
+function shakhov(
+    u::AbstractArray{<:AbstractFloat,1},
+    M::AbstractArray{<:AbstractFloat,1},
+    q::Real,
+    prim::Array{<:Real,1},
+    Pr::Real,
+)
 
+    M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
+       (u - prim[2]) *
+       q *
+       (2.0 * prim[end] * (u - prim[2])^2 - 5.0) *
+       M
+
+    return M_plus
+
+end
+
+
+#--- 2F1V ---#
 function shakhov(
     u::AbstractArray{<:AbstractFloat,1},
     H::AbstractArray{<:AbstractFloat,1},
@@ -905,6 +955,27 @@ function shakhov(
 end
 
 
+#--- 1F2V ---#
+function shakhov(
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    M::AbstractArray{<:AbstractFloat,2},
+    q::AbstractArray{<:AbstractFloat,1},
+    prim::Array{<:Real,1},
+    Pr::Real,
+)
+
+    M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
+       ((u - prim[2]) * q[1] + (v - prim[3]) * q[2]) *
+       (2.0 * prim[end] * ((u - prim[2])^2 + (v - prim[3])^2) - 5.0) *
+       M
+
+    return M_plus
+
+end
+
+
+#--- 2F2V ---#
 function shakhov(
     u::AbstractArray{<:AbstractFloat,2},
     v::AbstractArray{<:AbstractFloat,2},
@@ -926,6 +997,27 @@ function shakhov(
        B
 
     return H_plus, B_plus
+
+end
+
+
+#--- 1F3V ---#
+function shakhov(
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+    M::AbstractArray{<:AbstractFloat,3},
+    q::AbstractArray{<:AbstractFloat,1},
+    prim::Array{<:Real,1},
+    Pr::Real,
+)
+
+    M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
+       ((u - prim[2]) * q[1] + (v - prim[3]) * q[2] + (w - prim[4]) * q[3]) *
+       (2.0 * prim[end] * ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) - 5.0) *
+       M
+
+    return M_plus
 
 end
 
