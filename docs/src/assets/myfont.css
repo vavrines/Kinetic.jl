@@ -1,0 +1,11 @@
+pre, code, kbd {
+  font-family: 'Fira Code', Hack, 'Roboto Mono', 'Monaco', 'Courier', monospace;
+  font-size: 0.90em;
+}
+
+body, input {
+  font-family: 'Helvetica Neue', 'Lato', 'Arial', sans-serif;
+  font-size: 16px;
+  color: #222;
+  text-rendering: optimizeLegibility;
+}
