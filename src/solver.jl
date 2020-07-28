@@ -747,7 +747,6 @@ end
 
 ```
 Macroscopic update
-> no distribution function needed
 
 ```
 function step!(
