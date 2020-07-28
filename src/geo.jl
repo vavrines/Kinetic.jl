@@ -10,7 +10,6 @@ export PSpace1D, PSpace2D, uniform_mesh, global_frame, local_frame, meshgrid
 Structured mesh
 
 ```
-
 struct PSpace1D <: AbstractPhysicalSpace
 
     x0::Float64

@@ -70,15 +70,15 @@ struct GasProperty{A,B,C,D,E,F,G,H,I} <: AbstractProperty
     μᵣ::I
 
     function GasProperty(
-        Kn::Union{Real,Array}, # unified consideration of
-        Ma::Union{Real,Array}, # 1. deterministic solution, and
-        Pr::Union{Real,Array}, # 2. uncertainty quantification
-        K::Union{Real,Array},
-        γ::Union{Real,Array},
-        ω::Union{Real,Array},
-        αᵣ::Union{Real,Array},
-        ωᵣ::Union{Real,Array},
-        μᵣ::Union{Real,Array},
+        Kn::Union{Real,AbstractArray}, # unified consideration of
+        Ma::Union{Real,AbstractArray}, # 1. deterministic solution, and
+        Pr::Union{Real,AbstractArray}, # 2. uncertainty quantification
+        K::Union{Real,AbstractArray},
+        γ::Union{Real,AbstractArray},
+        ω::Union{Real,AbstractArray},
+        αᵣ::Union{Real,AbstractArray},
+        ωᵣ::Union{Real,AbstractArray},
+        μᵣ::Union{Real,AbstractArray},
     )
 
         # inner constructor method
@@ -135,16 +135,16 @@ struct PlasmaProperty{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P} <: AbstractProperty
     # {mi, ni, me, ne, sol, χ, ν} keep the same as before
     function PlasmaProperty(
         Kn::Array,
-        Ma::Union{Real,Array},
-        Pr::Union{Real,Array},
-        K::Union{Real,Array},
-        γ::Union{Real,Array},
+        Ma::Union{Real,AbstractArray},
+        Pr::Union{Real,AbstractArray},
+        K::Union{Real,AbstractArray},
+        γ::Union{Real,AbstractArray},
         mi::Real,
         ni::Real,
         me::Real,
         ne::Real,
-        lD::Union{Real,Array},
-        rL::Union{Real,Array},
+        lD::Union{Real,AbstractArray},
+        rL::Union{Real,AbstractArray},
         sol::Real,
         χ::Real,
         ν::Real,
@@ -251,14 +251,14 @@ struct IB{A} <: AbstractCondition
 
     # works for both 1V/3V and single-/multi-component gases
     function IB(
-        wL::Array,
-        primL::Array,
-        bcL::Array,
-        wR::Array,
-        primR::Array,
-        bcR::Array,
-        bcU = deepcopy(bcR)::Array,
-        bcD = deepcopy(bcR)::Array,
+        wL::AbstractArray,
+        primL::AbstractArray,
+        bcL::AbstractArray,
+        wR::AbstractArray,
+        primR::AbstractArray,
+        bcR::AbstractArray,
+        bcU = deepcopy(bcR)::AbstractArray,
+        bcD = deepcopy(bcR)::AbstractArray,
     )
 
         new{typeof(wL)}(wL, primL, bcL, wR, primR, bcR, bcU, bcD)
@@ -285,16 +285,16 @@ struct IB1F{A,B} <: AbstractCondition
 
     # works for both 1V/3V and single-/multi-component gases
     function IB1F(
-        wL::Array,
-        primL::Array,
+        wL::AbstractArray,
+        primL::AbstractArray,
         fL::AbstractArray,
-        bcL::Array,
-        wR::Array,
-        primR::Array,
+        bcL::AbstractArray,
+        wR::AbstractArray,
+        primR::AbstractArray,
         fR::AbstractArray,
         bcR::Array,
-        bcU = deepcopy(bcR)::Array,
-        bcD = deepcopy(bcR)::Array,
+        bcU = deepcopy(bcR)::AbstractArray,
+        bcD = deepcopy(bcR)::AbstractArray,
     )
 
         new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
@@ -302,6 +302,7 @@ struct IB1F{A,B} <: AbstractCondition
     end
 
 end
+
 
 struct IB2F{A,B} <: AbstractCondition
 
@@ -322,18 +323,18 @@ struct IB2F{A,B} <: AbstractCondition
     bcD::A
 
     function IB2F(
-        wL::Array,
-        primL::Array,
+        wL::AbstractArray,
+        primL::AbstractArray,
         hL::AbstractArray,
         bL::AbstractArray,
-        bcL::Array,
-        wR::Array,
-        primR::Array,
+        bcL::AbstractArray,
+        wR::AbstractArray,
+        primR::AbstractArray,
         hR::AbstractArray,
         bR::AbstractArray,
-        bcR::Array,
-        bcU = deepcopy(bcR)::Array,
-        bcD = deepcopy(bcR)::Array,
+        bcR::AbstractArray,
+        bcU = deepcopy(bcR)::AbstractArray,
+        bcD = deepcopy(bcR)::AbstractArray,
     )
 
         new{typeof(wL),typeof(hL)}(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
@@ -372,28 +373,28 @@ struct IB4F{A,B,C,D} <: AbstractCondition
     bcD::A
 
     function IB4F(
-        wL::Array,
-        primL::Array,
+        wL::AbstractArray,
+        primL::AbstractArray,
         h0L::AbstractArray,
         h1L::AbstractArray,
         h2L::AbstractArray,
         h3L::AbstractArray,
-        bcL::Array,
-        EL::Array,
-        BL::Array,
-        lorenzL::Array,
-        wR::Array,
-        primR::Array,
+        bcL::AbstractArray,
+        EL::AbstractArray,
+        BL::AbstractArray,
+        lorenzL::AbstractArray,
+        wR::AbstractArray,
+        primR::AbstractArray,
         h0R::AbstractArray,
         h1R::AbstractArray,
         h2R::AbstractArray,
         h3R::AbstractArray,
-        bcR::Array,
-        ER::Array,
-        BR::Array,
-        lorenzR::Array,
-        bcU = deepcopy(bcR)::Array,
-        bcD = deepcopy(bcR)::Array,
+        bcR::AbstractArray,
+        ER::AbstractArray,
+        BR::AbstractArray,
+        lorenzR::AbstractArray,
+        bcU = deepcopy(bcR)::AbstractArray,
+        bcD = deepcopy(bcR)::AbstractArray,
     )
 
         new{typeof(wL),typeof(h0L),typeof(EL),typeof(lorenzL)}(
@@ -426,9 +427,11 @@ struct IB4F{A,B,C,D} <: AbstractCondition
 end
 
 
-# ------------------------------------------------------------
-# Structure of control volume
-# ------------------------------------------------------------
+"""
+Data structure 1
+control volume & interface : array of struct
+
+"""
 mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
 
     x::F
@@ -438,7 +441,7 @@ mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
     prim::A
     sw::A
 
-    function ControlVolume1D(X::Real, DX::Real, W::Array, PRIM::Array)
+    function ControlVolume1D(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray)
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -466,7 +469,7 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
     f::B
     sf::B
 
-    function ControlVolume1D1F(X::Real, DX::Real, W::Array, PRIM::Array, F::AbstractArray)
+    function ControlVolume1D1F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -502,8 +505,8 @@ mutable struct ControlVolume1D2F{F,A,B} <: AbstractControlVolume1D
     function ControlVolume1D2F(
         X::Real,
         DX::Real,
-        W::Array,
-        PRIM::Array,
+        W::AbstractArray,
+        PRIM::AbstractArray,
         H::AbstractArray,
         B::AbstractArray,
     )
@@ -555,15 +558,15 @@ mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
     function ControlVolume1D4F(
         X::Real,
         DX::Real,
-        W::Array{<:Real,2},
-        PRIM::Array{<:Real,2},
+        W::AbstractArray{<:Real,2},
+        PRIM::AbstractArray{<:Real,2},
         H0::AbstractArray{<:AbstractFloat,2},
         H1::AbstractArray{Float64,2},
         H2::AbstractArray{Float64,2},
         H3::AbstractArray{Float64,2},
-        E0::Array{Float64,1},
-        B0::Array{Float64,1},
-        L::Array{Float64,2},
+        E0::AbstractArray{Float64,1},
+        B0::AbstractArray{Float64,1},
+        L::AbstractArray{Float64,2},
     )
 
         x = deepcopy(X)
@@ -615,15 +618,15 @@ mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
     function ControlVolume1D4F(
         X::Real,
         DX::Real,
-        W::Array{<:Real,3},
-        PRIM::Array{<:Real,3},
+        W::AbstractArray{<:Real,3},
+        PRIM::AbstractArray{<:Real,3},
         H0::AbstractArray{<:AbstractFloat,3},
         H1::AbstractArray{Float64,3},
         H2::AbstractArray{Float64,3},
         H3::AbstractArray{Float64,3},
-        E0::Array{Float64,2},
-        B0::Array{Float64,2},
-        L::Array{Float64,3},
+        E0::AbstractArray{Float64,2},
+        B0::AbstractArray{Float64,2},
+        L::AbstractArray{Float64,3},
     )
 
         x = deepcopy(X)
@@ -685,7 +688,7 @@ mutable struct ControlVolume2D{F,A,B} <: AbstractControlVolume2D
     prim::A
     sw::B
 
-    function ControlVolume2D(X::Real, DX::Real, Y::Real, DY::Real, W::Array, PRIM::Array)
+    function ControlVolume2D(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray)
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -722,8 +725,8 @@ mutable struct ControlVolume2D1F{F,A,B,C,D} <: AbstractControlVolume2D
         DX::Real,
         Y::Real,
         DY::Real,
-        W::Array,
-        PRIM::Array,
+        W::AbstractArray,
+        PRIM::AbstractArray,
         F::AbstractArray,
     )
 
@@ -777,8 +780,8 @@ mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
         DX::Real,
         Y::Real,
         DY::Real,
-        W::Array,
-        PRIM::Array,
+        W::AbstractArray,
+        PRIM::AbstractArray,
         H::AbstractArray,
         B::AbstractArray,
     )
@@ -816,14 +819,11 @@ mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
 end
 
 
-# ------------------------------------------------------------
-# Structure of cell interface
-# ------------------------------------------------------------
 mutable struct Interface1D{A} <: AbstractInterface1D
 
     fw::A
 
-    function Interface1D(w::Array)
+    function Interface1D(w::AbstractArray)
 
         fw = zeros(eltype(w), axes(w))
 
@@ -839,7 +839,7 @@ mutable struct Interface1D1F{A,B} <: AbstractInterface1D
     fw::A
     ff::B
 
-    function Interface1D1F(w::Array, f::AbstractArray)
+    function Interface1D1F(w::AbstractArray, f::AbstractArray)
 
         fw = zeros(typeof(w[1]), axes(w))
         ff = zeros(typeof(f[1]), axes(f))
@@ -857,7 +857,7 @@ mutable struct Interface1D2F{A,B} <: AbstractInterface1D
     fh::B
     fb::B
 
-    function Interface1D2F(w::Array, f::AbstractArray)
+    function Interface1D2F(w::AbstractArray, f::AbstractArray)
 
         fw = zeros(typeof(w[1]), axes(w))
         fh = zeros(typeof(f[1]), axes(f))
@@ -880,7 +880,7 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
     femL::C
     femR::C
 
-    function Interface1D4F(w::Array, f::AbstractArray, E::Array{<:Real,1})
+    function Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})
 
         fw = zeros(typeof(w[1]), axes(w))
         fh0 = zeros(typeof(f[1]), axes(f))
@@ -894,7 +894,7 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
 
     end
 
-    function Interface1D4F(w::Array, f::AbstractArray, E::Array{<:Real,2})
+    function Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})
 
         fw = zeros(typeof(w[1]), axes(w))
         fh0 = zeros(typeof(f[1]), axes(f))
@@ -917,7 +917,7 @@ mutable struct Interface2D{A,B,C} <: AbstractInterface2D
     n::B
     fw::C
 
-    function Interface2D(L::Real, C::Real, S::Real, w::Array)
+    function Interface2D(L::Real, C::Real, S::Real, w::AbstractArray)
 
         len = L
         n = [C, S]
@@ -939,7 +939,7 @@ mutable struct Interface2D1F{A,B,C,D} <: AbstractInterface2D
     fw::C
     ff::D
 
-    function Interface2D1F(L::Real, C::Real, S::Real, w::Array, f::AbstractArray)
+    function Interface2D1F(L::Real, C::Real, S::Real, w::AbstractArray, f::AbstractArray)
 
         len = L
         n = [C, S]
@@ -963,7 +963,7 @@ mutable struct Interface2D2F{A,B,C,D} <: AbstractInterface2D
     fh::D
     fb::D
 
-    function Interface2D2F(L::Real, C::Real, S::Real, w::Array, f::AbstractArray)
+    function Interface2D2F(L::Real, C::Real, S::Real, w::AbstractArray, f::AbstractArray)
 
         len = L
         n = [C, S]
@@ -979,6 +979,11 @@ mutable struct Interface2D2F{A,B,C,D} <: AbstractInterface2D
 end
 
 
+"""
+Data structure 2
+solution & flux : array of arrays
+
+"""
 mutable struct Solution1D{A} <: AbstractSolution1D
 
     w::A
