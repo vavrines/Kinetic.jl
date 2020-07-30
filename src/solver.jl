@@ -755,10 +755,12 @@ end
 # Time stepping
 # ------------------------------------------------------------
 
-```
-Macroscopic update
+"""
+step!(fwL, w, prim, fwR, γ, dx, RES, AVG)
 
-```
+Update flow variables based on fluxes `fwL` and `fwR` 
+
+"""
 function step!(
     fwL::Array{<:AbstractFloat,1},
     w::Array{<:AbstractFloat,1},
@@ -784,10 +786,6 @@ function step!(
 end
 
 
-```
-Mesoscopic update
-
-```
 #--- 1D1F1V ---#
 function step!(
     fwL::Array{<:AbstractFloat,1},
