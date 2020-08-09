@@ -3,7 +3,8 @@
 # ============================================================
 
 
-export PSpace1D, PSpace2D, uniform_mesh, global_frame, local_frame, meshgrid
+export PSpace1D, PSpace2D, UnstructPSpace
+export uniform_mesh, global_frame, local_frame, meshgrid
 
 
 ```
@@ -107,6 +108,18 @@ struct PSpace2D <: AbstractPhysicalSpace
         # inner constructor method
         new(x0, x1, nx, y0, y1, ny, x, y, dx, dy)
 
+    end
+
+end # struct
+
+
+struct UnstructPSpace{A,B} <: AbstractPhysicalSpace
+
+    nodes::A # locations of vertex points
+    elements::B # node indices of elements
+
+    function Interface1D(nodes, eles)
+        new{typeof(nodes),typeof(eles)}(nodes, eles)
     end
 
 end # struct
