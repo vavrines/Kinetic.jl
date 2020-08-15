@@ -14,14 +14,14 @@ export flux_em!
 """
 Gas kinetic Navier-Stokes flux
 
-> @param[in] : conservative variables and their slopes at left/right sides of interface
-> @param[in] : thermodynamic and molecular parameters
-> @param[in] : time step and cell size
+* 1D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, swL, swR)
+* 2D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, dy, swL, swR)
 
-< @return : flux of conservative variables
+* @param[in]: particle distribution functions and their left/right slopes
+* @param[in]: molecular and thermodynamic parameters
+* @param[in]: time step and cell size
 
 """
-
 function flux_gks!(
     fw::AbstractArray{<:AbstractFloat,1},
     wL::AbstractArray{<:AbstractFloat,1},
@@ -205,17 +205,18 @@ end
 """
 Kinetic flux vector splitting (KFVS) flux
 
-> @param[in] : particle distribution functions and their slopes at left/right sides of interface
-> @param[in] : particle velocity quadrature points and weights
-> @param[in] : time step and cell size
+* 1D1F1V: flux_kfvs!(fw, ff, fL, fR, u, ω, dt, sfL, sfR)
+* 1D1F3V: flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt, sfL, sfR) 
+* 1D2F1V: flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt, shL, sbL, shR, sbR)
+* 1D4F1V: flux_kfvs!(fw, fh0, fh1, fh2, fh3, h0L, h1L, h2L, h3L, h0R, h1R, h2R, h3R, u, ω, dt, sh0L, sh1L, sh2L, sh3L, sh0R, sh1R, sh2R, sh3R)
+* 2D1F2V: flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len, sfL, sfR)
+* 2D2F2V: flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, v, ω, dt, len, shL, sbL, shR, sbR)
 
-< @return : flux of particle distribution function and its velocity moments on conservative variables
+* @param[in]: particle distribution functions and their left/right slopes
+* @param[in]: particle velocity quadrature points and weights
+* @param[in]: time step and cell size
 
 """
-
-# ------------------------------------------------------------
-# 1D1F1V flux
-# ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
     ff::AbstractArray{<:AbstractFloat,1},
@@ -226,8 +227,8 @@ function flux_kfvs!(
     dt::AbstractFloat,
     sfL = zeros(eltype(fL), axes(fL))::AbstractArray{<:AbstractFloat,1},
     sfR = zeros(eltype(fR), axes(fR))::AbstractArray{<:AbstractFloat,1},
-)
-
+) # 1D1F1V flux
+    
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
 
@@ -480,17 +481,11 @@ end
 """
 Kinetic central-upwind (KCU) method
 
-> @param[in] : particle distribution functions and their slopes at left/right sides of interface
-> @param[in] : particle velocity quadrature points and weights
-> @param[in] : time step and cell size
-
-< @return : flux of particle distribution function and its velocity moments on conservative variables
+* @param[in] : particle distribution functions and their slopes at left/right sides of interface
+* @param[in] : particle velocity quadrature points and weights
+* @param[in] : time step and cell size
 
 """
-
-# ------------------------------------------------------------
-# 1D1F flux
-# ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:Real,1},
     ff::AbstractArray{<:AbstractFloat,1},
@@ -506,7 +501,7 @@ function flux_kcu!(
     visIdx::Real,
     pr::Real,
     dt::Real,
-)
+) # 1D1F flux
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -778,17 +773,6 @@ function flux_kcu!(
 
 end
 
-
-"""
-Kinetic central-upwind (KCU) method for multi-component gas
-
-> @param[in] : particle distribution functions and their slopes at left/right sides of interface
-> @param[in] : particle velocity quadrature points and weights
-> @param[in] : time step
-
-< @return : flux of particle distribution function and its velocity moments on conservative variables
-
-"""
 
 # ------------------------------------------------------------
 # 1D1F flux with AAP model
@@ -1146,17 +1130,11 @@ end
 """
 Unified gas kinetic scheme (UGKS) flux
 
-> @param[in] : particle distribution functions and their slopes at left/right sides of interface
-> @param[in] : particle velocity quadrature points and weights
-> @param[in] : time step
-
-< @return : flux of particle distribution function and its velocity moments on conservative variables
+* @param[in]: particle distribution functions and their slopes at left/right sides of interface
+* @param[in]: particle velocity quadrature points and weights
+* @param[in]: time step
 
 """
-
-# ------------------------------------------------------------
-# 2D2F flux
-# ------------------------------------------------------------
 function flux_ugks!(
     fw::AbstractArray{<:AbstractFloat,1},
     fh::AbstractArray{<:AbstractFloat,2},
@@ -1183,7 +1161,7 @@ function flux_ugks!(
     sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,2},
     shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,2},
     sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,2},
-)
+) # 2D2F flux
 
     #--- reconstruct initial distribution ---#
     δ = heaviside.(u)
@@ -1320,14 +1298,11 @@ end
 """
 Maxwell's diffusive boundary flux
 
-> @param[in] : particle distribution functions and their slopes at left/right sides of interface
-> @param[in] : particle velocity quadrature points and weights
-> @param[in] : time step
-
-< @return : flux of particle distribution function and its velocity moments on conservative variables
+* @param[in]: particle distribution functions and their slopes at left/right sides of interface
+* @param[in]: particle velocity quadrature points and weights
+* @param[in]: time step
 
 """
-
 function flux_boundary_maxwell!(
     fw::AbstractArray{<:AbstractFloat,1},
     fh::AbstractArray{<:AbstractFloat,2},
@@ -1381,15 +1356,12 @@ end
 """
 Wave propagation method for the Maxwell's equations
 
-> @param[in] : variables in left-left, left, right, and right-right cells
-> @param[in] : eigenmatrix (A), eigenvalue (D)
-> @param[in] : speed of light (sol)
-> @param[in] : auxiliary parameters (χₑ, νᵦ)
-
-< @return : flux of electromagnetic fields
+* @param[in]: variables in left-left, left, right, and right-right cells
+* @param[in]: eigenmatrix (A), eigenvalue (D)
+* @param[in]: speed of light (sol)
+* @param[in]: auxiliary parameters (χₑ, νᵦ)
 
 """
-
 function flux_em!(
     femL::AbstractArray{<:AbstractFloat,1},
     femR::AbstractArray{<:AbstractFloat,1},

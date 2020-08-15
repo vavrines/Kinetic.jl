@@ -758,7 +758,7 @@ end
 """
 step!(fwL, w, prim, fwR, γ, dx, RES, AVG)
 
-Update flow variables based on fluxes `fwL` and `fwR` 
+update flow variables with finite volume formulation
 
 """
 function step!(
