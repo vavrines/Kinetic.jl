@@ -149,6 +149,33 @@ end
 
 
 # ------------------------------------------------------------
+# 1D1F3V
+# ------------------------------------------------------------
+function ib_sod(
+    γ::Real,
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    w::AbstractArray{<:AbstractFloat,3},
+)
+
+    primL = [1.0, 0.0, 0.0, 0.0, 1.0]
+    primR = [0.125, 0.0, 0.0, 0.0, 0.625]
+
+    wL = prim_conserve(primL, γ)
+    wR = prim_conserve(primR, γ)
+
+    fL = maxwellian(u, v, w, primL)
+    fR = maxwellian(u, v, w, primR)
+
+    bcL = deepcopy(primL)
+    bcR = deepcopy(primR)
+
+    return wL, primL, fL, bcL, wR, primR, fR, bcR
+
+end
+
+
+# ------------------------------------------------------------
 # 1D2F1V
 # ------------------------------------------------------------
 function ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)

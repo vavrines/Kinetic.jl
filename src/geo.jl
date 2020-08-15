@@ -113,6 +113,10 @@ struct PSpace2D <: AbstractPhysicalSpace
 end # struct
 
 
+```
+Unstructured mesh
+
+```
 struct UnstructPSpace{A,B} <: AbstractPhysicalSpace
 
     nodes::A # locations of vertex points
@@ -224,8 +228,6 @@ end
 
 
 function meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1})
-    @assert ndims(x) == ndims(y) == 1
-
     X = [i for j in y, i in x]
     Y = [j for j in y, i in x]
 
@@ -238,8 +240,6 @@ function meshgrid(
     y::AbstractArray{<:Real,1},
     z::AbstractArray{<:Real,1},
 )
-    @assert ndims(x) == ndims(y) == ndims(z) == 1
-
     X = [i for k in z, j in y, i in x]
     Y = [j for k in z, j in y, i in x]
     Z = [k for k in z, j in y, i in x]
