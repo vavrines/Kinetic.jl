@@ -324,9 +324,10 @@ struct SolverSet <: AbstractSolverSet
 end # struct
 
 
-# ------------------------------------------------------------
-# Solution algorithm
-# ------------------------------------------------------------
+"""
+Solution algorithm
+
+"""
 function solve!(
     KS::SolverSet,
     ctr::AbstractArray{<:AbstractControlVolume1D,1},

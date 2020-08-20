@@ -1,7 +1,6 @@
 # ============================================================
-# Flux functions for finite volume method
+# Numerical Flux Functions
 # ============================================================
-
 
 export flux_gks!
 export flux_kfvs!

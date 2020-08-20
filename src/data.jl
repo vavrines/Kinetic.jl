@@ -2,7 +2,6 @@
 # Data Structures
 # ============================================================
 
-
 export Setup
 export GasProperty, PlasmaProperty
 export IB, IB1F, IB2F, IB4F
@@ -16,9 +15,10 @@ export Flux1D, Flux1D1F, Flux1D2F
 export Flux2D, Flux2D1F, Flux2D2F
 
 
-# ------------------------------------------------------------
-# Structure of computational setup
-# ------------------------------------------------------------
+"""
+Structure of computational setup
+
+"""
 struct Setup{S,I,E,F} <: AbstractSetup
 
     case::S
@@ -38,7 +38,6 @@ struct Setup{S,I,E,F} <: AbstractSetup
         cfl::Real,
         maxTime::Real,
     )
-
         new{typeof(case),typeof(nSpecies),typeof(cfl),typeof(maxTime)}(
             case,
             space,
@@ -48,15 +47,15 @@ struct Setup{S,I,E,F} <: AbstractSetup
             cfl,
             maxTime,
         )
-
     end
 
 end
 
 
-# ------------------------------------------------------------
-# Structure of property
-# ------------------------------------------------------------
+"""
+Structure of property
+
+"""
 struct GasProperty{A,B,C,D,E,F,G,H,I} <: AbstractProperty
 
     Kn::A
@@ -80,8 +79,6 @@ struct GasProperty{A,B,C,D,E,F,G,H,I} <: AbstractProperty
         ωᵣ::Union{Real,AbstractArray},
         μᵣ::Union{Real,AbstractArray},
     )
-
-        # inner constructor method
         new{
             typeof(Kn),
             typeof(Ma),
@@ -103,7 +100,6 @@ struct GasProperty{A,B,C,D,E,F,G,H,I} <: AbstractProperty
             ωᵣ,
             μᵣ,
         )
-
     end
 
 end
@@ -428,8 +424,7 @@ end
 
 
 """
-Data structure 1
-control volume & interface : array of struct
+Structure of control volume -> array of struct in flow simulation
 
 """
 mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D

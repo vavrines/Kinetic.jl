@@ -2,13 +2,13 @@
 # Methods of Particle Velocity Space
 # ============================================================
 
-
 export VSpace1D, VSpace2D, VSpace3D, MVSpace1D, MVSpace2D, newton_cotes
 
 
-# ------------------------------------------------------------
-# Structure of velocity space
-# ------------------------------------------------------------
+"""
+Structure of velocity space
+
+"""
 struct VSpace1D <: AbstractVelocitySpace
 
     u0::Float64
