@@ -34,7 +34,9 @@ export gauss_moments,
     hs_boltz_kn,
     kernel_mode,
     boltzmann_fft,
-    boltzmann_fft!
+    boltzmann_fft!,
+    euler_flux,
+    euler_matrix
 
 
 """
@@ -1197,9 +1199,10 @@ function mixture_prim_conserve(prim::Array{<:Real,2}, γ::Real)
 end
 
 
-# ------------------------------------------------------------
-# conservative -> primitive
-# ------------------------------------------------------------
+"""
+Calculate conservative -> primitive variables
+
+"""
 function conserve_prim(W::Array{<:Real,1}, γ::Real)
 
     prim = zeros(axes(W))
@@ -1910,5 +1913,89 @@ function em_coefficients(
         prim[1, 2] * prim[4, 2] * mr / (2.0 * rL * lD^2)
 
     return A, b
+
+end
+
+
+"""
+Theoretical fluxes of Euler Equations
+
+"""
+function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame=:cartesian::Symbol)
+
+    prim = conserve_prim(w, γ)
+    p = 0.5 * prim[1] / prim[end]
+
+    if length(w) == 3
+        F = zeros(axes(w))
+        F[1] = w[2]
+        F[2] = w[2]^2 / w[1] + p
+        F[3] = (w[3] + p) * w[2] / w[1]
+
+        return F
+    elseif length(w) == 4
+        F = zeros(axes(w))
+        F[1] = w[2]
+        F[2] = w[2]^2 / w[1] + p
+        F[3] = w[2] * w[3] / w[1]
+        F[4] = (w[end] + p) * w[2] / w[1]
+
+        G = zeros(axes(w))
+        G[1] = w[3]
+        G[2] = w[3] * w[2] / w[1]
+        G[3] = w[3]^2 / w[1] + p
+        G[4] = (w[end] + p) * w[3] / w[1]
+
+        return F, G
+    elseif length(w) == 5
+        F = zeros(axes(w))
+        F[1] = w[2]
+        F[2] = w[2]^2 / w[1] + p
+        F[3] = w[2] * w[3] / w[1]
+        F[4] = w[2] * w[4] / w[1]
+        F[5] = (w[end] + p) * w[2] / w[1]
+
+        G = zeros(axes(w))
+        G[1] = w[3]
+        G[2] = w[3] * w[2] / w[1]
+        G[3] = w[3]^2 / w[1] + p
+        G[4] = w[3] * w[4] / w[1]
+        G[5] = (w[end] + p) * w[3] / w[1]
+
+        H = zeros(axes(w))
+        H[1] = w[4]
+        H[2] = w[4] * w[2] / w[1]
+        H[3] = w[4] * w[3] / w[1]
+        H[4] = w[4]^2 / w[1] + p
+        H[5] = (w[end] + p) * w[4] / w[1]
+
+        return F, G, H
+    end
+
+end
+
+
+
+"""
+Flux Jacobian of Euler Equations
+
+"""
+function euler_matrix(w::AbstractArray{<:Real,1}, γ::Real)
+
+    A = zeros(eltype(w), 3, 3)
+
+    A[1, 1] = 0.
+    A[1, 2] = 1.
+    A[1, 3] = 0.
+
+    A[2, 1] = 0.5 * (γ - 3.) * (w[2] / w[1])^2
+    A[2, 2] = (3. - γ) * w[2] / w[1]
+    A[2, 3] = γ - 1.
+
+    A[3, 1] = -γ * w[3] * w[2] / w[1]^2 + (γ - 1.) * (w[2] / w[1])^3
+    A[3, 2] = γ * w[3] / w[1] - 1.5 * (γ - 1.) * (w[2] / w[1])^2
+    A[3, 3] = γ * w[2] / w[1]
+
+    return A
 
 end
