@@ -4,7 +4,8 @@
 
 export global_frame, local_frame
 export PSpace1D, PSpace2D, uniform_mesh, meshgrid
-export UnstructMesh, mesh_connectivity_2D, mesh_center_2D, mesh_area_2D
+export UnstructMesh 
+export read_mesh, mesh_connectivity_2D, mesh_center_2D, mesh_area_2D
 
 
 """
@@ -231,9 +232,6 @@ function uniform_mesh(x0::Real, xnum::Int, dx::Real)
 end
 
 
-
-
-
 """
 Equivalent structured mesh generator as matlab
 * 2D
@@ -279,6 +277,20 @@ struct UnstructMesh{A,B} <: AbstractPhysicalSpace
     end
 
 end # struct
+
+
+"""
+Read mesh file
+
+"""
+function read_mesh(file)
+    meshio = pyimport("meshio")
+    m0 = meshio.read(file)
+    nodes = m0.points
+    cells = m0.cells[end][2] .+ 1 # python data is zero-indexed
+
+    return nodes, cells
+end
 
 
 """
