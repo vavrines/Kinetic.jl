@@ -5,21 +5,26 @@
 export heaviside, fortsign
 
 
-# ------------------------------------------------------------
-# Heaviside step function
-# ------------------------------------------------------------
+"""
+Heaviside step function
+
+"""
 heaviside(x::Real) = ifelse(x >= 0, 1.0, 0.0)
 
 
-# ------------------------------------------------------------
-# Fortran sign() function
-# ------------------------------------------------------------
+"""
+Fortran sign() function
+
+"""
 fortsign(x::Real, y::Real) = abs(x) * sign(y)
 
 
-# ------------------------------------------------------------
-# Gauss Legendre integral for fast spectral method
-# ------------------------------------------------------------
+"""
+Gauss Legendre integral for fast spectral method `lgwt(N::Int, a::Real, b::Real)`
+* @param[in]: number of quadrature points N, integral range [a, b]
+* @param[out]: quadrature points x & weights w
+
+"""
 function lgwt(N::Int, a::Real, b::Real)
 
     x = zeros(N)

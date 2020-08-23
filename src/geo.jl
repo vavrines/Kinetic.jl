@@ -281,7 +281,8 @@ end # struct
 
 """
 Read mesh file
-
+* nodes : are saved with 3D coordinates (z=0 for 2D case)
+* cells : node ids inside cells
 """
 function read_mesh(file)
     meshio = pyimport("meshio")
@@ -418,8 +419,8 @@ Compute central points of 2D elements
 function mesh_center_2D(nodes, cells)
 
     cellMidPoints = zeros(size(cells, 1), 2)
-    for i in axes(cellMidPoints, 1)
-        for j in axes(cells, 2)
+    for i in axes(cellMidPoints, 1) # nCells
+        for j in axes(cells, 2) # nNodesPerCell
             cellMidPoints[i, :] .+= nodes[cells[i, j], :]
         end
     end
