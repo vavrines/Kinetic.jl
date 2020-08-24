@@ -272,7 +272,7 @@ struct UnstructMesh{A,B} <: AbstractPhysicalSpace
     nodes::A # locations of vertex points
     cells::B # node indices of elements
 
-    function Interface1D(nodes, cells)
+    function UnstructMesh(nodes, cells)
         new{typeof(nodes),typeof(cells)}(nodes, cells)
     end
 

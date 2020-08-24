@@ -1,18 +1,6 @@
 # ============================================================
-# Data Structures
+# Structs
 # ============================================================
-
-export Setup
-export GasProperty, PlasmaProperty
-export IB, IB1F, IB2F, IB4F
-export ControlVolume1D, ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
-export ControlVolume2D, ControlVolume2D1F, ControlVolume2D2F
-export Interface1D, Interface1D1F, Interface1D2F, Interface1D4F
-export Interface2D, Interface2D1F, Interface2D2F
-export Solution1D, Solution1D1F, Solution1D2F
-export Solution2D, Solution2D1F, Solution2D2F
-export Flux1D, Flux1D1F, Flux1D2F
-export Flux2D, Flux2D1F, Flux2D2F
 
 
 """
@@ -836,8 +824,8 @@ mutable struct Interface1D1F{A,B} <: AbstractInterface1D
 
     function Interface1D1F(w::AbstractArray, f::AbstractArray)
 
-        fw = zeros(typeof(w[1]), axes(w))
-        ff = zeros(typeof(f[1]), axes(f))
+        fw = zeros(eltype(w), axes(w))
+        ff = zeros(eltype(f), axes(f))
 
         new{typeof(fw),typeof(ff)}(fw, ff)
 

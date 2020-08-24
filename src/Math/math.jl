@@ -2,7 +2,14 @@
 # Mathematical Methods
 # ============================================================
 
-export heaviside, fortsign
+export linspace, heaviside, fortsign
+
+
+"""
+Python linspace function
+
+"""
+linspace(start::Real, stop::Real, n::Int) = collect(range(start, stop = stop, length = n))
 
 
 """
