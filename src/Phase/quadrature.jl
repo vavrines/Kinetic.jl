@@ -174,7 +174,7 @@ Create quadrature weights from points and triangulation
 * @return weights : quadrature weights
 
 """
-function create_weights(xyz::AbstractArray{<:Real,2}, triangles::AbstractArray{Int,2})
+function quadrature_weights(xyz::AbstractArray{<:Real,2}, triangles::AbstractArray{Int,2})
 
     weights = zeros(axes(xyz, 1))
     nTriangles = size(triangles, 1)

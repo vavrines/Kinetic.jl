@@ -6,7 +6,7 @@ export VSpace1D, VSpace2D, VSpace3D
 export MVSpace1D, MVSpace2D
 export newton_cotes
 
-export legendre_quadrature, octa_quadrature, create_weights
+export legendre_quadrature, octa_quadrature, quadrature_weights
 
 include("creamer.jl")
 include("velocity.jl")
