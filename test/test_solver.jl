@@ -1,0 +1,1 @@
+ks, ctr, face, simTime = Kinetic.initialize("config.txt")

@@ -2,6 +2,56 @@
 # Quadrature Methods
 # ============================================================
 
+
+"""
+Gauss-Legendre quadrature
+
+`legendre_quadrature(n::Int)`
+
+* @arg n : quadrature order (MUST be even)
+* @return points : quadrature points in 3D coordinate
+* @return weights : quadrature weights
+
+"""
+function legendre_quadrature(n::Int)
+
+    pointsxyz = zeros(n * n, 3)
+    weights = zeros(n * n)
+
+    # construct Gauss quadrature
+    mu, gaussweights = gausslegendre(n)
+
+    # transform between (mu,phi) and (x,y,z)
+    phi = [(k + 0.5) * pi / n for k = 0:2*n-1] # equidistance in z axis
+    range = 1:n÷2 # only use upper half of the sphere as quadrature point due to pseudo 3D
+
+    x = sqrt.(1.0 .- mu[range] .^ 2) .* cos.(phi)'
+    y = sqrt.(1.0 .- mu[range] .^ 2) .* sin.(phi)'
+    z = mu[range] .* ones(size(phi))'
+    weights = 2.0 * pi / n * repeat(gaussweights[range], 1, 2 * n)
+
+    # assign 
+    pointsxyz[:, 1] .= x[:]
+    pointsxyz[:, 2] .= y[:]
+    pointsxyz[:, 3] .= z[:]
+    weights = weights[:]
+
+    return pointsxyz, weights
+
+end
+
+
+"""
+Octaeder quadrature
+
+`octa_quadrature(n::Int, slerpflag = true::Bool)`
+
+* @arg n : quadrature order
+* @arg slerpflag : flag of spherical linear interpolation
+* @return points
+* @return triangulation
+
+"""
 function octa_quadrature(n::Int, slerpflag = true::Bool)
 
     # integral range
@@ -51,7 +101,7 @@ function octa_quadrature(n::Int, slerpflag = true::Bool)
 
     # enumerate over points and write their connectivity
     ids = zeros(Int64, n, n) # matrix that assigns an ID to the points
-    nTrianglesOctant = Int64(n * n - 2 * n + 1) 
+    nTrianglesOctant = Int64(n * n - 2 * n + 1)
     triangles = zeros(Int64, 3, nTrianglesOctant) # matrix that contains all triangles
 
     counter = 0
@@ -80,7 +130,7 @@ function octa_quadrature(n::Int, slerpflag = true::Bool)
         end
     end
 
-    # Now we have the quadrature points and triangles for a single octant
+    # now we have the quadrature points and triangles for a single octant
     ptsAll = deepcopy(pts)
 
     tmp = deepcopy(pts)

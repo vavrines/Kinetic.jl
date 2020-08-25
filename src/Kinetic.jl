@@ -5,6 +5,8 @@
 module Kinetic
 
 using Dates
+using LinearAlgebra
+using FastGaussQuadrature
 using OffsetArrays
 using SpecialFunctions
 using FFTW

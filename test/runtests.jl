@@ -1,3 +1,4 @@
-using Kinetic
+using Test, Kinetic
 
-ks, ctr, face, simTime = Kinetic.initialize("config.txt")
+include("test_quadrature.jl")
+include("test_solver.jl")
