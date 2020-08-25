@@ -224,7 +224,7 @@ function flux_kfvs!(
     dt::AbstractFloat,
     sfL = zeros(eltype(fL), axes(fL))::AbstractArray{<:AbstractFloat,1},
     sfR = zeros(eltype(fR), axes(fR))::AbstractArray{<:AbstractFloat,1},
-) # DOM
+) # DOM flux
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)

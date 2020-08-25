@@ -120,68 +120,6 @@ function unique(Points::Array{Float64,2}, Triangles::Array{Int64,2})
 end
 
 
-"""
-Create quadrature weights from points and triangulation
-
-`create_weights(n::Int, xyz::AbstractArray{<:Real,2}, triangles::AbstractArray{Int,2})`
-
-* @arg xyz : quadrature points
-* @arg triangles : triangulation
-* @return weights : quadrature weights
-
-"""
-function create_weights(xyz::AbstractArray{<:Real,2}, triangles::AbstractArray{Int,2})
-
-    weights = zeros(axes(xyz, 1))
-    nTriangles = size(triangles, 1)
-    xy = zeros(3)
-    yz = zeros(3)
-    zx = zeros(3)
-    mid = zeros(3)
-
-    for n = 1:nTriangles
-        # get three nodes of a triangle
-        i, j, k = triangles[n, :]
-
-        # get the corresponding points 
-        x = xyz[i, :]
-        y = xyz[j, :]
-        z = xyz[k, :]
-
-        # Now get the midpoint of the triangle and the midpoints along the lines
-        mid = (x + y + z) / 3.0
-        xy = (x + y) / 2.0
-        yz = (y + z) / 2.0
-        zx = (z + x) / 2.0
-
-        # These points still have to be projected onto the sphere
-        mid = mid / norm(mid, 2)
-        xy = xy / norm(xy, 2)
-        yz = yz / norm(yz, 2)
-        zx = zx / norm(zx, 2)
-
-        # By these four points, plus x,y,z we can span 6 triangles
-        # Each of these triangles is assigned to one of the three nodes of the triangle x,y,z.
-        # the area = the weight
-
-        # i
-        weights[i] += area(x, mid, xy, :sphere)
-        weights[i] += area(x, mid, zx, :sphere)
-
-        # j
-        weights[j] += area(y, mid, xy, :sphere)
-        weights[j] += area(y, mid, yz, :sphere)
-
-        # k
-        weights[k] += area(z, mid, yz, :sphere)
-        weights[k] += area(z, mid, zx, :sphere)
-    end
-
-    return weights
-
-end
-
-
 function area(
     A::AbstractArray{<:Real,1},
     B::AbstractArray{<:Real,1},
