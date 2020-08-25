@@ -460,10 +460,18 @@ Velocity moments of particle distribution function
 
 """
 
-# ------------------------------------------------------------
-# Velocity moments of order n
-# ------------------------------------------------------------
-# --- 1D ---#
+"""
+Discrete moments of particle distribution
+
+* `discrete_moments(f, ω)` : direct quadrature
+* `discrete_moments(f, u, ω, n)` : velocity moments
+
+"""
+discrete_moments(f::AbstractArray{<:AbstractFloat,1}, ω::AbstractArray{<:AbstractFloat,1}) =
+    sum(@. ω * f)
+
+
+#--- 1D DVM ---#
 discrete_moments(
     f::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
@@ -472,7 +480,7 @@ discrete_moments(
 ) = sum(@. ω * u^n * f)
 
 
-# --- 2D ---#
+#--- 2D DVM ---#
 discrete_moments(
     f::AbstractArray{<:AbstractFloat,2},
     u::AbstractArray{<:AbstractFloat,2},
@@ -481,7 +489,7 @@ discrete_moments(
 ) = sum(@. ω * u^n * f)
 
 
-# --- 3D ---#
+#--- 3D DVM ---#
 discrete_moments(
     f::AbstractArray{<:AbstractFloat,3},
     u::AbstractArray{<:AbstractFloat,3},
@@ -1921,7 +1929,7 @@ end
 Theoretical fluxes of Euler Equations
 
 """
-function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame=:cartesian::Symbol)
+function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame = :cartesian::Symbol)
 
     prim = conserve_prim(w, γ)
     p = 0.5 * prim[1] / prim[end]
@@ -1984,16 +1992,16 @@ function euler_matrix(w::AbstractArray{<:Real,1}, γ::Real)
 
     A = zeros(eltype(w), 3, 3)
 
-    A[1, 1] = 0.
-    A[1, 2] = 1.
-    A[1, 3] = 0.
+    A[1, 1] = 0.0
+    A[1, 2] = 1.0
+    A[1, 3] = 0.0
 
-    A[2, 1] = 0.5 * (γ - 3.) * (w[2] / w[1])^2
-    A[2, 2] = (3. - γ) * w[2] / w[1]
-    A[2, 3] = γ - 1.
+    A[2, 1] = 0.5 * (γ - 3.0) * (w[2] / w[1])^2
+    A[2, 2] = (3.0 - γ) * w[2] / w[1]
+    A[2, 3] = γ - 1.0
 
-    A[3, 1] = -γ * w[3] * w[2] / w[1]^2 + (γ - 1.) * (w[2] / w[1])^3
-    A[3, 2] = γ * w[3] / w[1] - 1.5 * (γ - 1.) * (w[2] / w[1])^2
+    A[3, 1] = -γ * w[3] * w[2] / w[1]^2 + (γ - 1.0) * (w[2] / w[1])^3
+    A[3, 2] = γ * w[3] / w[1] - 1.5 * (γ - 1.0) * (w[2] / w[1])^2
     A[3, 3] = γ * w[2] / w[1]
 
     return A

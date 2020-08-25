@@ -116,5 +116,167 @@ function unique(Points::Array{Float64,2}, Triangles::Array{Int64,2})
     end
 
     return xyz, triangulation
-    
+
+end
+
+
+"""
+Create quadrature weights from points and triangulation
+
+`create_weights(n::Int, xyz::AbstractArray{<:Real,2}, triangles::AbstractArray{Int,2})`
+
+* @arg xyz : quadrature points
+* @arg triangles : triangulation
+* @return weights : quadrature weights
+
+"""
+function create_weights(xyz::AbstractArray{<:Real,2}, triangles::AbstractArray{Int,2})
+
+    weights = zeros(axes(xyz, 1))
+    nTriangles = size(triangles, 1)
+    xy = zeros(3)
+    yz = zeros(3)
+    zx = zeros(3)
+    mid = zeros(3)
+
+    for n = 1:nTriangles
+        # get three nodes of a triangle
+        i, j, k = triangles[n, :]
+
+        # get the corresponding points 
+        x = xyz[i, :]
+        y = xyz[j, :]
+        z = xyz[k, :]
+
+        # Now get the midpoint of the triangle and the midpoints along the lines
+        mid = (x + y + z) / 3.0
+        xy = (x + y) / 2.0
+        yz = (y + z) / 2.0
+        zx = (z + x) / 2.0
+
+        # These points still have to be projected onto the sphere
+        mid = mid / norm(mid, 2)
+        xy = xy / norm(xy, 2)
+        yz = yz / norm(yz, 2)
+        zx = zx / norm(zx, 2)
+
+        # By these four points, plus x,y,z we can span 6 triangles
+        # Each of these triangles is assigned to one of the three nodes of the triangle x,y,z.
+        # the area = the weight
+
+        # i
+        weights[i] += area(x, mid, xy, :sphere)
+        weights[i] += area(x, mid, zx, :sphere)
+
+        # j
+        weights[j] += area(y, mid, xy, :sphere)
+        weights[j] += area(y, mid, yz, :sphere)
+
+        # k
+        weights[k] += area(z, mid, yz, :sphere)
+        weights[k] += area(z, mid, zx, :sphere)
+    end
+
+    return weights
+
+end
+
+
+function area(
+    A::AbstractArray{<:Real,1},
+    B::AbstractArray{<:Real,1},
+    C::AbstractArray{<:Real,1},
+    geometry = :plane::Symbol,
+)
+
+    if geometry == :plane
+        alpha = angle(B, A, C)
+        lb = norm(B - A)
+        la = norm(C - A)
+        return 0.5 * sin(alpha) * lb * la
+    elseif geometry == :sphere
+        alpha = angle(B, A, C, :sphere)
+        beta = angle(C, B, A, :sphere)
+        gamma = angle(A, C, B, :sphere)
+        #https://en.wikipedia.org/wiki/Spherical_trigonometry#Area_and_spherical_excess
+        #Excess = max(0.0,alpha+beta+gamma-pi)
+        #R = 1; # We always consider the uni sphere
+        #return Excess*R*R;
+        return alpha + beta + gamma - pi
+    else
+        throw("geometry has to be planar or sphere")
+    end
+
+end
+
+
+function angle(
+    B::AbstractArray{<:Real,1},
+    A::AbstractArray{<:Real,1},
+    C::AbstractArray{<:Real,1},
+    geometry = :plane::Symbol,
+)
+
+    if geometry == :plane
+        u, v = A - B, C - A
+        return acos(dot(u, v) / norm(u, 2) / norm(v, 2))
+    elseif geometry == :sphere
+        c = distance(B, A, :sphere)
+        b = distance(A, C, :sphere)
+        a = distance(C, B, :sphere)
+        if min(a, b, c) < 1e-10
+            return 0
+        end
+        # https://en.wikipedia.org/wiki/Spherical_trigonometry#Cosine_rules_and_sine_rules
+        tmp = (cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c))
+        # numerical error may lead that tmp is not inside [-1,1] but inside [-1-eps,1+eps]
+        tmp = max(-1.0, min(1.0, tmp))
+
+        angle = acos(tmp)
+        return angle
+    else
+        throw("geometry has to be planar or sphere")
+    end
+
+end
+
+
+function distance(
+    v1::AbstractArray{<:Real,1},
+    v2::AbstractArray{<:Real,1},
+    geometry = :plane::Symbol,
+)
+
+    if geometry == :plane
+        return norm(v1 - v2)
+    elseif geometry == :sphere
+        if sum(abs2, v1 - v2) < 1e-5
+            return norm(v1 - v2)
+        end
+        #https://en.wikipedia.org/wiki/Great-circle_distance
+        #return atan(norm(cross(v1, v2), 2) / dot(v1, v2))
+        return acos(max(-1.0, dot(v1, v2)))
+    else
+        throw("geometry has to be planar or sphere")
+    end
+
+end
+
+
+function muphi_xyz!(muphi::AbstractArray{<:Real,2}, xyz::AbstractArray{<:Real,2})
+    n = size(xyz, 1)
+    for i = 1:n
+        xyz[i, 1] = sqrt(1 - muphi[i, 1]^2) * cos(muphi[i, 2])
+        xyz[i, 2] = sqrt(1 - muphi[i, 1]^2) * sin(muphi[i, 2])
+        xyz[i, 3] = muphi[i, 1]
+    end
+end
+
+
+function xyz_muphi!(xyz::AbstractArray{<:Real,2}, muphi::AbstractArray{<:Real,2})
+    n = size(xyz, 1)
+    for i = 1:n
+        muphi[i, 1] = xyz[i, 3]
+        muphi[i, 2] = atan(xyz[i, 2], xyz[i, 1])
+    end
 end
