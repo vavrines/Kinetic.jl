@@ -11,7 +11,7 @@ export gauss_moments,
     moments_conserve_slope,
     mixture_moments_conserve_slope,
     discrete_moments,
-    stress_tensor,
+    stress,
     heat_flux,
     maxwellian,
     shakhov,
@@ -695,11 +695,20 @@ end
 
 
 """
-Stress tensor from particle distribution function
+Calculate stress tensor from particle distribution function
 
 """
+function stress(
+    f::AbstractArray{<:AbstractFloat,1},
+    prim::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+)
+    return sum(@. ω * (u - prim[2]) * (u - prim[2]) * f)
+end
 
-function stress_tensor(
+
+function stress(
     f::AbstractArray{<:AbstractFloat,2},
     prim::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,2},
@@ -718,11 +727,9 @@ end
 
 
 """
-Heat flux from particle distribution function
+Evaluate heat flux from particle distribution function
 
 """
-
-# --- 1D ---#
 heat_flux(
     h::AbstractArray{<:AbstractFloat,1},
     prim::AbstractArray{<:AbstractFloat,1},
@@ -740,7 +747,7 @@ heat_flux(
 ) = 0.5 * (sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h) + sum(@. ω * (u - prim[2]) * b))
 
 
-# --- 2D ---#
+#--- 2D ---#
 function heat_flux(
     h::AbstractArray{<:AbstractFloat,2},
     prim::AbstractArray{<:AbstractFloat,1},
@@ -782,7 +789,7 @@ function heat_flux(
 end
 
 
-# --- 3D ---#
+#--- 3D ---#
 function heat_flux(
     f::AbstractArray{<:AbstractFloat,3},
     prim::AbstractArray{<:AbstractFloat,1},
