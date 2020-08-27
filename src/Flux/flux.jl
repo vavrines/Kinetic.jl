@@ -300,6 +300,8 @@ function flux_gks!(
     # @. fw += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
     #--- fluxes of distribution functions ---#
+    δ = heaviside.(u)
+    
     HL = maxwellian(u, primL)
     BL = HL .* inK ./ (2.0 * primL[end])
     HR = maxwellian(u, primR)
