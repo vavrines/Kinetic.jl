@@ -200,6 +200,176 @@ function flux_gks!(
 end
 
 
+function flux_gks!(
+    fw::AbstractArray{<:AbstractFloat,1},
+    fh::AbstractArray{<:AbstractFloat,1},
+    fb::AbstractArray{<:AbstractFloat,1},
+    wL::AbstractArray{<:Real,1},
+    hL::AbstractArray{<:AbstractFloat,1},
+    bL::AbstractArray{<:AbstractFloat,1},
+    wR::AbstractArray{<:Real,1},
+    hR::AbstractArray{<:AbstractFloat,1},
+    bR::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    dt::Real,
+    dxL::Real,
+    dxR::Real,
+    swL = zeros(eltype(fw), axes(wL))::AbstractArray{<:AbstractFloat,1},
+    swR = zeros(eltype(fw), axes(wR))::AbstractArray{<:AbstractFloat,1},
+    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,1},
+    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,1},
+    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,1},
+    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,1},
+)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+
+    w =
+        primL[1] .* moments_conserve(MuL1, Mxi1, 0, 0) .+
+        primR[1] .* moments_conserve(MuR2, Mxi2, 0, 0)
+    prim = conserve_prim(w, γ)
+    tau =
+        vhs_collision_time(prim, visRef, visIdx) +
+        2.0 * dt * abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end])
+
+    faL = pdf_slope(primL, swL, inK)
+    sw = -primL[1] .* moments_conserve_slope(faL, Mu1, Mxi1, 1)
+    faTL = pdf_slope(primL, sw, inK)
+
+    faR = pdf_slope(primR, swR, inK)
+    sw = -primR[1] .* moments_conserve_slope(faR, Mu2, Mxi2, 1)
+    faTR = pdf_slope(primR, sw, inK)
+
+    Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
+    sw0L = (w .- wL) ./ dxL
+    sw0R = (wR .- w) ./ dxR
+    gaL = pdf_slope(prim, sw0L, inK)
+    gaR = pdf_slope(prim, sw0R, inK)
+    sw =
+        -prim[1] .* (
+            moments_conserve_slope(gaL, MuL, Mxi, 1) .+
+            moments_conserve_slope(gaR, MuR, Mxi, 1)
+        )
+    # ga = pdf_slope(prim, sw, inK)
+    # sw = -prim[1] .* moments_conserve_slope(ga, Mu, Mxi, 1)
+    gaT = pdf_slope(prim, sw, inK)
+
+    # time-integration constants
+    Mt = zeros(5)
+    Mt[4] = tau * (1.0 - exp(-dt / tau))
+    Mt[5] = -tau * dt * exp(-dt / tau) + tau * Mt[4]
+    Mt[1] = dt - Mt[4]
+    Mt[2] = -tau * Mt[1] + Mt[5]
+    Mt[3] = 0.5 * dt^2 - tau * Mt[1]
+
+    # flux related to central distribution
+    Muv = moments_conserve(Mu, Mxi, 1, 0)
+    MauL = moments_conserve_slope(gaL, MuL, Mxi, 2)
+    MauR = moments_conserve_slope(gaR, MuR, Mxi, 2)
+    # Mau = moments_conserve_slope(ga, MuR, Mxi, 2)
+    MauT = moments_conserve_slope(gaT, Mu, Mxi, 1)
+
+    fw .=
+        Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* (MauL .+ MauR) .+
+        Mt[3] .* prim[1] .* MauT
+    # fw .= Mt[1] .* prim[1] .* Muv .+ Mt[2] .* prim[1] .* Mau .+ Mt[3] .* prim[1] .* MauT
+
+    # flux related to upwind distribution
+    MuvL = moments_conserve(MuL1, Mxi1, 1, 0)
+    MauL = moments_conserve_slope(faL, MuL1, Mxi1, 2)
+    MauLT = moments_conserve_slope(faTL, MuL1, Mxi1, 1)
+
+    MuvR = moments_conserve(MuR2, Mxi2, 1, 0)
+    MauR = moments_conserve_slope(faR, MuR2, Mxi2, 2)
+    MauRT = moments_conserve_slope(faTR, MuR2, Mxi2, 1)
+
+    @. fw +=
+        Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL -
+        tau * Mt[4] * primL[1] * MauLT + Mt[4] * primR[1] * MuvR -
+        (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
+    # @. fw += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
+
+    #--- fluxes of distribution functions ---#
+    HL = maxwellian(u, primL)
+    BL = HL .* inK ./ (2.0 * primL[end])
+    HR = maxwellian(u, primR)
+    BR = HR .* inK ./ (2.0 * primR[end])
+
+    H = maxwellian(u, prim)
+    B = H .* inK ./ (2.0 * prim[end])
+
+    @. fh =
+        Mt[1] * u * H +
+        Mt[2] * u^2 * (gaL[1] * H + gaL[2] * u * H + 0.5 * gaL[3] * (u^2 * H + B)) * δ +
+        Mt[2] *
+        u^2 *
+        (gaR[1] * H + gaR[2] * u * H + 0.5 * gaR[3] * (u^2 * H + B)) *
+        (1.0 - δ) +
+        Mt[3] * u * (gaT[1] * H + gaT[2] * u * H + 0.5 * gaT[3] * (u^2 * H + B)) +
+        Mt[4] * u * HL * δ -
+        (Mt[5] + tau * Mt[4]) *
+        u^2 *
+        (faL[1] * HL + faL[2] * u * HL + 0.5 * faL[3] * (u^2 * HL + BL)) *
+        δ + Mt[4] * u * HR * (1.0 - δ) -
+        (Mt[5] + tau * Mt[4]) *
+        u^2 *
+        (faR[1] * HR + faR[2] * u * HR + 0.5 * faR[3] * (u^2 * HR + BR)) *
+        (1.0 - δ) -
+        tau *
+        Mt[4] *
+        u *
+        (faTL[1] * HL + faTL[2] * u * HL + 0.5 * faTL[3] * (u^2 * HL + BL)) *
+        δ -
+        tau *
+        Mt[4] *
+        u *
+        (faTR[1] * HR + faTR[2] * u * HR + 0.5 * faTR[3] * (u^2 * HR + BR)) *
+        (1.0 - δ)
+
+    @. fb =
+        Mt[1] * u * B +
+        Mt[2] *
+        u^2 *
+        (gaL[1] * B + gaL[2] * u * B + 0.5 * gaL[3] * (u^2 * B + Mxi[2] * H)) *
+        δ +
+        Mt[2] *
+        u^2 *
+        (gaR[1] * B + gaR[2] * u * B + 0.5 * gaR[3] * (u^2 * B + Mxi[2] * H)) *
+        (1.0 - δ) +
+        Mt[3] * u * (gaT[1] * H + gaT[2] * u * H + 0.5 * gaT[3] * (u^2 * B + Mxi[2] * H)) +
+        Mt[4] * u * BL * δ -
+        (Mt[5] + tau * Mt[4]) *
+        u^2 *
+        (faL[1] * BL + faL[2] * u * BL + 0.5 * faL[3] * (u^2 * BL + Mxi[2] * HL)) *
+        δ + Mt[4] * u * BR * (1.0 - δ) -
+        (Mt[5] + tau * Mt[4]) *
+        u^2 *
+        (faR[1] * BR + faR[2] * u * BR + 0.5 * faR[3] * (u^2 * BR + Mxi[2] * HR)) *
+        (1.0 - δ) -
+        tau *
+        Mt[4] *
+        u *
+        (faTL[1] * BL + faTL[2] * u * BL + 0.5 * faTL[3] * (u^2 * BL + Mxi[2] * HL)) *
+        δ -
+        tau *
+        Mt[4] *
+        u *
+        (faTR[1] * BR + faTR[2] * u * BR + 0.5 * faTR[3] * (u^2 * BR + Mxi[2] * HR)) *
+        (1.0 - δ)
+
+end
+
+
 """
 Kinetic flux vector splitting (KFVS) flux
 
@@ -1122,6 +1292,114 @@ Unified gas kinetic scheme (UGKS) flux
 """
 function flux_ugks!(
     fw::AbstractArray{<:AbstractFloat,1},
+    fh::AbstractArray{<:AbstractFloat,1},
+    fb::AbstractArray{<:AbstractFloat,1},
+    wL::AbstractArray{<:Real,1},
+    hL::AbstractArray{<:AbstractFloat,1},
+    bL::AbstractArray{<:AbstractFloat,1},
+    wR::AbstractArray{<:Real,1},
+    hR::AbstractArray{<:AbstractFloat,1},
+    bR::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    inK::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    pr::Real,
+    dt::Real,
+    dxL::Real,
+    dxR::Real,
+    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,1},
+    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,1},
+    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,1},
+    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,1},
+) # 1D2F flux
+
+    #--- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+
+    h = @. hL * δ + hR * (1.0 - δ)
+    b = @. bL * δ + bR * (1.0 - δ)
+    sh = @. shL * δ + shR * (1.0 - δ)
+    sb = @. sbL * δ + sbR * (1.0 - δ)
+
+    #--- construct interface variables ---#
+    #w = moments_conserve(h, b, u, v, ω)
+    #prim = conserve_prim(w, γ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+    Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mxi1, 0, 0)
+    Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    prim = conserve_prim(w, γ)
+    aL = pdf_slope(prim, (w .- wL) ./ dxL, inK)
+    aR = pdf_slope(prim, (wR .- w) ./ dxR, inK)
+
+    Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
+    MauL = moments_conserve_slope(aL, MuL, Mxi, 1)
+    MauR = moments_conserve_slope(aR, MuR, Mxi, 1)
+    aT = pdf_slope(prim, -prim[1] .* (MauL .+ MauR), inK)
+
+    #--- calculate integral time constants ---#
+    tau = vhs_collision_time(prim, visRef, visIdx)
+
+    Mt = zeros(5)
+    Mt[4] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[5] = -tau * dt * exp(-dt / tau) + tau * Mt[4]
+    Mt[1] = dt - Mt[4] # M0
+    Mt[2] = -tau * Mt[1] + Mt[5]
+    Mt[3] = dt^2 / 2.0 - tau * Mt[1]
+
+    #--- calculate flux from M0 ---#
+    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    MauL = moments_conserve_slope(aL, MuL, Mv, Mxi, 2, 0)
+    MauR = moments_conserve_slope(aR, MuR, Mv, Mxi, 2, 0)
+    MauT = moments_conserve_slope(aT, Mu, Mv, Mxi, 1, 0)
+
+    @. fw = Mt[1] * prim[1] * Muv + Mt[2] * prim[1] * (MauL + MauR) + Mt[3] * prim[1] * MauT
+
+    #--- calculate flux from f0 ---#
+    H = maxwellian(u, v, prim)
+    B = H .* inK ./ (2.0 * prim[end])
+
+    fw[1] += Mt[4] * sum(ω .* u .* h) - Mt[5] * sum(ω .* u .^ 2 .* sh)
+    fw[2] += Mt[4] * sum(ω .* u .^ 2 .* h) - Mt[5] * sum(ω .* u .^ 3 .* sh)
+    fw[3] +=
+        Mt[4] * 0.5 * (sum(ω .* u .^ 3 .* h) + sum(ω .* u .* b)) -
+        Mt[5] * 0.5 * (sum(ω .* u .^ 4 .* sh) + sum(ω .* u .^ 2 .* sb))
+
+    @. fh =
+        Mt[1] * u * H +
+        Mt[2] * u^2 * (aL[1] * H + aL[2] * u * H + 0.5 * aL[3] * (u^2 * H + B)) * δ +
+        Mt[2] *
+        u^2 *
+        (aR[1] * H + aR[2] * u * H + 0.5 * aR[3] * (u^2 * H + B)) *
+        (1.0 - δ) +
+        Mt[3] * u * (aT[1] * H + aT[2] * u * H + 0.5 * aT[3] * (u^2 * H + B)) +
+        Mt[4] * u * h - Mt[5] * u^2 * sh
+    @. fb =
+        Mt[1] * u * B +
+        Mt[2] *
+        u^2 *
+        (aL[1] * B + aL[2] * u * B + 0.5 * aL[3] * (u^2 * B + Mxi[2] * H)) *
+        δ +
+        Mt[2] *
+        u^2 *
+        (aR[1] * B + aR[2] * u * B + 0.5 * aR[3] * (u^2 * B + Mxi[2] * H)) *
+        (1.0 - δ) +
+        Mt[3] * u * (aT[1] * B + aT[2] * u * B + 0.5 * aT[3] * (u^2 * B + Mxi[2] * H)) +
+        Mt[4] * u * b - Mt[5] * u^2 * sb
+
+end
+
+
+function flux_ugks!(
+    fw::AbstractArray{<:AbstractFloat,1},
     fh::AbstractArray{<:AbstractFloat,2},
     fb::AbstractArray{<:AbstractFloat,2},
     wL::AbstractArray{<:Real,1},
@@ -1200,7 +1478,7 @@ function flux_ugks!(
     B = H .* inK ./ (2.0 * prim[end])
 
     fw[1] += Mt[4] * sum(ω .* u .* h) - Mt[5] * sum(ω .* u .^ 2 .* sh)
-    fw[2] += Mt[4] * sum(ω .* u .^ 2 .* h) - Mt[5] * sum(ω .* u .^ 2 .* sh)
+    fw[2] += Mt[4] * sum(ω .* u .^ 2 .* h) - Mt[5] * sum(ω .* u .^ 3 .* sh)
     fw[3] += Mt[4] * sum(ω .* v .* u .* h) - Mt[5] * sum(ω .* v .* u .^ 2 .* sh)
     fw[4] +=
         Mt[4] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) -
@@ -1334,9 +1612,9 @@ function flux_hll(wL, wR, γ)
     λmin = primL[2] - aL
     λmax = primR[2] + aR
 
-    if λmin >= 0.
+    if λmin >= 0.0
         y = euler_flux(wL, γ)
-    elseif λmax <= 0.
+    elseif λmax <= 0.0
         y = euler_flux(wR, γ)
     else
         factor = 1.0 / (λmax - λmin)
