@@ -1670,9 +1670,9 @@ function flux_roe!(
     HL = aL^2 / (γ - 1.0) + 0.5 * (uL^2 + vL^2)
 
     # right state
-    rhoR = primR(1)
-    uR = primR(2)
-    vR = primR(3)
+    rhoR = primR[1]
+    uR = primR[2]
+    vR = primR[3]
     unR = uR * nx + vR * ny
     umR = uR * mx + vR * my
     pR = 0.5 * primR[1] / primR[4]
@@ -1717,25 +1717,25 @@ function flux_roe!(
     # right eigenvectors
     Rv = zeros(4, 4)
 
-    Rv(1, 1) = 1.0
-    Rv(2, 1) = u - a * nx
-    Rv(3, 1) = v - a * ny
-    Rv(4, 1) = H - un * a
+    Rv[1, 1] = 1.0
+    Rv[2, 1] = u - a * nx
+    Rv[3, 1] = v - a * ny
+    Rv[4, 1] = H - un * a
 
-    Rv(1, 2) = 0.0
-    Rv(2, 2) = mx
-    Rv(3, 2) = my
-    Rv(4, 2) = um
+    Rv[1, 2] = 0.0
+    Rv[2, 2] = mx
+    Rv[3, 2] = my
+    Rv[4, 2] = um
 
-    Rv(1, 3) = 1.0
-    Rv(2, 3) = u
-    Rv(3, 3) = v
-    Rv(4, 3) = 0.5 * (u * u + v * v)
+    Rv[1, 3] = 1.0
+    Rv[2, 3] = u
+    Rv[3, 3] = v
+    Rv[4, 3] = 0.5 * (u * u + v * v)
 
-    Rv(1, 4) = 1.0
-    Rv(2, 4) = u + a * nx
-    Rv(3, 4) = v + a * ny
-    Rv(4, 4) = H + un * a
+    Rv[1, 4] = 1.0
+    Rv[2, 4] = u + a * nx
+    Rv[3, 4] = v + a * ny
+    Rv[4, 4] = H + un * a
 
     # dissipation term
     diss = zeros(4)
