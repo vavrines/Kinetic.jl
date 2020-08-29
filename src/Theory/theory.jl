@@ -36,7 +36,7 @@ export gauss_moments,
     boltzmann_fft,
     boltzmann_fft!,
     euler_flux,
-    euler_matrix
+    euler_jacobi
 
 
 """
@@ -1935,6 +1935,8 @@ end
 """
 Theoretical fluxes of Euler Equations
 
+* @return : flux tuple
+
 """
 function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame = :cartesian::Symbol)
 
@@ -1947,7 +1949,7 @@ function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame = :cartesian::Sy
         F[2] = w[2]^2 / w[1] + p
         F[3] = (w[3] + p) * w[2] / w[1]
 
-        return F
+        return (F, )
     elseif length(w) == 4
         F = zeros(axes(w))
         F[1] = w[2]
@@ -1990,12 +1992,11 @@ function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame = :cartesian::Sy
 end
 
 
-
 """
 Flux Jacobian of Euler Equations
 
 """
-function euler_matrix(w::AbstractArray{<:Real,1}, γ::Real)
+function euler_jacobi(w::AbstractArray{<:Real,1}, γ::Real)
 
     A = zeros(eltype(w), 3, 3)
 
