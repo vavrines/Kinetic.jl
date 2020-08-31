@@ -873,9 +873,9 @@ Maxwellian in discrete form
 
 """
 
-# --- 1D ---#
+#--- 1D ---#
 maxwellian(u::AbstractArray{<:AbstractFloat,1}, ρ::Real, U::Real, λ::Real) =
-    @. ρ * (λ / π)^0.5 * exp(-λ * (u - U)^2)
+    @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2)
 
 
 maxwellian(u::AbstractArray{<:AbstractFloat,1}, prim::Array{<:Real,1}) =
@@ -892,7 +892,7 @@ function mixture_maxwellian(u::AbstractArray{<:AbstractFloat,2}, prim::Array{<:R
 end
 
 
-# --- 2D ---#
+#--- 2D ---#
 maxwellian(
     u::AbstractArray{<:AbstractFloat,2},
     v::AbstractArray{<:AbstractFloat,2},
@@ -924,7 +924,7 @@ function mixture_maxwellian(
 end
 
 
-# --- 3D ---#
+#--- 3D ---#
 maxwellian(
     u::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
@@ -934,7 +934,7 @@ maxwellian(
     V::Real,
     W::Real,
     λ::Real,
-) = @. ρ * (λ / π)^1.5 * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
+) = @. ρ * sqrt((λ / π)^3) * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
 
 
 maxwellian(
@@ -1312,7 +1312,7 @@ function mixture_conserve_prim(w::Array{<:Real,2}, γ::Real)
     else
         prim = zeros(eltype(W), axes(W))
     end
-    
+
     for j in axes(prim, 2)
         prim[:, j] .= conserve_prim(w[:, j], γ)
     end
