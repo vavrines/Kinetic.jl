@@ -502,27 +502,33 @@ discrete_moments(
 # Conservative moments
 # ------------------------------------------------------------
 # --- 1D ---#
-moments_conserve(
+function moments_conserve(
     f::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
-) = [
-    discrete_moments(f, u, ω, 0),
-    discrete_moments(f, u, ω, 1),
-    0.5 * discrete_moments(f, u, ω, 2),
-]
+)
+    w = zeros(eltype(f), 3)
+    w[1] = discrete_moments(f, u, ω, 0)
+    w[2] = discrete_moments(f, u, ω, 1)
+    w[3] = 0.5 * discrete_moments(f, u, ω, 2)
+
+    return w
+end
 
 
-moments_conserve(
+function moments_conserve(
     h::AbstractArray{<:AbstractFloat,1},
     b::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
-) = [
-    discrete_moments(h, u, ω, 0),
-    discrete_moments(h, u, ω, 1),
-    0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(b, u, ω, 0)),
-]
+)
+    w = zeros(eltype(f), 3)
+    w[1] = discrete_moments(h, u, ω, 0)
+    w[2] = discrete_moments(h, u, ω, 1)
+    w[3] = 0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(b, u, ω, 0))
+
+    return w
+end
 
 
 function mixture_moments_conserve(
