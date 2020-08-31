@@ -2,8 +2,8 @@
 # Mathematical Methods
 # ============================================================
 
-export linspace, heaviside, fortsign
-export central_diff, central_diff!, upwind_diff, upwind_diff!
+export linspace, heaviside, fortsign, mat_split
+export central_diff, central_diff!, upwind_diff, upwind_diff!, unstruct_diff
 
 
 """
@@ -28,13 +28,32 @@ fortsign(x::Real, y::Real) = abs(x) * sign(y)
 
 
 """
+Split matrix into row vectors
+
+"""
+function mat_split(m::AbstractArray, dim::Int)
+
+    if ndims(m) == 2
+        nx = eltype(m).([1.0 0.0])
+        ny = eltype(m).([0.0 1.0])
+
+        return nx * x, ny * x
+    elseif ndims(m) == 3
+        nx = eltype(m).([1.0 0.0 0.0])
+        ny = eltype(m).([0.0 1.0 0.0])
+        nz = eltype(m).([0.0 0.0 1.0])
+
+        return nx * m, ny * m, nz * m
+    end
+
+end
+
+
+"""
 Central difference
 
 """
-function central_diff(
-    y::AbstractArray{<:Any,1},
-    x::AbstractArray{<:Any,1},
-)
+function central_diff(y::AbstractArray{<:Any,1}, x::AbstractArray{<:Any,1})
 
     dy = zeros(eltype(y), axes(y))
 
@@ -42,8 +61,8 @@ function central_diff(
     i0 = idx[1]
     i1 = idx[end]
 
-    dy[i0] = (y[i0+1] - y[i0]) / (x[i0+1] - x[i0])
-    dy[i1] = (y[i1] - y[i1-1]) / (x[i1] - x[i1-1])
+    dy[i0] = (y[i0+1] - y[i0]) / (x[i0+1] - x[i0] + 1e-7)
+    dy[i1] = (y[i1] - y[i1-1]) / (x[i1] - x[i1-1] + 1e-7)
     for i = i0+1:i1-1
         dy[i] = (y[i+1] - y[i-1]) / (x[i+1] - x[i-1] + 1e-7)
     end
@@ -73,8 +92,8 @@ function central_diff!(
     i0 = idx[1]
     i1 = idx[end]
 
-    dy[i0] = (y[i0+1] - y[i0]) / (x[i0+1] - x[i0])
-    dy[i1] = (y[i1] - y[i1-1]) / (x[i1] - x[i1-1])
+    dy[i0] = (y[i0+1] - y[i0]) / (x[i0+1] - x[i0] + 1e-7)
+    dy[i1] = (y[i1] - y[i1-1]) / (x[i1] - x[i1-1] + 1e-7)
     for i = i0+1:i1-1
         dy[i] = (y[i+1] - y[i-1]) / (x[i+1] - x[i-1] + 1e-7)
     end
@@ -82,11 +101,7 @@ function central_diff!(
 end
 
 
-function central_diff!(
-    dy::AbstractArray{<:Any,1},
-    y::AbstractArray{<:Any,1},
-    dx::Any,
-)
+function central_diff!(dy::AbstractArray{<:Any,1}, y::AbstractArray{<:Any,1}, dx::Any)
     x = ones(eltype(y), axes(y)) .* dx
     central_diff!(dy, y, x)
 end
@@ -176,6 +191,35 @@ function upwind_diff!(
     x = ones(eltype(y), axes(y)) .* dx
     upwind_diff!(dy, y, x, stream = stream)
 end
+
+
+"""
+Finite difference for pseudo-unstructured mesh
+
+"""
+function unstruct_diff(
+    u:AbstractArray{<:Any,1},
+    x:AbstractArray{<:Any,1},
+    nx::Int;
+    mode = :central::Symbol,
+)
+    uu = reshape(u, (nx, :))
+    xx = reshape(x, (nx, :))
+
+    dux = similar(xx)
+    for i = 1:nx
+        if mode == :central
+            dux[i, :] .= central_diff(uu[i, :], xx[i, :])
+        elseif mode == :upwind
+            dux[i, :] .= upwind_diff(uu[i, :], xx[i, :])
+        else
+            throw("difference mode should be central or upwind")
+        end
+    end
+
+    return reshape(dux, (1, :))
+end
+
 
 
 """
