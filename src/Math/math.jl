@@ -31,7 +31,7 @@ fortsign(x::Real, y::Real) = abs(x) * sign(y)
 Split matrix into row vectors
 
 """
-function mat_split(m::AbstractArray, dim::Int)
+function mat_split(m::AbstractArray)
 
     if ndims(m) == 2
         nx = eltype(m).([1.0 0.0])
