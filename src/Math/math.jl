@@ -221,18 +221,26 @@ function unstruct_diff(
 end
 
 
-function unstruct_diff(u::Function, x::AbstractArray{<:Any,2}, nx::Int, dim::Int)
+function unstruct_diff(u::Function, x::AbstractArray{<:Any,2}, nx::Int, dim::Int; mode = :central::Symbol,)
     uu = reshape(u(x), (nx, :))
     xx = reshape(x[dim, :], (nx, :))
     dux = zeros(eltype(x), axes(xx))
 
     if dim == 1
         for i = 1:nx
-            dux[i, :] .= central_diff(uu[i, :], xx[i, :])
+            if mode == :central
+                dux[i, :] .= central_diff(uu[i, :], xx[i, :])
+            elseif mode == :upwind
+                dux[i, :] .= upwind_diff(uu[i, :], xx[i, :])
+            end
         end
     elseif dim == 2
         for i = 1:nx
-            dux[:, i] .= central_diff(uu[:, i], xx[:, i])
+            if mode == :central
+                dux[:, i] .= central_diff(uu[:, i], xx[:, i])
+            elseif mode == :upwind
+                dux[:, i] .= upwind_diff(uu[:, i], xx[:, i])
+            end
         end
     end
 
