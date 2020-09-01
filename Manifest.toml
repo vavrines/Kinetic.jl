@@ -650,9 +650,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[SparseDiffTools]]
 deps = ["Adapt", "ArrayInterface", "Compat", "DataStructures", "FiniteDiff", "ForwardDiff", "LightGraphs", "LinearAlgebra", "Requires", "SparseArrays", "VertexSafeGraphs"]
-git-tree-sha1 = "69de355cb5e2b9a0e89f383c1762bba5ae70b580"
+git-tree-sha1 = "93666e93899d995ec37abddde4811f533e49c074"
 uuid = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
-version = "1.10.0"
+version = "1.9.1"
 
 [[SpecialFunctions]]
 deps = ["OpenSpecFun_jll"]
