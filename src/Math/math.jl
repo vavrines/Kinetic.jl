@@ -207,7 +207,7 @@ function unstruct_diff(
     xx = reshape(x, (nx, :))
 
     dux = similar(xx)
-    for i in 1:nx
+    for i = 1:nx
         if mode == :central
             dux[i, :] .= central_diff(uu[i, :], xx[i, :])
         elseif mode == :upwind
@@ -220,6 +220,24 @@ function unstruct_diff(
     return reshape(dux, (1, :))
 end
 
+
+function unstruct_diff(u::Function, x::AbstractArray{<:Any,2}, nx::Int, dim::Int)
+    uu = reshape(u(x), (nx, :))
+    xx = reshape(x[dim, :], (nx, :))
+    dux = zeros(eltype(x), axes(xx))
+
+    if dim == 1
+        for i = 1:nx
+            dux[i, :] .= central_diff(uu[i, :], xx[i, :])
+        end
+    elseif dim == 2
+        for i = 1:nx
+            dux[:, i] .= central_diff(uu[:, i], xx[:, i])
+        end
+    end
+
+    return reshape(dux, (1, :))
+end
 
 
 """
