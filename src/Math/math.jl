@@ -37,7 +37,7 @@ function mat_split(m::AbstractArray, dim::Int)
         nx = eltype(m).([1.0 0.0])
         ny = eltype(m).([0.0 1.0])
 
-        return nx * x, ny * x
+        return nx * m, ny * m
     elseif ndims(m) == 3
         nx = eltype(m).([1.0 0.0 0.0])
         ny = eltype(m).([0.0 1.0 0.0])
@@ -198,8 +198,8 @@ Finite difference for pseudo-unstructured mesh
 
 """
 function unstruct_diff(
-    u:AbstractArray{<:Any,1},
-    x:AbstractArray{<:Any,1},
+    u::AbstractArray{<:Any,1},
+    x::AbstractArray{<:Any,1},
     nx::Int;
     mode = :central::Symbol,
 )
@@ -207,7 +207,7 @@ function unstruct_diff(
     xx = reshape(x, (nx, :))
 
     dux = similar(xx)
-    for i = 1:nx
+    for i in 1:nx
         if mode == :central
             dux[i, :] .= central_diff(uu[i, :], xx[i, :])
         elseif mode == :upwind
