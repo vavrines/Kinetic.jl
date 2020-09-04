@@ -41,9 +41,70 @@ export gauss_moments,
 """
 Calculate moments of Gaussian distribution G = (λ / π)^(D / 2) * exp[-λ(c^2 + ξ^2)]
 
-`gauss_moments(prim::AbstractArray{<:Real,1}, inK::Real)`
+* with internality: `gauss_moments(prim::AbstractArray{<:Real,1}, inK::Real)`
+* without internality: `gauss_moments(prim::AbstractArray{<:Real,1})`
 
 """
+function gauss_moments(prim::AbstractArray{<:Real,1})
+
+    if eltype(prim) <: Int
+        MuL = OffsetArray{Float64}(undef, 0:6)
+    else
+        MuL = OffsetArray{eltype(prim)}(undef, 0:6)
+    end
+    MuR = similar(MuL)
+    Mu = similar(MuL)
+
+    MuL[0] = 0.5 * SpecialFunctions.erfc(-sqrt(prim[end]) * prim[2])
+    MuL[1] = prim[2] * MuL[0] + 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
+    MuR[0] = 0.5 * SpecialFunctions.erfc(sqrt(prim[end]) * prim[2])
+    MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
+
+    for i = 2:6
+        MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i - 1) * MuL[i-2] / prim[end]
+        MuR[i] = prim[2] * MuR[i-1] + 0.5 * (i - 1) * MuR[i-2] / prim[end]
+    end
+
+    @. Mu = MuL + MuR
+
+    if length(prim) == 3
+
+        return Mu, MuL, MuR
+
+    elseif length(prim) == 4
+
+        Mv = similar(MuL)
+        Mv[0] = 1.0
+        Mv[1] = prim[3]
+        for i = 2:6
+            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
+        end
+
+        return Mu, Mv, MuL, MuR
+
+    elseif length(prim) == 5
+
+        Mv = similar(MuL)
+        Mv[0] = 1.0
+        Mv[1] = prim[3]
+        for i = 2:6
+            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
+        end
+
+        Mw = similar(MuL)
+        Mw[0] = 1.0
+        Mw[1] = prim[4]
+        for i = 2:6
+            Mw[i] = prim[4] * Mw[i-1] + 0.5 * (i - 1) * Mw[i-2] / prim[end]
+        end
+
+        return Mu, Mv, Mw, MuL, MuR
+
+    end
+
+end
+
+
 function gauss_moments(prim::AbstractArray{<:Real,1}, inK::Real)
 
     if eltype(prim) <: Int
@@ -192,6 +253,9 @@ Calculate conservative moments of particle distribution
     Mw::OffsetArray{<:Real,1}, alpha::Int, beta::Int, delta::Int)`
 
 """
+moments_conserve(Mu::OffsetArray{<:AbstractFloat,1}, alpha::Int) = Mu[alpha]
+
+
 function moments_conserve(
     Mu::OffsetArray{<:AbstractFloat,1},
     Mxi::OffsetArray{<:AbstractFloat,1},
@@ -301,6 +365,9 @@ Calculate slope of particle distribution function,
 assuming a = a1 + u * a2 + 0.5 * u^2 * a3
 
 """
+pdf_slope(u::Real, Δ::Real) = Δ / u
+
+
 function pdf_slope(prim::AbstractArray{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
 
     sl = zeros(eltype(sw), axes(prim))
@@ -357,6 +424,10 @@ Calculate slope-related conservative moments,
 assuming a = a1 + u * a2 + 0.5 * u^2 * a3
 
 """
+moments_conserve_slope(a::Real, Mu::OffsetArray{<:Real,1}, alpha::Int) = 
+    a * moments_conserve(Mu, alpha)
+
+
 moments_conserve_slope(
     a::AbstractArray{<:Real,1},
     Mu::OffsetArray{<:Real,1},
@@ -1266,7 +1337,13 @@ end
 """
 Transform conservative -> primitive variables
 
+* scalar: pseudo primitive variables for scalar conservation laws
+* vector: Euler, Navier-Stokes and extended hydrodynamic equations
 """
+conserve_prim(u::Real) = [u, 0.5 * u, 1.0]
+conserve_prim(u::Real, a::Real) = [u, a, 1.0]
+
+
 function conserve_prim(W::Array{<:Real,1}, γ::Real)
 
     if eltype(W) <: Int

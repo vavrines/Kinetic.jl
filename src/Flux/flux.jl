@@ -2,7 +2,7 @@
 # Numerical Flux Functions
 # ============================================================
 
-export flux_gks!
+export flux_gks, flux_gks!
 export flux_kfvs!
 export flux_kcu!
 export flux_ugks!

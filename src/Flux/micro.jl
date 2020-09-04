@@ -5,10 +5,102 @@
 """
 Gas kinetic Navier-Stokes flux
 
+`flux_gks(uL, uR, μ, dt, dxL, dxR, suL, suR, a)`
+
+* @arg: conservative scalars and their left/right slopes
+* @arg: molecular and thermodynamic parameters
+* @arg: time step and cell size
+* @return: scalar flux
+
+"""
+function flux_gks(
+    uL::Real,
+    uR::Real,
+    μ::Real,
+    dt::Real,
+    dxL::Real,
+    dxR::Real,
+    suL = 0.0::Real,
+    suR = 0.0::Real,
+    a = 0::Real,
+)
+
+    primL = ifelse(a==0, conserve_prim(uL), conserve_prim(uL, a))
+    primR = ifelse(a==0, conserve_prim(uR), conserve_prim(uR, a))
+
+    Mu1, MuL1, MuR1 = gauss_moments(primL)
+    Mu2, MuL2, MuR2 = gauss_moments(primR)
+
+    u = primL[1] * moments_conserve(MuL1, 0) + primR[1] * moments_conserve(MuR2, 0)
+    prim = ifelse(a==0, conserve_prim(u), conserve_prim(u, a))
+    tau = 2.0 * abs(uL - uR) / (abs(uL) + abs(uR)) * dt + 2.0 * μ
+
+    faL = pdf_slope(uL, suL)
+    Δ = -primL[1] * moments_conserve_slope(faL, Mu1, 1)
+    faTL = pdf_slope(uL, Δ)
+
+    faR = pdf_slope(uR, suR)
+    Δ = -primR[1] * moments_conserve_slope(faR, Mu2, 1)
+    faTR = pdf_slope(uR, Δ)
+
+    Mu, MuL, MuR = gauss_moments(prim)
+    sw0L = (u - uL) / dxL
+    sw0R = (uR - u) / dxR
+    gaL = pdf_slope(u, sw0L)
+    gaR = pdf_slope(u, sw0R)
+    Δ =
+        -prim[1] *
+        (moments_conserve_slope(gaL, MuL, 1) + moments_conserve_slope(gaR, MuR, 1))
+    # sw = (uR - uL) / (dxL + dxR)
+    # ga = pdf_slope(u, sw)
+    # Δ = -prim[1] .* moments_conserve_slope(ga, Mu, 1)
+    gaT = pdf_slope(u, Δ)
+
+    # time-integration constants
+    Mt = zeros(5)
+    Mt[4] = tau * (1.0 - exp(-dt / tau))
+    Mt[5] = -tau * dt * exp(-dt / tau) + tau * Mt[4]
+    Mt[1] = dt - Mt[4]
+    Mt[2] = -tau * Mt[1] + Mt[5]
+    Mt[3] = 0.5 * dt^2 - tau * Mt[1]
+
+    # flux related to central distribution
+    Muv = moments_conserve(Mu, 1)
+    MauL = moments_conserve_slope(gaL, MuL, 2)
+    MauR = moments_conserve_slope(gaR, MuR, 2)
+    # Mau = moments_conserve_slope(ga, MuR, 2)
+    MauT = moments_conserve_slope(gaT, Mu, 1)
+
+    fw = Mt[1] * prim[1] * Muv + Mt[2] * prim[1] * (MauL + MauR) + Mt[3] * prim[1] * MauT
+    # fw = Mt[1] * prim[1] * Muv + Mt[2] * prim[1] * Mau + Mt[3] * prim[1] * MauT
+
+    # flux related to upwind distribution
+    MuvL = moments_conserve(MuL1, 1)
+    MauL = moments_conserve_slope(faL, MuL1, 2)
+    MauLT = moments_conserve_slope(faTL, MuL1, 1)
+
+    MuvR = moments_conserve(MuR2, 1)
+    MauR = moments_conserve_slope(faR, MuR2, 2)
+    MauRT = moments_conserve_slope(faTR, MuR2, 1)
+
+    fw +=
+        Mt[4] * primL[1] * MuvL - (Mt[5] + tau * Mt[4]) * primL[1] * MauL -
+        tau * Mt[4] * primL[1] * MauLT + Mt[4] * primR[1] * MuvR -
+        (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
+    # fw += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
+
+    return fw
+
+end
+
+
+"""
+Gas kinetic Navier-Stokes flux
+
 * 1D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, swL, swR)
 * 2D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, dy, swL, swR)
 
-* @param[in]: particle distribution functions and their left/right slopes
+* @param[in]: conservative variables and their left/right slopes
 * @param[in]: molecular and thermodynamic parameters
 * @param[in]: time step and cell size
 
