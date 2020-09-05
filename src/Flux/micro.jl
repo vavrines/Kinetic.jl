@@ -14,6 +14,44 @@ Gas kinetic Navier-Stokes flux
 
 """
 function flux_gks(
+    u::Real,
+    μ::Real,
+    dt::Real,
+    su = 0.0::Real,
+    a = 0::Real,
+)
+
+    prim = ifelse(a==0, conserve_prim(u), conserve_prim(u, a))
+
+    Mu, MuL, MuR = gauss_moments(prim)
+
+    tau = 2.0 * μ
+
+    fa = pdf_slope(u, su)
+    Δ = -prim[1] * moments_conserve_slope(fa, Mu, 1)
+    faT = pdf_slope(u, Δ)
+
+    # time-integration constants
+    Mt = zeros(5)
+    Mt[4] = dt
+    Mt[5] = -tau * dt * exp(-dt / tau) + tau * Mt[4]
+
+
+    # flux related to upwind distribution
+    Muv = moments_conserve(Mu, 1)
+    Mau = moments_conserve_slope(fa, Mu, 2)
+    MauT = moments_conserve_slope(faT, Mu, 1)
+
+    fw =
+        Mt[4] * prim[1] * Muv - (Mt[5] + tau * Mt[4]) * prim[1] * Mau -
+        tau * Mt[4] * prim[1] * MauT
+
+    return fw / dt
+
+end
+
+
+function flux_gks(
     uL::Real,
     uR::Real,
     μ::Real,
