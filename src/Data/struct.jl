@@ -135,7 +135,7 @@ struct PlasmaProperty{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P} <: AbstractProperty
     )
 
         # A^+
-        A1p = Array{typeof(sol)}(undef, 8, 8)
+        A1p = Array{Float64}(undef, 8, 8)
         A1p[1, 1] = (sol * χ) / 2.0
         A1p[7, 1] = χ / 2.0
         A1p[2, 2] = sol / 2.0
@@ -154,7 +154,7 @@ struct PlasmaProperty{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P} <: AbstractProperty
         A1p[8, 8] = (sol * ν) / 2.0
 
         # A^-
-        A1n = Array{typeof(sol)}(undef, 8, 8)
+        A1n = Array{Float64}(undef, 8, 8)
         A1n[1, 1] = -(sol * χ) / 2.0
         A1n[7, 1] = χ / 2.0
         A1n[2, 2] = -sol / 2.0
