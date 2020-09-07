@@ -47,9 +47,9 @@ prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) = prim_conserve([�
 
 function mixture_prim_conserve(prim::Array{<:Real,2}, γ::Real)
     if eltype(prim) <: Int
-        W = zeros(axes(prim))
+        w = zeros(axes(prim))
     else
-        W = zeros(eltype(prim), axes(prim))
+        w = zeros(eltype(prim), axes(prim))
     end
 
     for j in axes(w, 2)
