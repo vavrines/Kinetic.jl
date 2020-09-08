@@ -15,6 +15,7 @@ using FileIO
 using JLD2
 using Plots
 using PyCall
+using ProgressMeter
 
 include("Data/data.jl")
 include("IO/io.jl")

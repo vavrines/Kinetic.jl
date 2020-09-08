@@ -39,9 +39,10 @@ function initialize(configfilename::String)
 end
 
 
-# ------------------------------------------------------------
-# Initialize finite volume method
-# ------------------------------------------------------------
+"""
+Initialize finite volume method
+
+"""
 function init_fvm(KS::SolverSet)
 
     if KS.set.space[1:2] == "1d"

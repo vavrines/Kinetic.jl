@@ -1,5 +1,5 @@
 # ============================================================
-# Solution algorithm
+# Solution Algorithm
 # ============================================================
 
 """
@@ -70,6 +70,7 @@ struct SolverSet <: AbstractSolverSet
             if case == "shock"
 
                 μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
+
                 gas = GasProperty(
                     knudsen,
                     mach,
@@ -85,14 +86,15 @@ struct SolverSet <: AbstractSolverSet
                 if space == "1d1f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
-                    wL, primL, fL, bcL, wR, primR, fR, bcR =
-                        ib_rh(mach, γ, vSpace.u)
+                    wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(mach, γ, vSpace.u)
+
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
                 elseif space == "1d2f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
                     wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
                         ib_rh(mach, γ, vSpace.u, inK)
+
                     ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
                 elseif space == "1d1f3v"
                     vSpace = VSpace3D(
@@ -113,12 +115,14 @@ struct SolverSet <: AbstractSolverSet
 
                     wL, primL, fL, bcL, wR, primR, fR, bcR =
                         ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
+
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
                 end
 
             elseif case == "sod"
 
                 μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
+
                 gas = GasProperty(
                     knudsen,
                     mach,
@@ -134,14 +138,15 @@ struct SolverSet <: AbstractSolverSet
                 if space == "1d1f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
-                    wL, primL, fL, bcL, wR, primR, fR, bcR =
-                        ib_sod(γ, vSpace.u)
+                    wL, primL, fL, bcL, wR, primR, fR, bcR = ib_sod(γ, vSpace.u)
+
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
                 elseif space == "1d2f1v"
                     vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
 
                     wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
                         ib_sod(γ, vSpace.u, inK)
+
                     ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
                 elseif space == "1d1f3v"
                     vSpace = VSpace3D(
@@ -162,6 +167,7 @@ struct SolverSet <: AbstractSolverSet
 
                     wL, primL, fL, bcL, wR, primR, fR, bcR =
                         ib_sod(γ, vSpace.u, vSpace.v, vSpace.w)
+
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
                 end
 
@@ -172,6 +178,7 @@ struct SolverSet <: AbstractSolverSet
                 kne = knudsen * (me / mi)
 
                 vSpace = MVSpace1D(umin, umax, v0, v1, nu, vMeshType, nug)
+
                 gas = PlasmaProperty(
                     [knudsen, kne],
                     mach,
@@ -209,6 +216,7 @@ struct SolverSet <: AbstractSolverSet
                 ER,
                 BR,
                 lorenzR = ib_briowu(γ, vSpace.u, mi, me)
+
                 ib = IB4F(
                     wL,
                     primL,
@@ -232,6 +240,10 @@ struct SolverSet <: AbstractSolverSet
                     lorenzR,
                 )
 
+            else
+
+                throw("No preset available, please set up manually.")
+
             end
 
         elseif dim == 2
@@ -241,6 +253,7 @@ struct SolverSet <: AbstractSolverSet
             if case == "cavity"
 
                 μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
+
                 gas = GasProperty(
                     knudsen,
                     mach,
@@ -254,55 +267,31 @@ struct SolverSet <: AbstractSolverSet
                 )
 
                 if space == "2d1f2v"
-                    vSpace = VSpace2D(
-                        umin,
-                        umax,
-                        nu,
-                        vmin,
-                        vmax,
-                        nv,
-                        vMeshType,
-                        nug,
-                        nvg,
-                    )
+                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
 
                     wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD =
                         ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v)
+
                     ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
                 elseif space == "2d2f2v"
-                    vSpace = VSpace2D(
-                        umin,
-                        umax,
-                        nu,
-                        vmin,
-                        vmax,
-                        nv,
-                        vMeshType,
-                        nug,
-                        nvg,
-                    )
+                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
 
                     wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD =
                         ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v, inK)
-                    ib = IB2F(
-                        wL,
-                        primL,
-                        hL,
-                        bL,
-                        bcL,
-                        wR,
-                        primR,
-                        hR,
-                        bR,
-                        bcR,
-                        bcU,
-                        bcD,
-                    )
+
+                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
                 end
+
+            else
+
+                throw("No preset available, please set up manually.")
 
             end
 
         else
+
+            throw("No preset available for 3D simulation, please set up manually.")
+
         end
 
         # create working directory
@@ -334,39 +323,36 @@ function solve!(
 
     #--- setup ---#
     iter = 0
-    dt = 0.0
+    dt = timestep(KS, ctr, simTime)
+    nt = Int(Floor(KS.set.maxTime / dt)) + 1
     res = zeros(axes(KS.ib.wL))
-    #write_jld(KS, ctr, simTime)
+    write_jld(KS, ctr, simTime)
 
     #--- main loop ---#
-    #while KS.simTime < KS.maxTime
-    while true
+    #while true
+    @showprogress for iter = 1:nt
 
-        dt = timestep(KS, ctr, simTime)
-
+        #dt = timestep(KS, ctr, simTime)
         reconstruct!(KS, ctr)
-
         evolve!(KS, ctr, face, dt)
-
         update!(KS, ctr, face, dt, res)
 
-        iter += 1
+        #iter += 1
         simTime += dt
 
         if iter % 100 == 0
             println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:end])")
 
-            #if iter%400 == 0
+            #if iter%1000 == 0
             #write_jld(KS, ctr, iter)
             #end
         end
 
-        if maximum(res) < 5.e-7 || simTime > KS.set.maxTime
-            #if simTime > KS.set.maxTime
+        if simTime > KS.set.maxTime || maximum(res) < 5.e-7
             break
         end
 
-    end # while loop
+    end # loop
 
     write_jld(KS, ctr, simTime)
 
@@ -386,20 +372,20 @@ function timestep(
 
     if KS.set.nSpecies == 1
 
-        Threads.@threads for i = 1:KS.pSpace.nx
-            @inbounds prim = ctr[i].prim
+        @inbounds Threads.@threads for i = 1:KS.pSpace.nx
+            prim = ctr[i].prim
             sos = sound_speed(prim, KS.gas.γ)
             vmax = max(KS.vSpace.u1, abs(prim[2])) + sos
-            @inbounds tmax = max(tmax, vmax / ctr[i].dx)
+            tmax = max(tmax, vmax / ctr[i].dx)
         end
 
     elseif KS.set.nSpecies == 2
 
-        Threads.@threads for i = 1:KS.pSpace.nx
-            @inbounds prim = ctr[i].prim
+        @inbounds Threads.@threads for i = 1:KS.pSpace.nx
+            prim = ctr[i].prim
             sos = sound_speed(prim, KS.gas.γ)
             vmax = max(maximum(KS.quad.u1), maximum(abs.(prim[2, :]))) + sos
-            @inbounds tmax = ifelse(
+            tmax = ifelse(
                 KS.set.space == "1d4f",
                 max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx),
                 max(tmax, vmax / ctr[i].dx),
@@ -419,10 +405,7 @@ end
 # ------------------------------------------------------------
 # Reconstruction
 # ------------------------------------------------------------
-function reconstruct!(
-    KS::SolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1},
-)
+function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
 
     if KS.set.interpOrder == 1
         return
@@ -432,8 +415,8 @@ function reconstruct!(
     #ctr[KS.nx].sw .= reconstruct3(ctr[KS.nx-1].w, ctr[KS.nx].w, 0.5*(ctr[KS.nx-1].dx+ctr[KS.nx].dx))
 
     # macroscopic variables
-    Threads.@threads for i = 2:KS.pSpace.nx-1
-        @inbounds ctr[i].sw .= reconstruct3(
+    @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
+        ctr[i].sw .= reconstruct3(
             ctr[i-1].w,
             ctr[i].w,
             ctr[i+1].w,
@@ -444,9 +427,9 @@ function reconstruct!(
     end
 
     # particle distribution function
-    Threads.@threads for i = 2:KS.pSpace.nx-1
+    @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
         if KS.set.space[1:4] == "1d1f"
-            @inbounds ctr[i].sf .= reconstruct3(
+            ctr[i].sf .= reconstruct3(
                 ctr[i-1].f,
                 ctr[i].f,
                 ctr[i+1].f,
@@ -455,7 +438,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
         elseif KS.set.space[1:4] == "1d2f"
-            @inbounds ctr[i].sh .= reconstruct3(
+            ctr[i].sh .= reconstruct3(
                 ctr[i-1].h,
                 ctr[i].h,
                 ctr[i+1].h,
@@ -463,7 +446,7 @@ function reconstruct!(
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            @inbounds ctr[i].sb .= reconstruct3(
+            ctr[i].sb .= reconstruct3(
                 ctr[i-1].b,
                 ctr[i].b,
                 ctr[i+1].b,
@@ -472,7 +455,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
         elseif KS.set.space[1:4] == "1d4f"
-            @inbounds ctr[i].sh0 .= reconstruct3(
+            ctr[i].sh0 .= reconstruct3(
                 ctr[i-1].h0,
                 ctr[i].h0,
                 ctr[i+1].h0,
@@ -480,7 +463,7 @@ function reconstruct!(
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            @inbounds ctr[i].sh1 .= reconstruct3(
+            ctr[i].sh1 .= reconstruct3(
                 ctr[i-1].h1,
                 ctr[i].h1,
                 ctr[i+1].h1,
@@ -488,7 +471,7 @@ function reconstruct!(
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            @inbounds ctr[i].sh2 .= reconstruct3(
+            ctr[i].sh2 .= reconstruct3(
                 ctr[i-1].h2,
                 ctr[i].h2,
                 ctr[i+1].h2,
@@ -496,7 +479,7 @@ function reconstruct!(
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            @inbounds ctr[i].sh3 .= reconstruct3(
+            ctr[i].sh3 .= reconstruct3(
                 ctr[i-1].h3,
                 ctr[i].h3,
                 ctr[i+1].h3,
@@ -511,9 +494,10 @@ function reconstruct!(
 end
 
 
-# ------------------------------------------------------------
-# Evolution
-# ------------------------------------------------------------
+"""
+Evolution
+
+"""
 function evolve!(
     KS::SolverSet,
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
@@ -527,9 +511,9 @@ function evolve!(
 
     if KS.set.space == "1d1f1v"
 
-        Threads.@threads for i = 1:KS.pSpace.nx+1
-            @inbounds flux_kfvs!(
-                face[i].fw, 
+        @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+            flux_kfvs!(
+                face[i].fw,
                 face[i].ff,
                 ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf,
                 ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
@@ -543,9 +527,9 @@ function evolve!(
 
     elseif KS.set.space == "1d1f3v"
 
-        Threads.@threads for i = 1:KS.pSpace.nx+1
-            @inbounds flux_kfvs!(
-                face[i].fw, 
+        @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+            flux_kfvs!(
+                face[i].fw,
                 face[i].ff,
                 ctr[i-1].f .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sf,
                 ctr[i].f .- 0.5 .* ctr[i].dx .* ctr[i].sf,
@@ -561,9 +545,9 @@ function evolve!(
 
     elseif KS.set.space[1:4] == "1d2f"
 
-        Threads.@threads for i = 1:KS.pSpace.nx+1
-            @inbounds flux_kcu!(
-                face[i].fw, 
+        @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+            flux_kcu!(
+                face[i].fw,
                 face[i].fh,
                 face[i].fb,
                 ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
@@ -586,8 +570,8 @@ function evolve!(
     elseif KS.set.space[1:4] == "1d4f"
 
         if KS.set.nSpecies == 2
-            Threads.@threads for i = 2:KS.pSpace.nx
-                @inbounds flux_kcu!(
+            @inbounds Threads.@threads for i = 2:KS.pSpace.nx
+                flux_kcu!(
                     face[i].fw,
                     face[i].fh0,
                     face[i].fh1,
@@ -615,8 +599,8 @@ function evolve!(
                     dt,
                 )
 
-                @inbounds flux_em!(
-                    face[i].femL, 
+                flux_em!(
+                    face[i].femL,
                     face[i].femR,
                     ctr[i-2].E,
                     ctr[i-2].B,
@@ -648,24 +632,25 @@ function evolve!(
 end
 
 
-# ------------------------------------------------------------
-# Update
-# ------------------------------------------------------------
+"""
+Update flow variables
+
+"""
 function update!(
     KS::SolverSet,
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
     face::Array{<:AbstractInterface1D,1},
     dt::Real,
     residual::Array{<:AbstractFloat,1};
-    collision=:bgk::Symbol,
+    collision = :bgk::Symbol,
 )
 
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
 
-    Threads.@threads for i = 2:KS.pSpace.nx-1
+    @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
         if KS.set.space == "1d1f1v"
-            @inbounds step!(
+            step!(
                 face[i].fw,
                 face[i].ff,
                 ctr[i].w,
@@ -686,7 +671,7 @@ function update!(
                 collision,
             )
         elseif KS.set.space == "1d1f3v"
-            @inbounds step!(
+            step!(
                 face[i].fw,
                 face[i].ff,
                 ctr[i].w,
@@ -709,7 +694,7 @@ function update!(
                 collision,
             )
         elseif KS.set.space == "1d2f1v"
-            @inbounds step!(
+            step!(
                 face[i].fw,
                 face[i].fh,
                 face[i].fb,
@@ -754,9 +739,9 @@ end
 # ------------------------------------------------------------
 
 """
-step!(fwL, w, prim, fwR, γ, dx, RES, AVG)
+Update flow variables with finite volume formulation
 
-update flow variables with finite volume formulation
+`step!(fwL, w, prim, fwR, γ, dx, RES, AVG)`
 
 """
 function step!(
@@ -889,11 +874,8 @@ function step!(
     #--- update distribution function ---#
     for k in axes(wVelo, 3), j in axes(vVelo, 2), i in axes(uVelo, 1)
         f[i, j, k] =
-            (
-                f[i, j, k] +
-                (ffL[i, j, k] - ffR[i, j, k]) / dx +
-                dt / τ * M[i, j, k]
-            ) / (1.0 + dt / τ)
+            (f[i, j, k] + (ffL[i, j, k] - ffR[i, j, k]) / dx + dt / τ * M[i, j, k]) /
+            (1.0 + dt / τ)
     end
 
 end
