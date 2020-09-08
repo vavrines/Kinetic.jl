@@ -452,7 +452,13 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
     f::B
     sf::B
 
-    function ControlVolume1D1F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)
+    function ControlVolume1D1F(
+        X::Real,
+        DX::Real,
+        W::AbstractArray,
+        PRIM::AbstractArray,
+        F::AbstractArray,
+    )
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -671,7 +677,14 @@ mutable struct ControlVolume2D{F,A,B} <: AbstractControlVolume2D
     prim::A
     sw::B
 
-    function ControlVolume2D(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray)
+    function ControlVolume2D(
+        X::Real,
+        DX::Real,
+        Y::Real,
+        DY::Real,
+        W::AbstractArray,
+        PRIM::AbstractArray,
+    )
 
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -864,31 +877,27 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
     femR::C
 
     function Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})
-
-        fw = zeros(typeof(w[1]), axes(w))
-        fh0 = zeros(typeof(f[1]), axes(f))
-        fh1 = zeros(typeof(f[1]), axes(f))
-        fh2 = zeros(typeof(f[1]), axes(f))
-        fh3 = zeros(typeof(f[1]), axes(f))
-        femL = zeros(typeof(E), 8)
-        femR = zeros(typeof(E), 8)
+        fw = zeros(eltype(w), axes(w))
+        fh0 = zeros(eltype(f), axes(f))
+        fh1 = zeros(eltype(f), axes(f))
+        fh2 = zeros(eltype(f), axes(f))
+        fh3 = zeros(eltype(f), axes(f))
+        femL = zeros(eltype(E), 8)
+        femR = zeros(eltype(E), 8)
 
         new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, fh3, femL, femR)
-
     end
 
     function Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})
-
-        fw = zeros(typeof(w[1]), axes(w))
-        fh0 = zeros(typeof(f[1]), axes(f))
-        fh1 = zeros(typeof(f[1]), axes(f))
-        fh2 = zeros(typeof(f[1]), axes(f))
-        fh3 = zeros(typeof(f[1]), axes(f))
-        femL = zeros(typeof(E), 8, axes(E, 2))
-        femR = zeros(typeof(E), 8, axes(E, 2))
+        fw = zeros(eltype(w), axes(w))
+        fh0 = zeros(eltype(f), axes(f))
+        fh1 = zeros(eltype(f), axes(f))
+        fh2 = zeros(eltype(f), axes(f))
+        fh3 = zeros(eltype(f), axes(f))
+        femL = zeros(eltype(E), 8, axes(E, 2))
+        femR = zeros(eltype(E), 8, axes(E, 2))
 
         new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, fh3, femL, femR)
-
     end
 
 end
