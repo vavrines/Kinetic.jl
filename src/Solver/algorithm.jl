@@ -439,7 +439,7 @@ function reconstruct!(
             ctr[i+1].w,
             0.5 * (ctr[i-1].dx + ctr[i].dx),
             0.5 * (ctr[i].dx + ctr[i+1].dx),
-            KS.set.limiter,
+            Symbol(KS.set.limiter),
         )
     end
 
@@ -452,7 +452,7 @@ function reconstruct!(
                 ctr[i+1].f,
                 0.5 * (ctr[i-1].dx + ctr[i].dx),
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
-                KS.set.limiter,
+                Symbol(KS.set.limiter),
             )
         elseif KS.set.space[1:4] == "1d2f"
             @inbounds ctr[i].sh .= reconstruct3(
@@ -461,7 +461,7 @@ function reconstruct!(
                 ctr[i+1].h,
                 0.5 * (ctr[i-1].dx + ctr[i].dx),
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
-                KS.set.limiter,
+                Symbol(KS.set.limiter),
             )
             @inbounds ctr[i].sb .= reconstruct3(
                 ctr[i-1].b,
@@ -469,7 +469,7 @@ function reconstruct!(
                 ctr[i+1].b,
                 0.5 * (ctr[i-1].dx + ctr[i].dx),
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
-                KS.set.limiter,
+                Symbol(KS.set.limiter),
             )
         elseif KS.set.space[1:4] == "1d4f"
             @inbounds ctr[i].sh0 .= reconstruct3(
@@ -478,7 +478,7 @@ function reconstruct!(
                 ctr[i+1].h0,
                 0.5 * (ctr[i-1].dx + ctr[i].dx),
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
-                KS.set.limiter,
+                Symbol(KS.set.limiter),
             )
             @inbounds ctr[i].sh1 .= reconstruct3(
                 ctr[i-1].h1,
@@ -486,7 +486,7 @@ function reconstruct!(
                 ctr[i+1].h1,
                 0.5 * (ctr[i-1].dx + ctr[i].dx),
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
-                KS.set.limiter,
+                Symbol(KS.set.limiter),
             )
             @inbounds ctr[i].sh2 .= reconstruct3(
                 ctr[i-1].h2,
@@ -494,7 +494,7 @@ function reconstruct!(
                 ctr[i+1].h2,
                 0.5 * (ctr[i-1].dx + ctr[i].dx),
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
-                KS.set.limiter,
+                Symbol(KS.set.limiter),
             )
             @inbounds ctr[i].sh3 .= reconstruct3(
                 ctr[i-1].h3,
@@ -502,7 +502,7 @@ function reconstruct!(
                 ctr[i+1].h3,
                 0.5 * (ctr[i-1].dx + ctr[i].dx),
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
-                KS.set.limiter,
+                Symbol(KS.set.limiter),
             )
 
         end
