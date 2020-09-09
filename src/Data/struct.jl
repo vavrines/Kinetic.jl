@@ -1275,6 +1275,40 @@ mutable struct Interface1D2F{A,B} <: AbstractInterface1D
 end
 
 
+mutable struct Interface1D3F{A,B,C} <: AbstractInterface1D
+
+    fw::A
+    fh0::B
+    fh1::B
+    fh2::B
+    femL::C
+    femR::C
+
+    function Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})
+        fw = zeros(eltype(w), axes(w))
+        fh0 = zeros(eltype(f), axes(f))
+        fh1 = zeros(eltype(f), axes(f))
+        fh2 = zeros(eltype(f), axes(f))
+        femL = zeros(eltype(E), 8)
+        femR = zeros(eltype(E), 8)
+
+        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, femL, femR)
+    end
+
+    function Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})
+        fw = zeros(eltype(w), axes(w))
+        fh0 = zeros(eltype(f), axes(f))
+        fh1 = zeros(eltype(f), axes(f))
+        fh2 = zeros(eltype(f), axes(f))
+        femL = zeros(eltype(E), 8, axes(E, 2))
+        femR = zeros(eltype(E), 8, axes(E, 2))
+
+        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, femL, femR)
+    end
+
+end
+
+
 mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
 
     fw::A
