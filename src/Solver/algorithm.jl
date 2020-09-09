@@ -71,7 +71,7 @@ struct SolverSet <: AbstractSolverSet
 
                 μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
 
-                gas = GasProperty(
+                gas = Gas(
                     knudsen,
                     mach,
                     prandtl,
@@ -123,7 +123,7 @@ struct SolverSet <: AbstractSolverSet
 
                 μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
 
-                gas = GasProperty(
+                gas = Gas(
                     knudsen,
                     mach,
                     prandtl,
@@ -179,7 +179,7 @@ struct SolverSet <: AbstractSolverSet
 
                 vSpace = MVSpace1D(umin, umax, v0, v1, nu, vMeshType, nug)
 
-                gas = PlasmaProperty(
+                gas = Plasma1D(
                     [knudsen, kne],
                     mach,
                     prandtl,
@@ -254,7 +254,7 @@ struct SolverSet <: AbstractSolverSet
 
                 μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
 
-                gas = GasProperty(
+                gas = Gas(
                     knudsen,
                     mach,
                     prandtl,
