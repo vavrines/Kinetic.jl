@@ -864,36 +864,61 @@ function flux_kfvs!(
     sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,3},
 )
 
-    for j in axes(fw, 2)
-        _fw = @view fw[:, j]
-        _fh0 = @view fh0[:, :, j]
-        _fh1 = @view fh1[:, :, j]
-        _fh2 = @view fh2[:, :, j]
+    #--- reconstruct initial distribution ---#
+    δ = heaviside.(u)
 
-        flux_kfvs!(
-            _fw,
-            _fh0,
-            _fh1,
-            _fh2,
-            h0L[:, :, j],
-            h1L[:, :, j],
-            h2L[:, :, j],
-            h0R[:, :, j],
-            h1R[:, :, j],
-            h2R[:, :, j],
-            u[:, :, j],
-            v[:, :, j],
-            ω[:, :, j],
-            dt,
-            len,
-            sh0L[:, :, j],
-            sh1L[:, :, j],
-            sh2L[:, :, j],
-            sh0R[:, :, j],
-            sh1R[:, :, j],
-            sh2R[:, :, j],
-        )
+    h0 = @. h0L * δ + h0R * (1.0 - δ)
+    h1 = @. h1L * δ + h1R * (1.0 - δ)
+    h2 = @. h2L * δ + h2R * (1.0 - δ)
+
+    sh0 = @. sh0L * δ + sh0R * (1.0 - δ)
+    sh1 = @. sh1L * δ + sh1R * (1.0 - δ)
+    sh2 = @. sh2L * δ + sh2R * (1.0 - δ)
+
+    for j = 1:2
+        fw[1, j] =
+            dt * sum(ω[:, :, j] .* u[:, :, j] .* h0[:, :, j]) -
+            0.5 * dt^2 * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh0[:, :, j])
+        fw[2, j] =
+            dt * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* h0[:, :, j]) -
+            0.5 * dt^2 * sum(ω[:, :, j] .* u[:, :, j] .^ 3 .* sh0[:, :, j])
+        fw[3, j] =
+            dt * sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j]) -
+            0.5 * dt^2 * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* v[:, :, j] .* sh0[:, :, j])
+        fw[4, j] =
+            dt * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j]) -
+            0.5 * dt^2 * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh1[:, :, j])
+        fw[5, j] =
+            dt *
+            0.5 *
+            (
+                sum(
+                    ω[:, :, j] .* u[:, :, j] .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .*
+                    h0[:, :, j],
+                ) + sum(ω[:, :, j] .* u[:, :, j] .* h2[:, :, j])
+            ) -
+            0.5 *
+            dt^2 *
+            0.5 *
+            (
+                sum(
+                    ω[:, :, j] .* u[:, :, j] .^ 2 .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .*
+                    sh0[:, :, j],
+                ) + sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh2[:, :, j])
+            )
+
+        @. fh0[:, :, j] =
+            dt * u[:, :, j] * h0[:, :, j] - 0.5 * dt^2 * u[:, :, j]^2 * sh0[:, :, j]
+        @. fh1[:, :, j] =
+            dt * u[:, :, j] * h1[:, :, j] - 0.5 * dt^2 * u[:, :, j]^2 * sh1[:, :, j]
+        @. fh2[:, :, j] =
+            dt * u[:, :, j] * h2[:, :, j] - 0.5 * dt^2 * u[:, :, j]^2 * sh2[:, :, j]
     end
+
+    @. fw *= len
+    @. fh0 *= len
+    @. fh1 *= len
+    @. fh2 *= len
 
 end
 
