@@ -781,14 +781,14 @@ mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
     function ControlVolume1D3F(
         X::Real,
         DX::Real,
-        W::AbstractArray,
-        PRIM::AbstractArray,
-        H0::AbstractArray,
-        H1::AbstractArray,
-        H2::AbstractArray,
-        E0::AbstractArray,
-        B0::AbstractArray,
-        L::AbstractArray,
+        W::AbstractArray{<:Real,2},
+        PRIM::AbstractArray{<:Real,2},
+        H0::AbstractArray{<:AbstractFloat,2},
+        H1::AbstractArray{<:AbstractFloat,2},
+        H2::AbstractArray{<:AbstractFloat,2},
+        E0::AbstractArray{<:AbstractFloat,1},
+        B0::AbstractArray{<:AbstractFloat,1},
+        L::AbstractArray{<:AbstractFloat,2},
     )
         x = deepcopy(X)
         dx = deepcopy(DX)
@@ -828,6 +828,62 @@ mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
             ψ,
             lorenz,
         )
+    end
+
+    # stochastic
+    function ControlVolume1D3F(
+        X::Real,
+        DX::Real,
+        W::AbstractArray{<:Real,3},
+        PRIM::AbstractArray{<:Real,3},
+        H0::AbstractArray{<:AbstractFloat,3},
+        H1::AbstractArray{<:AbstractFloat,3},
+        H2::AbstractArray{<:AbstractFloat,3},
+        H3::AbstractArray{<:AbstractFloat,3},
+        E0::AbstractArray{<:AbstractFloat,2},
+        B0::AbstractArray{<:AbstractFloat,2},
+        L::AbstractArray{<:AbstractFloat,3},
+    )
+
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(typeof(W[1]), axes(W))
+
+        h0 = deepcopy(H0)
+        h1 = deepcopy(H1)
+        h2 = deepcopy(H2)
+        sh0 = zeros(eltype(H0), axes(H0))
+        sh1 = zeros(eltype(H1), axes(H1))
+        sh2 = zeros(eltype(H2), axes(H2))
+
+        E = deepcopy(E0)
+        B = deepcopy(B0)
+        ϕ = zeros(axes(E, 2)) # here is difference
+        ψ = zeros(axes(B, 2))
+        lorenz = deepcopy(L)
+
+        new{typeof(x),typeof(w),typeof(h0),typeof(E),typeof(ϕ),typeof(lorenz)}(
+            x,
+            dx,
+            w,
+            prim,
+            sw,
+            h0,
+            h1,
+            h2,
+            sh0,
+            sh1,
+            sh2,
+            E,
+            B,
+            ϕ,
+            ψ,
+            lorenz,
+        )
+
     end
 
 end
