@@ -12,7 +12,7 @@ export AbstractFlux, AbstractFlux1D, AbstractFlux2D
 
 export Setup
 export Gas, Plasma1D, Plasma2D
-export IB, IB1F, IB2F, IB4F
+export IB, IB1F, IB2F, IB3F, IB4F
 export ControlVolume1D, ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
 export ControlVolume2D, ControlVolume2D1F, ControlVolume2D2F, ControlVolume2D3F
 export Interface1D, Interface1D1F, Interface1D2F, Interface1D4F
