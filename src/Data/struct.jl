@@ -1283,6 +1283,10 @@ mutable struct Interface1D3F{A,B,C} <: AbstractInterface1D
     fh2::B
     femL::C
     femR::C
+    femLU::C
+    femLD::C
+    femRU::C
+    femRD::C
 
     function Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})
         fw = zeros(eltype(w), axes(w))
@@ -1291,8 +1295,12 @@ mutable struct Interface1D3F{A,B,C} <: AbstractInterface1D
         fh2 = zeros(eltype(f), axes(f))
         femL = zeros(eltype(E), 8)
         femR = zeros(eltype(E), 8)
+        femLU = zeros(eltype(E), 8)
+        femLD = zeros(eltype(E), 8)
+        femRU = zeros(eltype(E), 8)
+        femRD = zeros(eltype(E), 8)
 
-        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, femL, femR)
+        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, femL, femR, femLU, femLD, femRU, femRD)
     end
 
     function Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})
@@ -1302,8 +1310,12 @@ mutable struct Interface1D3F{A,B,C} <: AbstractInterface1D
         fh2 = zeros(eltype(f), axes(f))
         femL = zeros(eltype(E), 8, axes(E, 2))
         femR = zeros(eltype(E), 8, axes(E, 2))
+        femLU = zeros(eltype(E), 8, axes(E, 2))
+        femLD = zeros(eltype(E), 8, axes(E, 2))
+        femRU = zeros(eltype(E), 8, axes(E, 2))
+        femRD = zeros(eltype(E), 8, axes(E, 2))
 
-        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, femL, femR)
+        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, femL, femR, femLU, femLD, femRU, femRD)
     end
 
 end
