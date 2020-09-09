@@ -755,6 +755,84 @@ mutable struct ControlVolume1D2F{F,A,B} <: AbstractControlVolume1D
 end
 
 
+mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
+
+    x::F
+    dx::F
+
+    w::A
+    prim::A
+    sw::A
+
+    h0::B
+    h1::B
+    h2::B
+    sh0::B
+    sh1::B
+    sh2::B
+
+    E::C
+    B::C
+    ϕ::D
+    ψ::D
+    lorenz::E
+
+    # deterministic
+    function ControlVolume1D3F(
+        X::Real,
+        DX::Real,
+        W::AbstractArray,
+        PRIM::AbstractArray,
+        H0::AbstractArray,
+        H1::AbstractArray,
+        H2::AbstractArray,
+        E0::AbstractArray,
+        B0::AbstractArray,
+        L::AbstractArray,
+    )
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(typeof(W[1]), axes(W))
+
+        h0 = deepcopy(H0)
+        h1 = deepcopy(H1)
+        h2 = deepcopy(H2)
+        sh0 = zeros(eltype(H0), axes(H0))
+        sh1 = zeros(eltype(H1), axes(H1))
+        sh2 = zeros(eltype(H2), axes(H2))
+
+        E = deepcopy(E0)
+        B = deepcopy(B0)
+        ϕ = 0.0
+        ψ = 0.0
+        lorenz = deepcopy(L)
+
+        new{typeof(x),typeof(w),typeof(h0),typeof(E),typeof(ϕ),typeof(lorenz)}(
+            x,
+            dx,
+            w,
+            prim,
+            sw,
+            h0,
+            h1,
+            h2,
+            sh0,
+            sh1,
+            sh2,
+            E,
+            B,
+            ϕ,
+            ψ,
+            lorenz,
+        )
+    end
+
+end
+
+
 mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
 
     x::F
