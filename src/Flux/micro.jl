@@ -13,15 +13,9 @@ Gas kinetic Navier-Stokes flux
 * @return: scalar flux
 
 """
-function flux_gks(
-    u::Real,
-    μ::Real,
-    dt::Real,
-    su = 0.0::Real,
-    a = 0::Real,
-)
+function flux_gks(u::Real, μ::Real, dt::Real, su = 0.0::Real, a = 0::Real)
 
-    prim = ifelse(a==0, conserve_prim(u), conserve_prim(u, a))
+    prim = ifelse(a == 0, conserve_prim(u), conserve_prim(u, a))
 
     Mu, MuL, MuR = gauss_moments(prim)
 
@@ -63,14 +57,14 @@ function flux_gks(
     a = 0::Real,
 )
 
-    primL = ifelse(a==0, conserve_prim(uL), conserve_prim(uL, a))
-    primR = ifelse(a==0, conserve_prim(uR), conserve_prim(uR, a))
+    primL = ifelse(a == 0, conserve_prim(uL), conserve_prim(uL, a))
+    primR = ifelse(a == 0, conserve_prim(uR), conserve_prim(uR, a))
 
     Mu1, MuL1, MuR1 = gauss_moments(primL)
     Mu2, MuL2, MuR2 = gauss_moments(primR)
 
     u = primL[1] * moments_conserve(MuL1, 0) + primR[1] * moments_conserve(MuR2, 0)
-    prim = ifelse(a==0, conserve_prim(u), conserve_prim(u, a))
+    prim = ifelse(a == 0, conserve_prim(u), conserve_prim(u, a))
     tau = 2.0 * abs(uL - uR) / (abs(uL) + abs(uR)) * dt + 2.0 * μ
 
     faL = pdf_slope(uL, suL)
@@ -786,12 +780,130 @@ function flux_kfvs!(
 end
 
 
+# ------------------------------------------------------------
+# 2D3F flux
+# ------------------------------------------------------------
+function flux_kfvs!(
+    fw::AbstractArray{<:AbstractFloat,1},
+    fh0::AbstractArray{<:AbstractFloat,2},
+    fh1::AbstractArray{<:AbstractFloat,2},
+    fh2::AbstractArray{<:AbstractFloat,2},
+    h0L::AbstractArray{<:AbstractFloat,2},
+    h1L::AbstractArray{<:AbstractFloat,2},
+    h2L::AbstractArray{<:AbstractFloat,2},
+    h0R::AbstractArray{<:AbstractFloat,2},
+    h1R::AbstractArray{<:AbstractFloat,2},
+    h2R::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    dt::Real,
+    len::Real,
+    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,2},
+    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,2},
+    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,2},
+    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,2},
+    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,2},
+    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,2},
+)
+
+    #--- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    h0 = @. h0L * δ + h0R * (1.0 - δ)
+    h1 = @. h1L * δ + h1R * (1.0 - δ)
+    h2 = @. h2L * δ + h2R * (1.0 - δ)
+    sh0 = @. sh0L * δ + sh0R * (1.0 - δ)
+    sh1 = @. sh1L * δ + sh1R * (1.0 - δ)
+    sh2 = @. sh2L * δ + sh2R * (1.0 - δ)
+
+    #--- calculate fluxes ---#
+    fw[1] = dt * sum(ω .* u .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh0)
+    fw[2] = dt * sum(ω .* u .^ 2 .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh0)
+    fw[3] = dt * sum(ω .* u .* v .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sh0)
+    fw[4] = dt * sum(ω .* u .* h1) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh1)
+    fw[5] =
+        dt * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h0) + sum(ω .* u .* h2)) -
+        0.5 *
+        dt^2 *
+        0.5 *
+        (sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sh0) + sum(ω .* u .^ 2 .* sh2))
+
+    fw .*= len
+    @. fh0 = (dt * u * h0 - 0.5 * dt^2 * u^2 * sh0) * len
+    @. fh1 = (dt * u * h1 - 0.5 * dt^2 * u^2 * sh1) * len
+    @. fh2 = (dt * u * h2 - 0.5 * dt^2 * u^2 * sh2) * len
+
+end
+
+
+# ------------------------------------------------------------
+# 2D3F flux with AAP model
+# ------------------------------------------------------------
+function flux_kfvs!(
+    fw::AbstractArray{<:AbstractFloat,2},
+    fh0::AbstractArray{<:AbstractFloat,3},
+    fh1::AbstractArray{<:AbstractFloat,3},
+    fh2::AbstractArray{<:AbstractFloat,3},
+    h0L::AbstractArray{<:AbstractFloat,3},
+    h1L::AbstractArray{<:AbstractFloat,3},
+    h2L::AbstractArray{<:AbstractFloat,3},
+    h0R::AbstractArray{<:AbstractFloat,3},
+    h1R::AbstractArray{<:AbstractFloat,3},
+    h2R::AbstractArray{<:AbstractFloat,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    ω::AbstractArray{<:AbstractFloat,3},
+    dt::Real,
+    len::Real,
+    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,3},
+    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,3},
+    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,3},
+    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,3},
+    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,3},
+    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,3},
+)
+
+    for j in axes(fw, 2)
+        _fw = @view fw[:, j]
+        _fh0 = @view fh0[:, :, j]
+        _fh1 = @view fh1[:, :, j]
+        _fh2 = @view fh2[:, :, j]
+
+        flux_kfvs!(
+            _fw,
+            _fh0,
+            _fh1,
+            _fh2,
+            h0L[:, :, j],
+            h1L[:, :, j],
+            h2L[:, :, j],
+            h0R[:, :, j],
+            h1R[:, :, j],
+            h2R[:, :, j],
+            u[:, :, j],
+            v[:, :, j],
+            ω[:, :, j],
+            dt,
+            len,
+            sh0L[:, :, j],
+            sh1L[:, :, j],
+            sh2L[:, :, j],
+            sh0R[:, :, j],
+            sh1R[:, :, j],
+            sh2R[:, :, j],
+        )
+    end
+
+end
+
+
 """
 Kinetic central-upwind (KCU) method
 
-* @param[in] : particle distribution functions and their slopes at left/right sides of interface
-* @param[in] : particle velocity quadrature points and weights
-* @param[in] : time step and cell size
+* @arg: particle distribution functions and their slopes at left/right sides of interface
+* @arg: particle velocity quadrature points and weights
+* @arg: time step and cell size
 
 """
 function flux_kcu!(
@@ -1405,12 +1517,118 @@ function flux_kcu!(
 end
 
 
+# ------------------------------------------------------------
+# 2D3F flux with AAP model
+# ------------------------------------------------------------
+function flux_kcu!(
+    fw::AbstractArray{<:AbstractFloat,2},
+    fh0::AbstractArray{<:AbstractFloat,3},
+    fh1::AbstractArray{<:AbstractFloat,3},
+    fh2::AbstractArray{<:AbstractFloat,3},
+    wL::AbstractArray{<:Real,2},
+    h0L::AbstractArray{<:AbstractFloat,3},
+    h1L::AbstractArray{<:AbstractFloat,3},
+    h2L::AbstractArray{<:AbstractFloat,3},
+    wR::AbstractArray{<:Real,2},
+    h0R::AbstractArray{<:AbstractFloat,3},
+    h1R::AbstractArray{<:AbstractFloat,3},
+    h2R::AbstractArray{<:AbstractFloat,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    ω::AbstractArray{<:AbstractFloat,3},
+    γ::Real,
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    kn::Real,
+    dt::Real,
+    len::Real,
+)
+
+    #--- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+    h0 = @. h0L * δ + h0R * (1.0 - δ)
+    h1 = @. h1L * δ + h1R * (1.0 - δ)
+    h2 = @. h2L * δ + h2R * (1.0 - δ)
+
+    primL = mixture_conserve_prim(wL, γ)
+    primR = mixture_conserve_prim(wR, γ)
+
+    #--- construct interface distribution ---#
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = mixture_gauss_moments(primL, inK)
+    Muv1 = mixture_moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
+    Muv2 = mixture_moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    prim = mixture_conserve_prim(w, γ)
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
+    tau +=
+        abs(primL[1, 2] / primL[end, 2] - primR[1, 2] / primR[end, 2]) /
+        (primL[1, 2] / primL[end, 2] + primR[1, 2] / primR[end, 2]) *
+        dt *
+        2.0
+
+    Mt = zeros(2, 2)
+    @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
+    @. Mt[1, :] = dt - Mt[2, :] # M0
+
+    #--- calculate interface flux ---#
+    Mu, Mv, Mxi, MuL, MuR = mixture_gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = mixture_moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    for j = 1:2
+        @. fw[:, j] = Mt[1, j] * prim[1, j] * Muv[:, j]
+    end
+
+    # flux from f0
+    H0 = mixture_maxwellian(u, v, prim)
+    H1 = similar(H0)
+    H2 = similar(H2)
+    for j = 1:2
+        H1[:, :, j] = H0[:, :, j] .* prim[4, j]
+        H2[:, :, j] .= H0[:, :, j] .* (prim[4, j]^2 + 1.0 / (2.0 * prim[5, j]))
+    end
+
+    for j = 1:2
+        fw[1, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h0[:, :, j])
+        fw[2, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* h0[:, :, j])
+        fw[3, j] += Mt[2, j] * sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j])
+        fw[4, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j])
+        fw[5, j] +=
+            Mt[2, j] *
+            0.5 *
+            (
+                sum(
+                    ω[:, :, j] .* u[:, :, j] .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .*
+                    h0[:, :, j],
+                ) + sum(ω[:, :, j] .* u[:, :, j] .* h2[:, :, j])
+            )
+
+        @. fh0[:, :, j] =
+            Mt[1, j] * u[:, :, j] * H0[:, :, j] + Mt[2, j] * u[:, :, j] * h0[:, :, j]
+        @. fh1[:, :, j] =
+            Mt[1, j] * u[:, :, j] * H1[:, :, j] + Mt[2, j] * u[:, :, j] * h1[:, :, j]
+        @. fh2[:, :, j] =
+            Mt[1, j] * u[:, :, j] * H2[:, :, j] + Mt[2, j] * u[:, :, j] * h2[:, :, j]
+    end
+
+    @. fw *= len
+    @. fh0 *= len
+    @. fh1 *= len
+    @. fh2 *= len
+
+end
+
+
 """
 Unified gas kinetic scheme (UGKS) flux
 
-* @param[in]: particle distribution functions and their slopes at left/right sides of interface
-* @param[in]: particle velocity quadrature points and weights
-* @param[in]: time step
+* @arg: particle distribution functions and their slopes at left/right sides of interface
+* @arg: particle velocity quadrature points and weights
+* @arg: time step
 
 """
 function flux_ugks!(
