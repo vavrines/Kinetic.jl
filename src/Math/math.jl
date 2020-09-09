@@ -250,8 +250,8 @@ end
 
 """
 Gauss Legendre integral for fast spectral method `lgwt(N::Int, a::Real, b::Real)`
-* @param[in]: number of quadrature points N, integral range [a, b]
-* @param[out]: quadrature points x & weights w
+* @arg: number of quadrature points N, integral range [a, b]
+* @arg: quadrature points x & weights w
 
 """
 function lgwt(N::Int, a::Real, b::Real)
@@ -295,4 +295,43 @@ function lgwt(N::Int, a::Real, b::Real)
 
     return x, w
 
+end
+
+
+"""
+Extract subarray except the last column
+
+"""
+function extract_last(a::AbstractArray, idx::Int; mode=:view::Symbol)
+    if mode == :copy
+
+        if ndims(a) == 2
+            sw = a[:, idx]
+        elseif ndims(a) == 3
+            sw = a[:, :, idx]
+        elseif ndims(a) == 4
+            sw = a[:, :, :, idx]
+        elseif ndims(a) == 5
+            sw = a[:, :, :, :, idx]
+        end
+              
+    elseif mode == :view
+
+        if ndims(a) == 2
+            sw = @view a[:, idx]
+        elseif ndims(a) == 3
+            sw = @view a[:, :, idx]
+        elseif ndims(a) == 4
+            sw = @view a[:, :, :, idx]
+        elseif ndims(a) == 5
+            sw = @view a[:, :, :, :, idx]
+        end
+
+    else
+
+        throw("Error in extraction mode setup")
+
+    end
+
+    return sw
 end

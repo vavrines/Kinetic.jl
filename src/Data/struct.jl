@@ -815,6 +815,92 @@ mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
 end
 
 
+mutable struct ControlVolume2D3F{F,A,B,C,D,E,F,G} <: AbstractControlVolume2D
+
+    x::F
+    y::F
+    dx::F
+    dy::F
+
+    w::A
+    prim::A
+    sw::B
+
+    h0::C
+    h1::C
+    h2::C
+    sh0::D
+    sh1::D
+    sh2::D
+
+    E::E
+    B::E
+    ϕ::F
+    ψ::F
+    lorenz::G
+
+    # deterministic & stochastic
+    function ControlVolume2D3F(
+        X::Real,
+        DX::Real,
+        Y::Real,
+        DY::Real,
+        W::AbstractArray,
+        PRIM::AbstractArray,
+        H0::AbstractArray,
+        H1::AbstractArray,
+        H2::AbstractArray,
+        E0::AbstractArray,
+        B0::AbstractArray,
+        L::AbstractArray,
+    )
+        x = deepcopy(X)
+        dx = deepcopy(DX)
+        y = deepcopy(Y)
+        dy = deepcopy(DY)
+
+        w = deepcopy(W)
+        prim = deepcopy(PRIM)
+        sw = zeros(eltype(W), (axes(W)..., Base.OneTo(2))) # 2D
+
+        h0 = deepcopy(H0)
+        h1 = deepcopy(H1)
+        h2 = deepcopy(H2)
+        sh0 = zeros(eltype(H0), (axes(H0)..., Base.OneTo(2)))
+        sh1 = zeros(eltype(H1), (axes(H1)..., Base.OneTo(2)))
+        sh2 = zeros(eltype(H2), (axes(H2)..., Base.OneTo(2)))
+
+        E = deepcopy(E0)
+        B = deepcopy(B0)
+        ϕ = 0.0
+        ψ = 0.0
+        lorenz = deepcopy(L)
+
+        new{typeof(x),typeof(w),typeof(sw),typeof(h0),typeof(sh2),typeof(E),typeof(ϕ),typeof(lorenz)}(
+            x,
+            dx,
+            y,
+            dy,
+            w,
+            prim,
+            sw,
+            h0,
+            h1,
+            h2,
+            sh0,
+            sh1,
+            sh2,
+            E,
+            B,
+            ϕ,
+            ψ,
+            lorenz,
+        )
+    end
+
+end
+
+
 mutable struct Interface1D{A} <: AbstractInterface1D
 
     fw::A

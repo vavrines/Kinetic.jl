@@ -8,10 +8,8 @@ export flux_kcu!
 export flux_ugks!
 export flux_boundary_maxwell!
 
-export flux_lax!
-export flux_hll!
-export flux_roe!
-export flux_em!
+export flux_lax!, flux_hll!, flux_roe!
+export flux_em!, flux_emx!, flux_emy!
 
 include("macro.jl")
 include("micro.jl")

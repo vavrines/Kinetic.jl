@@ -14,7 +14,7 @@ export Setup
 export GasProperty, PlasmaProperty
 export IB, IB1F, IB2F, IB4F
 export ControlVolume1D, ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D4F
-export ControlVolume2D, ControlVolume2D1F, ControlVolume2D2F
+export ControlVolume2D, ControlVolume2D1F, ControlVolume2D2F, ControlVolume2D3F
 export Interface1D, Interface1D1F, Interface1D2F, Interface1D4F
 export Interface2D, Interface2D1F, Interface2D2F
 export Solution1D, Solution1D1F, Solution1D2F
