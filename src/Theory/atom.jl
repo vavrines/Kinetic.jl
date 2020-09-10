@@ -1766,6 +1766,7 @@ function shift_pdf!(
     dt::Real,
 )
     for j in axes(f, 2)
-        shift_pdf!(f[:, j], a[j], du[j], dt)
+        _f = @view f[:, j]
+        shift_pdf!(_f, a[j], du[j], dt)
     end
 end
