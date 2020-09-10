@@ -795,7 +795,7 @@ mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
 
         w = deepcopy(W)
         prim = deepcopy(PRIM)
-        sw = zeros(typeof(W[1]), axes(W))
+        sw = zeros(eltype(H0), axes(W))
 
         h0 = deepcopy(H0)
         h1 = deepcopy(H1)
@@ -839,18 +839,16 @@ mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
         H0::AbstractArray{<:AbstractFloat,3},
         H1::AbstractArray{<:AbstractFloat,3},
         H2::AbstractArray{<:AbstractFloat,3},
-        H3::AbstractArray{<:AbstractFloat,3},
         E0::AbstractArray{<:AbstractFloat,2},
         B0::AbstractArray{<:AbstractFloat,2},
         L::AbstractArray{<:AbstractFloat,3},
     )
-
         x = deepcopy(X)
         dx = deepcopy(DX)
 
         w = deepcopy(W)
         prim = deepcopy(PRIM)
-        sw = zeros(typeof(W[1]), axes(W))
+        sw = zeros(eltype(H0), axes(W))
 
         h0 = deepcopy(H0)
         h1 = deepcopy(H1)
@@ -883,7 +881,6 @@ mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
             ψ,
             lorenz,
         )
-
     end
 
 end
