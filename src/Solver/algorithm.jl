@@ -413,7 +413,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
 
     # macroscopic variables
     @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
-        ctr[i].sw .= reconstruct3(
+        reconstruct3!(
+            ctr[i].sw,
             ctr[i-1].w,
             ctr[i].w,
             ctr[i+1].w,
@@ -426,7 +427,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
     # particle distribution function
     @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
         if KS.set.space[1:4] == "1d1f"
-            ctr[i].sf .= reconstruct3(
+            reconstruct3!(
+                ctr[i].sf,
                 ctr[i-1].f,
                 ctr[i].f,
                 ctr[i+1].f,
@@ -435,7 +437,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 Symbol(KS.set.limiter),
             )
         elseif KS.set.space[1:4] == "1d2f"
-            ctr[i].sh .= reconstruct3(
+            reconstruct3!(
+                ctr[i].sh,
                 ctr[i-1].h,
                 ctr[i].h,
                 ctr[i+1].h,
@@ -443,7 +446,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            ctr[i].sb .= reconstruct3(
+            reconstruct3!(
+                ctr[i].sb,
                 ctr[i-1].b,
                 ctr[i].b,
                 ctr[i+1].b,
@@ -452,7 +456,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 Symbol(KS.set.limiter),
             )
         elseif KS.set.space[1:4] == "1d4f"
-            ctr[i].sh0 .= reconstruct3(
+            reconstruct3!(
+                ctr[i].sh0,
                 ctr[i-1].h0,
                 ctr[i].h0,
                 ctr[i+1].h0,
@@ -460,7 +465,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            ctr[i].sh1 .= reconstruct3(
+            reconstruct3!(
+                ctr[i].sh1,
                 ctr[i-1].h1,
                 ctr[i].h1,
                 ctr[i+1].h1,
@@ -468,7 +474,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            ctr[i].sh2 .= reconstruct3(
+            reconstruct3!(
+                ctr[i].sh2,
                 ctr[i-1].h2,
                 ctr[i].h2,
                 ctr[i+1].h2,
@@ -476,7 +483,8 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-            ctr[i].sh3 .= reconstruct3(
+            reconstruct3!(
+                ctr[i].sh3,
                 ctr[i-1].h3,
                 ctr[i].h3,
                 ctr[i+1].h3,
@@ -484,7 +492,34 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-
+        elseif KS.set.space[1:4] == "1d3f"
+            reconstruct3!(
+                ctr[i].sh0,
+                ctr[i-1].h0,
+                ctr[i].h0,
+                ctr[i+1].h0,
+                0.5 * (ctr[i-1].dx + ctr[i].dx),
+                0.5 * (ctr[i].dx + ctr[i+1].dx),
+                Symbol(KS.set.limiter),
+            )
+            reconstruct3!(
+                ctr[i].sh1,
+                ctr[i-1].h1,
+                ctr[i].h1,
+                ctr[i+1].h1,
+                0.5 * (ctr[i-1].dx + ctr[i].dx),
+                0.5 * (ctr[i].dx + ctr[i+1].dx),
+                Symbol(KS.set.limiter),
+            )
+            reconstruct3!(
+                ctr[i].sh2,
+                ctr[i-1].h2,
+                ctr[i].h2,
+                ctr[i+1].h2,
+                0.5 * (ctr[i-1].dx + ctr[i].dx),
+                0.5 * (ctr[i].dx + ctr[i+1].dx),
+                Symbol(KS.set.limiter),
+            )
         end
     end
 

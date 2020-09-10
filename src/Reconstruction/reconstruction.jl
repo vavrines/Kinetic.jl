@@ -263,6 +263,23 @@ function reconstruct3!(
 
 end
 
+function reconstruct3!(
+    sw::AbstractArray{<:AbstractFloat,4},
+    wL::AbstractArray{<:Real,4},
+    wN::AbstractArray{<:Real,4},
+    wR::AbstractArray{<:Real,4},
+    ΔxL::Real,
+    ΔxR::Real,
+    limiter = :vanleer::Symbol,
+)
+
+    for l in axes(sw, 4), k in axes(sw, 3), j in axes(sw, 2)
+        sjkl = @view sw[:, j, k, l]
+        reconstruct3!(sjkl, wL[:, j, k, l], wN[:, j, k, l], wR[:, j, k, l], ΔxL, ΔxR, limiter)
+    end
+
+end
+
 
 function weno5(wL2::Real, wL1::Real, wN::Real, wR1::Real, wR2::Real)
 
