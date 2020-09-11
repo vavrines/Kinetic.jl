@@ -1577,7 +1577,7 @@ function step!(
     cell.ψ -= dt * (faceL.femR[8] + faceR.femL[8]) / cell.dx
 
     for i=1:3
-        if 1 ∈ vcat(isnan.(cell.E), isnan(cell.B)) 
+        if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B)) 
             @warn "electromagnetic update is NaN"
         end
     end
@@ -1651,8 +1651,8 @@ function step!(
     )
 
     # interspecies interaction
-    prim = deepcopy(cell.prim)
-    #prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    #prim = deepcopy(cell.prim)
+    prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
 
     g = mixture_maxwellian(KS.vSpace.u, prim)
 
