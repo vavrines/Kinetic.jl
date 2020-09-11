@@ -1227,7 +1227,7 @@ function update!(
             )
         elseif KS.set.space[3:end] == "4f1v"
             step!(
-                ks,
+                KS,
                 face[i],
                 ctr[i],
                 face[i+1],
