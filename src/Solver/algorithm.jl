@@ -1044,7 +1044,7 @@ function evolve!(
 
     elseif KS.set.space[3:end] == "4f1v"
 
-        if KS.set.nSpecies == 2
+        if mode == :kcu
             @inbounds Threads.@threads for i = 2:KS.pSpace.nx
                 flux_kcu!(
                     face[i].fw,
@@ -1073,7 +1073,39 @@ function evolve!(
                     KS.gas.Kn[1],
                     dt,
                 )
+            end
+        elseif mode == :kfvs
+            @inbounds Threads.@threads for i = 2:KS.pSpace.nx
+                flux_kfvs!(
+                    face[i].fw,
+                    face[i].fh0,
+                    face[i].fh1,
+                    face[i].fh2,
+                    face[i].fh3,
+                    ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
+                    ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
+                    ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
+                    ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3,
+                    ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
+                    ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
+                    ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
+                    ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
+                    KS.vSpace.u,
+                    KS.vSpace.weights,
+                    dt,
+                    ctr[i-1].sh0,
+                    ctr[i-1].sh1,
+                    ctr[i-1].sh2,
+                    ctr[i-1].sh3,
+                    ctr[i].sh0,
+                    ctr[i].sh1,
+                    ctr[i].sh2,
+                    ctr[i].sh3,
+                )
+            end
+        end
 
+        @inbounds Threads.@threads for i = 2:KS.pSpace.nx
                 flux_em!(
                     face[i].femL,
                     face[i].femR,
@@ -1099,7 +1131,7 @@ function evolve!(
                     KS.gas.ν,
                     dt,
                 )
-            end
+            
         end
 
     end
@@ -1116,7 +1148,7 @@ function update!(
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
     face::Array{<:AbstractInterface1D,1},
     dt::Real,
-    residual::Array{<:AbstractFloat,1};
+    residual::Array{<:AbstractFloat}; # 1D / 2D
     collision = :bgk::Symbol,
 )
 
