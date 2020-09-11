@@ -976,14 +976,15 @@ function evolve!(
     KS::SolverSet,
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
     face::Array{<:AbstractInterface1D,1},
-    dt::Real,
+    dt::Real;
+    mode = :kfvs::Symbol,
 )
 
     #if KS.set.case == "heat"
     #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
     #    end
 
-    if KS.set.space == "1d1f1v"
+    if KS.set.space[3:end] == "1f1v"
 
         @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
             flux_kfvs!(
@@ -999,7 +1000,7 @@ function evolve!(
             )
         end
 
-    elseif KS.set.space == "1d1f3v"
+    elseif KS.set.space[3:end] == "1f3v"
 
         @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
             flux_kfvs!(
@@ -1017,7 +1018,7 @@ function evolve!(
             )
         end
 
-    elseif KS.set.space[1:4] == "1d2f"
+    elseif KS.set.space[3:end] == "2f1v"
 
         @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
             flux_kcu!(
@@ -1041,7 +1042,7 @@ function evolve!(
             )
         end
 
-    elseif KS.set.space[1:4] == "1d4f"
+    elseif KS.set.space[3:end] == "4f1v"
 
         if KS.set.nSpecies == 2
             @inbounds Threads.@threads for i = 2:KS.pSpace.nx
@@ -1069,7 +1070,7 @@ function evolve!(
                     KS.gas.ni,
                     KS.gas.me,
                     KS.gas.ne,
-                    KS.gas.knudsen[1],
+                    KS.gas.Kn[1],
                     dt,
                 )
 
@@ -1192,7 +1193,18 @@ function update!(
                 sumAvg,
                 collision,
             )
+        elseif KS.set.space[3:end] == "4f1v"
+            step!(
+                ks,
+                face[i],
+                ctr[i],
+                face[i+1],
+                dt,
+                sumRes,
+                sumAvg,
+            )
         end
+
     end
 
     #if KS.set.case == "heat"
