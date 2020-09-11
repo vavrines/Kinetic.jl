@@ -1090,9 +1090,9 @@ function evolve!(
                     ctr[i].ψ,
                     ctr[i-1].dx,
                     ctr[i].dx,
-                    KS.gas.A1p,
-                    KS.gas.A1n,
-                    KS.gas.D1,
+                    KS.gas.Ap,
+                    KS.gas.An,
+                    KS.gas.D,
                     KS.gas.sol,
                     KS.gas.χ,
                     KS.gas.ν,
@@ -1414,5 +1414,171 @@ function step!(
         h[i] = (h[i] + (fhL[i] - fhR[i]) / dx + dt / τ * MH[i]) / (1.0 + dt / τ)
         b[i] = (b[i] + (fbL[i] - fbR[i]) / dx + dt / τ * MB[i]) / (1.0 + dt / τ)
     end
+
+end
+
+
+#--- 1D4F1V ---#
+function step!(
+    KS::SolverSet,
+    faceL::Interface1D4F,
+    cell::ControlVolume1D4F,
+    faceR::Interface1D4F,
+    dt::AbstractFloat,
+    RES::Array{<:AbstractFloat,2},
+    AVG::Array{<:AbstractFloat,2},
+)
+
+    #--- update conservative flow variables: step 1 ---#
+    # w^n
+    w_old = deepcopy(cell.w)
+    prim_old = deepcopy(cell.prim)
+
+    # flux -> w^{n+1}
+    @. cell.w += (faceL.fw - faceR.fw) / cell.dx
+    cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
+
+    # temperature protection
+    if min(minimum(cell.prim[5, 1]), minimum(cell.prim[5, 2])) < 0
+        println("warning: temperature update is negative")
+        cell.w .= w_old
+        cell.prim .= prim_old
+    end
+
+    #=
+    # source -> w^{n+1}
+    # DifferentialEquations.jl
+    tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    for j in axes(wRan, 2)
+    prob = ODEProblem( mixture_source, 
+        vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
+        dt,
+        (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
+    sol = solve(prob, Rosenbrock23())
+
+    cell.w[1:5,j,1] .= sol[end][1:5]
+    cell.w[1:5,j,2] .= sol[end][6:10]
+    for k=1:2
+    cell.prim[:,j,k] .= Kinetic.conserve_prim(cell.w[:,j,k], KS.gas.γ)
+    end
+    end
+    =#
+    #=
+    # explicit
+    tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    mprim = get_mixprim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    mw = get_conserved(mprim, KS.gas.γ)
+    for k=1:2
+    cell.w[:,:,k] .+= (mw[:,:,k] .- w_old[:,:,k]) .* dt ./ tau[k]
+    end
+    cell.prim .= get_primitive(cell.w, KS.gas.γ)
+    =#
+
+    #--- update electromagnetic variables ---#
+    # flux -> E^{n+1} & B^{n+1}
+    cell.E[1] -= dt * (faceL.femR[1] + faceR.femL[1]) / cell.dx
+    cell.E[2] -= dt * (faceL.femR[2] + faceR.femL[2]) / cell.dx
+    cell.E[3] -= dt * (faceL.femR[3] + faceR.femL[3]) / cell.dx
+    cell.B[1] -= dt * (faceL.femR[4] + faceR.femL[4]) / cell.dx
+    cell.B[2] -= dt * (faceL.femR[5] + faceR.femL[5]) / cell.dx
+    cell.B[3] -= dt * (faceL.femR[6] + faceR.femL[6]) / cell.dx
+    cell.ϕ -= dt * (faceL.femR[7] + faceR.femL[7]) / cell.dx
+    cell.ψ -= dt * (faceL.femR[8] + faceR.femL[8]) / cell.dx
+
+    # source -> ϕ
+    #@. cell.ϕ += dt * (cell.w[1,:,1] / KS.gas.mi - cell.w[1,:,2] / KS.gas.me) / (KS.gas.lD^2 * KS.gas.rL)
+
+    # source -> U^{n+1}, E^{n+1} and B^{n+1}
+    mr = KS.gas.mi / KS.gas.me
+    A, b = em_coefficients(cell.prim, cell.E, cell.B, mr, KS.gas.lD, KS.gas.rL, dt)
+    x = A \ b
+
+    #--- calculate lorenz force ---#
+    cell.lorenz[1,1] = 0.5 * (x[1] + cell.E[1] + (cell.prim[3,1] + x[5]) * cell.B[3] - (cell.prim[4,1] + x[6]) * cell.B[2]) / KS.gas.rL
+    cell.lorenz[2,1] = 0.5 * (x[2] + cell.E[2] + (cell.prim[4,1] + x[6]) * cell.B[1] - (cell.prim[2,1] + x[4]) * cell.B[3]) / KS.gas.rL
+    cell.lorenz[3,1] = 0.5 * (x[3] + cell.E[3] + (cell.prim[2,1] + x[4]) * cell.B[2] - (cell.prim[3,1] + x[5]) * cell.B[1]) / KS.gas.rL
+    cell.lorenz[1,2] = -0.5 * (x[1] + cell.E[1] + (cell.prim[3,2] + x[8]) * cell.B[3] - (cell.prim[4,2] + x[9]) * cell.B[2]) * mr / KS.gas.rL
+    cell.lorenz[2,2] = -0.5 * (x[2] + cell.E[2] + (cell.prim[4,2] + x[9]) * cell.B[1] - (cell.prim[2,2] + x[7]) * cell.B[3]) * mr / KS.gas.rL
+    cell.lorenz[3,2] = -0.5 * (x[3] + cell.E[3] + (cell.prim[2,2] + x[7]) * cell.B[2] - (cell.prim[3,2] + x[8]) * cell.B[1]) * mr / KS.gas.rL
+
+    cell.E[1] = x[1]
+    cell.E[2] = x[2]
+    cell.E[3] = x[3]
+
+    #--- update conservative flow variables: step 2 ---#
+    cell.prim[2, 1] = x[4]
+    cell.prim[3, 1] = x[5]
+    cell.prim[4, 1] = x[6]
+    cell.prim[2, 2] = x[7]
+    cell.prim[3, 2] = x[8]
+    cell.prim[4, 2] = x[9]
+
+    cell.w .= Kinetic.mixture_prim_conserve(cell.prim, KS.gas.γ)
+
+    #--- update particle distribution function ---#
+    # flux -> f^{n+1}
+    @. cell.h0 += (faceL.fh0 - faceR.fh0) / cell.dx
+    @. cell.h1 += (faceL.fh1 - faceR.fh1) / cell.dx
+    @. cell.h2 += (faceL.fh2 - faceR.fh2) / cell.dx
+    @. cell.h3 += (faceL.fh3 - faceR.fh3) / cell.dx
+
+    # force -> f^{n+1} : step 1
+    for j in axes(cell.h0, 2)
+        _h0 = @view cell.h0[:, j]
+        _h1 = @view cell.h1[:, j]
+        _h2 = @view cell.h2[:, j]
+        _h3 = @view cell.h3[:, j]
+
+        shift_pdf!(_h0, cell.lorenz[1, j], KS.vSpace.du[1, j], dt)
+        shift_pdf!(_h1, cell.lorenz[1, j], KS.vSpace.du[1, j], dt)
+        shift_pdf!(_h2, cell.lorenz[1, j], KS.vSpace.du[1, j], dt)
+        shift_pdf!(_h3, cell.lorenz[1, j], KS.vSpace.du[1, j], dt)
+    end
+
+    # force -> f^{n+1} : step 2
+    for k in axes(cell.h1, 3)
+        @. cell.h3[:,k] += 2. * dt * cell.lorenz[2,k] * cell.h1[:,k] + (dt * cell.lorenz[2,k])^2 * cell.h0[:,k] +
+                                2. * dt * cell.lorenz[3,k] * cell.h2[:,k] + (dt * cell.lorenz[3,k])^2 * cell.h0[:,k]
+        @. cell.h2[:,k] += dt * cell.lorenz[3,k] * cell.h0[:,k]
+        @. cell.h1[:,k] += dt * cell.lorenz[2,k] * cell.h0[:,k]
+    end
+
+    # source -> f^{n+1}
+    tau = aap_hs_collision_time(
+        cell.prim,
+        KS.gas.mi,
+        KS.gas.ni,
+        KS.gas.me,
+        KS.gas.ne,
+        KS.gas.Kn[1],
+    )
+
+    # interspecies interaction
+    prim = deepcopy(cell.prim)
+    #for j in axes(prim, 2)
+    #    prim[:,j,:] .= aap_hs_prim(cell.prim[:,j,:], tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    #end
+
+    g = mixture_maxwellian(KS.vSpace.u, prim)
+
+    # BGK term
+    Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, KS.gas.K)
+    for k in axes(cell.h0, 3)
+        @. cell.h0[:, k] =
+            (cell.h0[:, k] + dt / tau[k] * g[:, k]) / (1.0 + dt / tau[k])
+        @. cell.h1[:, k] =
+            (cell.h1[:, k] + dt / tau[k] * Mv[1, k] * g[:, k]) /
+            (1.0 + dt / tau[k])
+        @. cell.h2[:, k] =
+            (cell.h2[:, k] + dt / tau[k] * Mw[1, k] * g[:, k]) /
+            (1.0 + dt / tau[k])
+        @. cell.h3[:, k] =
+            (cell.h3[:, k] + dt / tau[k] * (Mv[2, k] + Mw[2, k]) * g[:, k]) /
+            (1.0 + dt / tau[k])
+    end
+
+    #--- record residuals ---#
+    @. RES += (w_old - cell.w)^2
+    @. AVG += abs(cell.w)
 
 end
