@@ -1045,7 +1045,7 @@ function evolve!(
     elseif KS.set.space[3:end] == "4f1v"
 
         if mode == :kcu
-            @inbounds Threads.@threads for i = 2:KS.pSpace.nx
+            @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
                 flux_kcu!(
                     face[i].fw,
                     face[i].fh0,
@@ -1075,7 +1075,7 @@ function evolve!(
                 )
             end
         elseif mode == :kfvs
-            @inbounds Threads.@threads for i = 2:KS.pSpace.nx
+            @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
                 flux_kfvs!(
                     face[i].fw,
                     face[i].fh0,
@@ -1105,7 +1105,7 @@ function evolve!(
             end
         end
 
-        @inbounds Threads.@threads for i = 2:KS.pSpace.nx
+        @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
                 flux_em!(
                     face[i].femL,
                     face[i].femR,
@@ -1149,14 +1149,16 @@ function update!(
     face::Array{<:AbstractInterface1D,1},
     dt::Real,
     residual::Array{<:AbstractFloat}; # 1D / 2D
-    collision = :bgk::Symbol,
+    mode = :bgk::Symbol,
+    bc = :extra::Symbol,
 )
 
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
 
-    @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
-        if KS.set.space == "1d1f1v"
+    phase = KS.set.space[3:end]
+    if phase == "1f1v"
+        @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
             step!(
                 face[i].fw,
                 face[i].ff,
@@ -1175,9 +1177,11 @@ function update!(
                 dt,
                 sumRes,
                 sumAvg,
-                collision,
+                mode,
             )
-        elseif KS.set.space == "1d1f3v"
+        end
+    elseif phase == "1f3v"
+        @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
             step!(
                 face[i].fw,
                 face[i].ff,
@@ -1198,9 +1202,11 @@ function update!(
                 dt,
                 sumRes,
                 sumAvg,
-                collision,
+                mode,
             )
-        elseif KS.set.space == "1d2f1v"
+        end
+    elseif phase == "2f1v"
+        @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
             step!(
                 face[i].fw,
                 face[i].fh,
@@ -1223,9 +1229,11 @@ function update!(
                 dt,
                 sumRes,
                 sumAvg,
-                collision,
+                mode,
             )
-        elseif KS.set.space[3:end] == "4f1v"
+        end
+    elseif phase == "4f1v"
+        @inbounds Threads.@threads for i = 1:KS.pSpace.nx
             step!(
                 KS,
                 face[i],
@@ -1236,7 +1244,6 @@ function update!(
                 sumAvg,
             )
         end
-
     end
 
     #if KS.set.case == "heat"
@@ -1247,6 +1254,42 @@ function update!(
 
     for i in eachindex(residual)
         residual[i] = sqrt(sumRes[i] * KS.pSpace.nx) / (sumAvg[i] + 1.e-7)
+    end
+
+    if bc == :extra
+        ng = 1 - first(eachindex(KS.pSpace.x))
+
+        for i in 1:ng
+            @. ctr[1-i].w .= ctr[1].w
+            @. ctr[1-i].prim .= ctr[1].prim
+
+            @. ctr[KS.pSpace.nx+i].w .= ctr[KS.pSpace.nx].w
+            @. ctr[KS.pSpace.nx+i].prim .= ctr[KS.pSpace.nx].prim
+        end
+
+        if phase == "4f1v"
+            for i in 1:ng
+                ctr[1-i].h0 = deepcopy(ctr[1].h0)
+                ctr[1-i].h1 = deepcopy(ctr[1].h1)
+                ctr[1-i].h2 = deepcopy(ctr[1].h2)
+                ctr[1-i].h3 = deepcopy(ctr[1].h3)
+                ctr[1-i].E = deepcopy(ctr[1].E)
+                ctr[1-i].B = deepcopy(ctr[1].B)
+                ctr[1-i].ϕ = deepcopy(ctr[1].ϕ)
+                ctr[1-i].ψ = deepcopy(ctr[1].ψ)
+                ctr[1-i].lorenz = deepcopy(ctr[1].lorenz)
+
+                ctr[KS.pSpace.nx+i].h0 = deepcopy(ctr[KS.pSpace.nx].h0)
+                ctr[KS.pSpace.nx+i].h1 = deepcopy(ctr[KS.pSpace.nx].h1)
+                ctr[KS.pSpace.nx+i].h2 = deepcopy(ctr[KS.pSpace.nx].h2)
+                ctr[KS.pSpace.nx+i].h3 = deepcopy(ctr[KS.pSpace.nx].h3)
+                ctr[KS.pSpace.nx+i].E = deepcopy(ctr[KS.pSpace.nx].E)
+                ctr[KS.pSpace.nx+i].B = deepcopy(ctr[KS.pSpace.nx].B)
+                ctr[KS.pSpace.nx+i].ϕ = deepcopy(ctr[KS.pSpace.nx].ϕ)
+                ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[KS.pSpace.nx].ψ)
+                ctr[KS.pSpace.nx+i].lorenz = deepcopy(ctr[KS.pSpace.nx].lorenz)
+            end
+        end
     end
 
 end
@@ -1483,8 +1526,12 @@ function step!(
     cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
 
     # temperature protection
-    if min(minimum(cell.prim[5, 1]), minimum(cell.prim[5, 2])) < 0
-        println("warning: temperature update is negative")
+    if cell.prim[5, 1] < 0
+        @warn ("ion temperature update is negative")
+        cell.w .= w_old
+        cell.prim .= prim_old
+    elseif cell.prim[5, 2] < 0
+        @warn ("electron temperature update is negative")
         cell.w .= w_old
         cell.prim .= prim_old
     end
@@ -1509,13 +1556,13 @@ function step!(
     =#
     #=
     # explicit
-    tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    mprim = get_mixprim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    mw = get_conserved(mprim, KS.gas.γ)
+    tau = aap_hs_collision_time(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    mprim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    mw = mixture_prim_conserve(mprim, KS.gas.γ)
     for k=1:2
-    cell.w[:,:,k] .+= (mw[:,:,k] .- w_old[:,:,k]) .* dt ./ tau[k]
+        @. cell.w[:,k] += (mw[:,k] - w_old[:,k]) * dt / tau[k]
     end
-    cell.prim .= get_primitive(cell.w, KS.gas.γ)
+    cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
     =#
 
     #--- update electromagnetic variables ---#
@@ -1528,6 +1575,12 @@ function step!(
     cell.B[3] -= dt * (faceL.femR[6] + faceR.femL[6]) / cell.dx
     cell.ϕ -= dt * (faceL.femR[7] + faceR.femL[7]) / cell.dx
     cell.ψ -= dt * (faceL.femR[8] + faceR.femL[8]) / cell.dx
+
+    for i=1:3
+        if 1 ∈ vcat(isnan.(cell.E), isnan(cell.B)) 
+            @warn "electromagnetic update is NaN"
+        end
+    end
 
     # source -> ϕ
     #@. cell.ϕ += dt * (cell.w[1,:,1] / KS.gas.mi - cell.w[1,:,2] / KS.gas.me) / (KS.gas.lD^2 * KS.gas.rL)
@@ -1557,7 +1610,7 @@ function step!(
     cell.prim[3, 2] = x[8]
     cell.prim[4, 2] = x[9]
 
-    cell.w .= Kinetic.mixture_prim_conserve(cell.prim, KS.gas.γ)
+    cell.w .= mixture_prim_conserve(cell.prim, KS.gas.γ)
 
     #--- update particle distribution function ---#
     # flux -> f^{n+1}
@@ -1599,15 +1652,13 @@ function step!(
 
     # interspecies interaction
     prim = deepcopy(cell.prim)
-    #for j in axes(prim, 2)
-    #    prim[:,j,:] .= aap_hs_prim(cell.prim[:,j,:], tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    #end
+    #prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
 
     g = mixture_maxwellian(KS.vSpace.u, prim)
 
     # BGK term
     Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, KS.gas.K)
-    for k in axes(cell.h0, 3)
+    for k in axes(cell.h0, 2)
         @. cell.h0[:, k] =
             (cell.h0[:, k] + dt / tau[k] * g[:, k]) / (1.0 + dt / tau[k])
         @. cell.h1[:, k] =

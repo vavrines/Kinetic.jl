@@ -1,10 +1,10 @@
 """
 Wave propagation method for the Maxwell's equations
 
-* @param[in]: variables in left-left, left, right, and right-right cells
-* @param[in]: eigenmatrix (A), eigenvalue (D)
-* @param[in]: speed of light (sol)
-* @param[in]: auxiliary parameters (χₑ, νᵦ)
+* @arg: variables in left-left, left, right, and right-right cells
+* @arg: eigenmatrix (A), eigenvalue (D)
+* @arg: speed of light (sol)
+* @arg: auxiliary parameters (χₑ, νᵦ)
 
 """
 function flux_em!(
@@ -42,16 +42,16 @@ function flux_em!(
     slop[6, 2] = 0.5 * sol * (BR[3] - BL[3]) + 0.5 * (ER[2] - EL[2])
     slop[1, 3] = 0.5 * sol * χ * (ER[1] - EL[1])
     slop[7, 3] = 0.5 * χ * (ER[1] - EL[1])
-    slop[4, 4] = 0.5 * sol * ν * (BR[1] - BR[1])
-    slop[8, 4] = 0.5 * sol^2 * χ * (BR[1] - BR[1])
+    slop[4, 4] = 0.0
+    slop[8, 4] = 0.0
     slop[3, 5] = -0.5 * sol^2 * (BR[2] - BL[2]) - 0.5 * sol * (ER[3] - EL[3])
     slop[5, 5] = -0.5 * sol * (BR[2] - BL[2]) - 0.5 * (ER[3] - EL[3])
     slop[2, 6] = 0.5 * sol^2 * (BR[3] - BL[3]) - 0.5 * sol * (ER[2] - EL[2])
     slop[6, 6] = -0.5 * sol * (BR[3] - BL[3]) + 0.5 * (ER[2] - EL[2])
     slop[1, 7] = -0.5 * sol * χ * (ER[1] - EL[1])
     slop[7, 7] = 0.5 * χ * (ER[1] - EL[1])
-    slop[4, 8] = -0.5 * sol * ν * (BR[1] - BR[1])
-    slop[8, 8] = 0.5 * sol^2 * χ * (BR[1] - BR[1])
+    slop[4, 8] = 0.0
+    slop[8, 8] = 0.0
 
     limiter = zeros(8, 8)
     limiter[3, 1] = -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
@@ -60,16 +60,16 @@ function flux_em!(
     limiter[6, 2] = 0.5 * sol * (BL[3] - BLL[3]) + 0.5 * (EL[2] - ELL[2])
     limiter[1, 3] = 0.5 * sol * χ * (EL[1] - ELL[1])
     limiter[7, 3] = 0.5 * χ * (EL[1] - ELL[1])
-    limiter[4, 4] = 0.5 * sol * ν * (BL[1] - BL[1])
-    limiter[8, 4] = 0.5 * sol^2 * χ * (BL[1] - BL[1])
+    limiter[4, 4] = 0.0
+    limiter[8, 4] = 0.0
     limiter[3, 5] = -0.5 * sol^2 * (BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
     limiter[5, 5] = -0.5 * sol * (BRR[2] - BR[2]) - 0.5 * (ERR[3] - ER[3])
     limiter[2, 6] = 0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
     limiter[6, 6] = -0.5 * sol * (BRR[3] - BR[3]) + 0.5 * (ERR[2] - ER[2])
     limiter[1, 7] = -0.5 * sol * χ * (ERR[1] - ER[1])
     limiter[7, 7] = 0.5 * χ * (ERR[1] - ER[1])
-    limiter[4, 8] = -0.5 * sol * ν * (BRR[1] - BRR[1])
-    limiter[8, 8] = 0.5 * sol^2 * χ * (BRR[1] - BRR[1])
+    limiter[4, 8] = 0.0
+    limiter[8, 8] = 0.0
 
     for i = 1:8
         limiter_theta = sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)

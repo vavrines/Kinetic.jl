@@ -176,7 +176,7 @@ function flux_kfvs!(
     sh3R = zeros(eltype(h3R), axes(h3R))::AbstractArray{<:AbstractFloat,1},
 )
 
-    # --- upwind reconstruction ---#
+    #--- upwind reconstruction ---#
     δ = heaviside.(u)
 
     h0 = @. h0L * δ + h0R * (1.0 - δ)
