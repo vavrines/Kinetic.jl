@@ -498,9 +498,9 @@ Kinetic flux vector splitting (KFVS) flux
 * 2D1F2V: `flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len, sfL, sfR)`
 * 2D2F2V: `flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, v, ω, dt, len, shL, sbL, shR, sbR)`
 
-* @param[in]: particle distribution functions and their left/right slopes
-* @param[in]: particle velocity quadrature points and weights
-* @param[in]: time step and cell size
+* @arg: particle distribution functions and their left/right slopes
+* @arg: particle velocity quadrature points and weights
+* @arg: time step and cell size
 
 """
 function flux_kfvs!(
@@ -694,6 +694,70 @@ function flux_kfvs!(
 
 end
 
+
+function flux_kfvs!(
+    fw::AbstractArray{<:AbstractFloat,2},
+    fh0::AbstractArray{<:AbstractFloat,2},
+    fh1::AbstractArray{<:AbstractFloat,2},
+    fh2::AbstractArray{<:AbstractFloat,2},
+    fh3::AbstractArray{<:AbstractFloat,2},
+    h0L::AbstractArray{<:AbstractFloat,2},
+    h1L::AbstractArray{<:AbstractFloat,2},
+    h2L::AbstractArray{<:AbstractFloat,2},
+    h3L::AbstractArray{<:AbstractFloat,2},
+    h0R::AbstractArray{<:AbstractFloat,2},
+    h1R::AbstractArray{<:AbstractFloat,2},
+    h2R::AbstractArray{<:AbstractFloat,2},
+    h3R::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    dt::AbstractFloat,
+    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,2},
+    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,2},
+    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,2},
+    sh3L = zeros(eltype(h3L), axes(h3L))::AbstractArray{<:AbstractFloat,2},
+    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,2},
+    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,2},
+    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,2},
+    sh3R = zeros(eltype(h3R), axes(h3R))::AbstractArray{<:AbstractFloat,2},
+)
+
+    for j in axes(fw, 2)
+        _fw = @view fw[:, j]
+        _fh0 = @view fh0[:, j]
+        _fh1 = @view fh1[:, j]
+        _fh2 = @view fh2[:, j]
+        _fh3 = @view fh3[:, j]
+
+        flux_kfvs!(
+            _fw,
+            _fh0,
+            _fh1,
+            _fh2,
+            _fh3,
+            h0L[:, j],
+            h1L[:, j],
+            h2L[:, j],
+            h3L[:, j],
+            h0R[:, j],
+            h1R[:, j],
+            h2R[:, j],
+            h3R[:, j],
+            u[:, j],
+            ω[:, j],
+            dt,
+            sh0L[:, j],
+            sh1L[:, j],
+            sh2L[:, j],
+            sh3L[:, j],
+            sh0R[:, j],
+            sh1R[:, j],
+            sh2R[:, j],
+            sh3R[:, j],
+        )
+    end
+
+end
 
 # ------------------------------------------------------------
 # 2D1F flux
