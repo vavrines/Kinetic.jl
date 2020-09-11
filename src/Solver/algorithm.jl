@@ -384,7 +384,7 @@ function timestep(
         @inbounds Threads.@threads for i = 1:KS.pSpace.nx
             prim = ctr[i].prim
             sos = sound_speed(prim, KS.gas.γ)
-            vmax = max(maximum(KS.quad.u1), maximum(abs.(prim[2, :]))) + sos
+            vmax = max(maximum(KS.vSpace.u1), maximum(abs.(prim[2, :]))) + sos
             tmax = ifelse(
                 KS.set.space == "1d4f",
                 max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx),
