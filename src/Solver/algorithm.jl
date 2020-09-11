@@ -426,7 +426,7 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
 
     # particle distribution function
     @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
-        if KS.set.space[1:4] == "1d1f"
+        if KS.set.space[3:4] == "1f"
             reconstruct3!(
                 ctr[i].sf,
                 ctr[i-1].f,
@@ -436,7 +436,7 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-        elseif KS.set.space[1:4] == "1d2f"
+        elseif KS.set.space[3:4] == "2f"
             reconstruct3!(
                 ctr[i].sh,
                 ctr[i-1].h,
@@ -455,7 +455,7 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-        elseif KS.set.space[1:4] == "1d4f"
+        elseif KS.set.space[3:4] == "4f"
             reconstruct3!(
                 ctr[i].sh0,
                 ctr[i-1].h0,
@@ -492,7 +492,7 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
                 0.5 * (ctr[i].dx + ctr[i+1].dx),
                 Symbol(KS.set.limiter),
             )
-        elseif KS.set.space[1:4] == "1d3f"
+        elseif KS.set.space[3:4] == "3f"
             reconstruct3!(
                 ctr[i].sh0,
                 ctr[i-1].h0,
