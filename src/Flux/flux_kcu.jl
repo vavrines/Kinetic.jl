@@ -687,7 +687,7 @@ function flux_kcu!(
     # flux from f0
     H0 = mixture_maxwellian(u, v, prim)
     H1 = similar(H0)
-    H2 = similar(H2)
+    H2 = similar(H0)
     for j = 1:2
         H1[:, :, j] = H0[:, :, j] .* prim[4, j]
         H2[:, :, j] .= H0[:, :, j] .* (prim[4, j]^2 + 1.0 / (2.0 * prim[5, j]))
