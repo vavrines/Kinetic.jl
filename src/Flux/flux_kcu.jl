@@ -665,9 +665,9 @@ function flux_kcu!(
     w = @. primL[1] * Muv1 + primR[1] * Muv2
     prim = mixture_conserve_prim(w, γ)
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
-    tau +=
-        abs(primL[1, 2] / primL[end, 2] - primR[1, 2] / primR[end, 2]) /
-        (primL[1, 2] / primL[end, 2] + primR[1, 2] / primR[end, 2]) *
+    @. tau +=
+        abs(primL[1, :] / primL[end, :] - primR[1, :] / primR[end, :]) /
+        (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
         dt *
         2.0
 
