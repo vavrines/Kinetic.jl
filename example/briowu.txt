@@ -1,0 +1,54 @@
+# ------------------------------------------------------------
+# Configuration of Brio-Wu shock tube
+# ------------------------------------------------------------
+
+# setup
+case = brio-wu
+space = 1d4f1v
+nSpecies = 2
+interpOrder = 2
+limiter = minmod
+cfl = 0.3
+maxTime = 0.1
+
+# physical space
+x0 = 0
+x1 = 1
+nx = 200
+pMeshType = uniform
+nxg = 2
+
+# velocity space
+umin = -5
+umax = 5
+nu = 25
+vMeshType = rectangle
+nug = 0
+
+# random space
+uqMethod = collocation
+nr = 1
+nRec = 3
+opType = uniform
+parameter1 = 0.95
+parameter2 = 1.05
+
+# gas
+knudsen = 0.00001
+mach = 0.0
+prandtl = 1
+inK = 0
+
+mi = 1
+ni = 0.5
+#me = 0.01
+me = 0.0005446623
+ne = 0.5
+lD = 0.01
+rL = 100
+
+# electromagnetic field
+sol = 100
+#sol = 50
+echi = 1
+bnu = 1
