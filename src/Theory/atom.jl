@@ -291,7 +291,7 @@ function mixture_moments_conserve(
     delta::Int,
 )
 
-    Muv = zeros(eltype(Mu), 3, axes(Mu, 2))
+    Muv = zeros(eltype(Mu), 3, size(Mu, 2))
     for j in axes(Muv, 2)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], alpha, delta)
     end
@@ -312,8 +312,8 @@ function mixture_moments_conserve(
 
     Muv = ifelse(
         length(Mw) == 3,
-        zeros(eltype(Mu), 4, axes(Mu, 2)),
-        zeros(eltype(Mu), 5, axes(Mu, 2)),
+        zeros(eltype(Mu), 4, size(Mu, 2)),
+        zeros(eltype(Mu), 5, size(Mu, 2)),
     )
     for j in axes(Muv, 2)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mv[:, j], Mw[:, j], alpha, beta, delta)
