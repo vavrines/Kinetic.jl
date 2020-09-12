@@ -332,7 +332,7 @@ assuming a = a1 + u * a2 + 0.5 * u^2 * a3
 pdf_slope(u::Real, Δ::Real) = Δ / u
 
 
-function pdf_slope(prim::AbstractArray{<:Real,1}, sw::Array{<:Real,1}, inK::Real)
+function pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, inK::Real)
 
     sl = zeros(eltype(sw), axes(prim))
 
@@ -913,11 +913,11 @@ maxwellian(u::AbstractArray{<:AbstractFloat,1}, ρ::Real, U::Real, λ::Real) =
     @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2)
 
 
-maxwellian(u::AbstractArray{<:AbstractFloat,1}, prim::Array{<:Real,1}) =
+maxwellian(u::AbstractArray{<:AbstractFloat,1}, prim::AbstractArray{<:Real,1}) =
     maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 
-function mixture_maxwellian(u::AbstractArray{<:AbstractFloat,2}, prim::Array{<:Real,2})
+function mixture_maxwellian(u::AbstractArray{<:AbstractFloat,2}, prim::AbstractArray{<:Real,2})
     mixM = similar(u)
     for j in axes(mixM, 2)
         mixM[:, j] .= maxwellian(u[:, j], prim[:, j])
@@ -941,14 +941,14 @@ maxwellian(
 maxwellian(
     u::AbstractArray{<:AbstractFloat,2},
     v::AbstractArray{<:AbstractFloat,2},
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
 ) = maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
 
 
 function mixture_maxwellian(
     u::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
-    prim::Array{<:Real,2},
+    prim::AbstractArray{<:Real,2},
 )
     mixM = zeros(axes(u))
     for k in axes(mixM, 3)
@@ -976,7 +976,7 @@ maxwellian(
     u::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
 ) = maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
 
 
@@ -984,7 +984,7 @@ function mixture_maxwellian(
     u::AbstractArray{<:AbstractFloat,4},
     v::AbstractArray{<:AbstractFloat,4},
     w::AbstractArray{<:AbstractFloat,4},
-    prim::Array{<:Real,2},
+    prim::AbstractArray{<:Real,2},
 )
     mixM = zeros(eltype(u), axes(u))
     for l in axes(mixM, 4)
@@ -1009,7 +1009,7 @@ function shakhov(
     u::AbstractArray{<:AbstractFloat,1},
     M::AbstractArray{<:AbstractFloat,1},
     q::Real,
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
     Pr::Real,
 )
 
@@ -1030,7 +1030,7 @@ function shakhov(
     H::AbstractArray{<:AbstractFloat,1},
     B::AbstractArray{<:AbstractFloat,1},
     q::Real,
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
     Pr::Real,
     K::Real,
 )
@@ -1057,7 +1057,7 @@ function shakhov(
     v::AbstractArray{<:AbstractFloat,2},
     M::AbstractArray{<:AbstractFloat,2},
     q::AbstractArray{<:AbstractFloat,1},
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
     Pr::Real,
 )
 
@@ -1078,7 +1078,7 @@ function shakhov(
     H::AbstractArray{<:AbstractFloat,2},
     B::AbstractArray{<:AbstractFloat,2},
     q::AbstractArray{<:AbstractFloat,1},
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
     Pr::Real,
     K::Real,
 )
@@ -1104,7 +1104,7 @@ function shakhov(
     w::AbstractArray{<:AbstractFloat,3},
     M::AbstractArray{<:AbstractFloat,3},
     q::AbstractArray{<:AbstractFloat,1},
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
     Pr::Real,
 )
 
@@ -1234,7 +1234,7 @@ full_distribution(
     weights::AbstractArray{<:AbstractFloat,1},
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
-    prim::Array{<:Real,1},
+    prim::AbstractArray{<:Real,1},
     γ = 5 / 3::Real,
 ) = full_distribution(h, b, u, weights, v, w, prim[1], γ)
 
@@ -1422,7 +1422,7 @@ Calculate mixture collision time from AAP model
 
 """
 function aap_hs_collision_time(
-    prim::Array{<:Real,2},
+    prim::AbstractArray{<:Real,2},
     mi::Real,
     ni::Real,
     me::Real,
@@ -1453,8 +1453,8 @@ Calculate mixture primitive variables from AAP model
 
 """
 function aap_hs_prim(
-    prim::Array{<:Real,2},
-    tau::Array{<:Real,1},
+    prim::AbstractArray{<:Real,2},
+    tau::AbstractArray{<:Real,1},
     mi::Real,
     ni::Real,
     me::Real,
@@ -1761,7 +1761,7 @@ end
 #--- Multi-component gas ---#
 function shift_pdf!(
     f::AbstractArray{<:AbstractFloat,2},
-    a::Array{<:Real,1},
+    a::AbstractArray{<:Real,1},
     du::AbstractArray{<:AbstractFloat,1},
     dt::Real,
 )
