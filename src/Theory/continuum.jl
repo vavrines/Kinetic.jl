@@ -6,7 +6,7 @@
 Transform primitive -> conservative variables
 
 """
-function prim_conserve(prim::Array{<:Real,1}, γ::Real)
+function prim_conserve(prim::AbstractArray{<:Real,1}, γ::Real)
 
     if eltype(prim) <: Int
         W = zeros(axes(prim))
@@ -39,13 +39,12 @@ function prim_conserve(prim::Array{<:Real,1}, γ::Real)
 
 end
 
-
 prim_conserve(ρ::Real, U::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, λ], γ)
 
 prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, V, λ], γ)
 
 
-function mixture_prim_conserve(prim::Array{<:Real,2}, γ::Real)
+function mixture_prim_conserve(prim::AbstractArray{<:Real,2}, γ::Real)
     if eltype(prim) <: Int
         w = zeros(axes(prim))
     else
@@ -71,8 +70,7 @@ conserve_prim(u::Real) = [u, 0.5 * u, 1.0]
 
 conserve_prim(u::Real, a::Real) = [u, a, 1.0]
 
-
-function conserve_prim(W::Array{<:Real,1}, γ::Real)
+function conserve_prim(W::AbstractArray{<:Real,1}, γ::Real)
 
     if eltype(W) <: Int
         prim = zeros(axes(W))
@@ -103,14 +101,13 @@ function conserve_prim(W::Array{<:Real,1}, γ::Real)
 
 end
 
-
 conserve_prim(ρ::Real, M::Real, E::Real, gamma::Real) = conserve_prim([ρ, M, E], gamma)
 
 conserve_prim(ρ::Real, MX::Real, MY::Real, E::Real, gamma::Real) =
     conserve_prim([ρ, MX, MY, E], gamma)
 
 
-function mixture_conserve_prim(W::Array{<:Real,2}, γ::Real)
+function mixture_conserve_prim(W::AbstractArray{<:Real,2}, γ::Real)
     if eltype(W) <: Int
         prim = zeros(axes(W))
     else
@@ -130,9 +127,9 @@ Calculate electromagnetic coeffcients in hyperbolic Maxwell's equations
 
 """
 function em_coefficients(
-    prim::Array{<:Real,2},
-    E::Array{<:Real,1},
-    B::Array{<:Real,1},
+    prim::AbstractArray{<:Real,2},
+    E::AbstractArray{<:Real,1},
+    B::AbstractArray{<:Real,1},
     mr::Real,
     lD::Real,
     rL::Real,
