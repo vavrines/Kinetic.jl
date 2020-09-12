@@ -636,6 +636,7 @@ function flux_kcu!(
     u::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
     ω::AbstractArray{<:AbstractFloat,3},
+    inK::Real,
     γ::Real,
     mi::Real,
     ni::Real,
