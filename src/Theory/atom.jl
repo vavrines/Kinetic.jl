@@ -721,7 +721,7 @@ function moments_conserve(
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
 )
-    w = zeros(eltype(f), 5)
+    w = zeros(eltype(h0), 5)
 
     w[1] = discrete_moments(h0, u, ω, 0)
     w[2] = discrete_moments(h0, u, ω, 1)
