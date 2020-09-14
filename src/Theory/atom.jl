@@ -698,18 +698,19 @@ function moments_conserve(
     w::AbstractArray{<:AbstractFloat,3},
     ω::AbstractArray{<:AbstractFloat,3},
 )
-    w = zeros(eltype(f), 5)
-    w[1] = discrete_moments(f, u, ω, 0)
-    w[2] = discrete_moments(f, u, ω, 1)
-    w[3] = discrete_moments(f, v, ω, 1)
-    w[4] = discrete_moments(f, w, ω, 1)
-    w[5] = 0.5 * (
+    moments = zeros(eltype(f), 5)
+
+    moments[1] = discrete_moments(f, u, ω, 0)
+    moments[2] = discrete_moments(f, u, ω, 1)
+    moments[3] = discrete_moments(f, v, ω, 1)
+    moments[4] = discrete_moments(f, w, ω, 1)
+    moments[5] = 0.5 * (
         discrete_moments(f, u, ω, 2) +
         discrete_moments(f, v, ω, 2) +
         discrete_moments(f, w, ω, 2)
     )
 
-    return w
+    return moments
 end
 
 
@@ -721,13 +722,13 @@ function moments_conserve(
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
 )
-    w = zeros(eltype(h0), 5)
+    moments = zeros(eltype(h0), 5)
 
-    w[1] = discrete_moments(h0, u, ω, 0)
-    w[2] = discrete_moments(h0, u, ω, 1)
-    w[3] = discrete_moments(h1, u, ω, 0)
-    w[4] = discrete_moments(h2, u, ω, 0)
-    w[5] = 0.5 * discrete_moments(h0, u, ω, 2) + 0.5 * discrete_moments(h3, u, ω, 0)
+    moments[1] = discrete_moments(h0, u, ω, 0)
+    moments[2] = discrete_moments(h0, u, ω, 1)
+    moments[3] = discrete_moments(h1, u, ω, 0)
+    moments[4] = discrete_moments(h2, u, ω, 0)
+    moments[5] = 0.5 * discrete_moments(h0, u, ω, 2) + 0.5 * discrete_moments(h3, u, ω, 0)
 
     return w
 end
@@ -740,9 +741,10 @@ function mixture_moments_conserve(
     w::AbstractArray{<:AbstractFloat,4},
     ω::AbstractArray{<:AbstractFloat,4},
 )
-    w = zeros(eltype(f), 5, size(f, 4))
+    moments = zeros(eltype(f), 5, size(f, 4))
+
     for j in axes(w, 2)
-        w[:, j] .= moments_conserve(
+        moments[:, j] .= moments_conserve(
             f[:, :, :, j],
             u[:, :, :, j],
             v[:, :, :, j],
@@ -751,7 +753,7 @@ function mixture_moments_conserve(
         )
     end
 
-    return w
+    return moments
 end
 
 
@@ -763,13 +765,13 @@ function mixture_moments_conserve(
     u::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    w = zeros(eltype(h0), 5, size(h0, 2))
+    moments = zeros(eltype(h0), 5, size(h0, 2))
     for j in axes(w, 2)
-        w[:, j] .=
+        moments[:, j] .=
             moments_conserve(h0[:, j], h1[:, j], h2[:, j], h3[:, j], u[:, j], ω[:, j])
     end
 
-    return w
+    return moments
 end
 
 
