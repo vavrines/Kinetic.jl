@@ -1123,10 +1123,33 @@ end
 """
 Reduced distribution function
 
->@param[in] : particle distribution function with 3D velocity space
->@param[in] : quadrature weights with 2D setting (v & w by default)
+@arg : particle distribution function with full velocity space
+@arg : quadrature weights with reduced velocity setting (v & w by default)
 
 """
+function reduce_distribution(
+    f::AbstractArray{<:AbstractFloat,2},
+    weights::AbstractArray{<:AbstractFloat,1},
+    dim = 1::Int,
+)
+
+    if dim == 1
+        h = similar(f, axes(f, 1))
+        for i in eachindex(h)
+            h[i] = sum(@. weights * f[i, :])
+        end
+    elseif dim == 2
+        h = similar(f, axes(f, 2))
+        for j in eachindex(h)
+            h[j] = sum(@. weights * f[:, j])
+        end
+    else
+        throw("dimension dismatch")
+    end
+
+    return h
+
+end
 
 function reduce_distribution(
     f::AbstractArray{<:AbstractFloat,3},
@@ -1153,8 +1176,8 @@ function reduce_distribution(
     end
 
     return h
-end
 
+end
 
 function reduce_distribution(
     f::AbstractArray{<:AbstractFloat,3},
@@ -1189,6 +1212,7 @@ function reduce_distribution(
     end
 
     return h, b
+
 end
 
 
