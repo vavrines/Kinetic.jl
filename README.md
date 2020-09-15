@@ -27,4 +27,3 @@ After that, load the package,
 ```julia
 julia> using Kinetic
 ```
-That's it.

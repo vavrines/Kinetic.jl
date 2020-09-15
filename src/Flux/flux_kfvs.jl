@@ -22,7 +22,7 @@ function flux_kfvs!(
     dt::AbstractFloat,
     sfL = zeros(eltype(fL), axes(fL))::AbstractArray{<:AbstractFloat,1},
     sfR = zeros(eltype(fR), axes(fR))::AbstractArray{<:AbstractFloat,1},
-) # DOM flux
+) #// 1F1V flux of pure DOM
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -35,9 +35,8 @@ function flux_kfvs!(
 
 end
 
-
 # ------------------------------------------------------------
-# 1D1F1V flux
+# 1F1V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -66,9 +65,8 @@ function flux_kfvs!(
 
 end
 
-
 # ------------------------------------------------------------
-# 1D1F3V flux
+# 1F3V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -103,9 +101,8 @@ function flux_kfvs!(
 
 end
 
-
 # ------------------------------------------------------------
-# 1D2F flux
+# 2F1V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -145,9 +142,8 @@ function flux_kfvs!(
 
 end
 
-
 # ------------------------------------------------------------
-# 1D4F flux
+# 4F1V flux (single component)
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -205,7 +201,9 @@ function flux_kfvs!(
 
 end
 
-
+# ------------------------------------------------------------
+# 4F1V flux (multiple component)
+# ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,2},
     fh0::AbstractArray{<:AbstractFloat,2},
@@ -271,7 +269,7 @@ function flux_kfvs!(
 end
 
 # ------------------------------------------------------------
-# 2D1F flux
+# 1F2V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -306,9 +304,8 @@ function flux_kfvs!(
 
 end
 
-
 # ------------------------------------------------------------
-# 2D2F flux
+# 2F2V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -354,9 +351,8 @@ function flux_kfvs!(
 
 end
 
-
 # ------------------------------------------------------------
-# 2D3F flux
+# 3F2V flux (single component)
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -411,66 +407,8 @@ function flux_kfvs!(
 
 end
 
-function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh0::AbstractArray{<:AbstractFloat,2},
-    fh1::AbstractArray{<:AbstractFloat,2},
-    fh2::AbstractArray{<:AbstractFloat,2},
-    h0L::AbstractArray{<:AbstractFloat,2},
-    h1L::AbstractArray{<:AbstractFloat,2},
-    h2L::AbstractArray{<:AbstractFloat,2},
-    h0R::AbstractArray{<:AbstractFloat,2},
-    h1R::AbstractArray{<:AbstractFloat,2},
-    h2R::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    dt::Real,
-    len::Real,
-    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,2},
-    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,2},
-    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,2},
-    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,2},
-    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,2},
-    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,2},
-)
-
-    #--- reconstruct initial distribution ---#
-    δ = heaviside.(u)
-
-    h0 = @. h0L * δ + h0R * (1.0 - δ)
-    h1 = @. h1L * δ + h1R * (1.0 - δ)
-    h2 = @. h2L * δ + h2R * (1.0 - δ)
-
-    sh0 = @. sh0L * δ + sh0R * (1.0 - δ)
-    sh1 = @. sh1L * δ + sh1R * (1.0 - δ)
-    sh2 = @. sh2L * δ + sh2R * (1.0 - δ)
-
-
-    fw[1] = dt * sum(ω .* u .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh0)
-    fw[2] = dt * sum(ω .* u .^ 2 .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh0)
-    fw[3] = dt * sum(ω .* v .* u .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sh0)
-    fw[4] = dt * sum(ω .* u .* h1) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh1)
-    fw[5] =
-        dt * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h0) + sum(ω .* u .* h2)) -
-        0.5 *
-        dt^2 *
-        0.5 *
-        (sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sh0) + sum(ω .* u .^ 2 .* sh2))
-
-    @. fh0 = dt * u * h0 - 0.5 * dt^2 * u^2 * sh0
-    @. fh1 = dt * u * h1 - 0.5 * dt^2 * u^2 * sh1
-    @. fh2 = dt * u * h2 - 0.5 * dt^2 * u^2 * sh2
-
-    @. fw *= len
-    @. fh0 *= len
-    @. fh1 *= len
-    @. fh2 *= len
-
-end
-
 # ------------------------------------------------------------
-# 2D3F flux with AAP model
+# 3F2V flux (multiple component)
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::AbstractArray{<:AbstractFloat,2},
