@@ -328,6 +328,10 @@ end
 Calculate slope of particle distribution function, 
 assuming a = a1 + u * a2 + 0.5 * u^2 * a3
 
+`pdf_slope(u::Real, Δ::Real)`
+
+`pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, inK::Real)`
+
 """
 pdf_slope(u::Real, Δ::Real) = Δ / u
 
@@ -376,6 +380,25 @@ function pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, i
             sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] - prim[4] * sl[4] -
             0.5 * (prim[2]^2 + prim[3]^2 + prim[4]^2 + 0.5 * (inK + 3.0) / prim[5]) * sl[5]
 
+    end
+
+    return sl
+
+end
+
+
+"""
+Calculate slope of multi-component particle distribution function, 
+assuming `a = a1 + u * a2 + 0.5 * u^2 * a3`
+
+`mixture_pdf_slope(prim::AbstractArray{<:Real,2}, sw::AbstractArray{<:Real,2}, inK::Real)`
+
+"""
+function mixture_pdf_slope(prim::AbstractArray{<:Real,2}, sw::AbstractArray{<:Real,2}, inK::Real)
+
+    sl = zeros(eltype(sw), axes(prim))
+    for j in axes(sl, 2)
+        sl[:, j] .= pdf_slope(prim[:, j], sw[:, j], inK)
     end
 
     return sl
