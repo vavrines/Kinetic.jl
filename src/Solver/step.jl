@@ -13,7 +13,7 @@ function step!(
     dx::Real,
     RES::Array{<:AbstractFloat,1},
     AVG::Array{<:AbstractFloat,1},
-)
+) #// 1D0F
 
     #--- store W^n and calculate H^n,\tau^n ---#
     w_old = deepcopy(w)
@@ -197,6 +197,113 @@ function step!(
         h[i] = (h[i] + (fhL[i] - fhR[i]) / dx + dt / τ * MH[i]) / (1.0 + dt / τ)
         b[i] = (b[i] + (fbL[i] - fbR[i]) / dx + dt / τ * MB[i]) / (1.0 + dt / τ)
     end
+
+end
+
+#--- 1D2F1V mixture ---#
+function step!(
+    fwL::Array{<:AbstractFloat,2},
+    fhL::AbstractArray{<:AbstractFloat,2},
+    fbL::AbstractArray{<:AbstractFloat,2},
+    w::Array{<:AbstractFloat,2},
+    prim::Array{<:AbstractFloat,2},
+    h::AbstractArray{<:AbstractFloat,2},
+    b::AbstractArray{<:AbstractFloat,2},
+    fwR::Array{<:AbstractFloat,2},
+    fhR::AbstractArray{<:AbstractFloat,2},
+    fbR::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    weights::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    Kn::Real,
+    Pr::Real,
+    dx::Real,
+    dt::Real,
+    RES::Array{<:AbstractFloat,2},
+    AVG::Array{<:AbstractFloat,2},
+    collision = :bgk::Symbol,
+)
+
+    #--- update conservative flow variables ---#
+    # w^n
+    w_old = deepcopy(w)
+    prim_old = deepcopy(prim)
+
+    # flux -> w^{n+1}
+    @. w += (fwL - fwR) / dx
+    prim .= mixture_conserve_prim(w, γ)
+
+    # temperature protection
+    if prim[end, 1] < 0
+        @warn "negative temperature update of component 1"
+        w .= w_old
+        prim .= prim_old
+    elseif prim[end, 2] < 0
+        @warn "negative temperature update of component 2"
+        w .= w_old
+        prim .= prim_old
+    end
+    
+    # source -> w^{n+1}
+    #=
+    # DifferentialEquations.jl
+    tau = get_tau(prim, mi, ni, me, ne, Kn)
+    for j in axes(w, 2)
+        prob = ODEProblem(aap_hs_diffeq!, 
+            vcat(w[1:end,j,1], w[1:end,j,2]),
+            dt,
+            (tau[1], tau[2], mi, ni, me, ne, Kn, γ) 
+        )
+        sol = solve(prob, Rosenbrock23())
+
+        w[:,j,1] .= sol[end][1:end÷2]
+        w[:,j,2] .= sol[end][end÷2+1:end]
+    end
+    prim .= mixture_conserve_prim(w, γ)
+    =#
+    # explicit
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
+    mprim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
+    mw = mixture_prim_conserve(mprim, γ)
+    for k in axes(w, 2)
+        @. w[:, k] += (mw[:, k] - w_old[:, k]) * dt / tau[k]
+    end
+    prim .= mixture_conserve_prim(w, γ)
+
+    #--- update particle distribution function ---#
+    # flux -> f^{n+1}
+    @. h += (fhL - fhR) / dx
+    @. b += (fbL - fbR) / dx
+
+    # source -> f^{n+1}
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
+
+    # interspecies interaction
+    #mprim = deepcopy(prim)
+    mprim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
+
+    H = mixture_maxwellian(KS.vSpace.u, mprim)
+    B = similar(H)
+    for j in axes(B, 2)
+        B[:, j] = H[:, j] * inK / (2.0 * mprim[end, j])
+    end
+
+    # BGK term
+    for k in axes(h, 2)
+        @. h[:, k] =
+            (h[:, k] + dt / tau[k] * H[:, k]) / (1.0 + dt / tau[k])
+        @. b[:, k] =
+            (b[:, k] + dt / tau[k] * B[:, k]) / (1.0 + dt / tau[k])
+    end
+
+    #--- record residuals ---#
+    @. RES += (w_old - w)^2
+    @. AVG += abs(w)
 
 end
 
@@ -394,11 +501,11 @@ function step!(
     cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
 
     # temperature protection
-    if cell.prim[5, 1] < 0
+    if cell.prim[end, 1] < 0
         @warn ("ion temperature update is negative")
         cell.w .= w_old
         cell.prim .= prim_old
-    elseif cell.prim[5, 2] < 0
+    elseif cell.prim[end, 2] < 0
         @warn ("electron temperature update is negative")
         cell.w .= w_old
         cell.prim .= prim_old

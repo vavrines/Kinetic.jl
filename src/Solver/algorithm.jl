@@ -1,317 +1,10 @@
-# ============================================================
-# Solution Algorithm
-# ============================================================
-
-"""
-Structure of solver setup
-
-"""
-struct SolverSet <: AbstractSolverSet
-
-    # setup
-    set::AbstractSetup
-
-    # physical space
-    pSpace::AbstractPhysicalSpace
-
-    # velocity space
-    vSpace::AbstractVelocitySpace
-
-    # gas property
-    gas::AbstractProperty
-
-    # initial and boundary condition
-    ib::AbstractCondition
-
-    # file system
-    outputFolder::String
-
-    # constructor
-    #SolverSet() = SolverSet("./config/config.txt")
-
-    SolverSet(set, pSpace, vSpace, gas, ib, outputFolder) =
-        new(set, pSpace, vSpace, gas, ib, outputFolder)
-
-    function SolverSet(configfilename::String)
-
-        # read settings from configuration file
-        D = read_dict(configfilename)
-
-        # generate variables from dictionary
-        for key in keys(D)
-            s = Symbol(key)
-            @eval $s = $(D[key])
-        end
-
-        # generate data structure
-        dim = parse(Int, space[1])
-        gasD = map(parse(Int, space[3]), parse(Int, space[5])) do x, y # (x)f(y)v
-            if x == 1
-                if y >= 3
-                    return 3
-                else
-                    return dim
-                end
-            elseif x == 2
-                return dim
-            elseif x >= 3
-                return 3
-            else
-                return nothing
-            end
-        end
-        γ = heat_capacity_ratio(inK, gasD)
-        set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
-
-        if dim == 1
-
-            pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
-
-            if case == "shock"
-
-                μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
-
-                gas = Gas(
-                    knudsen,
-                    mach,
-                    prandtl,
-                    inK,
-                    γ,
-                    omega,
-                    alphaRef,
-                    omegaRef,
-                    μᵣ,
-                )
-
-                if space == "1d1f1v"
-                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
-
-                    wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(mach, γ, vSpace.u)
-
-                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
-                elseif space == "1d2f1v"
-                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
-
-                    wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
-                        ib_rh(mach, γ, vSpace.u, inK)
-
-                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
-                elseif space == "1d1f3v"
-                    vSpace = VSpace3D(
-                        umin,
-                        umax,
-                        nu,
-                        vmin,
-                        vmax,
-                        nv,
-                        wmin,
-                        wmax,
-                        nw,
-                        vMeshType,
-                        nug,
-                        nvg,
-                        nwg,
-                    )
-
-                    wL, primL, fL, bcL, wR, primR, fR, bcR =
-                        ib_rh(mach, γ, vSpace.u, vSpace.v, vSpace.w)
-
-                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
-                end
-
-            elseif case == "sod"
-
-                μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
-
-                gas = Gas(
-                    knudsen,
-                    mach,
-                    prandtl,
-                    inK,
-                    γ,
-                    omega,
-                    alphaRef,
-                    omegaRef,
-                    μᵣ,
-                )
-
-                if space == "1d1f1v"
-                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
-
-                    wL, primL, fL, bcL, wR, primR, fR, bcR = ib_sod(γ, vSpace.u)
-
-                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
-                elseif space == "1d2f1v"
-                    vSpace = VSpace1D(umin, umax, nu, vMeshType, nug)
-
-                    wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
-                        ib_sod(γ, vSpace.u, inK)
-
-                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
-                elseif space == "1d1f3v"
-                    vSpace = VSpace3D(
-                        umin,
-                        umax,
-                        nu,
-                        vmin,
-                        vmax,
-                        nv,
-                        wmin,
-                        wmax,
-                        nw,
-                        vMeshType,
-                        nug,
-                        nvg,
-                        nwg,
-                    )
-
-                    wL, primL, fL, bcL, wR, primR, fR, bcR =
-                        ib_sod(γ, vSpace.u, vSpace.v, vSpace.w)
-
-                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
-                end
-
-            elseif case == "brio-wu"
-
-                v0 = umin * sqrt(mi / me)
-                v1 = umax * sqrt(mi / me)
-                kne = knudsen * (me / mi)
-
-                vSpace = MVSpace1D(umin, umax, v0, v1, nu, vMeshType, nug)
-
-                gas = Plasma1D(
-                    [knudsen, kne],
-                    mach,
-                    prandtl,
-                    inK,
-                    γ,
-                    mi,
-                    ni,
-                    me,
-                    ne,
-                    lD,
-                    rL,
-                    sol,
-                    echi,
-                    bnu,
-                )
-
-                wL,
-                primL,
-                h0L,
-                h1L,
-                h2L,
-                h3L,
-                bcL,
-                EL,
-                BL,
-                lorenzL,
-                wR,
-                primR,
-                h0R,
-                h1R,
-                h2R,
-                h3R,
-                bcR,
-                ER,
-                BR,
-                lorenzR = ib_briowu(γ, vSpace.u, mi, me)
-
-                ib = IB4F(
-                    wL,
-                    primL,
-                    h0L,
-                    h1L,
-                    h2L,
-                    h3L,
-                    bcL,
-                    EL,
-                    BL,
-                    lorenzL,
-                    wR,
-                    primR,
-                    h0R,
-                    h1R,
-                    h2R,
-                    h3R,
-                    bcR,
-                    ER,
-                    BR,
-                    lorenzR,
-                )
-
-            else
-
-                throw("No preset available, please set up manually.")
-
-            end
-
-        elseif dim == 2
-
-            pSpace = PSpace2D(x0, x1, nx, y0, y1, ny, pMeshType, nxg, nyg)
-
-            if case == "cavity"
-
-                μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
-
-                gas = Gas(
-                    knudsen,
-                    mach,
-                    prandtl,
-                    inK,
-                    γ,
-                    omega,
-                    alphaRef,
-                    omegaRef,
-                    μᵣ,
-                )
-
-                if space == "2d1f2v"
-                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
-
-                    wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD =
-                        ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v)
-
-                    ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
-                elseif space == "2d2f2v"
-                    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
-
-                    wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD =
-                        ib_cavity(γ, uLid, vLid, tLid, vSpace.u, vSpace.v, inK)
-
-                    ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
-                end
-
-            else
-
-                throw("No preset available, please set up manually.")
-
-            end
-
-        else
-
-            throw("No preset available for 3D simulation, please set up manually.")
-
-        end
-
-        # create working directory
-        identifier = string(Dates.now(), "/")
-        #outputFolder = string("../out/", replace(identifier, ":"=>"."))
-        outputFolder = replace(identifier, ":" => ".")
-        mkdir(outputFolder)
-        mkdir(string(outputFolder, "data/"))
-        cp(configfilename, string(outputFolder, "config.txt"))
-
-        # create new struct
-        new(set, pSpace, vSpace, gas, ib, outputFolder)
-
-    end # function
-
-end # struct
-
-
 """
 Solution algorithm
+
+* 1D solver: `solve!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
+    face::Array{<:AbstractInterface1D,1}, simTime::Float64)`
+
+* @return: ending time
 
 """
 function solve!(
@@ -320,13 +13,16 @@ function solve!(
     face::Array{<:AbstractInterface1D,1},
     simTime::Float64,
 )
+    
+    #--- initial checkpoint ---#
+    write_jld(KS, ctr, simTime)
 
     #--- setup ---#
     iter = 0
+    t = deepcopy(simTime)
     dt = timestep(KS, ctr, simTime)
     nt = Int(Floor(KS.set.maxTime / dt)) + 1
     res = zeros(axes(KS.ib.wL))
-    write_jld(KS, ctr, simTime)
 
     #--- main loop ---#
     #while true
@@ -338,30 +34,37 @@ function solve!(
         update!(KS, ctr, face, dt, res)
 
         #iter += 1
-        simTime += dt
+        dt += dt
 
         if iter % 100 == 0
             println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:end])")
 
             #if iter%1000 == 0
-            #write_jld(KS, ctr, iter)
+            #    write_jld(KS, ctr, iter)
             #end
         end
 
-        if simTime > KS.set.maxTime || maximum(res) < 5.e-7
+        if t > KS.set.maxTime || maximum(res) < 5.e-7
             break
         end
 
     end # loop
 
     write_jld(KS, ctr, simTime)
+    return t
 
 end # function
 
 
-# ------------------------------------------------------------
-# Calculate time step
-# ------------------------------------------------------------
+"""
+Timestep calculator
+
+* 1D solver: `timestep(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1},
+    simTime::Real)`
+
+* @return: Δt
+
+"""
 function timestep(
     KS::SolverSet,
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
@@ -386,8 +89,8 @@ function timestep(
             sos = sound_speed(prim, KS.gas.γ)
             vmax = max(maximum(KS.vSpace.u1), maximum(abs.(prim[2, :]))) + sos
             tmax = ifelse(
-                KS.set.space == "1d4f",
-                max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx),
+                KS.set.space[3:4] in ["3f", "4f"],
+                max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx), # speed of light
                 max(tmax, vmax / ctr[i].dx),
             )
         end
@@ -402,9 +105,13 @@ function timestep(
 end
 
 
-# ------------------------------------------------------------
-# Reconstruction
-# ------------------------------------------------------------
+"""
+Reconstructor
+
+* 1D solver: `reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})`
+* 2D solver: `reconstruct!(KS::SolverSet, ctr::AbstractArray{ControlVolume2D2F,2})`
+
+"""
 function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
 
     if KS.set.interpOrder == 1
@@ -531,7 +238,7 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{ControlVolume2D2F,2})
         return
     end
 
-    #--- macroscopic variables ---#
+    #--- conservative variables ---#
     # boundary
     @inbounds Threads.@threads for j in 1:KS.pSpace.ny
         swL = extract_last(ctr[1, j].sw, 1, mode=:view)

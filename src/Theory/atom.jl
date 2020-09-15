@@ -1723,38 +1723,74 @@ end
 
 
 """
-Mixture source term function for DifferentialEquations.jl
+Source term of AAP model in DifferentialEquations.jl
 
 """
-function aap_hs_diffeq(du, u, p, t)
+function aap_hs_diffeq!(du, u, p, t)
 
-    I₁, I₂, I₃, I₄, I₅, E₁, E₂, E₃, E₄, E₅ = u
+    if length(u) == 6
+        I₁, I₂, I₃, E₁, E₂, E₃ = u
+        w = [
+            I₁ E₁
+            I₂ E₂
+            I₃ E₃
+        ]
+    elseif length(u) == 8
+        I₁, I₂, I₃, I₄, E₁, E₂, E₃, E₄ = u
+        w = [
+            I₁ E₁
+            I₂ E₂
+            I₃ E₃
+            I₄ E₄
+        ]
+    elseif length(u) == 10
+        I₁, I₂, I₃, I₄, I₅, E₁, E₂, E₃, E₄, E₅ = u
+        w = [
+            I₁ E₁
+            I₂ E₂
+            I₃ E₃
+            I₄ E₄
+            I₅ E₅
+        ]
+    else
+    end
+
     τᵢ, τₑ, mi, ni, me, ne, kn, γ = p
-
     τ = [τᵢ, τₑ]
-    w = [
-        I₁ E₁
-        I₂ E₂
-        I₃ E₃
-        I₄ E₄
-        I₅ E₅
-    ]
 
     # modified variables
     prim = mixture_conserve_prim(w, γ)
     mixprim = aap_hs_prim(prim, τ, mi, ni, me, ne, kn)
-    mixw = mixture_conserve_prim(prim, γ)
+    mixw = mixture_conserve_prim(mixprim, γ)
 
-    du[1] = (mixw[1, 1] - I₁) / τᵢ
-    du[2] = (mixw[2, 1] - I₂) / τᵢ
-    du[3] = (mixw[3, 1] - I₃) / τᵢ
-    du[4] = (mixw[4, 1] - I₄) / τᵢ
-    du[5] = (mixw[5, 1] - I₅) / τᵢ
-    du[6] = (mixw[1, 2] - E₁) / τₑ
-    du[7] = (mixw[2, 2] - E₂) / τₑ
-    du[8] = (mixw[3, 2] - E₃) / τₑ
-    du[9] = (mixw[4, 2] - E₄) / τₑ
-    du[10] = (mixw[5, 2] - E₅) / τₑ
+    if length(u) == 6
+        du[1] = (mixw[1, 1] - I₁) / τᵢ
+        du[2] = (mixw[2, 1] - I₂) / τᵢ
+        du[3] = (mixw[3, 1] - I₃) / τᵢ
+        du[4] = (mixw[1, 2] - E₁) / τₑ
+        du[5] = (mixw[2, 2] - E₂) / τₑ
+        du[6] = (mixw[3, 2] - E₃) / τₑ
+    elseif length(u) == 8
+        du[1] = (mixw[1, 1] - I₁) / τᵢ
+        du[2] = (mixw[2, 1] - I₂) / τᵢ
+        du[3] = (mixw[3, 1] - I₃) / τᵢ
+        du[4] = (mixw[4, 1] - I₄) / τᵢ
+        du[5] = (mixw[1, 2] - E₁) / τₑ
+        du[6] = (mixw[2, 2] - E₂) / τₑ
+        du[7] = (mixw[3, 2] - E₃) / τₑ
+        du[8] = (mixw[4, 2] - E₄) / τₑ
+    elseif length(u) == 10
+        du[1] = (mixw[1, 1] - I₁) / τᵢ
+        du[2] = (mixw[2, 1] - I₂) / τᵢ
+        du[3] = (mixw[3, 1] - I₃) / τᵢ
+        du[4] = (mixw[4, 1] - I₄) / τᵢ
+        du[5] = (mixw[5, 1] - I₅) / τᵢ
+        du[6] = (mixw[1, 2] - E₁) / τₑ
+        du[7] = (mixw[2, 2] - E₂) / τₑ
+        du[8] = (mixw[3, 2] - E₃) / τₑ
+        du[9] = (mixw[4, 2] - E₄) / τₑ
+        du[10] = (mixw[5, 2] - E₅) / τₑ
+    end
 
     nothing
 
