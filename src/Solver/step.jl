@@ -550,8 +550,8 @@ function step!(
         cell.prim .= prim_old
     end
 
-    #=
     # source -> w^{n+1}
+    #=
     # DifferentialEquations.jl
     tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
     for j in axes(wRan, 2)
@@ -588,7 +588,7 @@ function step!(
         KS.gas.Kn[1],
     )
     mw = mixture_prim_conserve(mprim, KS.gas.γ)
-    for k = 1:2
+    for k in axes(cell.w, 2)
         @. cell.w[:, k] += (mw[:, k] - w_old[:, k]) * dt / tau[k]
     end
     cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
@@ -605,7 +605,7 @@ function step!(
     cell.ϕ -= dt * (faceL.femR[7] + faceR.femL[7]) / cell.dx
     cell.ψ -= dt * (faceL.femR[8] + faceR.femL[8]) / cell.dx
 
-    for i = 1:3
+    for i in 1:3
         if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B))
             @warn "electromagnetic update is NaN"
         end
@@ -845,7 +845,6 @@ function step!(
     end
 
     # BGK term
-    #Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, KS.gas.K)
     for k in axes(cell.h0, 3)
         @. cell.h0[:, :, k] =
             (cell.h0[:, :, k] + dt / tau[k] * H0[:, :, k]) / (1.0 + dt / tau[k])
