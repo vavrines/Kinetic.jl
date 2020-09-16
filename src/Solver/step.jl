@@ -321,6 +321,8 @@ function step!(
     dt::AbstractFloat,
     RES::Array{<:AbstractFloat,2},
     AVG::Array{<:AbstractFloat,2},
+    collision = :bgk::Symbol,
+    isMHD = true::Bool,
 )
 
     #--- update conservative flow variables: step 1 ---#
@@ -343,34 +345,35 @@ function step!(
         cell.prim .= prim_old
     end
 
-    #=
     # source -> w^{n+1}
-    # DifferentialEquations.jl
-    tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    for j in axes(wRan, 2)
-    prob = ODEProblem( mixture_source,
-        vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
-        dt,
-        (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
-    sol = solve(prob, Rosenbrock23())
+    if isMHD == false
+        #=
+        # DifferentialEquations.jl
+        tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+        for j in axes(wRan, 2)
+        prob = ODEProblem( mixture_source,
+            vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
+            dt,
+            (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
+        sol = solve(prob, Rosenbrock23())
 
-    cell.w[1:5,j,1] .= sol[end][1:5]
-    cell.w[1:5,j,2] .= sol[end][6:10]
-    for k=1:2
-    cell.prim[:,j,k] .= Kinetic.conserve_prim(cell.w[:,j,k], KS.gas.γ)
+        cell.w[1:5,j,1] .= sol[end][1:5]
+        cell.w[1:5,j,2] .= sol[end][6:10]
+        for k=1:2
+        cell.prim[:,j,k] .= Kinetic.conserve_prim(cell.w[:,j,k], KS.gas.γ)
+        end
+        end
+        =#
+        
+        # explicit
+        tau = aap_hs_collision_time(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+        mprim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+        mw = mixture_prim_conserve(mprim, KS.gas.γ)
+        for k=1:2
+            @. cell.w[:,k] += (mw[:,k] - w_old[:,k]) * dt / tau[k]
+        end
+        cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
     end
-    end
-    =#
-    #=
-    # explicit
-    tau = aap_hs_collision_time(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    mprim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    mw = mixture_prim_conserve(mprim, KS.gas.γ)
-    for k=1:2
-        @. cell.w[:,k] += (mw[:,k] - w_old[:,k]) * dt / tau[k]
-    end
-    cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
-    =#
 
     #--- update electromagnetic variables ---#
     # flux -> E^{n+1} & B^{n+1}
@@ -492,9 +495,11 @@ function step!(
     )
 
     # interspecies interaction
-    prim = deepcopy(cell.prim)
-    #prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-
+    if isMHD == true
+        prim = deepcopy(cell.prim)
+    else
+        prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    end
     g = mixture_maxwellian(KS.vSpace.u, prim)
 
     # BGK term
@@ -528,6 +533,8 @@ function step!(
     dt::AbstractFloat,
     RES::Array{<:AbstractFloat,2},
     AVG::Array{<:AbstractFloat,2},
+    collision = :bgk::Symbol,
+    isMHD = true::Bool,
 )
 
     #--- update conservative flow variables: step 1 ---#
@@ -551,48 +558,49 @@ function step!(
     end
 
     # source -> w^{n+1}
-    #=
-    # DifferentialEquations.jl
-    tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    for j in axes(wRan, 2)
-    prob = ODEProblem( mixture_source,
-        vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
-        dt,
-        (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
-    sol = solve(prob, Rosenbrock23())
+    if isMHD == false
+        #=
+        # DifferentialEquations.jl
+        tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+        for j in axes(wRan, 2)
+        prob = ODEProblem( mixture_source,
+            vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
+            dt,
+            (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
+        sol = solve(prob, Rosenbrock23())
 
-    cell.w[1:5,j,1] .= sol[end][1:5]
-    cell.w[1:5,j,2] .= sol[end][6:10]
-    for k=1:2
-    cell.prim[:,j,k] .= Kinetic.conserve_prim(cell.w[:,j,k], KS.gas.γ)
-    end
-    end
-    =#
+        cell.w[1:5,j,1] .= sol[end][1:5]
+        cell.w[1:5,j,2] .= sol[end][6:10]
+        for k=1:2
+        cell.prim[:,j,k] .= Kinetic.conserve_prim(cell.w[:,j,k], KS.gas.γ)
+        end
+        end
+        =#
 
-    # explicit
-    tau = aap_hs_collision_time(
-        cell.prim,
-        KS.gas.mi,
-        KS.gas.ni,
-        KS.gas.me,
-        KS.gas.ne,
-        KS.gas.Kn[1],
-    )
-    mprim = aap_hs_prim(
-        cell.prim,
-        tau,
-        KS.gas.mi,
-        KS.gas.ni,
-        KS.gas.me,
-        KS.gas.ne,
-        KS.gas.Kn[1],
-    )
-    mw = mixture_prim_conserve(mprim, KS.gas.γ)
-    for k in axes(cell.w, 2)
-        @. cell.w[:, k] += (mw[:, k] - w_old[:, k]) * dt / tau[k]
+        # explicit
+        tau = aap_hs_collision_time(
+            cell.prim,
+            KS.gas.mi,
+            KS.gas.ni,
+            KS.gas.me,
+            KS.gas.ne,
+            KS.gas.Kn[1],
+        )
+        mprim = aap_hs_prim(
+            cell.prim,
+            tau,
+            KS.gas.mi,
+            KS.gas.ni,
+            KS.gas.me,
+            KS.gas.ne,
+            KS.gas.Kn[1],
+        )
+        mw = mixture_prim_conserve(mprim, KS.gas.γ)
+        for k in axes(cell.w, 2)
+            @. cell.w[:, k] += (mw[:, k] - w_old[:, k]) * dt / tau[k]
+        end
+        cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
     end
-    cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
-
 
     #--- update electromagnetic variables ---#
     # flux -> E^{n+1} & B^{n+1}
@@ -823,16 +831,19 @@ function step!(
     )
 
     # interspecies interaction
-    #prim = deepcopy(cell.prim)
-    prim = aap_hs_prim(
-        cell.prim,
-        tau,
-        KS.gas.mi,
-        KS.gas.ni,
-        KS.gas.me,
-        KS.gas.ne,
-        KS.gas.Kn[1],
-    )
+    if isMHD == true
+        prim = deepcopy(cell.prim)
+    else
+        prim = aap_hs_prim(
+            cell.prim,
+            tau,
+            KS.gas.mi,
+            KS.gas.ni,
+            KS.gas.me,
+            KS.gas.ne,
+            KS.gas.Kn[1],
+        )
+    end
 
     H0 = similar(KS.vSpace.u)
     H1 = similar(H0)

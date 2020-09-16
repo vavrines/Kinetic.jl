@@ -1007,6 +1007,7 @@ function update!(
     residual::Array{<:AbstractFloat}; # 1D / 2D
     mode = :bgk::Symbol,
     bc = :extra::Symbol,
+    isMHD = true::Bool,
 )
 
     sumRes = zeros(axes(KS.ib.wL))
@@ -1021,6 +1022,8 @@ function update!(
             dt,
             sumRes,
             sumAvg,
+            mode,
+            isMHD
         )
     end
 
@@ -1038,27 +1041,25 @@ function update!(
             @. ctr[KS.pSpace.nx+i].w .= ctr[KS.pSpace.nx].w
             @. ctr[KS.pSpace.nx+i].prim .= ctr[KS.pSpace.nx].prim
         end
-
         for i in 1:ng
-            ctr[1-i].h0 = deepcopy(ctr[1].h0)
-            ctr[1-i].h1 = deepcopy(ctr[1].h1)
-            ctr[1-i].h2 = deepcopy(ctr[1].h2)
-            ctr[1-i].E = deepcopy(ctr[1].E)
-            ctr[1-i].B = deepcopy(ctr[1].B)
-            ctr[1-i].ϕ = deepcopy(ctr[1].ϕ)
-            ctr[1-i].ψ = deepcopy(ctr[1].ψ)
-            ctr[1-i].lorenz = deepcopy(ctr[1].lorenz)
+            ctr[1-i].h0 .= ctr[1].h0
+            ctr[1-i].h1 .= ctr[1].h1
+            ctr[1-i].h2 .= ctr[1].h2
+            ctr[1-i].E .= ctr[1].E
+            ctr[1-i].B .= ctr[1].B
+            ctr[1-i].ϕ = ctr[1].ϕ
+            ctr[1-i].ψ = ctr[1].ψ
+            ctr[1-i].lorenz .= ctr[1].lorenz
 
-            ctr[KS.pSpace.nx+i].h0 = deepcopy(ctr[KS.pSpace.nx].h0)
-            ctr[KS.pSpace.nx+i].h1 = deepcopy(ctr[KS.pSpace.nx].h1)
-            ctr[KS.pSpace.nx+i].h2 = deepcopy(ctr[KS.pSpace.nx].h2)
-            ctr[KS.pSpace.nx+i].E = deepcopy(ctr[KS.pSpace.nx].E)
-            ctr[KS.pSpace.nx+i].B = deepcopy(ctr[KS.pSpace.nx].B)
+            ctr[KS.pSpace.nx+i].h0 .= ctr[KS.pSpace.nx].h0
+            ctr[KS.pSpace.nx+i].h1 .= ctr[KS.pSpace.nx].h1
+            ctr[KS.pSpace.nx+i].h2 .= ctr[KS.pSpace.nx].h2
+            ctr[KS.pSpace.nx+i].E .= ctr[KS.pSpace.nx].E
+            ctr[KS.pSpace.nx+i].B .= ctr[KS.pSpace.nx].B
             ctr[KS.pSpace.nx+i].ϕ = deepcopy(ctr[KS.pSpace.nx].ϕ)
             ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[KS.pSpace.nx].ψ)
-            ctr[KS.pSpace.nx+i].lorenz = deepcopy(ctr[KS.pSpace.nx].lorenz)
+            ctr[KS.pSpace.nx+i].lorenz .= ctr[KS.pSpace.nx].lorenz
         end
-
     end
 
 end
@@ -1071,6 +1072,7 @@ function update!(
     residual::Array{<:AbstractFloat}; # 1D / 2D
     mode = :bgk::Symbol,
     bc = :extra::Symbol,
+    isMHD = true::Bool,
 )
 
     sumRes = zeros(axes(KS.ib.wL))
@@ -1085,6 +1087,8 @@ function update!(
             dt,
             sumRes,
             sumAvg,
+            mode,
+            isMHD,
         )
     end
 
@@ -1102,29 +1106,27 @@ function update!(
             @. ctr[KS.pSpace.nx+i].w .= ctr[KS.pSpace.nx].w
             @. ctr[KS.pSpace.nx+i].prim .= ctr[KS.pSpace.nx].prim
         end
-
         for i in 1:ng
-            ctr[1-i].h0 = deepcopy(ctr[1].h0)
-            ctr[1-i].h1 = deepcopy(ctr[1].h1)
-            ctr[1-i].h2 = deepcopy(ctr[1].h2)
-            ctr[1-i].h3 = deepcopy(ctr[1].h3)
-            ctr[1-i].E = deepcopy(ctr[1].E)
-            ctr[1-i].B = deepcopy(ctr[1].B)
+            ctr[1-i].h0 .= ctr[1].h0
+            ctr[1-i].h1 .= ctr[1].h1
+            ctr[1-i].h2 .= ctr[1].h2
+            ctr[1-i].h3 .= ctr[1].h3
+            ctr[1-i].E .= ctr[1].E
+            ctr[1-i].B .= ctr[1].B
             ctr[1-i].ϕ = deepcopy(ctr[1].ϕ)
             ctr[1-i].ψ = deepcopy(ctr[1].ψ)
-            ctr[1-i].lorenz = deepcopy(ctr[1].lorenz)
+            ctr[1-i].lorenz .= ctr[1].lorenz
 
-            ctr[KS.pSpace.nx+i].h0 = deepcopy(ctr[KS.pSpace.nx].h0)
-            ctr[KS.pSpace.nx+i].h1 = deepcopy(ctr[KS.pSpace.nx].h1)
-            ctr[KS.pSpace.nx+i].h2 = deepcopy(ctr[KS.pSpace.nx].h2)
-            ctr[KS.pSpace.nx+i].h3 = deepcopy(ctr[KS.pSpace.nx].h3)
-            ctr[KS.pSpace.nx+i].E = deepcopy(ctr[KS.pSpace.nx].E)
-            ctr[KS.pSpace.nx+i].B = deepcopy(ctr[KS.pSpace.nx].B)
+            ctr[KS.pSpace.nx+i].h0 .= ctr[KS.pSpace.nx].h0
+            ctr[KS.pSpace.nx+i].h1 .= ctr[KS.pSpace.nx].h1
+            ctr[KS.pSpace.nx+i].h2 .= ctr[KS.pSpace.nx].h2
+            ctr[KS.pSpace.nx+i].h3 .= ctr[KS.pSpace.nx].h3
+            ctr[KS.pSpace.nx+i].E .= ctr[KS.pSpace.nx].E
+            ctr[KS.pSpace.nx+i].B .= ctr[KS.pSpace.nx].B
             ctr[KS.pSpace.nx+i].ϕ = deepcopy(ctr[KS.pSpace.nx].ϕ)
             ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[KS.pSpace.nx].ψ)
-            ctr[KS.pSpace.nx+i].lorenz = deepcopy(ctr[KS.pSpace.nx].lorenz)
+            ctr[KS.pSpace.nx+i].lorenz .= ctr[KS.pSpace.nx].lorenz
         end
-
     end
 
 end
