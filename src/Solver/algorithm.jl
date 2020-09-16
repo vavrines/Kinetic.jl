@@ -1126,8 +1126,8 @@ function update!(
             ctr[1-i].h2 .= ctr[1].h2
             ctr[1-i].E .= ctr[1].E
             ctr[1-i].B .= ctr[1].B
-            ctr[1-i].ϕ = ctr[1].ϕ
-            ctr[1-i].ψ = ctr[1].ψ
+            ctr[1-i].ϕ = deepcopy(ctr[1].ϕ)
+            ctr[1-i].ψ = deepcopy(ctr[1].ψ)
             ctr[1-i].lorenz .= ctr[1].lorenz
 
             ctr[KS.pSpace.nx+i].w .= ctr[KS.pSpace.nx].w
@@ -1150,8 +1150,8 @@ function update!(
             ctr[1-i].h2 .= ctr[KS.pSpace.nx+1-i].h2
             ctr[1-i].E .= ctr[KS.pSpace.nx+1-i].E
             ctr[1-i].B .= ctr[KS.pSpace.nx+1-i].B
-            ctr[1-i].ϕ .= ctr[KS.pSpace.nx+1-i].ϕ
-            ctr[1-i].ψ .= ctr[KS.pSpace.nx+1-i].ψ
+            ctr[1-i].ϕ = deepcopy(ctr[KS.pSpace.nx+1-i].ϕ)
+            ctr[1-i].ψ = deepcopy(ctr[KS.pSpace.nx+1-i].ψ)
             ctr[1-i].lorenz .= ctr[KS.pSpace.nx+1-i].lorenz
 
             ctr[KS.pSpace.nx+i].w .= ctr[i].w
@@ -1161,8 +1161,8 @@ function update!(
             ctr[KS.pSpace.nx+i].h2 .= ctr[i].h2
             ctr[KS.pSpace.nx+i].E .= ctr[i].E
             ctr[KS.pSpace.nx+i].B .= ctr[i].B
-            ctr[KS.pSpace.nx+i].ϕ .= ctr[i].ϕ
-            ctr[KS.pSpace.nx+i].ψ .= ctr[i].ψ
+            ctr[KS.pSpace.nx+i].ϕ = deepcopy(ctr[i].ϕ)
+            ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[i].ψ)
             ctr[KS.pSpace.nx+i].lorenz .= ctr[i].lorenz
         end
     elseif bc == :balance
