@@ -136,8 +136,11 @@ function step!(
     #--- update distribution function ---#
     for k in axes(wVelo, 3), j in axes(vVelo, 2), i in axes(uVelo, 1)
         f[i, j, k] =
-            (f[i, j, k] + (ffL[i, j, k] - ffR[i, j, k]) / dx + dt / τ * M[i, j, k]) /
-            (1.0 + dt / τ)
+            (
+                f[i, j, k] +
+                (ffL[i, j, k] - ffR[i, j, k]) / dx +
+                dt / τ * M[i, j, k]
+            ) / (1.0 + dt / τ)
     end
 
 end
@@ -252,16 +255,16 @@ function step!(
         w .= w_old
         prim .= prim_old
     end
-    
+
     # source -> w^{n+1}
     #=
     # DifferentialEquations.jl
     tau = get_tau(prim, mi, ni, me, ne, Kn)
     for j in axes(w, 2)
-        prob = ODEProblem(aap_hs_diffeq!, 
+        prob = ODEProblem(aap_hs_diffeq!,
             vcat(w[1:end,j,1], w[1:end,j,2]),
             dt,
-            (tau[1], tau[2], mi, ni, me, ne, Kn, γ) 
+            (tau[1], tau[2], mi, ni, me, ne, Kn, γ)
         )
         sol = solve(prob, Rosenbrock23())
 
@@ -299,10 +302,8 @@ function step!(
 
     # BGK term
     for k in axes(h, 2)
-        @. h[:, k] =
-            (h[:, k] + dt / tau[k] * H[:, k]) / (1.0 + dt / tau[k])
-        @. b[:, k] =
-            (b[:, k] + dt / tau[k] * B[:, k]) / (1.0 + dt / tau[k])
+        @. h[:, k] = (h[:, k] + dt / tau[k] * H[:, k]) / (1.0 + dt / tau[k])
+        @. b[:, k] = (b[:, k] + dt / tau[k] * B[:, k]) / (1.0 + dt / tau[k])
     end
 
     #--- record residuals ---#
@@ -347,7 +348,7 @@ function step!(
     # DifferentialEquations.jl
     tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
     for j in axes(wRan, 2)
-    prob = ODEProblem( mixture_source, 
+    prob = ODEProblem( mixture_source,
         vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
         dt,
         (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
@@ -382,8 +383,8 @@ function step!(
     cell.ϕ -= dt * (faceL.femR[7] + faceR.femL[7]) / cell.dx
     cell.ψ -= dt * (faceL.femR[8] + faceR.femL[8]) / cell.dx
 
-    for i=1:3
-        if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B)) 
+    for i = 1:3
+        if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B))
             @warn "electromagnetic update is NaN"
         end
     end
@@ -393,16 +394,47 @@ function step!(
 
     # source -> U^{n+1}, E^{n+1} and B^{n+1}
     mr = KS.gas.mi / KS.gas.me
-    A, b = em_coefficients(cell.prim, cell.E, cell.B, mr, KS.gas.lD, KS.gas.rL, dt)
+    A, b =
+        em_coefficients(cell.prim, cell.E, cell.B, mr, KS.gas.lD, KS.gas.rL, dt)
     x = A \ b
 
     #--- calculate lorenz force ---#
-    cell.lorenz[1,1] = 0.5 * (x[1] + cell.E[1] + (cell.prim[3,1] + x[5]) * cell.B[3] - (cell.prim[4,1] + x[6]) * cell.B[2]) / KS.gas.rL
-    cell.lorenz[2,1] = 0.5 * (x[2] + cell.E[2] + (cell.prim[4,1] + x[6]) * cell.B[1] - (cell.prim[2,1] + x[4]) * cell.B[3]) / KS.gas.rL
-    cell.lorenz[3,1] = 0.5 * (x[3] + cell.E[3] + (cell.prim[2,1] + x[4]) * cell.B[2] - (cell.prim[3,1] + x[5]) * cell.B[1]) / KS.gas.rL
-    cell.lorenz[1,2] = -0.5 * (x[1] + cell.E[1] + (cell.prim[3,2] + x[8]) * cell.B[3] - (cell.prim[4,2] + x[9]) * cell.B[2]) * mr / KS.gas.rL
-    cell.lorenz[2,2] = -0.5 * (x[2] + cell.E[2] + (cell.prim[4,2] + x[9]) * cell.B[1] - (cell.prim[2,2] + x[7]) * cell.B[3]) * mr / KS.gas.rL
-    cell.lorenz[3,2] = -0.5 * (x[3] + cell.E[3] + (cell.prim[2,2] + x[7]) * cell.B[2] - (cell.prim[3,2] + x[8]) * cell.B[1]) * mr / KS.gas.rL
+    cell.lorenz[1, 1] =
+        0.5 * (
+            x[1] + cell.E[1] + (cell.prim[3, 1] + x[5]) * cell.B[3] -
+            (cell.prim[4, 1] + x[6]) * cell.B[2]
+        ) / KS.gas.rL
+    cell.lorenz[2, 1] =
+        0.5 * (
+            x[2] + cell.E[2] + (cell.prim[4, 1] + x[6]) * cell.B[1] -
+            (cell.prim[2, 1] + x[4]) * cell.B[3]
+        ) / KS.gas.rL
+    cell.lorenz[3, 1] =
+        0.5 * (
+            x[3] + cell.E[3] + (cell.prim[2, 1] + x[4]) * cell.B[2] -
+            (cell.prim[3, 1] + x[5]) * cell.B[1]
+        ) / KS.gas.rL
+    cell.lorenz[1, 2] =
+        -0.5 *
+        (
+            x[1] + cell.E[1] + (cell.prim[3, 2] + x[8]) * cell.B[3] -
+            (cell.prim[4, 2] + x[9]) * cell.B[2]
+        ) *
+        mr / KS.gas.rL
+    cell.lorenz[2, 2] =
+        -0.5 *
+        (
+            x[2] + cell.E[2] + (cell.prim[4, 2] + x[9]) * cell.B[1] -
+            (cell.prim[2, 2] + x[7]) * cell.B[3]
+        ) *
+        mr / KS.gas.rL
+    cell.lorenz[3, 2] =
+        -0.5 *
+        (
+            x[3] + cell.E[3] + (cell.prim[2, 2] + x[7]) * cell.B[2] -
+            (cell.prim[3, 2] + x[8]) * cell.B[1]
+        ) *
+        mr / KS.gas.rL
 
     cell.E[1] = x[1]
     cell.E[2] = x[2]
@@ -440,10 +472,13 @@ function step!(
 
     # force -> f^{n+1} : step 2
     for k in axes(cell.h1, 3)
-        @. cell.h3[:,k] += 2. * dt * cell.lorenz[2,k] * cell.h1[:,k] + (dt * cell.lorenz[2,k])^2 * cell.h0[:,k] +
-                                2. * dt * cell.lorenz[3,k] * cell.h2[:,k] + (dt * cell.lorenz[3,k])^2 * cell.h0[:,k]
-        @. cell.h2[:,k] += dt * cell.lorenz[3,k] * cell.h0[:,k]
-        @. cell.h1[:,k] += dt * cell.lorenz[2,k] * cell.h0[:,k]
+        @. cell.h3[:, k] +=
+            2.0 * dt * cell.lorenz[2, k] * cell.h1[:, k] +
+            (dt * cell.lorenz[2, k])^2 * cell.h0[:, k] +
+            2.0 * dt * cell.lorenz[3, k] * cell.h2[:, k] +
+            (dt * cell.lorenz[3, k])^2 * cell.h0[:, k]
+        @. cell.h2[:, k] += dt * cell.lorenz[3, k] * cell.h0[:, k]
+        @. cell.h1[:, k] += dt * cell.lorenz[2, k] * cell.h0[:, k]
     end
 
     # source -> f^{n+1}
@@ -520,7 +555,7 @@ function step!(
     # DifferentialEquations.jl
     tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
     for j in axes(wRan, 2)
-    prob = ODEProblem( mixture_source, 
+    prob = ODEProblem( mixture_source,
         vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
         dt,
         (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
@@ -533,16 +568,31 @@ function step!(
     end
     end
     =#
-    #=
+
     # explicit
-    tau = aap_hs_collision_time(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-    mprim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    tau = aap_hs_collision_time(
+        cell.prim,
+        KS.gas.mi,
+        KS.gas.ni,
+        KS.gas.me,
+        KS.gas.ne,
+        KS.gas.Kn[1],
+    )
+    mprim = aap_hs_prim(
+        cell.prim,
+        tau,
+        KS.gas.mi,
+        KS.gas.ni,
+        KS.gas.me,
+        KS.gas.ne,
+        KS.gas.Kn[1],
+    )
     mw = mixture_prim_conserve(mprim, KS.gas.γ)
-    for k=1:2
-        @. cell.w[:,k] += (mw[:,k] - w_old[:,k]) * dt / tau[k]
+    for k = 1:2
+        @. cell.w[:, k] += (mw[:, k] - w_old[:, k]) * dt / tau[k]
     end
     cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
-    =#
+
 
     #--- update electromagnetic variables ---#
     # flux -> E^{n+1} & B^{n+1}
@@ -555,8 +605,8 @@ function step!(
     cell.ϕ -= dt * (faceL.femR[7] + faceR.femL[7]) / cell.dx
     cell.ψ -= dt * (faceL.femR[8] + faceR.femL[8]) / cell.dx
 
-    for i=1:3
-        if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B)) 
+    for i = 1:3
+        if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B))
             @warn "electromagnetic update is NaN"
         end
     end
@@ -566,16 +616,47 @@ function step!(
 
     # source -> U^{n+1}, E^{n+1} and B^{n+1}
     mr = KS.gas.mi / KS.gas.me
-    A, b = em_coefficients(cell.prim, cell.E, cell.B, mr, KS.gas.lD, KS.gas.rL, dt)
+    A, b =
+        em_coefficients(cell.prim, cell.E, cell.B, mr, KS.gas.lD, KS.gas.rL, dt)
     x = A \ b
 
     #--- calculate lorenz force ---#
-    cell.lorenz[1,1] = 0.5 * (x[1] + cell.E[1] + (cell.prim[3,1] + x[5]) * cell.B[3] - (cell.prim[4,1] + x[6]) * cell.B[2]) / KS.gas.rL
-    cell.lorenz[2,1] = 0.5 * (x[2] + cell.E[2] + (cell.prim[4,1] + x[6]) * cell.B[1] - (cell.prim[2,1] + x[4]) * cell.B[3]) / KS.gas.rL
-    cell.lorenz[3,1] = 0.5 * (x[3] + cell.E[3] + (cell.prim[2,1] + x[4]) * cell.B[2] - (cell.prim[3,1] + x[5]) * cell.B[1]) / KS.gas.rL
-    cell.lorenz[1,2] = -0.5 * (x[1] + cell.E[1] + (cell.prim[3,2] + x[8]) * cell.B[3] - (cell.prim[4,2] + x[9]) * cell.B[2]) * mr / KS.gas.rL
-    cell.lorenz[2,2] = -0.5 * (x[2] + cell.E[2] + (cell.prim[4,2] + x[9]) * cell.B[1] - (cell.prim[2,2] + x[7]) * cell.B[3]) * mr / KS.gas.rL
-    cell.lorenz[3,2] = -0.5 * (x[3] + cell.E[3] + (cell.prim[2,2] + x[7]) * cell.B[2] - (cell.prim[3,2] + x[8]) * cell.B[1]) * mr / KS.gas.rL
+    cell.lorenz[1, 1] =
+        0.5 * (
+            x[1] + cell.E[1] + (cell.prim[3, 1] + x[5]) * cell.B[3] -
+            (cell.prim[4, 1] + x[6]) * cell.B[2]
+        ) / KS.gas.rL
+    cell.lorenz[2, 1] =
+        0.5 * (
+            x[2] + cell.E[2] + (cell.prim[4, 1] + x[6]) * cell.B[1] -
+            (cell.prim[2, 1] + x[4]) * cell.B[3]
+        ) / KS.gas.rL
+    cell.lorenz[3, 1] =
+        0.5 * (
+            x[3] + cell.E[3] + (cell.prim[2, 1] + x[4]) * cell.B[2] -
+            (cell.prim[3, 1] + x[5]) * cell.B[1]
+        ) / KS.gas.rL
+    cell.lorenz[1, 2] =
+        -0.5 *
+        (
+            x[1] + cell.E[1] + (cell.prim[3, 2] + x[8]) * cell.B[3] -
+            (cell.prim[4, 2] + x[9]) * cell.B[2]
+        ) *
+        mr / KS.gas.rL
+    cell.lorenz[2, 2] =
+        -0.5 *
+        (
+            x[2] + cell.E[2] + (cell.prim[4, 2] + x[9]) * cell.B[1] -
+            (cell.prim[2, 2] + x[7]) * cell.B[3]
+        ) *
+        mr / KS.gas.rL
+    cell.lorenz[3, 2] =
+        -0.5 *
+        (
+            x[3] + cell.E[3] + (cell.prim[2, 2] + x[7]) * cell.B[2] -
+            (cell.prim[3, 2] + x[8]) * cell.B[1]
+        ) *
+        mr / KS.gas.rL
 
     cell.E[1] = x[1]
     cell.E[2] = x[2]
@@ -630,106 +711,106 @@ function step!(
         @. cell.h1[:, :, k] += dt * cell.lorenz[3, k] * cell.h0[:, :, k]
     end
 
-#=
-    for m=1:2
-        for l=1:KS.vSpace.nv
-            if cell.lorenz[1,m]>0
+    #=
+        for m=1:2
+            for l=1:KS.vSpace.nv
+                if cell.lorenz[1,m]>0
 
-                shift = Int(floor(cell.lorenz[1,m]*dt/KS.vSpace.du[1,l,m]))
-                for k=KS.vSpace.nu:-1:1+shift
-                    cell.h0[k,l,m] = cell.h0[k-shift,l,m]
-                    cell.h1[k,l,m] = cell.h1[k-shift,l,m]
-                    cell.h2[k,l,m] = cell.h2[k-shift,l,m]
-                end
-                for k=1:shift
-                    cell.h0[k,l,m] = 0.0
-                    cell.h1[k,l,m] = 0.0
-                    cell.h2[k,l,m] = 0.0
-                end
+                    shift = Int(floor(cell.lorenz[1,m]*dt/KS.vSpace.du[1,l,m]))
+                    for k=KS.vSpace.nu:-1:1+shift
+                        cell.h0[k,l,m] = cell.h0[k-shift,l,m]
+                        cell.h1[k,l,m] = cell.h1[k-shift,l,m]
+                        cell.h2[k,l,m] = cell.h2[k-shift,l,m]
+                    end
+                    for k=1:shift
+                        cell.h0[k,l,m] = 0.0
+                        cell.h1[k,l,m] = 0.0
+                        cell.h2[k,l,m] = 0.0
+                    end
 
-                for k=2:KS.vSpace.nu
-                    cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h0[k-1,l,m]-cell.h0[k,l,m])/KS.vSpace.du[k,1,m]
-                    cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h1[k-1,l,m]-cell.h1[k,l,m])/KS.vSpace.du[k,1,m]
-                    cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h2[k-1,l,m]-cell.h2[k,l,m])/KS.vSpace.du[k,1,m]
-                end
-            else
-                shift = Int(floor(-cell.lorenz[1,m]*dt/KS.vSpace.du[1,l,m]))
-                for k=1:KS.vSpace.nu-shift
-                    cell.h0[k,l,m] = cell.h0[k+shift,l,m]
-                    cell.h1[k,l,m] = cell.h1[k+shift,l,m]
-                    cell.h2[k,l,m] = cell.h2[k+shift,l,m]
-                end
-                for k=KS.vSpace.nu-shift+1:KS.vSpace.nu
-                    cell.h0[k,l,m] = 0.0
-                    cell.h1[k,l,m] = 0.0
-                    cell.h2[k,l,m] = 0.0
-                end
-                for k=1:KS.vSpace.nu-1
-                    cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h0[k,l,m]-cell.h0[k+1,l,m])/KS.vSpace.du[k,1,m]
-                    cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h1[k,l,m]-cell.h1[k+1,l,m])/KS.vSpace.du[k,1,m]
-                    cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h2[k,l,m]-cell.h2[k+1,l,m])/KS.vSpace.du[k,1,m]
+                    for k=2:KS.vSpace.nu
+                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h0[k-1,l,m]-cell.h0[k,l,m])/KS.vSpace.du[k,1,m]
+                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h1[k-1,l,m]-cell.h1[k,l,m])/KS.vSpace.du[k,1,m]
+                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h2[k-1,l,m]-cell.h2[k,l,m])/KS.vSpace.du[k,1,m]
+                    end
+                else
+                    shift = Int(floor(-cell.lorenz[1,m]*dt/KS.vSpace.du[1,l,m]))
+                    for k=1:KS.vSpace.nu-shift
+                        cell.h0[k,l,m] = cell.h0[k+shift,l,m]
+                        cell.h1[k,l,m] = cell.h1[k+shift,l,m]
+                        cell.h2[k,l,m] = cell.h2[k+shift,l,m]
+                    end
+                    for k=KS.vSpace.nu-shift+1:KS.vSpace.nu
+                        cell.h0[k,l,m] = 0.0
+                        cell.h1[k,l,m] = 0.0
+                        cell.h2[k,l,m] = 0.0
+                    end
+                    for k=1:KS.vSpace.nu-1
+                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h0[k,l,m]-cell.h0[k+1,l,m])/KS.vSpace.du[k,1,m]
+                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h1[k,l,m]-cell.h1[k+1,l,m])/KS.vSpace.du[k,1,m]
+                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h2[k,l,m]-cell.h2[k+1,l,m])/KS.vSpace.du[k,1,m]
+                    end
                 end
             end
-        end
-        @. cell.h0[1,:,m] = cell.h0[2,:,m]
-        @. cell.h0[KS.vSpace.nu,:,m] = cell.h0[KS.vSpace.nu-1,:,m]
-        @. cell.h1[1,:,m] = cell.h1[2,:,m]
-        @. cell.h1[KS.vSpace.nu,:,m] = cell.h1[KS.vSpace.nu-1,:,m]
-        @. cell.h2[1,:,m] = cell.h2[2,:,m]
-        @. cell.h2[KS.vSpace.nu,:,m] = cell.h2[KS.vSpace.nu-1,:,m]
+            @. cell.h0[1,:,m] = cell.h0[2,:,m]
+            @. cell.h0[KS.vSpace.nu,:,m] = cell.h0[KS.vSpace.nu-1,:,m]
+            @. cell.h1[1,:,m] = cell.h1[2,:,m]
+            @. cell.h1[KS.vSpace.nu,:,m] = cell.h1[KS.vSpace.nu-1,:,m]
+            @. cell.h2[1,:,m] = cell.h2[2,:,m]
+            @. cell.h2[KS.vSpace.nu,:,m] = cell.h2[KS.vSpace.nu-1,:,m]
 
-        for k=1:KS.vSpace.nu
-            if cell.lorenz[2,m]>0
-                shift = Int(floor(cell.lorenz[2,m]*dt/KS.vSpace.dv[k,1,m]))
-                for l=KS.vSpace.nv:-1:1+shift
-                    cell.h0[k,l,m] = cell.h0[k,l-shift,m]
-                    cell.h1[k,l,m] = cell.h1[k,l-shift,m]
-                    cell.h2[k,l,m] = cell.h2[k,l-shift,m]
-                end
-                for l=1:shift
-                    cell.h0[k,l,m] = 0.0
-                    cell.h1[k,l,m] = 0.0
-                    cell.h2[k,l,m] = 0.0
-                end
+            for k=1:KS.vSpace.nu
+                if cell.lorenz[2,m]>0
+                    shift = Int(floor(cell.lorenz[2,m]*dt/KS.vSpace.dv[k,1,m]))
+                    for l=KS.vSpace.nv:-1:1+shift
+                        cell.h0[k,l,m] = cell.h0[k,l-shift,m]
+                        cell.h1[k,l,m] = cell.h1[k,l-shift,m]
+                        cell.h2[k,l,m] = cell.h2[k,l-shift,m]
+                    end
+                    for l=1:shift
+                        cell.h0[k,l,m] = 0.0
+                        cell.h1[k,l,m] = 0.0
+                        cell.h2[k,l,m] = 0.0
+                    end
 
-                for l=2:KS.vSpace.nv
-                    cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h0[k,l-1,m]-cell.h0[k,l,m])/KS.vSpace.dv[k,1,m]
-                    cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h1[k,l-1,m]-cell.h1[k,l,m])/KS.vSpace.dv[k,1,m]
-                    cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h2[k,l-1,m]-cell.h2[k,l,m])/KS.vSpace.dv[k,1,m]
-                end
-            else
-                shift = Int(floor(-cell.lorenz[2,m]*dt/KS.vSpace.dv[k,1,m]))
-                for l=1:KS.vSpace.nv-shift
-                    cell.h0[k,l,m] = cell.h0[k,l+shift,m]
-                    cell.h1[k,l,m] = cell.h1[k,l+shift,m]
-                    cell.h2[k,l,m] = cell.h2[k,l+shift,m]
-                end
-                for l=KS.vSpace.nv-shift+1:KS.vSpace.nv
-                    cell.h0[k,l,m] = 0.0
-                    cell.h1[k,l,m] = 0.0
-                    cell.h2[k,l,m] = 0.0
-                end
+                    for l=2:KS.vSpace.nv
+                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h0[k,l-1,m]-cell.h0[k,l,m])/KS.vSpace.dv[k,1,m]
+                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h1[k,l-1,m]-cell.h1[k,l,m])/KS.vSpace.dv[k,1,m]
+                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h2[k,l-1,m]-cell.h2[k,l,m])/KS.vSpace.dv[k,1,m]
+                    end
+                else
+                    shift = Int(floor(-cell.lorenz[2,m]*dt/KS.vSpace.dv[k,1,m]))
+                    for l=1:KS.vSpace.nv-shift
+                        cell.h0[k,l,m] = cell.h0[k,l+shift,m]
+                        cell.h1[k,l,m] = cell.h1[k,l+shift,m]
+                        cell.h2[k,l,m] = cell.h2[k,l+shift,m]
+                    end
+                    for l=KS.vSpace.nv-shift+1:KS.vSpace.nv
+                        cell.h0[k,l,m] = 0.0
+                        cell.h1[k,l,m] = 0.0
+                        cell.h2[k,l,m] = 0.0
+                    end
 
-                for l=1:KS.vSpace.nv-1
-                    cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h0[k,l,m]-cell.h0[k,l+1,m])/KS.vSpace.dv[k,1,m]
-                    cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h1[k,l,m]-cell.h1[k,l+1,m])/KS.vSpace.dv[k,1,m]
-                    cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h2[k,l,m]-cell.h2[k,l+1,m])/KS.vSpace.dv[k,1,m]
+                    for l=1:KS.vSpace.nv-1
+                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h0[k,l,m]-cell.h0[k,l+1,m])/KS.vSpace.dv[k,1,m]
+                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h1[k,l,m]-cell.h1[k,l+1,m])/KS.vSpace.dv[k,1,m]
+                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h2[k,l,m]-cell.h2[k,l+1,m])/KS.vSpace.dv[k,1,m]
+                    end
                 end
             end
+            @. cell.h0[:,1,m] = cell.h0[:,2,m]
+            @. cell.h0[:,KS.vSpace.nv,m] = cell.h0[:,KS.vSpace.nv-1,m]
+            @. cell.h1[:,1,m] = cell.h1[:,2,m]
+            @. cell.h1[:,KS.vSpace.nv,m] = cell.h1[:,KS.vSpace.nv-1,m]
+            @. cell.h2[:,1,m] = cell.h2[:,2,m]
+            @. cell.h2[:,KS.vSpace.nv,m] = cell.h2[:,KS.vSpace.nv-1,m]
         end
-        @. cell.h0[:,1,m] = cell.h0[:,2,m]
-        @. cell.h0[:,KS.vSpace.nv,m] = cell.h0[:,KS.vSpace.nv-1,m]
-        @. cell.h1[:,1,m] = cell.h1[:,2,m]
-        @. cell.h1[:,KS.vSpace.nv,m] = cell.h1[:,KS.vSpace.nv-1,m]
-        @. cell.h2[:,1,m] = cell.h2[:,2,m]
-        @. cell.h2[:,KS.vSpace.nv,m] = cell.h2[:,KS.vSpace.nv-1,m]
-    end
 
-    for m=1:2
-        @. cell.h2[:,:,m] = cell.h2[:,:,m]+2*dt*cell.lorenz[3,m]*cell.h1[:,:,m]+(dt*cell.lorenz[3,m])^2*cell.h0[:,:,m]
-        @. cell.h1[:,:,m] = cell.h1[:,:,m]+dt*cell.lorenz[3,m]*cell.h0[:,:,m]
-    end
-=#
+        for m=1:2
+            @. cell.h2[:,:,m] = cell.h2[:,:,m]+2*dt*cell.lorenz[3,m]*cell.h1[:,:,m]+(dt*cell.lorenz[3,m])^2*cell.h0[:,:,m]
+            @. cell.h1[:,:,m] = cell.h1[:,:,m]+dt*cell.lorenz[3,m]*cell.h0[:,:,m]
+        end
+    =#
 
     # source -> f^{n+1}
     tau = aap_hs_collision_time(
@@ -742,18 +823,26 @@ function step!(
     )
 
     # interspecies interaction
-    prim = deepcopy(cell.prim)
-    #prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+    #prim = deepcopy(cell.prim)
+    prim = aap_hs_prim(
+        cell.prim,
+        tau,
+        KS.gas.mi,
+        KS.gas.ni,
+        KS.gas.me,
+        KS.gas.ne,
+        KS.gas.Kn[1],
+    )
 
     H0 = similar(KS.vSpace.u)
     H1 = similar(H0)
     H2 = similar(H0)
     for k in axes(H0, 3)
-        H0[:,:,k] .= maxwellian(KS.vSpace.u[:,:,k], KS.vSpace.v[:,:,k], prim[:,k])
-        @. H1[:,:,k] = H0[:,:,k] * prim[4,k]
-        @. H2[:,:,k] = H0[:,:,k] * (prim[4,k]^2+1.0/(2.0*prim[5,k]))
+        H0[:, :, k] .=
+            maxwellian(KS.vSpace.u[:, :, k], KS.vSpace.v[:, :, k], prim[:, k])
+        @. H1[:, :, k] = H0[:, :, k] * prim[4, k]
+        @. H2[:, :, k] = H0[:, :, k] * (prim[4, k]^2 + 1.0 / (2.0 * prim[5, k]))
     end
-    #g = mixture_maxwellian(KS.vSpace.u, KS.vSpace.v, prim)
 
     # BGK term
     #Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, KS.gas.K)
