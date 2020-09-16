@@ -28,7 +28,9 @@ function step!(
 
 end
 
-#--- 1D1F1V ---#
+# ------------------------------------------------------------
+# 1D1F1V
+# ------------------------------------------------------------
 function step!(
     fwL::Array{<:AbstractFloat,1},
     ffL::AbstractArray{<:AbstractFloat,1},
@@ -81,7 +83,9 @@ function step!(
 
 end
 
-#--- 1D1F3V ---#
+# ------------------------------------------------------------
+# 1D1F3V
+# ------------------------------------------------------------
 function step!(
     fwL::Array{<:AbstractFloat,1},
     ffL::AbstractArray{<:AbstractFloat,3},
