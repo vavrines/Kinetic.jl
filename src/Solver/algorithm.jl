@@ -1189,7 +1189,6 @@ function update!(
         @. ctr[KS.pSpace.nx+1].lorenz = 0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
     else
     end
-    end
 
 end
 
