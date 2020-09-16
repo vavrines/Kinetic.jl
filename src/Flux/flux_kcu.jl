@@ -218,13 +218,7 @@ function flux_kcu!(
     fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h0)
     fw[3] += Mt[2] * sum(ω .* u .* h1)
     fw[4] += Mt[2] * sum(ω .* u .* h2)
-    fw[5] +=
-        Mt[2] *
-        0.5 *
-        (
-            sum(ω .* u .^ 3 .* h0) +
-            sum(ω .* u .* h3)
-        )
+    fw[5] += Mt[2] * 0.5 * (sum(ω .* u .^ 3 .* h0) + sum(ω .* u .* h3))
 
     @. fh0 = Mt[1] * u * g0 + Mt[2] * u * h0
     @. fh1 = Mt[1] * u * g1 + Mt[2] * u * h1
@@ -452,15 +446,7 @@ function flux_kcu!(
     fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h0)
     fw[3] += Mt[2] * sum(ω .* v .* u .* h0)
     fw[4] += Mt[2] * sum(ω .* u .* h1)
-    fw[5] +=
-        Mt[2] *
-        0.5 *
-        (
-            sum(
-                ω .* u .* (u .^ 2 .+ v .^ 2) .*
-                h0,
-            ) + sum(ω .* u .* h2)
-        )
+    fw[5] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h0) + sum(ω .* u .* h2))
 
     @. fw *= len
     @. fh0 = (Mt[1] * u * H0 + Mt[2] * u * h0) * len
@@ -503,7 +489,7 @@ function flux_kcu!(
     Mu2, Mxi2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
     Muv1 = mixture_moments_conserve(MuL1, Mxi1, 0, 0)
     Muv2 = mixture_moments_conserve(MuR2, Mxi2, 0, 0)
-    
+
     w = similar(wL)
     for j in axes(w, 2)
         @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
