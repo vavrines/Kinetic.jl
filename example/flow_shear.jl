@@ -1,43 +1,10 @@
 using Revise, ProgressMeter, OffsetArrays, Kinetic
 
-begin
-    # case
-    case = "layer"
-    space = "2d2f2v"
-    nSpecies = 1
-    interpOrder = 2
-    limiter = "vanleer"
-    cfl = 0.5
-    maxTime = 0.005539
-
-    # physical space
-    x0 = -0.25
-    x1 = 0.25
-    nx = 250
-    pMeshType = "uniform"
-    nxg = 2
-
-    # velocity space
-    vMeshType = "rectangle"
-    umin = -5
-    umax = 5
-    nu = 32
-    nug = 0
-
-    vmin = -5
-    vmax = 5
-    nv = 64
-    nvg = 0
-
-    # gas
-    knudsen = 0.005
-    mach = 0.0
-    prandtl = 1
-    inK = 1
-
-    omega = 0.81
-    alphaRef = 1.0
-    omegaRef = 0.5
+cd(@__DIR__)
+D = read_dict("shear.txt")
+for key in keys(D)
+    s = Symbol(key)
+    @eval $s = $(D[key])
 end
 
 begin
@@ -115,13 +82,17 @@ begin
     end
 end
 
-iter = 0
-res = zeros(4)
-simTime = 0.0
-dt = Kinetic.timestep(KS, ctr, simTime)
-maxTime = vhs_collision_time(ks.ib.primL, μᵣ, omega)
-nt = Int(floor(maxTime / dt))
+begin
+    iter = 0
+    res = zeros(4)
+    simTime = 0.0
+    dt = Kinetic.timestep(KS, ctr, simTime)
+    maxTime = vhs_collision_time(ks.ib.primL, μᵣ, omega)
+    nt = Int(floor(maxTime / dt))
+end
 
+# There're no default solver for 1D simulation with 2D setting
+# Let's do it manually
 @showprogress for iter in 1:nt
     #Kinetic.reconstruct!(KS, ctr)
 
@@ -160,6 +131,9 @@ end
 
 using Plots
 plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,1])
+plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,2])
+plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,3])
+plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,4])
 
 u1d = VSpace1D(umin, umax, nu, vMeshType)
 f = zeros(ks.vSpace.nv)

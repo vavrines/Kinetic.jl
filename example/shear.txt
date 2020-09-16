@@ -1,0 +1,41 @@
+# ------------------------------------------------------------
+# Configuration of shear layer
+# ------------------------------------------------------------
+
+# case
+case = layer
+space = 2d2f2v
+nSpecies = 1
+interpOrder = 2
+limiter = vanleer
+cfl = 0.5
+maxTime = 0.005539
+
+# physical space
+x0 = -0.25
+x1 = 0.25
+nx = 250
+pMeshType = uniform
+nxg = 2
+
+# velocity space
+vMeshType = rectangle
+umin = -5
+umax = 5
+nu = 32
+nug = 0
+
+vmin = -5
+vmax = 5
+nv = 64
+nvg = 0
+
+# gas
+knudsen = 0.005
+mach = 0.0
+prandtl = 1
+inK = 1
+
+omega = 0.81
+alphaRef = 1.0
+omegaRef = 0.5
