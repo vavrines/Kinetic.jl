@@ -21,16 +21,16 @@ function flux_kcu!(
     visIdx::Real,
     pr::Real,
     dt::Real,
-) # 1D1F flux
+) #// 1D1F1V
 
-    # --- upwind reconstruction ---#
+    #--- upwind reconstruction ---#
     δ = heaviside.(u)
     f = @. fL * δ + fR * (1.0 - δ)
 
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
 
-    # --- construct interface distribution ---#
+    #--- construct interface distribution ---#
     Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
     Muv1 = moments_conserve(MuL1, Mxi1, 0, 0)
     Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
@@ -51,7 +51,7 @@ function flux_kcu!(
     Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
     Mt[1] = dt - Mt[2] # M0
 
-    # --- calculate fluxes ---#
+    #--- calculate fluxes ---#
     Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
 
     # flux from M0
@@ -69,9 +69,8 @@ function flux_kcu!(
 
 end
 
-
 # ------------------------------------------------------------
-# 1D2F flux
+# 1D2F1V
 # ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:Real,1},
@@ -93,7 +92,7 @@ function flux_kcu!(
     dt::Real,
 )
 
-    # --- upwind reconstruction ---#
+    #--- upwind reconstruction ---#
     δ = heaviside.(u)
     h = @. hL * δ + hR * (1.0 - δ)
     b = @. bL * δ + bR * (1.0 - δ)
@@ -101,15 +100,15 @@ function flux_kcu!(
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
 
-    # --- construct interface distribution ---#
+    #--- construct interface distribution ---#
     Mu1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
     Muv1 = moments_conserve(MuL1, Mxi1, 0, 0)
     Mu2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
     Muv2 = moments_conserve(MuR2, Mxi2, 0, 0)
 
     w = @. primL[1] * Muv1 + primR[1] * Muv2
-
     prim = conserve_prim(w, γ)
+
     tau = vhs_collision_time(prim, visRef, visIdx)
     tau +=
         abs(primL[1] / primL[end] - primR[1] / primR[end]) /
@@ -121,7 +120,7 @@ function flux_kcu!(
     Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
     Mt[1] = dt - Mt[2] # M0
 
-    # --- calculate fluxes ---#
+    #--- calculate fluxes ---#
     Mu, Mxi, MuL, MuR = gauss_moments(prim, inK)
 
     # flux from M0
@@ -141,9 +140,101 @@ function flux_kcu!(
 
 end
 
+# ------------------------------------------------------------
+# 1D4F1V
+# ------------------------------------------------------------
+function flux_kcu!(
+    fw::AbstractArray{<:AbstractFloat,1},
+    fh0::AbstractArray{<:AbstractFloat,1},
+    fh1::AbstractArray{<:AbstractFloat,1},
+    fh2::AbstractArray{<:AbstractFloat,1},
+    fh3::AbstractArray{<:AbstractFloat,1},
+    wL::AbstractArray{<:Real,1},
+    h0L::AbstractArray{<:AbstractFloat,1},
+    h1L::AbstractArray{<:AbstractFloat,1},
+    h2L::AbstractArray{<:AbstractFloat,1},
+    h3L::AbstractArray{<:AbstractFloat,1},
+    wR::AbstractArray{<:Real,1},
+    h0R::AbstractArray{<:AbstractFloat,1},
+    h1R::AbstractArray{<:AbstractFloat,1},
+    h2R::AbstractArray{<:AbstractFloat,1},
+    h3R::AbstractArray{<:AbstractFloat,1},
+    u::AbstractArray{<:AbstractFloat,1},
+    ω::AbstractArray{<:AbstractFloat,1},
+    inK::Real,
+    γ::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    Pr::Real,
+    dt::Real,
+)
+
+    #--- upwind reconstruction ---#
+    δ = heaviside.(u)
+
+    h0 = @. h0L * δ + h0R * (1.0 - δ)
+    h1 = @. h1L * δ + h1R * (1.0 - δ)
+    h2 = @. h2L * δ + h2R * (1.0 - δ)
+    h3 = @. h3L * δ + h3R * (1.0 - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    #--- construct interface distribution ---#
+    Mu1, Mv1, Mw1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mv1, Mw1, 0, 0, 0)
+    Mu2, Mv2, Mw2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mv2, Mw2, 0, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    prim = conserve_prim(w, γ)
+
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    #--- calculate fluxes ---#
+    Mu, Mv, Mw, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mv, Mw, 1, 0, 0)
+    @. fw = Mt[1] * prim[1] * Muv
+
+    # flux from f0
+    g0 = maxwellian(u, prim)
+    g1 = Mv[1] .* g0
+    g2 = Mw[1] .* g0
+    g3 = (Mv[2] + Mw[2]) .* g0
+
+    fw[1] += Mt[2] * sum(ω .* u .* h0)
+    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h0)
+    fw[3] += Mt[2] * sum(ω .* u .* h1)
+    fw[4] += Mt[2] * sum(ω .* u .* h2)
+    fw[5] +=
+        Mt[2] *
+        0.5 *
+        (
+            sum(ω .* u .^ 3 .* h0) +
+            sum(ω .* u .* h3)
+        )
+
+    @. fh0 = Mt[1] * u * g0 + Mt[2] * u * h0
+    @. fh1 = Mt[1] * u * g1 + Mt[2] * u * h1
+    @. fh2 = Mt[1] * u * g2 + Mt[2] * u * h2
+    @. fh3 = Mt[1] * u * g3 + Mt[2] * u * h3
+
+end
 
 # ------------------------------------------------------------
-# 2D1F flux
+# 2D1F2V
 # ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:Real,1},
@@ -164,17 +255,17 @@ function flux_kcu!(
     len::Real,
 )
 
-    # --- prepare ---#
+    #--- prepare ---#
     delta = heaviside.(u)
 
-    # --- reconstruct initial distribution ---#
+    #--- reconstruct initial distribution ---#
     δ = heaviside.(u)
     f = @. fL * δ + fR * (1.0 - δ)
 
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
 
-    # --- construct interface distribution ---#
+    #--- construct interface distribution ---#
     Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
     Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
     Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
@@ -193,7 +284,7 @@ function flux_kcu!(
     Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
     Mt[1] = dt - Mt[2] # M0
 
-    # --- calculate interface flux ---#
+    #--- calculate interface flux ---#
     Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
 
     # flux from M0
@@ -212,9 +303,8 @@ function flux_kcu!(
 
 end
 
-
 # ------------------------------------------------------------
-# 2D2F flux
+# 2D2F2V
 # ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:AbstractFloat,1},
@@ -238,10 +328,10 @@ function flux_kcu!(
     len::Real,
 )
 
-    # --- prepare ---#
+    #--- prepare ---#
     delta = heaviside.(u)
 
-    # --- reconstruct initial distribution ---#
+    #--- reconstruct initial distribution ---#
     δ = heaviside.(u)
     h = @. hL * δ + hR * (1.0 - δ)
     b = @. bL * δ + bR * (1.0 - δ)
@@ -249,7 +339,7 @@ function flux_kcu!(
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
 
-    # --- construct interface distribution ---#
+    #--- construct interface distribution ---#
     Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
     Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
     Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
@@ -268,7 +358,7 @@ function flux_kcu!(
     Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
     Mt[1] = dt - Mt[2] # M0
 
-    # --- calculate interface flux ---#
+    #--- calculate interface flux ---#
     Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
 
     # flux from M0
@@ -289,9 +379,98 @@ function flux_kcu!(
 
 end
 
+# ------------------------------------------------------------
+# 2D3F2V
+# ------------------------------------------------------------
+function flux_kcu!(
+    fw::AbstractArray{<:AbstractFloat,1},
+    fh0::AbstractArray{<:AbstractFloat,2},
+    fh1::AbstractArray{<:AbstractFloat,2},
+    fh2::AbstractArray{<:AbstractFloat,2},
+    wL::AbstractArray{<:Real,1},
+    h0L::AbstractArray{<:AbstractFloat,2},
+    h1L::AbstractArray{<:AbstractFloat,2},
+    h2L::AbstractArray{<:AbstractFloat,2},
+    wR::AbstractArray{<:Real,1},
+    h0R::AbstractArray{<:AbstractFloat,2},
+    h1R::AbstractArray{<:AbstractFloat,2},
+    h2R::AbstractArray{<:AbstractFloat,2},
+    u::AbstractArray{<:AbstractFloat,2},
+    v::AbstractArray{<:AbstractFloat,2},
+    ω::AbstractArray{<:AbstractFloat,2},
+    inK::Real,
+    γ::Real,
+    γ::Real,
+    visRef::Real,
+    visIdx::Real,
+    Pr::Real,
+    dt::Real,
+    len::Real,
+)
+
+    #--- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+    h0 = @. h0L * δ + h0R * (1.0 - δ)
+    h1 = @. h1L * δ + h1R * (1.0 - δ)
+    h2 = @. h2L * δ + h2R * (1.0 - δ)
+
+    primL = conserve_prim(wL, γ)
+    primR = conserve_prim(wR, γ)
+
+    #--- construct interface distribution ---#
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
+    Muv1 = moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
+    Muv2 = moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
+
+    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    prim = conserve_prim(w, γ)
+    tau = vhs_collision_time(prim, visRef, visIdx)
+    tau +=
+        abs(primL[1] / primL[end] - primR[1] / primR[end]) /
+        (primL[1] / primL[end] + primR[1] / primR[end]) *
+        dt *
+        2.0
+
+    Mt = zeros(2)
+    Mt[2] = tau * (1.0 - exp(-dt / tau)) # f0
+    Mt[1] = dt - Mt[2] # M0
+
+    #--- calculate interface flux ---#
+    Mu, Mv, Mxi, MuL, MuR = gauss_moments(prim, inK)
+
+    # flux from M0
+    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    @. fw = Mt[1] * prim[1] * Muv
+
+    # flux from f0
+    H0 = maxwellian(u, v, prim)
+    H1 = H0 .* prim[4]
+    H2 = H0 .* (prim[4]^2 + 1.0 / (2.0 * prim[5]))
+
+    fw[1] += Mt[2] * sum(ω .* u .* h0)
+    fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h0)
+    fw[3] += Mt[2] * sum(ω .* v .* u .* h0)
+    fw[4] += Mt[2] * sum(ω .* u .* h1)
+    fw[5] +=
+        Mt[2] *
+        0.5 *
+        (
+            sum(
+                ω .* u .* (u .^ 2 .+ v .^ 2) .*
+                h0,
+            ) + sum(ω .* u .* h2)
+        )
+
+    @. fw *= len
+    @. fh0 = (Mt[1] * u * H0 + Mt[2] * u * h0) * len
+    @. fh1 = (Mt[1] * u * H1 + Mt[2] * u * h1) * len
+    @. fh2 = (Mt[1] * u * H2 + Mt[2] * u * h2) * len
+
+end
 
 # ------------------------------------------------------------
-# 1D1F flux with AAP model
+# 1D1F1V with AAP model
 # ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:AbstractFloat,2},
@@ -312,42 +491,24 @@ function flux_kcu!(
     dt::Real,
 )
 
-    # --- upwind reconstruction ---#
+    #--- upwind reconstruction ---#
     δ = heaviside.(u)
-
     f = @. fL * δ + fR * (1.0 - δ)
 
-    primL = zeros(axes(wL))
-    primR = similar(primL)
-    for j = 1:2
-        primL[:, j] .= conserve_prim(wL[:, j], γ)
-        primR[:, j] .= conserve_prim(wR[:, j], γ)
-    end
+    primL = mixture_conserve_prim(wL, γ)
+    primR = mixture_conserve_prim(wR, γ)
 
-    # --- construct interface distribution ---#
-    Mu1 = OffsetArray{Float64}(undef, 0:6, 1:2)
-    Mxi1 = similar(Mu1)
-    MuL1 = similar(Mu1)
-    MuR1 = similar(Mu1)
-    Mu2 = similar(Mu1)
-    Mxi2 = similar(Mu1)
-    MuL2 = similar(Mu1)
-    MuR2 = similar(Mu1)
-    Muv1 = similar(wL)
-    Muv2 = similar(wL)
-    for j = 1:2
-        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] = gauss_moments(primL[:, j], inK)
-        Muv1[:, j] = moments_conserve(MuL1[:, j], Mxi1[:, j], 0, 0)
-        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] = gauss_moments(primR[:, j], inK)
-        Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
-    end
-
+    #--- construct interface distribution ---#
+    Mu1, Mxi1, MuL1, MuR1 = mixture_gauss_moments(primL, inK)
+    Mu2, Mxi2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
+    Muv1 = mixture_moments_conserve(MuL1, Mxi1, 0, 0)
+    Muv2 = mixture_moments_conserve(MuR2, Mxi2, 0, 0)
+    
     w = similar(wL)
-    prim = similar(wL)
-    for j = 1:2
+    for j in axes(w, 2)
         @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
-        prim[:, j] .= conserve_prim(w[:, j], γ)
     end
+    prim = mixture_conserve_prim(w, γ)
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
     @. tau +=
@@ -361,41 +522,30 @@ function flux_kcu!(
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
     @. Mt[1, :] = dt - Mt[2, :] # M0
 
-    # --- calculate fluxes ---#
-    Mu = similar(Mu1)
-    Mxi = similar(Mu1)
-    MuL = similar(Mu1)
-    MuR = similar(Mu1)
-    Muv = similar(wL)
-    for j in axes(Mu1, 2)
-        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] = gauss_moments(prim[:, j], inK)
-        Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], 1, 0)
-    end
+    #--- calculate fluxes ---#
+    Mu, Mxi, MuL, MuR = mixture_gauss_moments(prim, inK)
+    Muv = mixture_moments_conserve(Mu, Mxi, 1, 0)
 
     # flux from M0
-    for j = 1:2
+    for j in axes(fw, 2)
         @. fw[:, j] = Mt[1, j] * prim[1, j] * Muv[:, j]
     end
 
     # flux from f0
-    g = similar(f)
-    for j = 1:2
-        g[:, j] .= maxwellian(u[:, j], prim[:, j])
-    end
+    M = mixture_maxwellian(u, prim)
 
-    for j = 1:2
+    for j in axes(fw, 2)
         fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* f[:, j])
         fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* f[:, j])
         fw[3, j] += Mt[2, j] * 0.5 * sum(ω[:, j] .* u[:, j] .^ 3 .* f[:, j])
 
-        @. ff[:, j] = Mt[1, j] * u[:, j] * g[:, j] + Mt[2, j] * u[:, j] * f[:, j]
+        @. ff[:, j] = Mt[1, j] * u[:, j] * M[:, j] + Mt[2, j] * u[:, j] * f[:, j]
     end
 
 end
 
-
 # ------------------------------------------------------------
-# 1D2F flux with AAP model
+# 1D2F1V with AAP model
 # ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:AbstractFloat,2},
@@ -419,43 +569,26 @@ function flux_kcu!(
     dt::Real,
 )
 
-    # --- upwind reconstruction ---#
+    #--- upwind reconstruction ---#
     δ = heaviside.(u)
 
     h = @. hL * δ + hR * (1.0 - δ)
     b = @. bL * δ + bR * (1.0 - δ)
 
-    primL = similar(wL)
-    primR = similar(primL)
-    for j = 1:2
-        primL[:, j] .= conserve_prim(wL[:, j], γ)
-        primR[:, j] .= conserve_prim(wR[:, j], γ)
-    end
+    primL = mixture_conserve_prim(wL, γ)
+    primR = mixture_conserve_prim(wR, γ)
 
-    # --- construct interface distribution ---#
-    Mu1 = OffsetArray{Float64}(undef, 0:6, 1:2)
-    Mxi1 = similar(Mu1)
-    MuL1 = similar(Mu1)
-    MuR1 = similar(Mu1)
-    Mu2 = similar(Mu1)
-    Mxi2 = similar(Mu1)
-    MuL2 = similar(Mu1)
-    MuR2 = similar(Mu1)
-    Muv1 = similar(wL)
-    Muv2 = similar(wL)
-    for j = 1:2
-        Mu1[:, j], Mxi1[:, j], MuL1[:, j], MuR1[:, j] = gauss_moments(primL[:, j], inK)
-        Muv1[:, j] = moments_conserve(MuL1[:, j], Mxi1[:, j], 0, 0)
-        Mu2[:, j], Mxi2[:, j], MuL2[:, j], MuR2[:, j] = gauss_moments(primR[:, j], inK)
-        Muv2[:, j] = moments_conserve(MuR2[:, j], Mxi2[:, j], 0, 0)
-    end
+    #--- construct interface distribution ---#
+    Mu1, Mxi1, MuL1, MuR1 = mixture_gauss_moments(primL, inK)
+    Mu2, Mxi2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
+    Muv1 = mixture_moments_conserve(MuL1, Mxi1, 0, 0)
+    Muv2 = mixture_moments_conserve(MuR2, Mxi2, 0, 0)
 
     w = similar(wL)
-    prim = similar(wL)
-    for j = 1:2
+    for j in axes(w, 2)
         @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
-        prim[:, j] .= conserve_prim(w[:, j], γ)
     end
+    prim = mixture_conserve_prim(w, γ)
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
     @. tau +=
@@ -469,31 +602,23 @@ function flux_kcu!(
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
     @. Mt[1, :] = dt - Mt[2, :] # M0
 
-    # --- calculate fluxes ---#
-    Mu = similar(Mu1)
-    Mxi = similar(Mu1)
-    MuL = similar(Mu1)
-    MuR = similar(Mu1)
-    Muv = similar(wL)
-    for j in axes(Mu1, 2)
-        Mu[:, j], Mxi[:, j], MuL[:, j], MuR[:, j] = gauss_moments(prim[:, j], inK)
-        Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], 1, 0)
-    end
+    #--- calculate fluxes ---#
+    Mu, Mxi, MuL, MuR = mixture_gauss_moments(prim, inK)
+    Muv = mixture_moments_conserve(Mu, Mxi, 1, 0)
 
     # flux from M0
-    for j = 1:2
+    for j in axes(fw, 2)
         @. fw[:, j] = Mt[1, j] * prim[1, j] * Muv[:, j]
     end
 
     # flux from f0
-    g0 = similar(h)
-    g1 = similar(b)
-    for j = 1:2
-        g0[:, j] .= maxwellian(u[:, j], prim[:, j])
-        g1[:, j] .= g0[:, j] .* inK ./ (2.0 * prim[end, j])
+    MH = mixture_maxwellian(u, prim)
+    MB = similar(MH)
+    for j in axes(MB, 2)
+        MB[:, j] .= MH[:, j] .* inK ./ (2.0 * prim[end, j])
     end
 
-    for j = 1:2
+    for j in axes(fw, 2)
         fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h[:, j])
         fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h[:, j])
         fw[3, j] +=
@@ -501,15 +626,14 @@ function flux_kcu!(
             0.5 *
             (sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) + sum(ω[:, j] .* u[:, j] .* b[:, j]))
 
-        @. fh[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h[:, j]
-        @. fb[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * b[:, j]
+        @. fh[:, j] = Mt[1, j] * u[:, j] * MH[:, j] + Mt[2, j] * u[:, j] * h[:, j]
+        @. fb[:, j] = Mt[1, j] * u[:, j] * MB[:, j] + Mt[2, j] * u[:, j] * b[:, j]
     end
 
 end
 
-
 # ------------------------------------------------------------
-# 1D4F flux with AAP model
+# 1D4F1V with AAP model
 # ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:AbstractFloat,2},
@@ -539,7 +663,7 @@ function flux_kcu!(
     dt::Real,
 )
 
-    # --- upwind reconstruction ---#
+    #--- upwind reconstruction ---#
     δ = heaviside.(u)
 
     h0 = @. h0L * δ + h0R * (1.0 - δ)
@@ -550,14 +674,14 @@ function flux_kcu!(
     primL = mixture_conserve_prim(wL, γ)
     primR = mixture_conserve_prim(wR, γ)
 
-    # --- construct interface distribution ---#
+    #--- construct interface distribution ---#
     Mu1, Mv1, Mw1, MuL1, MuR1 = mixture_gauss_moments(primL, inK)
     Muv1 = mixture_moments_conserve(MuL1, Mv1, Mw1, 0, 0, 0)
     Mu2, Mv2, Mw2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
     Muv2 = mixture_moments_conserve(MuR2, Mv2, Mw2, 0, 0, 0)
 
     w = similar(wL)
-    for j = 1:2
+    for j in axes(w, 2)
         @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
     end
     prim = mixture_conserve_prim(w, γ)
@@ -568,18 +692,18 @@ function flux_kcu!(
         (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
         dt *
         5.0
-    # prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
+    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
 
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
     @. Mt[1, :] = dt - Mt[2, :] # M0
 
-    # --- calculate fluxes ---#
+    #--- calculate fluxes ---#
     Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, inK)
     Muv = mixture_moments_conserve(Mu, Mv, Mw, 1, 0, 0)
 
     # flux from M0
-    for j = 1:2
+    for j in axes(fw, 2)
         @. fw[:, j] = Mt[1, j] * prim[1, j] * Muv[:, j]
     end
 
@@ -589,13 +713,13 @@ function flux_kcu!(
     g1 = similar(h0)
     g2 = similar(h0)
     g3 = similar(h0)
-    for j = 1:2
+    for j in axes(g0, 2)
         g1[:, j] .= Mv[1, j] .* g0[:, j]
         g2[:, j] .= Mw[1, j] .* g0[:, j]
         g3[:, j] .= (Mv[2, j] + Mw[2, j]) .* g0[:, j]
     end
 
-    for j = 1:2
+    for j in axes(fw, 2)
         fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h0[:, j])
         fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h0[:, j])
         fw[3, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h1[:, j])
@@ -616,9 +740,8 @@ function flux_kcu!(
 
 end
 
-
 # ------------------------------------------------------------
-# 2D3F flux with AAP model
+# 2D3F2V with AAP model
 # ------------------------------------------------------------
 function flux_kcu!(
     fw::AbstractArray{<:AbstractFloat,2},
@@ -670,6 +793,7 @@ function flux_kcu!(
         (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
         dt *
         2.0
+    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
 
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -680,7 +804,7 @@ function flux_kcu!(
 
     # flux from M0
     Muv = mixture_moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
-    for j = 1:2
+    for j in axes(fw, 2)
         @. fw[:, j] = Mt[1, j] * prim[1, j] * Muv[:, j]
     end
 
@@ -688,17 +812,16 @@ function flux_kcu!(
     H0 = mixture_maxwellian(u, v, prim)
     H1 = similar(H0)
     H2 = similar(H0)
-    for j = 1:2
+    for j in axes(H0, 3)
         H1[:, :, j] = H0[:, :, j] .* prim[4, j]
         H2[:, :, j] .= H0[:, :, j] .* (prim[4, j]^2 + 1.0 / (2.0 * prim[5, j]))
     end
 
-    for j = 1:2
+    for j in axes(fw, 2)
         fw[1, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h0[:, :, j])
         fw[2, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* h0[:, :, j])
         fw[3, j] += Mt[2, j] * sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j])
-        #fw[4, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j])
-        fw[4, j] += Mt[2, j] * sum(ω[:, :, j] .* v[:, :, j] .* h1[:, :, j])
+        fw[4, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j])
         fw[5, j] +=
             Mt[2, j] *
             0.5 *
