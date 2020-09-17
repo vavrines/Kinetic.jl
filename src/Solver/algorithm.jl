@@ -1132,7 +1132,7 @@ function update!(
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
 
-    @inbounds Threads.@threads for i = 1:KS.pSpace.nx
+    @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
         step!(
             KS,
             face[i],
@@ -1251,7 +1251,7 @@ function update!(
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
 
-    @inbounds Threads.@threads for 2 = 1:KS.pSpace.nx-1
+    @inbounds Threads.@threads for i in 2:KS.pSpace.nx-1
         step!(
             KS,
             face[i],
