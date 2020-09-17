@@ -1156,8 +1156,9 @@ function update!(
         face, 
         dt, 
         residual; 
-        coll=coll, 
-        bc=bc, 
+        coll = coll, 
+        bc = bc, 
+        isMHD = isMHD,
     )
 
     #=
@@ -1275,8 +1276,9 @@ function update!(
         face, 
         dt, 
         residual; 
-        coll=coll, 
-        bc=bc, 
+        coll = coll, 
+        bc = bc, 
+        isMHD = isMHD,
     )
 
 end
@@ -1290,6 +1292,7 @@ function update_boundary!(
     residual::Array{<:AbstractFloat};
     coll = :bgk::Symbol,
     bc = :extra::Symbol,
+    isMHD = true::Bool,
 )
 
     if bc != :fix
