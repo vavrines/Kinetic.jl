@@ -1300,10 +1300,10 @@ function update_boundary!(
 
         i = 1
         j = KS.pSpace.nx
-        if KS.set.case[3:4] == "0f"
+        if KS.set.space[3:4] == "0f"
             step!(KS, face[i], ctr[i], face[i+1], dt, resL, avgL)
             step!(KS, face[j], ctr[j], face[j+1], dt, resR, avgR)
-        elseif KS.set.case[3:4] in ["3f", "4f"]
+        elseif KS.set.space[3:4] in ["3f", "4f"]
             step!(KS, face[i], ctr[i], face[i+1], dt, resL, avgL, coll, isMHD)
             step!(KS, face[j], ctr[j], face[j+1], dt, resR, avgR, coll, isMHD)
         else
@@ -1324,15 +1324,15 @@ function update_boundary!(
             ctr[KS.pSpace.nx+i].w .= ctr[KS.pSpace.nx].w
             ctr[KS.pSpace.nx+i].prim .= ctr[KS.pSpace.nx].prim
 
-            if KS.set.case[3:4] == "1f"
+            if KS.set.space[3:4] == "1f"
                 ctr[1-i].f .= ctr[1].f
                 ctr[KS.pSpace.nx+i].f .= ctr[KS.pSpace.nx].f
-            elseif KS.set.case[3:4] == "2f"
+            elseif KS.set.space[3:4] == "2f"
                 ctr[1-i].h .= ctr[1].h
                 ctr[1-i].b .= ctr[1].b
                 ctr[KS.pSpace.nx+i].h .= ctr[KS.pSpace.nx].h
                 ctr[KS.pSpace.nx+i].b .= ctr[KS.pSpace.nx].b
-            elseif KS.set.case[3:4] == "3f"
+            elseif KS.set.space[3:4] == "3f"
                 ctr[1-i].h0 .= ctr[1].h0
                 ctr[1-i].h1 .= ctr[1].h1
                 ctr[1-i].h2 .= ctr[1].h2
@@ -1350,7 +1350,7 @@ function update_boundary!(
                 ctr[KS.pSpace.nx+i].ϕ = deepcopy(ctr[KS.pSpace.nx].ϕ)
                 ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[KS.pSpace.nx].ψ)
                 ctr[KS.pSpace.nx+i].lorenz .= ctr[KS.pSpace.nx].lorenz
-            elseif KS.set.case[3:4] == "4f"
+            elseif KS.set.space[3:4] == "4f"
                 ctr[1-i].h0 .= ctr[1].h0
                 ctr[1-i].h1 .= ctr[1].h1
                 ctr[1-i].h2 .= ctr[1].h2
@@ -1401,15 +1401,15 @@ function update_boundary!(
             ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[i].ψ)
             ctr[KS.pSpace.nx+i].lorenz .= ctr[i].lorenz
 
-            if KS.set.case[3:4] == "1f"
+            if KS.set.space[3:4] == "1f"
                 ctr[1-i].f .= ctr[KS.pSpace.nx+1-i].f
                 ctr[KS.pSpace.nx+i].f .= ctr[i].f
-            elseif KS.set.case[3:4] == "2f"
+            elseif KS.set.space[3:4] == "2f"
                 ctr[1-i].h .= ctr[KS.pSpace.nx+1-i].h
                 ctr[1-i].b .= ctr[KS.pSpace.nx+1-i].b
                 ctr[KS.pSpace.nx+i].h .= ctr[i].h
                 ctr[KS.pSpace.nx+i].b .= ctr[i].b
-            elseif KS.set.case[3:4] == "3f"
+            elseif KS.set.space[3:4] == "3f"
                 ctr[1-i].h0 .= ctr[KS.pSpace.nx+1-i].h0
                 ctr[1-i].h1 .= ctr[KS.pSpace.nx+1-i].h1
                 ctr[1-i].h2 .= ctr[KS.pSpace.nx+1-i].h2
@@ -1427,7 +1427,7 @@ function update_boundary!(
                 ctr[KS.pSpace.nx+i].ϕ = deepcopy(ctr[i].ϕ)
                 ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[i].ψ)
                 ctr[KS.pSpace.nx+i].lorenz .= ctr[i].lorenz
-            elseif KS.set.case[3:4] == "4f"
+            elseif KS.set.space[3:4] == "4f"
                 ctr[1-i].h0 .= ctr[KS.pSpace.nx+1-i].h0
                 ctr[1-i].h1 .= ctr[KS.pSpace.nx+1-i].h1
                 ctr[1-i].h2 .= ctr[KS.pSpace.nx+1-i].h2
@@ -1474,15 +1474,15 @@ function update_boundary!(
         ctr[KS.pSpace.nx+1].ψ = 0.5 * (ctr[KS.pSpace.nx].ψ + ctr[KS.pSpace.nx+2].ψ)
         @. ctr[KS.pSpace.nx+1].lorenz = 0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
 
-        if KS.set.case[3:4] == "1f"
+        if KS.set.space[3:4] == "1f"
             @. ctr[0].f = 0.5 * (ctr[-1].f + ctr[1].f)
             @. ctr[KS.pSpace.nx+1].f = 0.5 * (ctr[KS.pSpace.nx].f + ctr[KS.pSpace.nx+2].f)
-        elseif KS.set.case[3:4] == "2f"
+        elseif KS.set.space[3:4] == "2f"
             @. ctr[0].h = 0.5 * (ctr[-1].h + ctr[1].h)
             @. ctr[0].b = 0.5 * (ctr[-1].b + ctr[1].b)
             @. ctr[KS.pSpace.nx+1].h = 0.5 * (ctr[KS.pSpace.nx].h + ctr[KS.pSpace.nx+2].h)
             @. ctr[KS.pSpace.nx+1].b = 0.5 * (ctr[KS.pSpace.nx].b + ctr[KS.pSpace.nx+2].b)
-        elseif KS.set.case[3:4] == "3f"
+        elseif KS.set.space[3:4] == "3f"
             @. ctr[0].h0 = 0.5 * (ctr[-1].h0 + ctr[1].h0)
             @. ctr[0].h1 = 0.5 * (ctr[-1].h1 + ctr[1].h1)
             @. ctr[0].h2 = 0.5 * (ctr[-1].h2 + ctr[1].h2)
@@ -1500,7 +1500,7 @@ function update_boundary!(
             ctr[KS.pSpace.nx+1].ϕ = 0.5 * (ctr[KS.pSpace.nx].ϕ + ctr[KS.pSpace.nx+2].ϕ)
             ctr[KS.pSpace.nx+1].ψ = 0.5 * (ctr[KS.pSpace.nx].ψ + ctr[KS.pSpace.nx+2].ψ)
             @. ctr[KS.pSpace.nx+1].lorenz = 0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
-        elseif KS.set.case[3:4] == "4f"
+        elseif KS.set.space[3:4] == "4f"
             @. ctr[0].h0 = 0.5 * (ctr[-1].h0 + ctr[1].h0)
             @. ctr[0].h1 = 0.5 * (ctr[-1].h1 + ctr[1].h1)
             @. ctr[0].h2 = 0.5 * (ctr[-1].h2 + ctr[1].h2)
