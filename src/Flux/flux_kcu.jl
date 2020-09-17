@@ -769,7 +769,10 @@ function flux_kcu!(
     Mu2, Mv2, Mxi2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
     Muv2 = mixture_moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
 
-    w = @. primL[1] * Muv1 + primR[1] * Muv2
+    w = similar(wL)
+    for j in axes(w, 2)
+        @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
+    end
     prim = mixture_conserve_prim(w, γ)
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
     @. tau +=

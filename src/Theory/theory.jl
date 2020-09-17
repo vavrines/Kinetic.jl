@@ -41,4 +41,6 @@ export heat_capacity_ratio, sound_speed
 
 include("continuum.jl")
 include("atom.jl")
+include("moments_pure.jl")
+include("moments_mixture.jl")
 include("thermo.jl")

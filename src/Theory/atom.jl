@@ -1,329 +1,3 @@
-# ============================================================
-# Atomistic Theory
-# ============================================================
-
-"""
-Calculate moments of Gaussian distribution G = (λ / π)^(D / 2) * exp[-λ(c^2 + ξ^2)]
-
-* with internality: `gauss_moments(prim::AbstractArray{<:Real,1}, inK::Real)`
-* without internality: `gauss_moments(prim::AbstractArray{<:Real,1})`
-
-"""
-function gauss_moments(prim::AbstractArray{<:Real,1})
-
-    if eltype(prim) <: Int
-        MuL = OffsetArray{Float64}(undef, 0:6)
-    else
-        MuL = OffsetArray{eltype(prim)}(undef, 0:6)
-    end
-    MuR = similar(MuL)
-    Mu = similar(MuL)
-
-    MuL[0] = 0.5 * SpecialFunctions.erfc(-sqrt(prim[end]) * prim[2])
-    MuL[1] = prim[2] * MuL[0] + 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
-    MuR[0] = 0.5 * SpecialFunctions.erfc(sqrt(prim[end]) * prim[2])
-    MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
-
-    for i = 2:6
-        MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i - 1) * MuL[i-2] / prim[end]
-        MuR[i] = prim[2] * MuR[i-1] + 0.5 * (i - 1) * MuR[i-2] / prim[end]
-    end
-
-    @. Mu = MuL + MuR
-
-    if length(prim) == 3
-
-        return Mu, MuL, MuR
-
-    elseif length(prim) == 4
-
-        Mv = similar(MuL)
-        Mv[0] = 1.0
-        Mv[1] = prim[3]
-        for i = 2:6
-            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
-        end
-
-        return Mu, Mv, MuL, MuR
-
-    elseif length(prim) == 5
-
-        Mv = similar(MuL)
-        Mv[0] = 1.0
-        Mv[1] = prim[3]
-        for i = 2:6
-            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
-        end
-
-        Mw = similar(MuL)
-        Mw[0] = 1.0
-        Mw[1] = prim[4]
-        for i = 2:6
-            Mw[i] = prim[4] * Mw[i-1] + 0.5 * (i - 1) * Mw[i-2] / prim[end]
-        end
-
-        return Mu, Mv, Mw, MuL, MuR
-
-    end
-
-end
-
-
-function gauss_moments(prim::AbstractArray{<:Real,1}, inK::Real)
-
-    if eltype(prim) <: Int
-        MuL = OffsetArray{Float64}(undef, 0:6)
-    else
-        MuL = OffsetArray{eltype(prim)}(undef, 0:6)
-    end
-    MuR = similar(MuL)
-    Mu = similar(MuL)
-
-    MuL[0] = 0.5 * SpecialFunctions.erfc(-sqrt(prim[end]) * prim[2])
-    MuL[1] = prim[2] * MuL[0] + 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
-    MuR[0] = 0.5 * SpecialFunctions.erfc(sqrt(prim[end]) * prim[2])
-    MuR[1] = prim[2] * MuR[0] - 0.5 * exp(-prim[end] * prim[2]^2) / sqrt(π * prim[end])
-
-    for i = 2:6
-        MuL[i] = prim[2] * MuL[i-1] + 0.5 * (i - 1) * MuL[i-2] / prim[end]
-        MuR[i] = prim[2] * MuR[i-1] + 0.5 * (i - 1) * MuR[i-2] / prim[end]
-    end
-
-    @. Mu = MuL + MuR
-
-    if length(prim) == 3
-
-        Mxi = similar(MuL, 0:2)
-        Mxi[0] = 1.0
-        Mxi[1] = 0.5 * inK / prim[end]
-        Mxi[2] = (inK^2 + 2.0 * inK) / (4.0 * prim[end]^2)
-
-        return Mu, Mxi, MuL, MuR
-
-    elseif length(prim) == 4
-
-        Mv = similar(MuL)
-        Mv[0] = 1.0
-        Mv[1] = prim[3]
-        for i = 2:6
-            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
-        end
-
-        Mxi = similar(MuL, 0:2)
-        Mxi[0] = 1.0
-        Mxi[1] = 0.5 * inK / prim[end]
-        Mxi[2] = (inK^2 + 2.0 * inK) / (4.0 * prim[end]^2)
-
-        return Mu, Mv, Mxi, MuL, MuR
-
-    elseif length(prim) == 5
-
-        Mv = similar(MuL)
-        Mv[0] = 1.0
-        Mv[1] = prim[3]
-        for i = 2:6
-            Mv[i] = prim[3] * Mv[i-1] + 0.5 * (i - 1) * Mv[i-2] / prim[end]
-        end
-
-        Mw = similar(MuL)
-        Mw[0] = 1.0
-        Mw[1] = prim[4]
-        for i = 2:6
-            Mw[i] = prim[4] * Mw[i-1] + 0.5 * (i - 1) * Mw[i-2] / prim[end]
-        end
-
-        return Mu, Mv, Mw, MuL, MuR
-
-    end
-
-end
-
-
-"""
-Calculate moments of Gaussian distribution in multi-component gas
-
-`mixture_gauss_moments(prim::AbstractArray{<:Real,2}, inK::Real)`
-
-"""
-function mixture_gauss_moments(prim::AbstractArray{<:Real,2}, inK::Real)
-
-    if eltype(prim) <: Int
-        Mu = OffsetArray{Float64}(undef, 0:6, axes(prim, 2))
-    else
-        Mu = OffsetArray{eltype(prim)}(undef, 0:6, axes(prim, 2))
-    end
-
-    MuL = similar(Mu)
-    MuR = similar(Mu)
-
-    if size(prim, 1) == 3
-
-        Mxi = similar(Mu, 0:2, axes(prim, 2))
-        for j in axes(prim, 2)
-            _tu, _txi, _tuL, _tuR = gauss_moments(prim[:, j], inK)
-
-            Mu[:, j] .= _tu
-            Mxi[:, j] .= _txi
-            MuL[:, j] .= _tuL
-            MuR[:, j] .= _tuR
-        end
-
-        return Mu, Mxi, MuL, MuR
-
-    elseif size(prim, 1) == 4
-
-        Mv = similar(Mu)
-        Mxi = similar(Mu, 0:2, axes(prim, 2))
-        for j in axes(prim, 2)
-            _tu, _tv, _txi, _tuL, _tuR = gauss_moments(prim[:, j], inK)
-
-            Mu[:, j] .= _tu
-            Mv[:, j] .= _tv
-            Mxi[:, j] .= _txi
-            MuL[:, j] .= _tuL
-            MuR[:, j] .= _tuR
-        end
-
-        return Mu, Mv, Mxi, MuL, MuR
-
-    elseif size(prim, 1) == 5
-
-        Mv = similar(Mu)
-        Mw = similar(Mu)
-
-        for j in axes(prim, 2)
-            _tu, _tv, _tw, _tuL, _tuR = gauss_moments(prim[:, j], inK)
-
-            Mu[:, j] .= _tu
-            Mv[:, j] .= _tv
-            Mw[:, j] .= _tw
-            MuL[:, j] .= _tuL
-            MuR[:, j] .= _tuR
-        end
-
-        return Mu, Mv, Mw, MuL, MuR
-
-    end
-
-end
-
-
-"""
-Calculate conservative moments of particle distribution
-
-`moments_conserve(Mu::OffsetArray{<:Real,1}, Mxi::OffsetArray{<:Real,1}, 
-    alpha::Int, delta::Int)`
-`moments_conserve(Mu::OffsetArray{<:Real,1}, Mv::OffsetArray{<:Real,1},
-    Mw::OffsetArray{<:Real,1}, alpha::Int, beta::Int, delta::Int)`
-
-"""
-moments_conserve(Mu::OffsetArray{<:AbstractFloat,1}, alpha::Int) = Mu[alpha]
-
-
-function moments_conserve(
-    Mu::OffsetArray{<:AbstractFloat,1},
-    Mxi::OffsetArray{<:AbstractFloat,1},
-    alpha::Int,
-    delta::Int,
-)
-
-    uv = zeros(eltype(Mu), 3)
-    uv[1] = Mu[alpha] * Mxi[delta÷2]
-    uv[2] = Mu[alpha+1] * Mxi[delta÷2]
-    uv[3] = 0.5 * (Mu[alpha+2] * Mxi[delta÷2] + Mu[alpha] * Mxi[(delta+2)÷2])
-
-    return uv
-
-end
-
-
-function moments_conserve(
-    Mu::OffsetArray{<:AbstractFloat,1},
-    Mv::OffsetArray{<:AbstractFloat,1},
-    Mw::OffsetArray{<:AbstractFloat,1},
-    alpha::Int,
-    beta::Int,
-    delta::Int,
-)
-
-    if length(Mw) == 3 # internal motion
-
-        uv = zeros(eltype(Mu), 4)
-        uv[1] = Mu[alpha] * Mv[beta] * Mw[delta÷2]
-        uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta÷2]
-        uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta÷2]
-        uv[4] =
-            0.5 * (
-                Mu[alpha+2] * Mv[beta] * Mw[delta÷2] +
-                Mu[alpha] * Mv[beta+2] * Mw[delta÷2] +
-                Mu[alpha] * Mv[beta] * Mw[(delta+2)÷2]
-            )
-
-    else
-
-        uv = zeros(eltype(Mu), 5)
-        uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
-        uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta]
-        uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta]
-        uv[4] = Mu[alpha] * Mv[beta] * Mw[delta+1]
-        uv[5] =
-            0.5 * (
-                Mu[alpha+2] * Mv[beta] * Mw[delta] +
-                Mu[alpha] * Mv[beta+2] * Mw[delta] +
-                Mu[alpha] * Mv[beta] * Mw[delta+2]
-            )
-
-    end
-
-    return uv
-
-end
-
-
-"""
-Calculate conservative moments of particle distribution in multi-component gas
-
-"""
-function mixture_moments_conserve(
-    Mu::OffsetArray{<:AbstractFloat,2},
-    Mxi::OffsetArray{<:AbstractFloat,2},
-    alpha::Int,
-    delta::Int,
-)
-
-    Muv = zeros(eltype(Mu), 3, size(Mu, 2))
-    for j in axes(Muv, 2)
-        Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], alpha, delta)
-    end
-
-    return Muv
-
-end
-
-
-function mixture_moments_conserve(
-    Mu::OffsetArray{<:AbstractFloat,2},
-    Mv::OffsetArray{<:AbstractFloat,2},
-    Mw::OffsetArray{<:AbstractFloat,2},
-    alpha::Int,
-    beta::Int,
-    delta::Int,
-)
-
-    Muv = ifelse(
-        length(Mw) == 3,
-        zeros(eltype(Mu), 4, size(Mu, 2)),
-        zeros(eltype(Mu), 5, size(Mu, 2)),
-    )
-    for j in axes(Muv, 2)
-        Muv[:, j] .= moments_conserve(Mu[:, j], Mv[:, j], Mw[:, j], alpha, beta, delta)
-    end
-
-    return Muv
-
-end
-
-
 """
 Calculate slope of particle distribution function, 
 assuming a = a1 + u * a2 + 0.5 * u^2 * a3
@@ -407,540 +81,18 @@ end
 
 
 """
-Calculate slope-related conservative moments,
-assuming a = a1 + u * a2 + 0.5 * u^2 * a3
-
-"""
-moments_conserve_slope(a::Real, Mu::OffsetArray{<:Real,1}, alpha::Int) = 
-    a * moments_conserve(Mu, alpha)
-
-
-moments_conserve_slope(
-    a::AbstractArray{<:Real,1},
-    Mu::OffsetArray{<:Real,1},
-    Mxi::OffsetArray{<:Real,1},
-    alpha::Int,
-) =
-    a[1] .* moments_conserve(Mu, Mxi, alpha + 0, 0) .+
-    a[2] .* moments_conserve(Mu, Mxi, alpha + 1, 0) .+
-    0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 2, 0) .+
-    0.5 * a[3] .* moments_conserve(Mu, Mxi, alpha + 0, 2)
-
-
-function moments_conserve_slope(
-    a::AbstractArray{<:Real,1},
-    Mu::OffsetArray{<:Real,1},
-    Mv::OffsetArray{<:Real,1},
-    Mxi::OffsetArray{<:Real,1},
-    alpha::Int,
-    beta::Int,
-)
-
-    au =
-        a[1] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 0) .+
-        a[2] .* moments_conserve(Mu, Mv, Mxi, alpha + 1, beta + 0, 0) .+
-        a[3] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 1, 0) .+
-        0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 2, beta + 0, 0) .+
-        0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 2, 0) .+
-        0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 2)
-
-    return au
-
-end
-
-
-function moments_conserve_slope(
-    a::AbstractArray{<:Real,1},
-    Mu::OffsetArray{<:Real,1},
-    Mv::OffsetArray{<:Real,1},
-    Mw::OffsetArray{<:Real,1},
-    alpha::Int,
-    beta::Int,
-    delta::Int,
-)
-
-    au =
-        a[1] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) .+
-        a[2] .* moments_conserve(Mu, Mv, Mw, alpha + 1, beta + 0, delta + 0) .+
-        a[3] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 1, delta + 0) .+
-        a[4] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 1) .+
-        0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 2, beta + 0, delta + 0) .+
-        0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 2, delta + 0) .+
-        0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 2)
-
-    return au
-
-end
-
-
-function mixture_moments_conserve_slope(
-    a::AbstractArray{<:Real,2},
-    Mu::OffsetArray{<:Real,2},
-    Mxi::OffsetArray{<:Real,2},
-    alpha::Int,
-)
-
-    au = zeros(3, axes(a, 2))
-    for j in axes(au, 2)
-        au[:, j] .= moments_conserve_slope(a[:, j], Mu[:, j], Mxi[:, j], alpha)
-    end
-
-    return au
-
-end
-
-
-function mixture_moments_conserve_slope(
-    a::AbstractArray{<:Real,2},
-    Mu::OffsetArray{<:Real,2},
-    Mv::OffsetArray{<:Real,2},
-    Mxi::OffsetArray{<:Real,2},
-    alpha::Int,
-    beta::Int,
-)
-
-    au = zeros(4, axes(a, 2))
-    for j in axes(au, 2)
-        au[:, j] .=
-            moments_conserve_slope(a[:, j], Mu[:, j], Mv[:, j], Mxi[:, j], alpha, beta)
-    end
-
-    return au
-
-end
-
-
-function mixture_moments_conserve_slope(
-    a::AbstractArray{<:Real,2},
-    Mu::OffsetArray{<:Real,2},
-    Mv::OffsetArray{<:Real,2},
-    Mw::OffsetArray{<:Real,2},
-    alpha::Int,
-    beta::Int,
-    delta::Int,
-)
-
-    au = zeros(eltype(a), 5, axes(a, 2))
-    for j in axes(au, 2)
-        au[:, j] .= moments_conserve_slope(
-            a[:, j],
-            Mu[:, j],
-            Mv[:, j],
-            Mw[:, j],
-            alpha,
-            beta,
-            delta,
-        )
-    end
-
-    return au
-
-end
-
-
-"""
-Velocity moments of particle distribution function
-2) discrete form
-
-"""
-
-"""
-Discrete moments of particle distribution
-
-* `discrete_moments(f, ω)` : direct quadrature
-* `discrete_moments(f, u, ω, n)` : velocity moments
-
-"""
-discrete_moments(f::AbstractArray{<:AbstractFloat,1}, ω::AbstractArray{<:AbstractFloat,1}) =
-    sum(@. ω * f)
-
-
-#--- 1D DVM ---#
-discrete_moments(
-    f::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-    n::Int,
-) = sum(@. ω * u^n * f)
-
-
-#--- 2D DVM ---#
-discrete_moments(
-    f::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    n::Int,
-) = sum(@. ω * u^n * f)
-
-
-#--- 3D DVM ---#
-discrete_moments(
-    f::AbstractArray{<:AbstractFloat,3},
-    u::AbstractArray{<:AbstractFloat,3},
-    ω::AbstractArray{<:AbstractFloat,3},
-    n::Int,
-) = sum(@. ω * u^n * f)
-
-
-# ------------------------------------------------------------
-# Conservative moments
-# ------------------------------------------------------------
-#--- 1D ---#
-function moments_conserve(
-    f::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-)
-    w = zeros(eltype(f), 3)
-    w[1] = discrete_moments(f, u, ω, 0)
-    w[2] = discrete_moments(f, u, ω, 1)
-    w[3] = 0.5 * discrete_moments(f, u, ω, 2)
-
-    return w
-end
-
-
-function moments_conserve(
-    h::AbstractArray{<:AbstractFloat,1},
-    b::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-)
-    w = zeros(eltype(f), 3)
-    w[1] = discrete_moments(h, u, ω, 0)
-    w[2] = discrete_moments(h, u, ω, 1)
-    w[3] = 0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(b, u, ω, 0))
-
-    return w
-end
-
-
-function mixture_moments_conserve(
-    f::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    w = zeros(eltype(f), 3, size(f, 2))
-    for j in axes(w, 2)
-        w[:, j] .= moments_conserve(f[:, j], u, ω)
-    end
-
-    return w
-end
-
-
-function mixture_moments_conserve(
-    h::AbstractArray{<:AbstractFloat,2},
-    b::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    w = zeros(eltype(h), 3, size(h, 2))
-    for j in axes(w, 2)
-        w[:, j] .= moments_conserve(h[:, j], b[:, j], u, ω)
-    end
-
-    return w
-end
-
-
-#--- 2D ---#
-function moments_conserve(
-    f::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    w = zeros(eltype(f), 4)
-    w[1] = discrete_moments(f, u, ω, 0)
-    w[2] = discrete_moments(f, u, ω, 1)
-    w[3] = discrete_moments(f, v, ω, 1)
-    w[4] = 0.5 * (discrete_moments(f, u, ω, 2) + discrete_moments(f, v, ω, 2))
-
-    return w
-end
-
-function moments_conserve(
-    h::AbstractArray{<:AbstractFloat,2},
-    b::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    w = zeros(eltype(h), 4)
-    w[1] = discrete_moments(h, u, ω, 0)
-    w[2] = discrete_moments(h, u, ω, 1)
-    w[3] = discrete_moments(h, v, ω, 1)
-    w[4] = 0.5 * (
-        discrete_moments(h, u, ω, 2) +
-        discrete_moments(h, v, ω, 2) +
-        discrete_moments(b, u, ω, 0)
-    )
-
-    return w
-end
-
-
-function mixture_moments_conserve(
-    f::AbstractArray{<:AbstractFloat,3},
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    ω::AbstractArray{<:AbstractFloat,3},
-)
-    w = zeros(eltype(f), 4, size(f, 3))
-    for j in axes(w, 2)
-        w[:, j] .= moments_conserve(f[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
-    end
-
-    return w
-end
-
-
-function mixture_moments_conserve(
-    h::AbstractArray{<:AbstractFloat,2},
-    b::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    w = zeros(eltype(h), 4, size(h, 3))
-    for j in axes(w, 2)
-        w[:, j] .=
-            moments_conserve(h[:, :, j], b[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
-    end
-
-    return w
-end
-
-
-#--- 3D ---#
-function moments_conserve(
-    f::AbstractArray{<:AbstractFloat,3},
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    ω::AbstractArray{<:AbstractFloat,3},
-)
-    moments = zeros(eltype(f), 5)
-
-    moments[1] = discrete_moments(f, u, ω, 0)
-    moments[2] = discrete_moments(f, u, ω, 1)
-    moments[3] = discrete_moments(f, v, ω, 1)
-    moments[4] = discrete_moments(f, w, ω, 1)
-    moments[5] = 0.5 * (
-        discrete_moments(f, u, ω, 2) +
-        discrete_moments(f, v, ω, 2) +
-        discrete_moments(f, w, ω, 2)
-    )
-
-    return moments
-end
-
-
-function moments_conserve(
-    h0::AbstractArray{<:AbstractFloat,1},
-    h1::AbstractArray{<:AbstractFloat,1},
-    h2::AbstractArray{<:AbstractFloat,1},
-    h3::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-)
-    moments = zeros(eltype(h0), 5)
-
-    moments[1] = discrete_moments(h0, u, ω, 0)
-    moments[2] = discrete_moments(h0, u, ω, 1)
-    moments[3] = discrete_moments(h1, u, ω, 0)
-    moments[4] = discrete_moments(h2, u, ω, 0)
-    moments[5] = 0.5 * discrete_moments(h0, u, ω, 2) + 0.5 * discrete_moments(h3, u, ω, 0)
-
-    return w
-end
-
-
-function mixture_moments_conserve(
-    f::AbstractArray{<:AbstractFloat,4},
-    u::AbstractArray{<:AbstractFloat,4},
-    v::AbstractArray{<:AbstractFloat,4},
-    w::AbstractArray{<:AbstractFloat,4},
-    ω::AbstractArray{<:AbstractFloat,4},
-)
-    moments = zeros(eltype(f), 5, size(f, 4))
-
-    for j in axes(w, 2)
-        moments[:, j] .= moments_conserve(
-            f[:, :, :, j],
-            u[:, :, :, j],
-            v[:, :, :, j],
-            w[:, :, :, j],
-            ω[:, :, :, j],
-        )
-    end
-
-    return moments
-end
-
-
-function mixture_moments_conserve(
-    h0::AbstractArray{<:AbstractFloat,2},
-    h1::AbstractArray{<:AbstractFloat,2},
-    h2::AbstractArray{<:AbstractFloat,2},
-    h3::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    moments = zeros(eltype(h0), 5, size(h0, 2))
-    for j in axes(w, 2)
-        moments[:, j] .=
-            moments_conserve(h0[:, j], h1[:, j], h2[:, j], h3[:, j], u[:, j], ω[:, j])
-    end
-
-    return moments
-end
-
-
-"""
-Calculate stress tensor from particle distribution function
-
-"""
-function stress(
-    f::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-)
-    return sum(@. ω * (u - prim[2]) * (u - prim[2]) * f)
-end
-
-
-function stress(
-    f::AbstractArray{<:AbstractFloat,2},
-    prim::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    P = zeros(eltype(prim), 2, 2)
-
-    P[1, 1] = sum(@. ω * (u - prim[2]) * (u - prim[2]) * f)
-    P[1, 2] = sum(@. ω * (u - prim[2]) * (v - prim[3]) * f)
-    P[2, 1] = P[1, 2]
-    P[1, 2] = sum(@. ω * (v - prim[3]) * (v - prim[3]) * f)
-
-    return P
-end
-
-
-"""
-Evaluate heat flux from particle distribution function
-
-"""
-heat_flux(
-    h::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-) = 0.5 * sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h)
-
-
-heat_flux(
-    h::AbstractArray{<:AbstractFloat,1},
-    b::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-) = 0.5 * (sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h) + sum(@. ω * (u - prim[2]) * b))
-
-
-#--- 2D ---#
-function heat_flux(
-    h::AbstractArray{<:AbstractFloat,2},
-    prim::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    q = zeros(eltype(f), 2)
-
-    q[1] = 0.5 * sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
-    q[2] = 0.5 * sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
-
-    return q
-end
-
-
-function heat_flux(
-    h::AbstractArray{<:AbstractFloat,2},
-    b::AbstractArray{<:AbstractFloat,2},
-    prim::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-)
-    q = zeros(eltype(f), 2)
-
-    q[1] =
-        0.5 * (
-            sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h) +
-            sum(@. ω * (u - prim[2]) * b)
-        )
-    q[2] =
-        0.5 * (
-            sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h) +
-            sum(@. ω * (v - prim[3]) * b)
-        )
-
-    return q
-end
-
-
-#--- 3D ---#
-function heat_flux(
-    f::AbstractArray{<:AbstractFloat,3},
-    prim::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    ω::AbstractArray{<:AbstractFloat,3},
-)
-    q = zeros(eltype(f), 3)
-
-    q[1] =
-        0.5 * sum(@. ω *
-               (u - prim[2]) *
-               ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) *
-               f)
-    q[2] =
-        0.5 * sum(@. ω *
-               (v - prim[3]) *
-               ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) *
-               f)
-    q[3] =
-        0.5 * sum(@. ω *
-               (w - prim[4]) *
-               ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) *
-               f)
-
-    return q
-end
-
-
-"""
 Maxwellian in discrete form
 
->@param[in] : particle velocity quadrature points
->@param[in] : density, velocity and inverse of temperature
->@return : Maxwellian distribution function
+* @arg: particle velocity quadrature points
+* @arg: density, velocity and inverse of temperature
+* @return: Maxwellian distribution function
 
 """
-
-#--- 1D ---#
 maxwellian(u::AbstractArray{<:AbstractFloat,1}, ρ::Real, U::Real, λ::Real) =
-    @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2)
-
+    @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2) #// 1V
 
 maxwellian(u::AbstractArray{<:AbstractFloat,1}, prim::AbstractArray{<:Real,1}) =
     maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
-
 
 function mixture_maxwellian(u::AbstractArray{<:AbstractFloat,2}, prim::AbstractArray{<:Real,2})
     mixM = similar(u)
@@ -951,8 +103,7 @@ function mixture_maxwellian(u::AbstractArray{<:AbstractFloat,2}, prim::AbstractA
     return mixM
 end
 
-
-#--- 2D ---#
+#--- 2V ---#
 maxwellian(
     u::AbstractArray{<:AbstractFloat,2},
     v::AbstractArray{<:AbstractFloat,2},
@@ -962,13 +113,11 @@ maxwellian(
     λ::Real,
 ) = @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
-
 maxwellian(
     u::AbstractArray{<:AbstractFloat,2},
     v::AbstractArray{<:AbstractFloat,2},
     prim::AbstractArray{<:Real,1},
 ) = maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
-
 
 function mixture_maxwellian(
     u::AbstractArray{<:AbstractFloat,3},
@@ -983,8 +132,7 @@ function mixture_maxwellian(
     return mixM
 end
 
-
-#--- 3D ---#
+#--- 3V ---#
 maxwellian(
     u::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
@@ -996,14 +144,12 @@ maxwellian(
     λ::Real,
 ) = @. ρ * sqrt((λ / π)^3) * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
 
-
 maxwellian(
     u::AbstractArray{<:AbstractFloat,3},
     v::AbstractArray{<:AbstractFloat,3},
     w::AbstractArray{<:AbstractFloat,3},
     prim::AbstractArray{<:Real,1},
 ) = maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
-
 
 function mixture_maxwellian(
     u::AbstractArray{<:AbstractFloat,4},
@@ -1024,19 +170,18 @@ end
 """
 Shakhov non-equilibrium part
 
-> @param[in] : particle velocity quadrature points
-> @param[in] : discrete Maxwellian
-> @param[in] : primitive variables, Prandtl number, heat flux, inner degree of freedom
+* @arg: particle velocity quadrature points
+* @arg: discrete Maxwellian
+* @arg: primitive variables, Prandtl number, heat flux, inner degree of freedom
 
 """
-#--- 1F1V ---#
 function shakhov(
     u::AbstractArray{<:AbstractFloat,1},
     M::AbstractArray{<:AbstractFloat,1},
     q::Real,
     prim::AbstractArray{<:Real,1},
     Pr::Real,
-)
+) #// 1F1V
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        (u - prim[2]) *
@@ -1047,7 +192,6 @@ function shakhov(
     return M_plus
 
 end
-
 
 #--- 2F1V ---#
 function shakhov(
@@ -1075,7 +219,6 @@ function shakhov(
 
 end
 
-
 #--- 1F2V ---#
 function shakhov(
     u::AbstractArray{<:AbstractFloat,2},
@@ -1094,7 +237,6 @@ function shakhov(
     return M_plus
 
 end
-
 
 #--- 2F2V ---#
 function shakhov(
@@ -1121,7 +263,6 @@ function shakhov(
 
 end
 
-
 #--- 1F3V ---#
 function shakhov(
     u::AbstractArray{<:AbstractFloat,3},
@@ -1146,8 +287,8 @@ end
 """
 Reduced distribution function
 
-@arg : particle distribution function with full velocity space
-@arg : quadrature weights with reduced velocity setting (v & w by default)
+* @arg : particle distribution function with full velocity space
+* @arg : quadrature weights with reduced velocity setting (v & w by default)
 
 """
 function reduce_distribution(
@@ -1242,12 +383,11 @@ end
 """
 Recover full distribution function from reduced ones
 
->@param[in] h & b : reduced particle distribution function with 1D velocity space
->@param[in] u : quadrature nodes in 1D velocity space
->@param[in] weights : quadrature weights in 1D velocity space
->@param[in] v & w : quadrature nodes in the rest velocity space (with 3D setting)
-
->@param[out] f : particle distribution function with 3D velocity space
+* @arg h & b : reduced particle distribution function with 1D velocity space
+* @arg u : quadrature nodes in 1D velocity space
+* @arg weights : quadrature weights in 1D velocity space
+* @arg v & w : quadrature nodes in the rest velocity space (with 3D setting)
+* @return f : particle distribution function with 3D velocity space
 
 """
 
@@ -1274,7 +414,6 @@ function full_distribution(
 
     return f
 end
-
 
 full_distribution(
     h::AbstractArray{<:AbstractFloat,1},
@@ -1469,6 +608,15 @@ end
 """
 Calculate mixture collision time from AAP model
 
+`aap_hs_collision_time(
+    prim::AbstractArray{<:Real,2},
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    kn::Real,
+)`
+
 """
 function aap_hs_collision_time(
     prim::AbstractArray{<:Real,2},
@@ -1499,6 +647,16 @@ end
 
 """
 Calculate mixture primitive variables from AAP model
+
+`aap_hs_prim(
+    prim::AbstractArray{<:Real,2},
+    tau::AbstractArray{<:Real,1},
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    kn::Real,
+)`
 
 """
 function aap_hs_prim(
@@ -1713,7 +871,7 @@ function aap_hs_prim(
 
     else
 
-        throw("AAP mixture : dimension dismatch")
+        throw("AAP mixture: dimension dismatch")
 
     end
 
@@ -1724,6 +882,8 @@ end
 
 """
 Source term of AAP model in DifferentialEquations.jl
+
+`aap_hs_diffeq!(du, u, p, t)`
 
 """
 function aap_hs_diffeq!(du, u, p, t)
@@ -1800,6 +960,20 @@ end
 """
 Shift distribution function by external force
 
+`shift_pdf!(
+    f::AbstractArray{<:AbstractFloat,1},
+    a::Real,
+    du::AbstractFloat,
+    dt::Real,
+)`
+
+`shift_pdf!(
+    f::AbstractArray{<:AbstractFloat,2},
+    a::AbstractArray{<:Real,1},
+    du::AbstractArray{<:AbstractFloat,1},
+    dt::Real,
+)`
+
 """
 function shift_pdf!(
     f::AbstractArray{<:AbstractFloat,1},
@@ -1842,8 +1016,7 @@ function shift_pdf!(
 
 end
 
-
-#--- Multi-component gas ---#
+#--- multi-component gas ---#
 function shift_pdf!(
     f::AbstractArray{<:AbstractFloat,2},
     a::AbstractArray{<:Real,1},
