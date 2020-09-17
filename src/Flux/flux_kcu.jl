@@ -471,7 +471,7 @@ function flux_kcu!(
     ni::Real,
     me::Real,
     ne::Real,
-    kn::Real,
+    Kn::Real,
     dt::Real,
 )
 
@@ -494,13 +494,13 @@ function flux_kcu!(
     end
     prim = mixture_conserve_prim(w, γ)
 
-    tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
     @. tau +=
         abs(cellL.prim[1, :] / cellL.prim[end, :] - cellR.prim[1, :] / cellR.prim[end, :]) /
         (cellL.prim[1, :] / cellL.prim[end, :] + cellR.prim[1, :] / cellR.prim[end, :]) *
         dt *
         2.0
-    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
+    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
 
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -549,7 +549,7 @@ function flux_kcu!(
     ni::Real,
     me::Real,
     ne::Real,
-    kn::Real,
+    Kn::Real,
     dt::Real,
 )
 
@@ -574,13 +574,13 @@ function flux_kcu!(
     end
     prim = mixture_conserve_prim(w, γ)
 
-    tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
     @. tau +=
         abs(cellL.prim[1, :] / cellL.prim[end, :] - cellR.prim[1, :] / cellR.prim[end, :]) /
         (cellL.prim[1, :] / cellL.prim[end, :] + cellR.prim[1, :] / cellR.prim[end, :]) *
         dt *
         2.0
-    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
+    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
 
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -643,7 +643,7 @@ function flux_kcu!(
     ni::Real,
     me::Real,
     ne::Real,
-    kn::Real,
+    Kn::Real,
     dt::Real,
 )
 
@@ -670,13 +670,13 @@ function flux_kcu!(
     end
     prim = mixture_conserve_prim(w, γ)
 
-    tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
     @. tau +=
         abs(primL[1, :] / primL[end, :] - primR[1, :] / primR[end, :]) /
         (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
         dt *
         5.0
-    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, kn)
+    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
 
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
@@ -749,7 +749,7 @@ function flux_kcu!(
     ni::Real,
     me::Real,
     ne::Real,
-    kn::Real,
+    Kn::Real,
     dt::Real,
     len::Real,
 )
@@ -771,7 +771,7 @@ function flux_kcu!(
 
     w = @. primL[1] * Muv1 + primR[1] * Muv2
     prim = mixture_conserve_prim(w, γ)
-    tau = aap_hs_collision_time(prim, mi, ni, me, ne, kn)
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
     @. tau +=
         abs(primL[1, :] / primL[end, :] - primR[1, :] / primR[end, :]) /
         (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *

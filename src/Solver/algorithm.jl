@@ -1075,31 +1075,63 @@ function update!(
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
 
-    @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
-        step!(
-            face[i].fw,
-            face[i].fh,
-            face[i].fb,
-            ctr[i].w,
-            ctr[i].prim,
-            ctr[i].h,
-            ctr[i].b,
-            face[i+1].fw,
-            face[i+1].fh,
-            face[i+1].fb,
-            KS.vSpace.u,
-            KS.vSpace.weights,
-            KS.gas.K,
-            KS.gas.γ,
-            KS.gas.μᵣ,
-            KS.gas.ω,
-            KS.gas.Pr,
-            ctr[i].dx,
-            dt,
-            sumRes,
-            sumAvg,
-            coll,
-        )
+    if ndims(sumRes) == 1
+        @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
+            step!(
+                face[i].fw,
+                face[i].fh,
+                face[i].fb,
+                ctr[i].w,
+                ctr[i].prim,
+                ctr[i].h,
+                ctr[i].b,
+                face[i+1].fw,
+                face[i+1].fh,
+                face[i+1].fb,
+                KS.vSpace.u,
+                KS.vSpace.weights,
+                KS.gas.K,
+                KS.gas.γ,
+                KS.gas.μᵣ,
+                KS.gas.ω,
+                KS.gas.Pr,
+                ctr[i].dx,
+                dt,
+                sumRes,
+                sumAvg,
+                coll,
+            )
+        end
+    elseif ndims(sumRes) == 2
+        @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
+            step!(
+                face[i].fw,
+                face[i].fh,
+                face[i].fb,
+                ctr[i].w,
+                ctr[i].prim,
+                ctr[i].h,
+                ctr[i].b,
+                face[i+1].fw,
+                face[i+1].fh,
+                face[i+1].fb,
+                KS.vSpace.u,
+                KS.vSpace.weights,
+                KS.gas.inK,
+                KS.gas.γ,
+                KS.gas.mi,
+                KS.gas.ni,
+                KS.gas.me,
+                KS.gas.ne,
+                KS.gas.Kn[1],
+                KS.gas.Pr,
+                dx,
+                dt,
+                sumRes,
+                sumAvg,
+                coll,
+            )
+        end
     end
 
     for i in eachindex(residual)
