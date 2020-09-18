@@ -937,6 +937,8 @@ function flux_ugks!(
     ne::Real,
     Kn::Real,
     dt::Real,
+    dxL::Real,
+    dxR::Real,
     len::Real,
     sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,3},
     sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,3},

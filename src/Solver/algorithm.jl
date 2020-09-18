@@ -971,6 +971,8 @@ function evolve!(
                     KS.gas.ne,
                     KS.gas.Kn[1],
                     dt,
+                    0.5 * ctr[i-1].dx,
+                    0.5 * ctr[i].dx,
                     1.0,
                     ctr[i-1].sh0,
                     ctr[i-1].sh1,
