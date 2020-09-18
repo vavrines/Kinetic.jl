@@ -911,7 +911,7 @@ function flux_ugks!(
 end
 
 # ------------------------------------------------------------
-# 2D3F2V with AAP model
+# 3F2V with AAP model
 # ------------------------------------------------------------
 function flux_ugks!(
     fw::AbstractArray{<:AbstractFloat,2},
@@ -997,7 +997,7 @@ function flux_ugks!(
     for j in axes(fw, 2)
         @. fw[:, j] =
             Mt[1, j] * prim[1, j] * Muv[:, j] +
-            Mt[2, j] * prim[1, j] * (MauL[:, j] + MauR[:, j]) +
+            Mt[2, j] * prim[1, j] * Mau[:, j] +
             Mt[3, j] * prim[1, j] * MauT[:, j]
     end
 
