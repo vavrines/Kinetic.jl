@@ -685,6 +685,7 @@ function evolve!(
     face::Array{<:AbstractInterface1D,1},
     dt::Real;
     mode = :kfvs::Symbol,
+    isPlasma = true::Bool,
 )
 
     #if KS.set.case == "heat"
@@ -857,33 +858,34 @@ function evolve!(
             end
         end
 
-        @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
-                flux_em!(
-                    face[i].femL,
-                    face[i].femR,
-                    ctr[i-2].E,
-                    ctr[i-2].B,
-                    ctr[i-1].E,
-                    ctr[i-1].B,
-                    ctr[i].E,
-                    ctr[i].B,
-                    ctr[i+1].E,
-                    ctr[i+1].B,
-                    ctr[i-1].ϕ,
-                    ctr[i].ϕ,
-                    ctr[i-1].ψ,
-                    ctr[i].ψ,
-                    ctr[i-1].dx,
-                    ctr[i].dx,
-                    KS.gas.Ap,
-                    KS.gas.An,
-                    KS.gas.D,
-                    KS.gas.sol,
-                    KS.gas.χ,
-                    KS.gas.ν,
-                    dt,
-                )
-            
+        if isPlasma == true
+            @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+                    flux_em!(
+                        face[i].femL,
+                        face[i].femR,
+                        ctr[i-2].E,
+                        ctr[i-2].B,
+                        ctr[i-1].E,
+                        ctr[i-1].B,
+                        ctr[i].E,
+                        ctr[i].B,
+                        ctr[i+1].E,
+                        ctr[i+1].B,
+                        ctr[i-1].ϕ,
+                        ctr[i].ϕ,
+                        ctr[i-1].ψ,
+                        ctr[i].ψ,
+                        ctr[i-1].dx,
+                        ctr[i].dx,
+                        KS.gas.Ap,
+                        KS.gas.An,
+                        KS.gas.D,
+                        KS.gas.sol,
+                        KS.gas.χ,
+                        KS.gas.ν,
+                        dt,
+                    )
+            end
         end
 
     elseif KS.set.space[3:end] == "3f2v"
@@ -943,34 +945,71 @@ function evolve!(
                     ctr[i].sh2,
                 )
             end
+        elseif mode == :ugks
+            @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+                flux_ugks!(
+                    face[i].fw,
+                    face[i].fh0,
+                    face[i].fh1,
+                    face[i].fh2,
+                    ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
+                    ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
+                    ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
+                    ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
+                    ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw,
+                    ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
+                    ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
+                    ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
+                    KS.vSpace.u,
+                    KS.vSpace.v,
+                    KS.vSpace.weights,
+                    KS.gas.K,
+                    KS.gas.γ,
+                    KS.gas.mi,
+                    KS.gas.ni,
+                    KS.gas.me,
+                    KS.gas.ne,
+                    KS.gas.Kn[1],
+                    dt,
+                    1.0,
+                    ctr[i-1].sh0,
+                    ctr[i-1].sh1,
+                    ctr[i-1].sh2,
+                    ctr[i].sh0,
+                    ctr[i].sh1,
+                    ctr[i].sh2,
+                )
+            end
         end
 
-        @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
-                flux_em!(
-                    face[i].femL,
-                    face[i].femR,
-                    ctr[i-2].E,
-                    ctr[i-2].B,
-                    ctr[i-1].E,
-                    ctr[i-1].B,
-                    ctr[i].E,
-                    ctr[i].B,
-                    ctr[i+1].E,
-                    ctr[i+1].B,
-                    ctr[i-1].ϕ,
-                    ctr[i].ϕ,
-                    ctr[i-1].ψ,
-                    ctr[i].ψ,
-                    ctr[i-1].dx,
-                    ctr[i].dx,
-                    KS.gas.A1p,
-                    KS.gas.A1n,
-                    KS.gas.D1,
-                    KS.gas.sol,
-                    KS.gas.χ,
-                    KS.gas.ν,
-                    dt,
-                )
+        if isPlasma == true
+            @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+                    flux_em!(
+                        face[i].femL,
+                        face[i].femR,
+                        ctr[i-2].E,
+                        ctr[i-2].B,
+                        ctr[i-1].E,
+                        ctr[i-1].B,
+                        ctr[i].E,
+                        ctr[i].B,
+                        ctr[i+1].E,
+                        ctr[i+1].B,
+                        ctr[i-1].ϕ,
+                        ctr[i].ϕ,
+                        ctr[i-1].ψ,
+                        ctr[i].ψ,
+                        ctr[i-1].dx,
+                        ctr[i].dx,
+                        KS.gas.A1p,
+                        KS.gas.A1n,
+                        KS.gas.D1,
+                        KS.gas.sol,
+                        KS.gas.χ,
+                        KS.gas.ν,
+                        dt,
+                    )
+            end
         end
 
     end
