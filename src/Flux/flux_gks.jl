@@ -950,9 +950,14 @@ function flux_ugks!(
 
     #--- reconstruct initial distribution ---#
     δ = heaviside.(u)
+    
     h0 = @. h0L * δ + h0R * (1.0 - δ)
     h1 = @. h1L * δ + h1R * (1.0 - δ)
     h2 = @. h2L * δ + h2R * (1.0 - δ)
+
+    sh0 = @. sh0L * δ + sh0R * (1.0 - δ)
+    sh1 = @. sh1L * δ + sh1R * (1.0 - δ)
+    sh2 = @. sh2L * δ + sh2R * (1.0 - δ)
 
     primL = mixture_conserve_prim(wL, γ)
     primR = mixture_conserve_prim(wR, γ)
@@ -1012,21 +1017,21 @@ function flux_ugks!(
 
     for j in axes(fw, 2)
         fw[1, j] +=
-            Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h0[:, :, j]) -
+            Mt[4, j] * sum(ω[:, :, j] .* u[:, :, j] .* h0[:, :, j]) -
             Mt[5, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh0[:, :, j])
         fw[2, j] +=
-            Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* h0[:, :, j]) -
+            Mt[4, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* h0[:, :, j]) -
             Mt[5, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 3 .* sh0[:, :, j])
         fw[3, j] +=
-            Mt[2, j] *
+            Mt[4, j] *
             sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j]) -
             Mt[5, j] *
             sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .^ 2 .* sh0[:, :, j])
         fw[4, j] +=
-            Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j]) -
+            Mt[4, j] * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j]) -
             Mt[5, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh1[:, :, j])
         fw[5, j] +=
-            Mt[2, j] *
+            Mt[4, j] *
             0.5 *
             (
                 sum(
