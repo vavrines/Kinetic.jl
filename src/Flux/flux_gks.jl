@@ -843,3 +843,139 @@ function flux_ugks!(
     fb .*= len
 
 end
+
+# ------------------------------------------------------------
+# 2D3F2V with AAP model
+# ------------------------------------------------------------
+function flux_ugks!(
+    fw::AbstractArray{<:AbstractFloat,2},
+    fh0::AbstractArray{<:AbstractFloat,3},
+    fh1::AbstractArray{<:AbstractFloat,3},
+    fh2::AbstractArray{<:AbstractFloat,3},
+    wL::AbstractArray{<:Real,2},
+    h0L::AbstractArray{<:AbstractFloat,3},
+    h1L::AbstractArray{<:AbstractFloat,3},
+    h2L::AbstractArray{<:AbstractFloat,3},
+    wR::AbstractArray{<:Real,2},
+    h0R::AbstractArray{<:AbstractFloat,3},
+    h1R::AbstractArray{<:AbstractFloat,3},
+    h2R::AbstractArray{<:AbstractFloat,3},
+    u::AbstractArray{<:AbstractFloat,3},
+    v::AbstractArray{<:AbstractFloat,3},
+    ω::AbstractArray{<:AbstractFloat,3},
+    inK::Real,
+    γ::Real,
+    mi::Real,
+    ni::Real,
+    me::Real,
+    ne::Real,
+    Kn::Real,
+    dt::Real,
+    len::Real,
+    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,3},
+    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,3},
+    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,3},
+    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,3},
+    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,3},
+    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,3},
+)
+
+    #--- reconstruct initial distribution ---#
+    δ = heaviside.(u)
+    h0 = @. h0L * δ + h0R * (1.0 - δ)
+    h1 = @. h1L * δ + h1R * (1.0 - δ)
+    h2 = @. h2L * δ + h2R * (1.0 - δ)
+
+    primL = mixture_conserve_prim(wL, γ)
+    primR = mixture_conserve_prim(wR, γ)
+
+    #--- construct interface distribution ---#
+    Mu1, Mv1, Mxi1, MuL1, MuR1 = mixture_gauss_moments(primL, inK)
+    Muv1 = mixture_moments_conserve(MuL1, Mv1, Mxi1, 0, 0, 0)
+    Mu2, Mv2, Mxi2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
+    Muv2 = mixture_moments_conserve(MuR2, Mv2, Mxi2, 0, 0, 0)
+
+    w = similar(wL)
+    for j in axes(w, 2)
+        @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
+    end
+    prim = mixture_conserve_prim(w, γ)
+    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
+    prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
+
+    a = mixture_pdf_slope(prim, (wR .- wL) ./ (dxR + dxL), inK)
+    Mu, Mv, Mxi, MuL, MuR = mixture_gauss_moments(prim, inK)
+    Mau = mixture_moments_conserve_slope(a, Mu, Mv, Mxi, 1, 0, 0)
+    aT = mixture_pdf_slope(prim, -prim[1] .* Mau, inK)
+
+    Mt = zeros(2, 2)
+    @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
+    @. Mt[1, :] = dt - Mt[2, :] # M0
+
+    Mt = zeros(5, axes(w, 2))
+    for j in axes(Mt, 2)
+        Mt[4, j] = tau[j] * (1.0 - exp(-dt / tau[j])) # f0
+        Mt[5, j] = -tau[j] * dt * exp(-dt / tau[j]) + tau[j] * Mt[4, j]
+        Mt[1, j] = dt - Mt[4, j] # M0
+        Mt[2, j] = -tau[j] * Mt[1, j] + Mt[5, j]
+        Mt[3, j] = dt^2 / 2.0 - tau[j] * Mt[1, j]
+    end
+
+    #--- calculate interface flux ---#
+    # flux from M0
+    Muv = mixture_moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
+    Mau = mixture_moments_conserve_slope(a, Mu, Mv, Mxi, 2, 0, 0)
+    MauT = mixture_moments_conserve_slope(aT, Mu, Mv, Mxi, 1, 0, 0)
+    for j in axes(fw, 2)
+        @. fw[:, j] = Mt[1, j] * prim[1, j] * Muv[:, j] + Mt[2, j] * prim[1, j] * (MauL[:, j] + MauR[:, j]) + Mt[3, j] * prim[1, j] * MauT[:, j]
+    end
+
+    # flux from f0
+    H0 = mixture_maxwellian(u, v, prim)
+    H1 = similar(H0)
+    H2 = similar(H0)
+    for j in axes(H0, 3)
+        H1[:, :, j] = H0[:, :, j] .* prim[4, j]
+        H2[:, :, j] .= H0[:, :, j] .* (prim[4, j]^2 + 1.0 / (2.0 * prim[5, j]))
+    end
+
+    for j in axes(fw, 2)
+        fw[1, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h0[:, :, j]) - Mt[5, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh0[:, :, j])
+        fw[2, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* h0[:, :, j]) - Mt[5, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 3 .* sh0[:, :, j])
+        fw[3, j] += Mt[2, j] * sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j]) - Mt[5, j] * sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .^ 2 .* sh0[:, :, j])
+        fw[4, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j]) - Mt[5, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh1[:, :, j])
+        fw[5, j] += Mt[2, j] * 0.5 *
+            (
+                sum(
+                    ω[:, :, j] .* u[:, :, j] .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .*
+                    h0[:, :, j],
+                ) + sum(ω[:, :, j] .* u[:, :, j] .* h2[:, :, j])
+            ) -
+            Mt[5, j] *
+            0.5 *
+            (sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .* sh0[:, :, j]) + sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh2[:, :, j]))
+
+        @. fh0[:, :, j] =
+            Mt[1, j] * u[:, :, j] * H0[:, :, j] + 
+            Mt[2, j] * u[:, :, j]^2 * (a[1,j]*H0[:,:,i]+a[2,j]*u[:,:,j]*H0[:,:,i]+a[3,j]*v[:,:,j]*H0[:,:,j]+a[4,j]*u[:,:,j]*H1[:,:,j]+0.5*a[5,j]*((u[:,:,j]^2+v[:,:,j]^2)*H0[:,:,j]+H2[:,:,j]))+
+            Mt[3,j]*u[:,:,j]*(aT[1,j]*H0[:,:,j]+aT[2,j]*u[:,:,j]*H0[:,:,j]+aT[3,j]*v[:,:,j]*H0[:,:,j]+aT[4,j]*u[:,:,j]*H1[:,:,j]+0.5*aT[5,j]*((u[:,:,j]^2+v[:,:,j]^2)*H0[:,:,j]+H2[:,:,j]))+
+            Mt[4, j] * u[:, :, j] * h0[:, :, j] - Mt[5,i]*u[:,:,j]^2*sh0[:,:,j]
+        @. fh1[:, :, j] =
+            Mt[1, j] * u[:, :, j] * H1[:, :, j] + 
+            Mt[2, j] * u[:, :, j]^2 * (a[1,j]*H1[:,:,i]+a[2,j]*u[:,:,j]*H1[:,:,i]+a[3,j]*v[:,:,j]*H1[:,:,j]+a[4,j]*u[:,:,j]*H2[:,:,j]+0.5*a[5,j]*((u[:,:,j]^2+v[:,:,j]^2)*H1[:,:,j]+Mw[3,j]*H0[:,:,j]))+
+            Mt[3,j]*u[:,:,j]*(aT[1,j]*H1[:,:,j]+aT[2,j]*u[:,:,j]*H1[:,:,j]+aT[3,j]*v[:,:,j]*H1[:,:,j]+aT[4,j]*u[:,:,j]*H2[:,:,j]+0.5*aT[5,j]*((u[:,:,j]^2+v[:,:,j]^2)*H1[:,:,j]+Mw[3,j]*H0[:,:,j]))+
+            Mt[4, j] * u[:, :, j] * h1[:, :, j] - Mt[5,i]*u[:,:,j]^2*sh1[:,:,j]
+        @. fh2[:, :, j] =
+            Mt[1, j] * u[:, :, j] * H2[:, :, j] + 
+            Mt[2, j] * u[:, :, j]^2 * (a[1,j]*H2[:,:,i]+a[2,j]*u[:,:,j]*H2[:,:,i]+a[3,j]*v[:,:,j]*H2[:,:,j]+a[4,j]*u[:,:,j]*Mw[3,j]*H0[:,:,j]+0.5*a[5,j]*((u[:,:,j]^2+v[:,:,j]^2)*H2[:,:,j]+Mw[4,j]*H0[:,:,j]))+
+            Mt[3,j]*u[:,:,j]*(aT[1,j]*H2[:,:,j]+aT[2,j]*u[:,:,j]*H2[:,:,j]+aT[3,j]*v[:,:,j]*H2[:,:,j]+aT[4,j]*u[:,:,j]*Mw[3,j]*H0[:,:,j]+0.5*aT[5,j]*((u[:,:,j]^2+v[:,:,j]^2)*H2[:,:,j]+Mw[4,j]*H0[:,:,j]))+
+            Mt[4, j] * u[:, :, j] * h2[:, :, j] - Mt[5,i]*u[:,:,j]^2*sh2[:,:,j]
+    end
+
+
+    @. fw *= len
+    @. fh0 *= len
+    @. fh1 *= len
+    @. fh2 *= len
+
+end
