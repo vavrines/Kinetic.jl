@@ -986,31 +986,31 @@ function evolve!(
 
         if isPlasma == true
             @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
-                    flux_em!(
-                        face[i].femL,
-                        face[i].femR,
-                        ctr[i-2].E,
-                        ctr[i-2].B,
-                        ctr[i-1].E,
-                        ctr[i-1].B,
-                        ctr[i].E,
-                        ctr[i].B,
-                        ctr[i+1].E,
-                        ctr[i+1].B,
-                        ctr[i-1].ϕ,
-                        ctr[i].ϕ,
-                        ctr[i-1].ψ,
-                        ctr[i].ψ,
-                        ctr[i-1].dx,
-                        ctr[i].dx,
-                        KS.gas.A1p,
-                        KS.gas.A1n,
-                        KS.gas.D1,
-                        KS.gas.sol,
-                        KS.gas.χ,
-                        KS.gas.ν,
-                        dt,
-                    )
+                flux_em!(
+                    face[i].femL,
+                    face[i].femR,
+                    ctr[i-2].E,
+                    ctr[i-2].B,
+                    ctr[i-1].E,
+                    ctr[i-1].B,
+                    ctr[i].E,
+                    ctr[i].B,
+                    ctr[i+1].E,
+                    ctr[i+1].B,
+                    ctr[i-1].ϕ,
+                    ctr[i].ϕ,
+                    ctr[i-1].ψ,
+                    ctr[i].ψ,
+                    ctr[i-1].dx,
+                    ctr[i].dx,
+                    KS.gas.Ap,
+                    KS.gas.An,
+                    KS.gas.D,
+                    KS.gas.sol,
+                    KS.gas.χ,
+                    KS.gas.ν,
+                    dt,
+                )
             end
         end
 

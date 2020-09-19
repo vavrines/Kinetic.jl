@@ -19,7 +19,7 @@ begin
     kne = knudsen * (me / mi)
 
     vSpace = MVSpace2D(umin, umax, ue0, ue1, nu, vmin, vmax, ve0, ve1, nv, vMeshType, nug, nvg)
-    plasma = Plasma2D([knudsen,kne], mach, prandtl, inK, γ, mi, ni, me, ne, lD, rL, sol, echi, bnu)
+    plasma = Plasma1D([knudsen,kne], mach, prandtl, inK, γ, mi, ni, me, ne, lD, rL, sol, echi, bnu)
 
     begin
         # upstream
@@ -145,7 +145,7 @@ end
     #dt = Kinetic.timestep(KS, ctr, simTime)
     #Kinetic.reconstruct!(ks, ctr)
 
-    Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs)
+    Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=:true)
     # it's equivalent to the following process
     #=
     @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
