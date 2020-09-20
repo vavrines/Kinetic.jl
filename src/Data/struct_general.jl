@@ -94,6 +94,61 @@ end
 
 
 """
+Structure of multi-component gas property
+
+"""
+struct Mixture{A,B,C,D,E,F,G,H,I} <: AbstractProperty
+
+    Kn::A
+    Ma::B
+    Pr::C
+    K::D
+    γ::E
+    mi::F
+    ni::G
+    me::H
+    ne::I
+
+    function Mixture(
+        Kn::Array,
+        Ma::Union{Real,AbstractArray},
+        Pr::Union{Real,AbstractArray},
+        K::Union{Real,AbstractArray},
+        γ::Union{Real,AbstractArray},
+        mi::Real,
+        ni::Real,
+        me::Real,
+        ne::Real,
+    )
+    
+        # inner constructor method
+        new{
+            typeof(Kn),
+            typeof(Ma),
+            typeof(Pr),
+            typeof(K),
+            typeof(γ),
+            typeof(mi),
+            typeof(ni),
+            typeof(me),
+            typeof(ne),
+        }(
+            Kn,
+            Ma,
+            Pr,
+            K,
+            γ,
+            mi,
+            ni,
+            me,
+            ne,
+        )
+    end
+
+end
+
+
+"""
 Structure of 1D plasma property
 
 """

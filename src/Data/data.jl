@@ -11,7 +11,7 @@ export AbstractSolution, AbstractSolution1D, AbstractSolution2D
 export AbstractFlux, AbstractFlux1D, AbstractFlux2D
 
 export Setup
-export Gas, Plasma1D, Plasma2D
+export Gas, Mixture, Plasma1D, Plasma2D
 export IB, IB1F, IB2F, IB3F, IB4F
 export ControlVolume1D, ControlVolume1D1F, ControlVolume1D2F, ControlVolume1D3F, ControlVolume1D4F
 export ControlVolume2D, ControlVolume2D1F, ControlVolume2D2F, ControlVolume2D3F

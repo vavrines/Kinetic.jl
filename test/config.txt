@@ -6,7 +6,7 @@
 case = shock
 space = 1d1f1v
 nSpecies = 1
-interpOrder = 1
+interpOrder = 2
 limiter = vanleer
 cfl = 0.95
 maxTime = 250.0

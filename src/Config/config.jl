@@ -5,14 +5,10 @@
 export ib_rh, ib_sod, ib_briowu, ib_cavity
 
 
-```
+"""
 Initialize Rankine-Hugoniot relation
 
-```
-
-# ------------------------------------------------------------
-# 1D1F1V
-# ------------------------------------------------------------
+"""
 function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1})
 
     #--- calculate Rankine-Hugoniot relation ---#
@@ -42,10 +38,7 @@ function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1})
 
 end
 
-
-# ------------------------------------------------------------
-# 1D2F1V
-# ------------------------------------------------------------
+#--- 1D2F1V ---#
 function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)
 
     #--- calculate Rankine-Hugoniot relation ---#

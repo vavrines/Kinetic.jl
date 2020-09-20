@@ -59,7 +59,6 @@ struct VSpace1D <: AbstractVelocitySpace
 
 end # struct
 
-
 struct VSpace2D <: AbstractVelocitySpace
 
     u0::Float64
@@ -139,7 +138,6 @@ struct VSpace2D <: AbstractVelocitySpace
     end # constructor
 
 end # struct
-
 
 struct VSpace3D <: AbstractVelocitySpace
 
@@ -238,7 +236,6 @@ struct VSpace3D <: AbstractVelocitySpace
     end # constructor
 
 end # struct
-
 
 # ------------------------------------------------------------
 # Structure of multi-component velocity space
@@ -379,10 +376,115 @@ struct MVSpace2D <: AbstractVelocitySpace
 
 end # struct
 
+struct MVSpace3D <: AbstractVelocitySpace
 
-# ------------------------------------------------------------
-# Newton-Cotes rule
-# ------------------------------------------------------------
+    u0::Array{Float64,1}
+    u1::Array{Float64,1}
+    nu::Int64
+    v0::Array{Float64,1}
+    v1::Array{Float64,1}
+    nv::Int64
+    w0::Array{Float64,1}
+    w1::Array{Float64,1}
+    nw::Int64
+    u::AbstractArray{Float64,4}
+    v::AbstractArray{Float64,4}
+    w::AbstractArray{Float64,4}
+    du::AbstractArray{Float64,4}
+    dv::AbstractArray{Float64,4}
+    dw::AbstractArray{Float64,4}
+    weights::AbstractArray{Float64,4}
+
+    MVSpace3D() = 
+        MVSpace3D(-5, 5, -10, 10, 20, -5, 5, -10, 10, 20, -5, 5, -10, 10, 20)
+    MVSpace3D(U0::Real, U1::Real, V0::Real, V1::Real, W0::Real, W1::Real) = 
+        MVSpace3D(U0, U1, U0, U1, 20, V0, V1, V0, V1, 20, W0, W1, W0, W1, 20)
+
+    function MVSpace3D(
+        Ui0::Real,
+        Ui1::Real,
+        Ue0::Real,
+        Ue1::Real,
+        UNUM::Int,
+        Vi0::Real,
+        Vi1::Real,
+        Ve0::Real,
+        Ve1::Real,
+        VNUM::Int,
+        Wi0::Real,
+        Wi1::Real,
+        We0::Real,
+        We1::Real,
+        WNUM::Int,
+        TYPE = "rectangle"::String,
+        NGU = 0::Int,
+        NGV = 0::Int,
+        NGW = 0::Int,
+    )
+
+        u0 = Float64.([Ui0, Ue0])
+        u1 = Float64.([Ui1, Ue1])
+        nu = UNUM
+        δu = (u1 .- u0) ./ nu
+        v0 = Float64.([Vi0, Ve0])
+        v1 = Float64.([Vi1, Ve1])
+        nv = VNUM
+        δv = (v1 .- v0) ./ nv
+        w0 = Float64.([Wi0, We0])
+        w1 = Float64.([Wi1, We1])
+        nw = WNUM
+        δw = (w1 .- w0) ./ nw
+
+        u = OffsetArray{Float64}(undef, 1-NGU:nu+NGU, 1-NGV:nv+NGV, 1-NGW:nw+NGW, 1:2)
+        v = similar(u)
+        w = similar(u)
+        du = similar(u)
+        dv = similar(u)
+        dw = similar(u)
+        weights = similar(u)
+
+        if TYPE == "rectangle" # rectangular formula
+            for l in axes(u, 4), k in axes(u, 3), j in axes(u, 2), i in axes(u, 1)
+                u[i, j, k, l] = u0[l] + (i - 0.5) * δu[l]
+                v[i, j, k, l] = v0[l] + (j - 0.5) * δv[l]
+                w[i, j, k, l] = w0[l] + (k - 0.5) * δw[l]
+                du[i, j, k, l] = δu[l]
+                dv[i, j, k, l] = δv[l]
+                dw[i, j, k, l] = δw[l]
+                weights[i, j, k, l] = δu[l] * δv[l] * δw[l]
+            end
+        elseif TYPE == "newton" # newton-cotes formula
+            for l in axes(u, 4), k in axes(u, 3), j in axes(u, 2), i in axes(u, 1)
+                u[i, j, k, l] = u0[l] + (i - 0.5) * δu[l]
+                v[i, j, k, l] = v0[l] + (j - 0.5) * δv[l]
+                w[i, j, k, l] = w0[l] + (k - 0.5) * δw[l]
+                du[i, j, k, l] = δu[l]
+                dv[i, j, k, l] = δv[l]
+                dw[i, j, k, l] = δw[l]
+                weights[i, j, k, l] =
+                    newton_cotes(i + NGU, UNUM + NGU * 2) *
+                    δu[l] *
+                    newton_cotes(j + NGV, VNUM + NGV * 2) *
+                    δv[l] *
+                    newton_cotes(k + NGW, WNUM + NGW * 2) *
+                    δw[l]
+            end
+        else
+            throw("No velocity quadrature available")
+        end
+
+        # inner constructor method
+        new(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, v, du, dv, dw, weights)
+
+    end # constructor
+
+end # struct
+
+
+"""
+Newton-Cotes rule
+
+"""
 function newton_cotes(idx::Int, num::Int)
 
     if idx == 1 || idx == num

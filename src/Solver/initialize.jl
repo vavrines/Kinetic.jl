@@ -107,6 +107,45 @@ function init_fvm(KS::SolverSet)
                 face[i] = Interface1D2F(KS.ib.wL, KS.ib.hL)
             end
 
+        elseif KS.set.space[3:4] == "3f"
+
+            ctr = OffsetArray{ControlVolume1D3F}(undef, eachindex(KS.pSpace.x))
+            face = Array{Interface1D3F}(undef, KS.pSpace.nx + 1)
+
+            for i in eachindex(ctr)
+                if i <= KS.pSpace.nx ÷ 2
+                    ctr[i] = ControlVolume1D3F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wL,
+                        KS.ib.primL,
+                        KS.ib.h0L,
+                        KS.ib.h1L,
+                        KS.ib.h2L,
+                        KS.ib.EL,
+                        KS.ib.BL,
+                        KS.ib.lorenzL,
+                    )
+                else
+                    ctr[i] = ControlVolume1D3F(
+                        KS.pSpace.x[i],
+                        KS.pSpace.dx[i],
+                        KS.ib.wR,
+                        KS.ib.primR,
+                        KS.ib.h0R,
+                        KS.ib.h1R,
+                        KS.ib.h2R,
+                        KS.ib.ER,
+                        KS.ib.BR,
+                        KS.ib.lorenzR,
+                    )
+                end
+            end
+
+            for i = 1:KS.pSpace.nx+1
+                face[i] = Interface1D3F(KS.ib.wL, KS.ib.h0L, KS.ib.EL)
+            end
+
         elseif KS.set.space[3:4] == "4f"
 
             ctr = OffsetArray{ControlVolume1D4F}(undef, eachindex(KS.pSpace.x))

@@ -1,6 +1,6 @@
 # ============================================================
 # Structs of Solution
-# constituting array of arrays in numerical simulation
+# -> array of arrays in numerical simulation
 # ============================================================
 
 

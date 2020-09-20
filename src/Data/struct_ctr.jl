@@ -1,6 +1,6 @@
 # ============================================================
 # Structs of Control Volume
-# constituting array of struct in numerical simulation
+# -> array of struct in numerical simulation
 # ============================================================
 
 
