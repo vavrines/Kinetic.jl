@@ -168,6 +168,7 @@ struct SolverSet <: AbstractSolverSet
                 μᵣ,
             )
         elseif nSpecies == 2
+            kne = knudsen * (me / mi)
             if !(@isdefined rL) && !(@isdefined echi) # undefined plasma args
                 gas = Mixture(
                         [knudsen, kne],
