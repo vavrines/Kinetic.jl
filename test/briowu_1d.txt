@@ -14,7 +14,7 @@ maxTime = 0.1
 # physical space
 x0 = 0
 x1 = 1
-nx = 200
+nx = 400
 pMeshType = uniform
 nxg = 2
 
@@ -37,6 +37,7 @@ me = 0.0005446623
 ne = 0.5
 lD = 0.01
 rL = 0.003
+#rL = 100
 
 # electromagnetic field
 sol = 100

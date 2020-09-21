@@ -388,7 +388,7 @@ function step!(
 
     for i = 1:3
         if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B))
-            @warn "electromagnetic update is NaN"
+            @warn "NaN electromagnetic update"
         end
     end
 

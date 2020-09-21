@@ -3,15 +3,15 @@ using Revise, ProgressMeter, Kinetic
 cd(@__DIR__)
 ks, ctr, face, simTime = Kinetic.initialize("briowu_1d.txt")
 
-dt = Kinetic.timestep(KS, ctr, simTime)
+dt = Kinetic.timestep(ks, ctr, simTime)
 nt = Int(floor(ks.set.maxTime / dt))+1
 res = zeros(5, 2)
 
 @showprogress for iter in 1:nt
     #dt = timestep(KS, ctr, simTime)
-    #Kinetic.reconstruct!(ks, ctr)
-    Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs)
-    Kinetic.update!(ks, ctr, face, dt, res)
+    Kinetic.reconstruct!(ks, ctr)
+    Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
+    Kinetic.update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
     # it's equivalent to the following process
     #=
     sumRes = zeros(5, 2)
