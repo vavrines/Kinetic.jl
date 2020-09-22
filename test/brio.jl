@@ -145,48 +145,7 @@ function step_tst!(
     # flux -> w^{n+1}
     @. cell.w += (faceL.fw - faceR.fw) / cell.dx
     cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
-#=
-    # temperature protection
-    if cell.prim[5, 1] < 0
-        @warn ("ion temperature update is negative")
-        cell.w .= w_old
-        cell.prim .= prim_old
-    elseif cell.prim[5, 2] < 0
-        @warn ("electron temperature update is negative")
-        cell.w .= w_old
-        cell.prim .= prim_old
-    end
 
-    # source -> w^{n+1}
-    if isMHD == false
-        #=
-        # DifferentialEquations.jl
-        tau = get_tau(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-        for j in axes(wRan, 2)
-        prob = ODEProblem( mixture_source,
-            vcat(cell.w[1:5,j,1], cell.w[1:5,j,2]),
-            dt,
-            (tau[1], tau[2], KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1], KS.gas.γ) )
-        sol = solve(prob, Rosenbrock23())
-
-        cell.w[1:5,j,1] .= sol[end][1:5]
-        cell.w[1:5,j,2] .= sol[end][6:10]
-        for k=1:2
-        cell.prim[:,j,k] .= Kinetic.conserve_prim(cell.w[:,j,k], KS.gas.γ)
-        end
-        end
-        =#
-        
-        # explicit
-        tau = aap_hs_collision_time(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-        mprim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-        mw = mixture_prim_conserve(mprim, KS.gas.γ)
-        for k=1:2
-            @. cell.w[:,k] += (mw[:,k] - w_old[:,k]) * dt / tau[k]
-        end
-        cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
-    end
-=#
     #--- update electromagnetic variables ---#
     # flux -> E^{n+1} & B^{n+1}
     cell.E[1] -= dt * (faceL.femR[1] + faceR.femL[1]) / cell.dx
@@ -338,7 +297,6 @@ res = zeros(5, 2)
     evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
     #=
     @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
-        #flux_kfvs!(
         flux_tst!(
             face[i].fw,
             face[i].fh0,
@@ -383,8 +341,8 @@ res = zeros(5, 2)
             ctr[i].ϕ,
             ctr[i-1].ψ,
             ctr[i].ψ,
-            ctr[i-1].dx,
-            ctr[i].dx,
+            0.5 * ctr[i-1].dx,
+            0.5 * ctr[i].dx,
             KS.gas.Ap,
             KS.gas.An,
             KS.gas.D,
@@ -395,8 +353,8 @@ res = zeros(5, 2)
         )
     end
     =#
-    #update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
-    
+    update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
+    #=
     @inbounds Threads.@threads for i in 2:KS.pSpace.nx-1
         step_tst!(
             KS,
@@ -416,7 +374,7 @@ res = zeros(5, 2)
         bc=:extra, 
         isMHD=true,
     )
-    
+    =#
 end
 
 sol = zeros(ks.pSpace.nx, 10, 2)
