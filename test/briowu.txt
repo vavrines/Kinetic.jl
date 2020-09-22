@@ -14,7 +14,7 @@ maxTime = 0.1
 # physical space
 x0 = 0
 x1 = 1
-nx = 200
+nx = 100
 pMeshType = uniform
 nxg = 2
 
@@ -22,7 +22,7 @@ nxg = 2
 umin = -5
 umax = 5
 nu = 25
-vMeshType = rectangle
+vMeshType = newton
 nug = 0
 
 # gas

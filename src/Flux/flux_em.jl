@@ -1,8 +1,9 @@
 """
-Wave propagation method for the Maxwell's equations
+Wave propagation method for 1D Maxwell's equations
 
-* @arg: variables in left-left, left, right, and right-right cells
-* @arg: eigenmatrix (A), eigenvalue (D)
+* @arg: {E, B, ϕ, ψ} in left-left, left, right, and right-right cells
+* @arg: eigenmatrix (A -> A+ & A-), eigenvalue (D)
+* @arg: full size of left & right cells
 * @arg: speed of light (sol)
 * @arg: auxiliary parameters (χₑ, νᵦ)
 
@@ -22,8 +23,8 @@ function flux_em!(
     ϕR::Real,
     ψL::Real,
     ψR::Real,
-    dxL::Real,
-    dxR::Real,
+    dxL::Real, # NO need to multiply 0.5
+    dxR::Real, # NO need to multiply 0.5
     Ap::AbstractArray{<:Real,2},
     An::AbstractArray{<:Real,2},
     D::AbstractArray{<:Real,1},
@@ -101,6 +102,16 @@ function flux_em!(
 end
 
 
+"""
+Wave propagation method for 2D Maxwell's equations
+
+* @arg: {E, B, ϕ, ψ} in left-left, left, right, and right-right cells
+* @arg: eigenmatrix (A -> A+ & A-), eigenvalue (D)
+* @arg: full size of left & right cells
+* @arg: speed of light (sol)
+* @arg: auxiliary parameters (χₑ, νᵦ)
+
+"""
 function flux_emx!(
     femL::AbstractArray{<:Real,1},
     femR::AbstractArray{<:Real,1},
@@ -120,8 +131,8 @@ function flux_emx!(
     ϕR::Real,
     ψL::Real,
     ψR::Real,
-    dxL::Real,
-    dxR::Real,
+    dxL::Real, # NO need to multiply 0.5
+    dxR::Real, # NO need to multiply 0.5
     A1p::AbstractArray{<:Real,2},
     A1n::AbstractArray{<:Real,2},
     A2p::AbstractArray{<:Real,2},

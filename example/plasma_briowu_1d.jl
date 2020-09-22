@@ -9,7 +9,7 @@ res = zeros(5, 2)
 
 @showprogress for iter in 1:nt
     #dt = timestep(KS, ctr, simTime)
-    Kinetic.reconstruct!(ks, ctr)
+#    Kinetic.reconstruct!(ks, ctr)
     Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
     Kinetic.update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
     # it's equivalent to the following process
