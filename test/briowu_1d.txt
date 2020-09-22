@@ -14,7 +14,7 @@ maxTime = 0.1
 # physical space
 x0 = 0
 x1 = 1
-nx = 400
+nx = 200
 pMeshType = uniform
 nxg = 2
 

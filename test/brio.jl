@@ -433,5 +433,5 @@ for i in 1:ks.pSpace.nx
 end
 
 using Plots
-plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,1,:])
+plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,2,:])
 plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,6,:])
