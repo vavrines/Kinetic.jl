@@ -291,7 +291,7 @@ res = zeros(5, 2)
     #dt = timestep(KS, ctr, simTime)
     Kinetic.reconstruct!(ks, ctr)
 
-    Kinetic.evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=true)
+    Kinetic.evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=true, isMHD=false)
     #=
     #@inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
     for i = 1:KS.pSpace.nx+1
