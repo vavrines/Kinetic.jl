@@ -1,30 +1,4 @@
-using Revise#, Kinetic
-
-cd(@__DIR__)
-begin
-    using Dates
-    using LinearAlgebra
-    using FastGaussQuadrature
-    using OffsetArrays
-    using SpecialFunctions
-    using FFTW
-    using OrdinaryDiffEq
-    using FileIO
-    using JLD2
-    using Plots
-    using PyCall
-    using ProgressMeter
-    include("../src/Data/data.jl")
-    include("../src/IO/io.jl")
-    include("../src/Math/math.jl")
-    include("../src/Geometry/geometry.jl")
-    include("../src/Theory/theory.jl")
-    include("../src/Phase/phase.jl")
-    include("../src/Reconstruction/reconstruction.jl")
-    include("../src/Flux/flux.jl")
-    include("../src/Config/config.jl")
-    include("../src/Solver/solver.jl")
-end
+using Revise, Kinetic, ProgressMeter
 
 function flux_tst!(
     fw::AbstractArray{<:AbstractFloat,2},
@@ -62,6 +36,7 @@ function flux_tst!(
     h2 = @. h2L * δ + h2R * (1.0 - δ)
     h3 = @. h3L * δ + h3R * (1.0 - δ)
 
+    #w = mixture_moments_conserve(h0, h1, h2, h3, u, ω)
     primL = mixture_conserve_prim(wL, γ)
     primR = mixture_conserve_prim(wR, γ)
 
@@ -78,19 +53,19 @@ function flux_tst!(
     prim = mixture_conserve_prim(w, γ)
 
     tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
-    @. tau +=
-        abs(primL[1, :] / primL[end, :] - primR[1, :] / primR[end, :]) /
-        (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
-        dt *
-        5.0
-    #prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
+    #@. tau +=
+    #    abs(primL[1, :] / primL[end, :] - primR[1, :] / primR[end, :]) /
+    #    (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
+    #    dt *
+    #    5.0
+    mprim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
 
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
     @. Mt[1, :] = dt - Mt[2, :] # M0
 
     #--- calculate fluxes ---#
-    Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, inK)
+    Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(mprim, inK)
     Muv = mixture_moments_conserve(Mu, Mv, Mw, 1, 0, 0)
 
     # flux from M0
@@ -109,16 +84,18 @@ function flux_tst!(
         g2[:, j] .= Mw[1, j] .* g0[:, j]
         g3[:, j] .= (Mv[2, j] + Mw[2, j]) .* g0[:, j]
     end
-
+    #=
     for j in axes(fw, 2)
-        fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h0[:, j])
-        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h0[:, j])
-        fw[3, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h1[:, j])
-        fw[4, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h2[:, j])
-        fw[5, j] +=
-            Mt[2, j] *
-            0.5 *
-            (
+        fw[1, j] = Mt[1, j] * sum(ω[:, j] .* u[:, j] .* g0[:, j]) + Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h0[:, j])
+        fw[2, j] = Mt[1, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* g0[:, j]) + Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h0[:, j])
+        fw[3, j] = Mt[1, j] * sum(ω[:, j] .* u[:, j] .* g1[:, j]) + Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h1[:, j])
+        fw[4, j] = Mt[1, j] * sum(ω[:, j] .* u[:, j] .* g2[:, j]) + Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h2[:, j])
+        fw[5, j] = 
+            Mt[1, j] * 0.5 * (
+                sum(ω[:, j] .* u[:, j] .^ 3 .* g0[:, j]) +
+                sum(ω[:, j] .* u[:, j] .* g3[:, j])
+            )
+            Mt[2, j] * 0.5 * (
                 sum(ω[:, j] .* u[:, j] .^ 3 .* h0[:, j]) +
                 sum(ω[:, j] .* u[:, j] .* h3[:, j])
             )
@@ -128,7 +105,24 @@ function flux_tst!(
         @. fh2[:, j] = Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
         @. fh3[:, j] = Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
     end
+    =#
+    for j in axes(fw, 2)
+        fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h0[:, j])
+        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h0[:, j])
+        fw[3, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h1[:, j])
+        fw[4, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h2[:, j])
+        fw[5, j] += 
+            Mt[2, j] * 0.5 * (
+                sum(ω[:, j] .* u[:, j] .^ 3 .* h0[:, j]) +
+                sum(ω[:, j] .* u[:, j] .* h3[:, j])
+            )
 
+        @. fh0[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
+        @. fh1[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
+        @. fh2[:, j] = Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
+        @. fh3[:, j] = Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
+    end
+    
 end
 
 function step_tst!(
@@ -286,20 +280,21 @@ function step_tst!(
 end
 
 cd(@__DIR__)
-ks, ctr, face, simTime = initialize("briowu.txt")
+ks, ctr, face, simTime = Kinetic.initialize("briowu_1d.txt")
 KS = ks
 
-dt = timestep(ks, ctr, simTime)
+dt = Kinetic.timestep(ks, ctr, simTime)
 nt = Int(floor(ks.set.maxTime / dt))+1
 res = zeros(5, 2)
 
-@showprogress for iter in 1:nt
+@showprogress for iter in 1:nt÷3
     #dt = timestep(KS, ctr, simTime)
-    reconstruct!(ks, ctr)
+    Kinetic.reconstruct!(ks, ctr)
 
-    #evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
-    
-    @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+    Kinetic.evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=true)
+    #=
+    #@inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
+    for i = 1:KS.pSpace.nx+1
         flux_tst!(
             face[i].fw,
             face[i].fh0,
@@ -327,6 +322,7 @@ res = zeros(5, 2)
             KS.gas.Kn[1],
             dt,
         )
+
         
         flux_em!(
             face[i].femL,
@@ -354,7 +350,7 @@ res = zeros(5, 2)
             dt,
         )
     end
-    
+    =#
     #update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
     @inbounds Threads.@threads for i in 1:KS.pSpace.nx
         step_tst!(
@@ -391,6 +387,7 @@ res = zeros(5, 2)
         ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[KS.pSpace.nx].ψ)
         ctr[KS.pSpace.nx+i].lorenz .= ctr[KS.pSpace.nx].lorenz
     end
+    
 end
 
 sol = zeros(ks.pSpace.nx, 10, 2)

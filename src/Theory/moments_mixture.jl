@@ -220,7 +220,7 @@ function mixture_moments_conserve(
     ω::AbstractArray{<:AbstractFloat,2},
 )
     moments = zeros(eltype(h0), 5, size(h0, 2))
-    for j in axes(w, 2)
+    for j in axes(moments, 2)
         moments[:, j] .=
             moments_conserve(h0[:, j], h1[:, j], h2[:, j], h3[:, j], u[:, j], ω[:, j])
     end

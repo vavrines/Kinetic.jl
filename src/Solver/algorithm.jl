@@ -686,6 +686,7 @@ function evolve!(
     dt::Real;
     mode = :kfvs::Symbol,
     isPlasma = true::Bool,
+    isMHD = false::Bool,
 )
 
     #if KS.set.case == "heat"
@@ -825,6 +826,7 @@ function evolve!(
                     KS.gas.ne,
                     KS.gas.Kn[1],
                     dt,
+                    isMHD,
                 )
             end
         elseif mode == :kfvs
@@ -858,33 +860,33 @@ function evolve!(
             end
         end
 
-        if isPlasma == true
+        if isPlasma
             @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
-                    flux_em!(
-                        face[i].femL,
-                        face[i].femR,
-                        ctr[i-2].E,
-                        ctr[i-2].B,
-                        ctr[i-1].E,
-                        ctr[i-1].B,
-                        ctr[i].E,
-                        ctr[i].B,
-                        ctr[i+1].E,
-                        ctr[i+1].B,
-                        ctr[i-1].ϕ,
-                        ctr[i].ϕ,
-                        ctr[i-1].ψ,
-                        ctr[i].ψ,
-                        ctr[i-1].dx,
-                        ctr[i].dx,
-                        KS.gas.Ap,
-                        KS.gas.An,
-                        KS.gas.D,
-                        KS.gas.sol,
-                        KS.gas.χ,
-                        KS.gas.ν,
-                        dt,
-                    )
+                flux_em!(
+                    face[i].femL,
+                    face[i].femR,
+                    ctr[i-2].E,
+                    ctr[i-2].B,
+                    ctr[i-1].E,
+                    ctr[i-1].B,
+                    ctr[i].E,
+                    ctr[i].B,
+                    ctr[i+1].E,
+                    ctr[i+1].B,
+                    ctr[i-1].ϕ,
+                    ctr[i].ϕ,
+                    ctr[i-1].ψ,
+                    ctr[i].ψ,
+                    ctr[i-1].dx,
+                    ctr[i].dx,
+                    KS.gas.Ap,
+                    KS.gas.An,
+                    KS.gas.D,
+                    KS.gas.sol,
+                    KS.gas.χ,
+                    KS.gas.ν,
+                    dt,
+                )
             end
         end
 
@@ -917,6 +919,7 @@ function evolve!(
                     KS.gas.Kn[1],
                     dt,
                     1.0,
+                    isMHD,
                 )
             end
         elseif mode == :kfvs
@@ -984,7 +987,7 @@ function evolve!(
             end
         end
 
-        if isPlasma == true
+        if isPlasma
             @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
                 flux_em!(
                     face[i].femL,

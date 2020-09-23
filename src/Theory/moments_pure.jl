@@ -438,7 +438,7 @@ function moments_conserve(
     moments[4] = discrete_moments(h2, u, ω, 0)
     moments[5] = 0.5 * discrete_moments(h0, u, ω, 2) + 0.5 * discrete_moments(h3, u, ω, 0)
 
-    return w
+    return moments
 end
 
 

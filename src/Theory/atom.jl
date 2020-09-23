@@ -648,6 +648,8 @@ end
 """
 Calculate mixture primitive variables from AAP model
 
+*tested √*
+
 `aap_hs_prim(
     prim::AbstractArray{<:Real,2},
     tau::AbstractArray{<:Real,1},
