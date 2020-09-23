@@ -26,111 +26,7 @@ begin
     include("../src/Solver/solver.jl")
 end
 
-function flux_mhd!(
-    fw::AbstractArray{<:AbstractFloat,2},
-    fh0::AbstractArray{<:AbstractFloat,2},
-    fh1::AbstractArray{<:AbstractFloat,2},
-    fh2::AbstractArray{<:AbstractFloat,2},
-    fh3::AbstractArray{<:AbstractFloat,2},
-    wL::AbstractArray{<:Real,2},
-    h0L::AbstractArray{<:AbstractFloat,2},
-    h1L::AbstractArray{<:AbstractFloat,2},
-    h2L::AbstractArray{<:AbstractFloat,2},
-    h3L::AbstractArray{<:AbstractFloat,2},
-    wR::AbstractArray{<:Real,2},
-    h0R::AbstractArray{<:AbstractFloat,2},
-    h1R::AbstractArray{<:AbstractFloat,2},
-    h2R::AbstractArray{<:AbstractFloat,2},
-    h3R::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    inK::Real,
-    γ::Real,
-    mi::Real,
-    ni::Real,
-    me::Real,
-    ne::Real,
-    Kn::Real,
-    dt::Real,
-)
-
-    #--- upwind reconstruction ---#
-    δ = heaviside.(u)
-
-    h0 = @. h0L * δ + h0R * (1.0 - δ)
-    h1 = @. h1L * δ + h1R * (1.0 - δ)
-    h2 = @. h2L * δ + h2R * (1.0 - δ)
-    h3 = @. h3L * δ + h3R * (1.0 - δ)
-
-    primL = mixture_conserve_prim(wL, γ)
-    primR = mixture_conserve_prim(wR, γ)
-
-    #--- construct interface distribution ---#
-    Mu1, Mv1, Mw1, MuL1, MuR1 = mixture_gauss_moments(primL, inK)
-    Muv1 = mixture_moments_conserve(MuL1, Mv1, Mw1, 0, 0, 0)
-    Mu2, Mv2, Mw2, MuL2, MuR2 = mixture_gauss_moments(primR, inK)
-    Muv2 = mixture_moments_conserve(MuR2, Mv2, Mw2, 0, 0, 0)
-
-    w = similar(wL)
-    for j in axes(w, 2)
-        @. w[:, j] = primL[1, j] * Muv1[:, j] + primR[1, j] * Muv2[:, j]
-    end
-    prim = mixture_conserve_prim(w, γ)
-
-    tau = aap_hs_collision_time(prim, mi, ni, me, ne, Kn)
-    @. tau +=
-        abs(primL[1, :] / primL[end, :] - primR[1, :] / primR[end, :]) /
-        (primL[1, :] / primL[end, :] + primR[1, :] / primR[end, :]) *
-        dt *
-        5.0
-    #prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
-
-    Mt = zeros(2, 2)
-    @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
-    @. Mt[1, :] = dt - Mt[2, :] # M0
-
-    #--- calculate fluxes ---#
-    Mu, Mv, Mw, MuL, MuR = mixture_gauss_moments(prim, inK)
-    Muv = mixture_moments_conserve(Mu, Mv, Mw, 1, 0, 0)
-
-    # flux from M0
-    for j in axes(fw, 2)
-        @. fw[:, j] = Mt[1, j] * prim[1, j] * Muv[:, j]
-    end
-
-    # flux from f0
-    g0 = mixture_maxwellian(u, prim)
-
-    g1 = similar(h0)
-    g2 = similar(h0)
-    g3 = similar(h0)
-    for j in axes(g0, 2)
-        g1[:, j] .= Mv[1, j] .* g0[:, j]
-        g2[:, j] .= Mw[1, j] .* g0[:, j]
-        g3[:, j] .= (Mv[2, j] + Mw[2, j]) .* g0[:, j]
-    end
-
-    for j in axes(fw, 2)
-        fw[1, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h0[:, j])
-        fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* h0[:, j])
-        fw[3, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h1[:, j])
-        fw[4, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .* h2[:, j])
-        fw[5, j] +=
-            Mt[2, j] *
-            0.5 *
-            (
-                sum(ω[:, j] .* u[:, j] .^ 3 .* h0[:, j]) +
-                sum(ω[:, j] .* u[:, j] .* h3[:, j])
-            )
-
-        @. fh0[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
-        @. fh1[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
-        @. fh2[:, j] = Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
-        @. fh3[:, j] = Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
-    end
-end
-
-function step_mhd!(
+function step_tst!(
     KS::SolverSet,
     faceL::Interface1D4F,
     cell::ControlVolume1D4F,
@@ -263,6 +159,7 @@ function step_mhd!(
     )
 
     # interspecies interaction
+    prim = copy(cell.prim)
     prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
     g = mixture_maxwellian(KS.vSpace.u, prim)
 
@@ -295,95 +192,11 @@ res = zeros(5, 2)
     #dt = timestep(KS, ctr, simTime)
     reconstruct!(ks, ctr)
 
-    #evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
-    @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
-        #=
-        flux_kfvs!(
-            face[i].fw,
-            face[i].fh0,
-            face[i].fh1,
-            face[i].fh2,
-            face[i].fh3,
-            ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
-            ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
-            ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
-            ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3,
-            ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
-            ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
-            ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
-            ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
-            KS.vSpace.u,
-            KS.vSpace.weights,
-            dt,
-            ctr[i-1].sh0,
-            ctr[i-1].sh1,
-            ctr[i-1].sh2,
-            ctr[i-1].sh3,
-            ctr[i].sh0,
-            ctr[i].sh1,
-            ctr[i].sh2,
-            ctr[i].sh3,
-        )
-        =#
-        flux_mhd!(
-            face[i].fw,
-            face[i].fh0,
-            face[i].fh1,
-            face[i].fh2,
-            face[i].fh3,
-            ctr[i-1].w .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sw,
-            ctr[i-1].h0 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh0,
-            ctr[i-1].h1 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh1,
-            ctr[i-1].h2 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh2,
-            ctr[i-1].h3 .+ 0.5 .* ctr[i-1].dx .* ctr[i-1].sh3,
-            ctr[i].w .- 0.5 .* ctr[i].dx .* ctr[i].sw,
-            ctr[i].h0 .- 0.5 .* ctr[i].dx .* ctr[i].sh0,
-            ctr[i].h1 .- 0.5 .* ctr[i].dx .* ctr[i].sh1,
-            ctr[i].h2 .- 0.5 .* ctr[i].dx .* ctr[i].sh2,
-            ctr[i].h3 .- 0.5 .* ctr[i].dx .* ctr[i].sh3,
-            KS.vSpace.u,
-            KS.vSpace.weights,
-            KS.gas.K,
-            KS.gas.γ,
-            KS.gas.mi,
-            KS.gas.ni,
-            KS.gas.me,
-            KS.gas.ne,
-            KS.gas.Kn[1],
-            dt,
-        )
-    end
-    @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
-        flux_em!(
-            face[i].femL,
-            face[i].femR,
-            ctr[i-2].E,
-            ctr[i-2].B,
-            ctr[i-1].E,
-            ctr[i-1].B,
-            ctr[i].E,
-            ctr[i].B,
-            ctr[i+1].E,
-            ctr[i+1].B,
-            ctr[i-1].ϕ,
-            ctr[i].ϕ,
-            ctr[i-1].ψ,
-            ctr[i].ψ,
-            ctr[i-1].dx,
-            ctr[i].dx,
-            KS.gas.Ap,
-            KS.gas.An,
-            KS.gas.D,
-            KS.gas.sol,
-            KS.gas.χ,
-            KS.gas.ν,
-            dt,
-        )
-    end
+    evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
     
     #update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
     @inbounds Threads.@threads for i in 1:KS.pSpace.nx
-        step_mhd!(
+        step_tst!(
             KS,
             face[i],
             ctr[i],
@@ -433,7 +246,7 @@ for i in 1:ks.pSpace.nx
 end
 
 using Plots
+plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,1,:])
 plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,2,:])
-plot(ks.pSpace.x[1:ks.pSpace.nx], sol[:,6,:])
 
-savefig("kfvs.png")
+@save "kfvs.jld2" ks ctr

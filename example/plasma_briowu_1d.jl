@@ -12,6 +12,7 @@ KS = ks
     #dt = timestep(KS, ctr, simTime)
     Kinetic.reconstruct!(ks, ctr)
     #Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
+    #=
     @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
         flux_kfvs!(
             face[i].fw,
@@ -67,6 +68,7 @@ KS = ks
             dt,
         )
     end
+    =#
     #Kinetic.update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
     # it's equivalent to the following process
     
