@@ -97,7 +97,7 @@ function mixture_moments_conserve(
 )
 
     Muv = ifelse(
-        length(Mw) == 3,
+        size(Mw, 1) == 3,
         zeros(eltype(Mu), 4, size(Mu, 2)),
         zeros(eltype(Mu), 5, size(Mu, 2)),
     )
