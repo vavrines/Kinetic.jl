@@ -9,9 +9,9 @@ Transform primitive -> conservative variables
 function prim_conserve(prim::AbstractArray{<:Real,1}, γ::Real)
 
     if eltype(prim) <: Int
-        W = zeros(axes(prim))
+        W = similar(prim, Float64)
     else
-        W = zeros(eltype(prim), axes(prim))
+        W = similar(prim)
     end
 
     if length(prim) == 3 # 1D
@@ -46,9 +46,9 @@ prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) = prim_conserve([�
 
 function mixture_prim_conserve(prim::AbstractArray{<:Real,2}, γ::Real)
     if eltype(prim) <: Int
-        w = zeros(axes(prim))
+        w = similar(prim, Float64)
     else
-        w = zeros(eltype(prim), axes(prim))
+        w = similar(prim)
     end
 
     for j in axes(w, 2)
@@ -73,9 +73,9 @@ conserve_prim(u::Real, a::Real) = [u, a, 1.0]
 function conserve_prim(W::AbstractArray{<:Real,1}, γ::Real)
 
     if eltype(W) <: Int
-        prim = zeros(axes(W))
+        prim = similar(W, Float64)
     else
-        prim = zeros(eltype(W), axes(W))
+        prim = similar(W)
     end
 
     if length(W) == 3 # 1D
@@ -109,9 +109,9 @@ conserve_prim(ρ::Real, MX::Real, MY::Real, E::Real, gamma::Real) =
 
 function mixture_conserve_prim(W::AbstractArray{<:Real,2}, γ::Real)
     if eltype(W) <: Int
-        prim = zeros(axes(W))
+        prim = similar(W, Float64)
     else
-        prim = zeros(eltype(W), axes(W))
+        prim = similar(W)
     end
 
     for j in axes(prim, 2)
