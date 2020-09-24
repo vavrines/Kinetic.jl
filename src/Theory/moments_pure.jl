@@ -8,9 +8,9 @@ Calculate moments of Gaussian distribution G = (λ / π)^(D / 2) * exp[-λ(c^2 +
 function gauss_moments(prim::AbstractArray{<:Real,1})
 
     if eltype(prim) <: Int
-        MuL = OffsetArray{Float64}(undef, 0:6)
+        MuL = OffsetArray(similar(prim, Float64, 7), 0:6)
     else
-        MuL = OffsetArray{eltype(prim)}(undef, 0:6)
+        MuL = OffsetArray(similar(prim, 7), 0:6)
     end
     MuR = similar(MuL)
     Mu = similar(MuL)
@@ -69,9 +69,9 @@ end
 function gauss_moments(prim::AbstractArray{<:Real,1}, inK::Real)
 
     if eltype(prim) <: Int
-        MuL = OffsetArray{Float64}(undef, 0:6)
+        MuL = OffsetArray(similar(prim, Float64, 7), 0:6)
     else
-        MuL = OffsetArray{eltype(prim)}(undef, 0:6)
+        MuL = OffsetArray(similar(prim, 7), 0:6)
     end
     MuR = similar(MuL)
     Mu = similar(MuL)
@@ -155,7 +155,7 @@ function moments_conserve(
     delta::Int,
 )
 
-    uv = zeros(eltype(Mu), 3)
+    uv = similar(Mu, 3)
     uv[1] = Mu[alpha] * Mxi[delta÷2]
     uv[2] = Mu[alpha+1] * Mxi[delta÷2]
     uv[3] = 0.5 * (Mu[alpha+2] * Mxi[delta÷2] + Mu[alpha] * Mxi[(delta+2)÷2])
@@ -175,7 +175,7 @@ function moments_conserve(
 
     if length(Mw) == 3 # internal motion
 
-        uv = zeros(eltype(Mu), 4)
+        uv = similar(Mu, 4)
         uv[1] = Mu[alpha] * Mv[beta] * Mw[delta÷2]
         uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta÷2]
         uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta÷2]
@@ -188,7 +188,7 @@ function moments_conserve(
 
     else
 
-        uv = zeros(eltype(Mu), 5)
+        uv = similar(Mu, 5)
         uv[1] = Mu[alpha] * Mv[beta] * Mw[delta]
         uv[2] = Mu[alpha+1] * Mv[beta] * Mw[delta]
         uv[3] = Mu[alpha] * Mv[beta+1] * Mw[delta]
@@ -235,15 +235,12 @@ function moments_conserve_slope(
     beta::Int,
 )
 
-    au =
-        a[1] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 0) .+
+    return a[1] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 0) .+
         a[2] .* moments_conserve(Mu, Mv, Mxi, alpha + 1, beta + 0, 0) .+
         a[3] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 1, 0) .+
         0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 2, beta + 0, 0) .+
         0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 2, 0) .+
         0.5 * a[4] .* moments_conserve(Mu, Mv, Mxi, alpha + 0, beta + 0, 2)
-
-    return au
 
 end
 
@@ -257,16 +254,13 @@ function moments_conserve_slope(
     delta::Int,
 )
 
-    au =
-        a[1] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) .+
+    return a[1] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 0) .+
         a[2] .* moments_conserve(Mu, Mv, Mw, alpha + 1, beta + 0, delta + 0) .+
         a[3] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 1, delta + 0) .+
         a[4] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 1) .+
         0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 2, beta + 0, delta + 0) .+
         0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 2, delta + 0) .+
         0.5 * a[5] .* moments_conserve(Mu, Mv, Mw, alpha + 0, beta + 0, delta + 2)
-
-    return au
 
 end
 
@@ -315,7 +309,7 @@ function moments_conserve(
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
 )
-    w = zeros(eltype(f), 3)
+    w = similar(f, 3)
     w[1] = discrete_moments(f, u, ω, 0)
     w[2] = discrete_moments(f, u, ω, 1)
     w[3] = 0.5 * discrete_moments(f, u, ω, 2)
@@ -330,7 +324,7 @@ function moments_conserve(
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
 )
-    w = zeros(eltype(f), 3)
+    w = similar(h, 3)
     w[1] = discrete_moments(h, u, ω, 0)
     w[2] = discrete_moments(h, u, ω, 1)
     w[3] = 0.5 * (discrete_moments(h, u, ω, 2) + discrete_moments(b, u, ω, 0))
@@ -345,7 +339,7 @@ function moments_conserve(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    w = zeros(eltype(f), 4)
+    w = similar(f, 4)
     w[1] = discrete_moments(f, u, ω, 0)
     w[2] = discrete_moments(f, u, ω, 1)
     w[3] = discrete_moments(f, v, ω, 1)
@@ -362,7 +356,7 @@ function moments_conserve(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    w = zeros(eltype(h), 4)
+    w = similar(h, 4)
     w[1] = discrete_moments(h, u, ω, 0)
     w[2] = discrete_moments(h, u, ω, 1)
     w[3] = discrete_moments(h, v, ω, 1)
@@ -384,7 +378,7 @@ function moments_conserve(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    w = zeros(eltype(h0), 5)
+    w = similar(h0, 5)
     w[1] = discrete_moments(h0, u, ω, 0)
     w[2] = discrete_moments(h0, u, ω, 1)
     w[3] = discrete_moments(h0, v, ω, 1)
@@ -406,7 +400,7 @@ function moments_conserve(
     w::AbstractArray{<:AbstractFloat,3},
     ω::AbstractArray{<:AbstractFloat,3},
 )
-    moments = zeros(eltype(f), 5)
+    moments = similar(f, 5)
 
     moments[1] = discrete_moments(f, u, ω, 0)
     moments[2] = discrete_moments(f, u, ω, 1)
@@ -430,7 +424,7 @@ function moments_conserve(
     u::AbstractArray{<:AbstractFloat,1},
     ω::AbstractArray{<:AbstractFloat,1},
 )
-    moments = zeros(eltype(h0), 5)
+    moments = similar(h0, 5)
 
     moments[1] = discrete_moments(h0, u, ω, 0)
     moments[2] = discrete_moments(h0, u, ω, 1)
@@ -462,7 +456,7 @@ function stress(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    P = zeros(eltype(prim), 2, 2)
+    P = similar(prim, 2, 2)
 
     P[1, 1] = sum(@. ω * (u - prim[2]) * (u - prim[2]) * f)
     P[1, 2] = sum(@. ω * (u - prim[2]) * (v - prim[3]) * f)
@@ -501,8 +495,7 @@ function heat_flux(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    q = zeros(eltype(f), 2)
-
+    q = similar(h, 2)
     q[1] = 0.5 * sum(@. ω * (u - prim[2]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
     q[2] = 0.5 * sum(@. ω * (v - prim[3]) * ((u - prim[2])^2 + (v - prim[3])^2) * h)
 
@@ -518,7 +511,7 @@ function heat_flux(
     v::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    q = zeros(eltype(f), 2)
+    q = similar(h, 2)
 
     q[1] =
         0.5 * (
@@ -543,7 +536,7 @@ function heat_flux(
     w::AbstractArray{<:AbstractFloat,3},
     ω::AbstractArray{<:AbstractFloat,3},
 )
-    q = zeros(eltype(f), 3)
+    q = similar(f, 3)
 
     q[1] =
         0.5 * sum(@. ω *

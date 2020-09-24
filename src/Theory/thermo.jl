@@ -31,7 +31,7 @@ sound_speed(prim::Array{<:Real,1}, γ::Real) = sound_speed(prim[end], γ)
 
 
 function sound_speed(prim::Array{<:Real,2}, γ::Real)
-    c = zeros(axes(prim, 2))
+    c = similar(prim, axes(prim, 2))
     for j in eachindex(c)
         c[j] = sound_speed(prim[end, j], γ)
     end

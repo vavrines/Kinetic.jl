@@ -12,7 +12,7 @@ pdf_slope(u::Real, Δ::Real) = Δ / u
 
 function pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, inK::Real)
 
-    sl = zeros(eltype(sw), axes(prim))
+    sl = similar(sw, axes(prim))
 
     if length(prim) == 3
 
@@ -70,7 +70,8 @@ assuming `a = a1 + u * a2 + 0.5 * u^2 * a3`
 """
 function mixture_pdf_slope(prim::AbstractArray{<:Real,2}, sw::AbstractArray{<:Real,2}, inK::Real)
 
-    sl = zeros(eltype(sw), axes(prim))
+    sl = similar(sw, axes(prim))
+
     for j in axes(sl, 2)
         sl[:, j] .= pdf_slope(prim[:, j], sw[:, j], inK)
     end
@@ -124,7 +125,7 @@ function mixture_maxwellian(
     v::AbstractArray{<:AbstractFloat,3},
     prim::AbstractArray{<:Real,2},
 )
-    mixM = zeros(axes(u))
+    mixM = similar(u)
     for k in axes(mixM, 3)
         mixM[:, :, k] .= maxwellian(u[:, :, k], v[:, :, k], prim[:, k])
     end
@@ -157,7 +158,7 @@ function mixture_maxwellian(
     w::AbstractArray{<:AbstractFloat,4},
     prim::AbstractArray{<:Real,2},
 )
-    mixM = zeros(eltype(u), axes(u))
+    mixM = similar(u)
     for l in axes(mixM, 4)
         mixM[:, :, :, l] .=
             maxwellian(u[:, :, :, l], v[:, :, :, l], w[:, :, :, l], prim[:, l])
@@ -627,7 +628,7 @@ function aap_hs_collision_time(
     kn::Real,
 )
 
-    ν = zeros(axes(prim, 2))
+    ν = similar(prim, 2)
 
     ν[1] =
         prim[1, 1] / (mi * (ni + ne)) * 4.0 * sqrt(π) / 3.0 *

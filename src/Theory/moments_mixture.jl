@@ -7,9 +7,9 @@ Calculate moments of Gaussian distribution in multi-component gas
 function mixture_gauss_moments(prim::AbstractArray{<:Real,2}, inK::Real)
 
     if eltype(prim) <: Int
-        Mu = OffsetArray{Float64}(undef, 0:6, axes(prim, 2))
+        MuL = OffsetArray(similar(prim, Float64, 7, axes(prim, 2)), 0:6, axes(prim, 2))
     else
-        Mu = OffsetArray{eltype(prim)}(undef, 0:6, axes(prim, 2))
+        MuL = OffsetArray(similar(prim, 7, axes(prim, 2)), 0:6, axes(prim, 2))
     end
 
     MuL = similar(Mu)
@@ -78,7 +78,7 @@ function mixture_moments_conserve(
     delta::Int,
 )
 
-    Muv = zeros(eltype(Mu), 3, size(Mu, 2))
+    Muv = similar(Mu, 3, size(Mu, 2))
     for j in axes(Muv, 2)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mxi[:, j], alpha, delta)
     end
@@ -98,8 +98,8 @@ function mixture_moments_conserve(
 
     Muv = ifelse(
         size(Mw, 1) == 3,
-        zeros(eltype(Mu), 4, size(Mu, 2)),
-        zeros(eltype(Mu), 5, size(Mu, 2)),
+        similar(Mu, 4, size(Mu, 2)),
+        similar(Mu, 5, size(Mu, 2)),
     )
     for j in axes(Muv, 2)
         Muv[:, j] .= moments_conserve(Mu[:, j], Mv[:, j], Mw[:, j], alpha, beta, delta)
@@ -122,7 +122,7 @@ function mixture_moments_conserve_slope(
     alpha::Int,
 )
 
-    au = zeros(3, axes(a, 2))
+    au = similar(a, 3, axes(a, 2))
     for j in axes(au, 2)
         au[:, j] .= moments_conserve_slope(a[:, j], Mu[:, j], Mxi[:, j], alpha)
     end
@@ -140,7 +140,7 @@ function mixture_moments_conserve_slope(
     beta::Int,
 )
 
-    au = zeros(4, axes(a, 2))
+    au = similar(a, 4, axes(a, 2))
     for j in axes(au, 2)
         au[:, j] .=
             moments_conserve_slope(a[:, j], Mu[:, j], Mv[:, j], Mxi[:, j], alpha, beta)
@@ -160,7 +160,7 @@ function mixture_moments_conserve_slope(
     delta::Int,
 )
 
-    au = zeros(eltype(a), 5, axes(a, 2))
+    au = similar(a, 5, axes(a, 2))
     for j in axes(au, 2)
         au[:, j] .= moments_conserve_slope(
             a[:, j],
@@ -187,7 +187,7 @@ function mixture_moments_conserve(
     u::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    w = zeros(eltype(f), 3, size(f, 2))
+    w = similar(f, 3, size(f, 2))
     for j in axes(w, 2)
         w[:, j] .= moments_conserve(f[:, j], u, ω)
     end
@@ -202,7 +202,7 @@ function mixture_moments_conserve(
     u::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    w = zeros(eltype(h), 3, size(h, 2))
+    w = similar(h, 3, size(h, 2))
     for j in axes(w, 2)
         w[:, j] .= moments_conserve(h[:, j], b[:, j], u, ω)
     end
@@ -219,7 +219,7 @@ function mixture_moments_conserve(
     u::AbstractArray{<:AbstractFloat,2},
     ω::AbstractArray{<:AbstractFloat,2},
 )
-    moments = zeros(eltype(h0), 5, size(h0, 2))
+    moments = similar(h0, 5, size(h0, 2))
     for j in axes(moments, 2)
         moments[:, j] .=
             moments_conserve(h0[:, j], h1[:, j], h2[:, j], h3[:, j], u[:, j], ω[:, j])
@@ -235,7 +235,7 @@ function mixture_moments_conserve(
     v::AbstractArray{<:AbstractFloat,3},
     ω::AbstractArray{<:AbstractFloat,3},
 )
-    w = zeros(eltype(f), 4, size(f, 3))
+    w = similar(f, 4, size(f, 3))
     for j in axes(w, 2)
         w[:, j] .= moments_conserve(f[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
     end
@@ -251,7 +251,7 @@ function mixture_moments_conserve(
     v::AbstractArray{<:AbstractFloat,3},
     ω::AbstractArray{<:AbstractFloat,3},
 )
-    w = zeros(eltype(h), 4, size(h, 3))
+    w = similar(h, 4, size(f, 3))
     for j in axes(w, 2)
         w[:, j] .=
             moments_conserve(h[:, :, j], b[:, :, j], u[:, :, j], v[:, :, j], ω[:, :, j])
@@ -269,7 +269,7 @@ function mixture_moments_conserve(
     v::AbstractArray{<:AbstractFloat,3},
     ω::AbstractArray{<:AbstractFloat,3},
 )
-    w = zeros(eltype(h), 5, size(h0, 3))
+    w = similar(h0, 5, size(h0, 3))
     for j in axes(w, 2)
         w[:, j] .=
             moments_conserve(
@@ -293,8 +293,8 @@ function mixture_moments_conserve(
     w::AbstractArray{<:AbstractFloat,4},
     ω::AbstractArray{<:AbstractFloat,4},
 )
-    moments = zeros(eltype(f), 5, size(f, 4))
 
+    moments = similar(f, 5, size(f, 4))
     for j in axes(w, 2)
         moments[:, j] .= moments_conserve(
             f[:, :, :, j],
