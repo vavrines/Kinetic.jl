@@ -443,7 +443,7 @@ Calculate collision time
 * variable hard sphere (VHS) model
 
 """
-vhs_collision_time(prim::Array{<:Real,1}, muRef::Real, omega::Real) =
+vhs_collision_time(prim::AbstractArray{<:Real,1}, muRef::Real, omega::Real) =
     muRef * 2.0 * prim[end]^(1.0 - omega) / prim[1]
 
 
