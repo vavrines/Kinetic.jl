@@ -7,9 +7,9 @@ Calculate moments of Gaussian distribution in multi-component gas
 function mixture_gauss_moments(prim::AbstractArray{<:Real,2}, inK::Real)
 
     if eltype(prim) <: Int
-        MuL = OffsetArray(similar(prim, Float64, 7, axes(prim, 2)), 0:6, axes(prim, 2))
+        Mu = OffsetArray(similar(prim, Float64, 7, axes(prim, 2)), 0:6, axes(prim, 2))
     else
-        MuL = OffsetArray(similar(prim, 7, axes(prim, 2)), 0:6, axes(prim, 2))
+        Mu = OffsetArray(similar(prim, 7, axes(prim, 2)), 0:6, axes(prim, 2))
     end
 
     MuL = similar(Mu)
