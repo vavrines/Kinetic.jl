@@ -11,7 +11,7 @@ function initialize(configfilename::String)
 
     println("==============================================================")
     println("Kinetic.jl")
-    println("A Software Package for Kinetic Theory and Simulation")
+    println("A Lightweight Toolbox for Kinetic Modeling and Simulation")
     println("==============================================================")
     println("")
     println("reading configurations from $(configfilename)")

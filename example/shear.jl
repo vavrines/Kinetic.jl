@@ -9,7 +9,7 @@ end
 
 begin
     γ = heat_capacity_ratio(inK, 2)
-    set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
+    set = Setup(case, space, flux, collision, nSpecies, interpOrder, limiter, cfl, maxTime)
     pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
     vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
     
@@ -97,9 +97,20 @@ end
     #Kinetic.reconstruct!(KS, ctr)
 
     @inbounds Threads.@threads for i in eachindex(face)
-        flux_kfvs!(face[i].fw, face[i].fh, face[i].fb, ctr[i-1].h,
-        ctr[i-1].b,ctr[i].h,ctr[i].b,ks.vSpace.u,ks.vSpace.v,ks.vSpace.weights,
-        dt, 1.0)
+        flux_kfvs!(
+            face[i].fw, 
+            face[i].fh, 
+            face[i].fb, 
+            ctr[i-1].h,
+            ctr[i-1].b,
+            ctr[i].h,
+            ctr[i].b,
+            ks.vSpace.u,
+            ks.vSpace.v,
+            ks.vSpace.weights,
+            dt, 
+            1.0
+        )
     end
 
     @inbounds Threads.@threads for i in 1:ks.pSpace.nx

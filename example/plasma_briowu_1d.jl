@@ -11,7 +11,7 @@ KS = ks
 @showprogress for iter in 1:nt
     #dt = timestep(KS, ctr, simTime)
     Kinetic.reconstruct!(ks, ctr)
-    #Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=true)
+    Kinetic.evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=true)
     #=
     @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
         flux_kfvs!(
@@ -71,7 +71,6 @@ KS = ks
     =#
     #Kinetic.update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
     # it's equivalent to the following process
-    
     sumRes = zeros(5, 2)
     sumAvg = zeros(5, 2)
     Threads.@threads for i = 1:ks.pSpace.nx
@@ -109,7 +108,6 @@ KS = ks
         ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[KS.pSpace.nx].ψ)
         ctr[KS.pSpace.nx+i].lorenz .= ctr[KS.pSpace.nx].lorenz
     end
-
 end
 
 sol = zeros(ks.pSpace.nx, 10, 2)

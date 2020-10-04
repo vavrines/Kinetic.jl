@@ -1,42 +1,37 @@
 # ------------------------------------------------------------
-# Configuration of shear layer
+# Configuration of sod shock tube
 # ------------------------------------------------------------
 
 # case
-case = layer
-space = 2d2f2v
+case = sod
+space = 1d2f1v
+nSpecies = 1
 flux = kfvs
 collision = bgk
-nSpecies = 1
 interpOrder = 2
 limiter = vanleer
 cfl = 0.5
-maxTime = 0.005539
+maxTime = 0.2
 
 # physical space
-x0 = -0.25
-x1 = 0.25
-nx = 250
+x0 = 0
+x1 = 1
+nx = 200
 pMeshType = uniform
-nxg = 2
+nxg = 1
 
 # velocity space
 vMeshType = rectangle
 umin = -5
 umax = 5
-nu = 32
+nu = 28
 nug = 0
 
-vmin = -5
-vmax = 5
-nv = 64
-nvg = 0
-
 # gas
-knudsen = 0.005
+knudsen = 0.0001
 mach = 0.0
 prandtl = 1
-inK = 1
+inK = 2
 
 omega = 0.81
 alphaRef = 1.0

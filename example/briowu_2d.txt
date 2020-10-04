@@ -5,6 +5,8 @@
 # setup
 case = brio-wu
 space = 1d3f2v
+flux = kcu
+collision = bgk
 nSpecies = 2
 interpOrder = 2
 limiter = minmod

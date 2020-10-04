@@ -5,14 +5,14 @@ Update flow variables with finite volume formulation
 
 """
 function step!(
-    fwL::Array{<:AbstractFloat,1},
-    w::Array{<:AbstractFloat,1},
-    prim::Array{<:AbstractFloat,1},
-    fwR::Array{<:AbstractFloat,1},
+    fwL::AbstractArray{<:AbstractFloat,1},
+    w::AbstractArray{<:AbstractFloat,1},
+    prim::AbstractArray{<:AbstractFloat,1},
+    fwR::AbstractArray{<:AbstractFloat,1},
     γ::Real,
     dx::Real,
-    RES::Array{<:AbstractFloat,1},
-    AVG::Array{<:AbstractFloat,1},
+    RES::AbstractArray{<:AbstractFloat,1},
+    AVG::AbstractArray{<:AbstractFloat,1},
 ) #// 1D0F
 
     #--- store W^n and calculate H^n,\tau^n ---#
@@ -32,12 +32,12 @@ end
 # 1D1F1V
 # ------------------------------------------------------------
 function step!(
-    fwL::Array{<:AbstractFloat,1},
+    fwL::AbstractArray{<:AbstractFloat,1},
     ffL::AbstractArray{<:AbstractFloat,1},
-    w::Array{<:AbstractFloat,1},
-    prim::Array{<:AbstractFloat,1},
+    w::AbstractArray{<:AbstractFloat,1},
+    prim::AbstractArray{<:AbstractFloat,1},
     f::AbstractArray{<:AbstractFloat,1},
-    fwR::Array{<:AbstractFloat,1},
+    fwR::AbstractArray{<:AbstractFloat,1},
     ffR::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
     weights::AbstractArray{<:AbstractFloat,1},
@@ -47,8 +47,8 @@ function step!(
     Pr::Real,
     dx::Real,
     dt::Real,
-    RES::Array{<:AbstractFloat,1},
-    AVG::Array{<:AbstractFloat,1},
+    RES::AbstractArray{<:AbstractFloat,1},
+    AVG::AbstractArray{<:AbstractFloat,1},
     collision = :bgk::Symbol,
 )
 
@@ -87,12 +87,12 @@ end
 # 1D1F3V
 # ------------------------------------------------------------
 function step!(
-    fwL::Array{<:AbstractFloat,1},
+    fwL::AbstractArray{<:AbstractFloat,1},
     ffL::AbstractArray{<:AbstractFloat,3},
-    w::Array{<:AbstractFloat,1},
-    prim::Array{<:AbstractFloat,1},
+    w::AbstractArray{<:AbstractFloat,1},
+    prim::AbstractArray{<:AbstractFloat,1},
     f::AbstractArray{<:AbstractFloat,3},
-    fwR::Array{<:AbstractFloat,1},
+    fwR::AbstractArray{<:AbstractFloat,1},
     ffR::AbstractArray{<:AbstractFloat,3},
     uVelo::AbstractArray{<:AbstractFloat,3},
     vVelo::AbstractArray{<:AbstractFloat,3},
@@ -147,14 +147,14 @@ end
 
 #--- 1D2F1V ---#
 function step!(
-    fwL::Array{<:AbstractFloat,1},
+    fwL::AbstractArray{<:AbstractFloat,1},
     fhL::AbstractArray{<:AbstractFloat,1},
     fbL::AbstractArray{<:AbstractFloat,1},
-    w::Array{<:AbstractFloat,1},
-    prim::Array{<:AbstractFloat,1},
+    w::AbstractArray{<:AbstractFloat,1},
+    prim::AbstractArray{<:AbstractFloat,1},
     h::AbstractArray{<:AbstractFloat,1},
     b::AbstractArray{<:AbstractFloat,1},
-    fwR::Array{<:AbstractFloat,1},
+    fwR::AbstractArray{<:AbstractFloat,1},
     fhR::AbstractArray{<:AbstractFloat,1},
     fbR::AbstractArray{<:AbstractFloat,1},
     u::AbstractArray{<:AbstractFloat,1},
@@ -166,8 +166,8 @@ function step!(
     Pr::Real,
     dx::Real,
     dt::Real,
-    RES::Array{<:AbstractFloat,1},
-    AVG::Array{<:AbstractFloat,1},
+    RES::AbstractArray{<:AbstractFloat,1},
+    AVG::AbstractArray{<:AbstractFloat,1},
     collision = :bgk::Symbol,
 )
 
@@ -209,14 +209,14 @@ end
 
 #--- 1D2F1V mixture ---#
 function step!(
-    fwL::Array{<:AbstractFloat,2},
+    fwL::AbstractArray{<:AbstractFloat,2},
     fhL::AbstractArray{<:AbstractFloat,2},
     fbL::AbstractArray{<:AbstractFloat,2},
-    w::Array{<:AbstractFloat,2},
-    prim::Array{<:AbstractFloat,2},
+    w::AbstractArray{<:AbstractFloat,2},
+    prim::AbstractArray{<:AbstractFloat,2},
     h::AbstractArray{<:AbstractFloat,2},
     b::AbstractArray{<:AbstractFloat,2},
-    fwR::Array{<:AbstractFloat,2},
+    fwR::AbstractArray{<:AbstractFloat,2},
     fhR::AbstractArray{<:AbstractFloat,2},
     fbR::AbstractArray{<:AbstractFloat,2},
     u::AbstractArray{<:AbstractFloat,2},
@@ -231,8 +231,8 @@ function step!(
     Pr::Real,
     dx::Real,
     dt::Real,
-    RES::Array{<:AbstractFloat,2},
-    AVG::Array{<:AbstractFloat,2},
+    RES::AbstractArray{<:AbstractFloat,2},
+    AVG::AbstractArray{<:AbstractFloat,2},
     collision = :bgk::Symbol,
 )
 
@@ -718,107 +718,6 @@ function step!(
             (dt * cell.lorenz[3, k])^2 * cell.h0[:, :, k]
         @. cell.h1[:, :, k] += dt * cell.lorenz[3, k] * cell.h0[:, :, k]
     end
-
-    #=
-        for m=1:2
-            for l=1:KS.vSpace.nv
-                if cell.lorenz[1,m]>0
-
-                    shift = Int(floor(cell.lorenz[1,m]*dt/KS.vSpace.du[1,l,m]))
-                    for k=KS.vSpace.nu:-1:1+shift
-                        cell.h0[k,l,m] = cell.h0[k-shift,l,m]
-                        cell.h1[k,l,m] = cell.h1[k-shift,l,m]
-                        cell.h2[k,l,m] = cell.h2[k-shift,l,m]
-                    end
-                    for k=1:shift
-                        cell.h0[k,l,m] = 0.0
-                        cell.h1[k,l,m] = 0.0
-                        cell.h2[k,l,m] = 0.0
-                    end
-
-                    for k=2:KS.vSpace.nu
-                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h0[k-1,l,m]-cell.h0[k,l,m])/KS.vSpace.du[k,1,m]
-                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h1[k-1,l,m]-cell.h1[k,l,m])/KS.vSpace.du[k,1,m]
-                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[1,m]-KS.vSpace.du[k,1,m]*shift)*(cell.h2[k-1,l,m]-cell.h2[k,l,m])/KS.vSpace.du[k,1,m]
-                    end
-                else
-                    shift = Int(floor(-cell.lorenz[1,m]*dt/KS.vSpace.du[1,l,m]))
-                    for k=1:KS.vSpace.nu-shift
-                        cell.h0[k,l,m] = cell.h0[k+shift,l,m]
-                        cell.h1[k,l,m] = cell.h1[k+shift,l,m]
-                        cell.h2[k,l,m] = cell.h2[k+shift,l,m]
-                    end
-                    for k=KS.vSpace.nu-shift+1:KS.vSpace.nu
-                        cell.h0[k,l,m] = 0.0
-                        cell.h1[k,l,m] = 0.0
-                        cell.h2[k,l,m] = 0.0
-                    end
-                    for k=1:KS.vSpace.nu-1
-                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h0[k,l,m]-cell.h0[k+1,l,m])/KS.vSpace.du[k,1,m]
-                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h1[k,l,m]-cell.h1[k+1,l,m])/KS.vSpace.du[k,1,m]
-                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[1,m]+KS.vSpace.du[k,1,m]*shift)*(cell.h2[k,l,m]-cell.h2[k+1,l,m])/KS.vSpace.du[k,1,m]
-                    end
-                end
-            end
-            @. cell.h0[1,:,m] = cell.h0[2,:,m]
-            @. cell.h0[KS.vSpace.nu,:,m] = cell.h0[KS.vSpace.nu-1,:,m]
-            @. cell.h1[1,:,m] = cell.h1[2,:,m]
-            @. cell.h1[KS.vSpace.nu,:,m] = cell.h1[KS.vSpace.nu-1,:,m]
-            @. cell.h2[1,:,m] = cell.h2[2,:,m]
-            @. cell.h2[KS.vSpace.nu,:,m] = cell.h2[KS.vSpace.nu-1,:,m]
-
-            for k=1:KS.vSpace.nu
-                if cell.lorenz[2,m]>0
-                    shift = Int(floor(cell.lorenz[2,m]*dt/KS.vSpace.dv[k,1,m]))
-                    for l=KS.vSpace.nv:-1:1+shift
-                        cell.h0[k,l,m] = cell.h0[k,l-shift,m]
-                        cell.h1[k,l,m] = cell.h1[k,l-shift,m]
-                        cell.h2[k,l,m] = cell.h2[k,l-shift,m]
-                    end
-                    for l=1:shift
-                        cell.h0[k,l,m] = 0.0
-                        cell.h1[k,l,m] = 0.0
-                        cell.h2[k,l,m] = 0.0
-                    end
-
-                    for l=2:KS.vSpace.nv
-                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h0[k,l-1,m]-cell.h0[k,l,m])/KS.vSpace.dv[k,1,m]
-                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h1[k,l-1,m]-cell.h1[k,l,m])/KS.vSpace.dv[k,1,m]
-                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[2,m]-KS.vSpace.dv[k,1,m]*shift)*(cell.h2[k,l-1,m]-cell.h2[k,l,m])/KS.vSpace.dv[k,1,m]
-                    end
-                else
-                    shift = Int(floor(-cell.lorenz[2,m]*dt/KS.vSpace.dv[k,1,m]))
-                    for l=1:KS.vSpace.nv-shift
-                        cell.h0[k,l,m] = cell.h0[k,l+shift,m]
-                        cell.h1[k,l,m] = cell.h1[k,l+shift,m]
-                        cell.h2[k,l,m] = cell.h2[k,l+shift,m]
-                    end
-                    for l=KS.vSpace.nv-shift+1:KS.vSpace.nv
-                        cell.h0[k,l,m] = 0.0
-                        cell.h1[k,l,m] = 0.0
-                        cell.h2[k,l,m] = 0.0
-                    end
-
-                    for l=1:KS.vSpace.nv-1
-                        cell.h0[k,l,m] = cell.h0[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h0[k,l,m]-cell.h0[k,l+1,m])/KS.vSpace.dv[k,1,m]
-                        cell.h1[k,l,m] = cell.h1[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h1[k,l,m]-cell.h1[k,l+1,m])/KS.vSpace.dv[k,1,m]
-                        cell.h2[k,l,m] = cell.h2[k,l,m]+(dt*cell.lorenz[2,m]+KS.vSpace.dv[k,1,m]*shift)*(cell.h2[k,l,m]-cell.h2[k,l+1,m])/KS.vSpace.dv[k,1,m]
-                    end
-                end
-            end
-            @. cell.h0[:,1,m] = cell.h0[:,2,m]
-            @. cell.h0[:,KS.vSpace.nv,m] = cell.h0[:,KS.vSpace.nv-1,m]
-            @. cell.h1[:,1,m] = cell.h1[:,2,m]
-            @. cell.h1[:,KS.vSpace.nv,m] = cell.h1[:,KS.vSpace.nv-1,m]
-            @. cell.h2[:,1,m] = cell.h2[:,2,m]
-            @. cell.h2[:,KS.vSpace.nv,m] = cell.h2[:,KS.vSpace.nv-1,m]
-        end
-
-        for m=1:2
-            @. cell.h2[:,:,m] = cell.h2[:,:,m]+2*dt*cell.lorenz[3,m]*cell.h1[:,:,m]+(dt*cell.lorenz[3,m])^2*cell.h0[:,:,m]
-            @. cell.h1[:,:,m] = cell.h1[:,:,m]+dt*cell.lorenz[3,m]*cell.h0[:,:,m]
-        end
-    =#
 
     # source -> f^{n+1}
     tau = aap_hs_collision_time(

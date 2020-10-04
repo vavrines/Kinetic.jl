@@ -5,9 +5,11 @@
 # setup
 case = brio-wu
 space = 1d4f1v
+flux = kcu
+collision = bgk
 nSpecies = 2
 interpOrder = 2
-limiter = vanleer
+limiter = minmod
 cfl = 0.3
 maxTime = 0.1
 
@@ -26,7 +28,7 @@ vMeshType = rectangle
 nug = 0
 
 # gas
-knudsen = 0.00001
+knudsen = 0.000001
 mach = 0.0
 prandtl = 1
 inK = 0

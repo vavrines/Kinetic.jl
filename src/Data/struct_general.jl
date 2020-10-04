@@ -11,6 +11,8 @@ struct Setup{S,I,E,F} <: AbstractSetup
 
     case::S
     space::S
+    flux::S
+    collision::S
     nSpecies::I
     interpOrder::I
     limiter::S
@@ -20,6 +22,8 @@ struct Setup{S,I,E,F} <: AbstractSetup
     function Setup(
         case::AbstractString,
         space::AbstractString,
+        flux::AbstractString,
+        collision::AbstractString,
         nSpecies::Int,
         interpOrder::Int,
         limiter::AbstractString,
@@ -29,6 +33,8 @@ struct Setup{S,I,E,F} <: AbstractSetup
         new{typeof(case),typeof(nSpecies),typeof(cfl),typeof(maxTime)}(
             case,
             space,
+            flux,
+            collision,
             nSpecies,
             interpOrder,
             limiter,

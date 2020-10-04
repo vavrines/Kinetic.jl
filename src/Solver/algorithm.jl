@@ -21,7 +21,7 @@ function solve!(
     iter = 0
     t = deepcopy(simTime)
     dt = timestep(KS, ctr, simTime)
-    nt = Int(Floor(KS.set.maxTime / dt)) + 1
+    nt = Int(floor(KS.set.maxTime / dt)) + 1
     res = zeros(axes(KS.ib.wL))
 
     #--- main loop ---#
@@ -34,7 +34,7 @@ function solve!(
         update!(KS, ctr, face, dt, res)
 
         #iter += 1
-        dt += dt
+        t += dt
 
         if iter % 100 == 0
             println("iter: $(iter), time: $(simTime), dt: $(dt), res: $(res[1:end])")
@@ -684,8 +684,8 @@ function evolve!(
     ctr::AbstractArray{<:AbstractControlVolume1D,1},
     face::Array{<:AbstractInterface1D,1},
     dt::Real;
-    mode = :kfvs::Symbol,
-    isPlasma = true::Bool,
+    mode = Symbol(KS.set.flux)::Symbol,
+    isPlasma = false::Bool,
     isMHD = false::Bool,
 )
 
@@ -1033,7 +1033,7 @@ function update!(
     dt::Real,
     residual::Array{<:AbstractFloat}; # 1D / 2D
     coll = :bgk::Symbol,
-    bc = :extra::Symbol,
+    bc = :fix::Symbol,
 )
 
     sumRes = zeros(axes(KS.ib.wL))
@@ -1102,6 +1102,7 @@ function update!(
         residual; 
         coll=coll, 
         bc=bc, 
+        isMHD = false,
     )
 
 end
@@ -1188,8 +1189,9 @@ function update!(
         face, 
         dt, 
         residual; 
-        coll=coll, 
-        bc=bc, 
+        coll = coll, 
+        bc = bc, 
+        isMHD = false,
     )
 
 end
@@ -1366,23 +1368,158 @@ function update_boundary!(
     face::Array{<:AbstractInterface1D,1},
     dt::Real,
     residual::Array{<:AbstractFloat};
-    coll = :bgk::Symbol,
-    bc = :extra::Symbol,
-    isMHD = true::Bool,
+    coll::Symbol,
+    bc::Symbol,
+    isMHD::Bool,
 )
 
-    if bc != :fix
-        resL = zeros(axes(KS.ib.wL))
-        avgL = zeros(axes(KS.ib.wL))
-        resR = zeros(axes(KS.ib.wL))
-        avgR = zeros(axes(KS.ib.wL))
+    resL = zeros(axes(KS.ib.wL))
+    avgL = zeros(axes(KS.ib.wL))
+    resR = zeros(axes(KS.ib.wL))
+    avgR = zeros(axes(KS.ib.wL))
 
+    if bc != :fix
         i = 1
         j = KS.pSpace.nx
         if KS.set.space[3:4] == "0f"
-            step!(KS, face[i], ctr[i], face[i+1], dt, resL, avgL)
-            step!(KS, face[j], ctr[j], face[j+1], dt, resR, avgR)
-        elseif KS.set.space[3:4] in ["3f", "4f"]
+            step!(face[i].fw, ctr[i].w, ctr[i].prim, face[i+1].fw, KS.gas.γ, ctr[i].dx, resL, avgL)
+            step!(face[j].fw, ctr[j].w, ctr[j].prim, face[j+1].fw, KS.gas.γ, ctr[j].dx, resR, avgR)
+        elseif KS.set.space[3:4] == "1f"
+            if KS.set.space[5:6] == "1v"
+                step!(
+                    face[i].fw, 
+                    face[i].ff, 
+                    ctr[i].w, 
+                    ctr[i].prim, 
+                    ctr[i].f, 
+                    face[i+1].fw, 
+                    face[i+1].ff, 
+                    KS.vSpace.u, 
+                    KS.vSpace.weights, 
+                    KS.gas.γ,
+                    KS.gas.μᵣ,
+                    KS.gas.ω,
+                    KS.gas.Pr,
+                    ctr[i].dx,
+                    dt,
+                    resL,
+                    avgL,
+                    Symbol(KS.set.collision),
+                )
+                step!(
+                    face[j].fw, 
+                    face[j].ff, 
+                    ctr[j].w, 
+                    ctr[j].prim, 
+                    ctr[j].f, 
+                    face[j+1].fw, 
+                    face[j+1].ff, 
+                    KS.vSpace.u, 
+                    KS.vSpace.weights, 
+                    KS.gas.γ,
+                    KS.gas.μᵣ,
+                    KS.gas.ω,
+                    KS.gas.Pr,
+                    ctr[j].dx,
+                    dt,
+                    resR,
+                    avgR,
+                    Symbol(KS.set.collision),
+                )
+            elseif KS.set.space[5:6] == "3v"
+                step!(
+                    face[i].fw, 
+                    face[i].ff, 
+                    ctr[i].w, 
+                    ctr[i].prim, 
+                    face[i+1].fw, 
+                    face[i+1].ff, 
+                    KS.vSpace.u, 
+                    KS.vSpace.v, 
+                    KS.vSpace.w, 
+                    KS.vSpace.weights, 
+                    KS.gas.γ,
+                    KS.gas.μᵣ,
+                    KS.gas.ω,
+                    KS.gas.Pr,
+                    ctr[i].dx,
+                    dt,
+                    resL,
+                    avgL,
+                    Symbol(KS.set.collision),
+                )
+                step!(
+                    face[j].fw, 
+                    face[j].ff, 
+                    ctr[j].w, 
+                    ctr[j].prim, 
+                    face[j+1].fw, 
+                    face[j+1].ff, 
+                    KS.vSpace.u, 
+                    KS.vSpace.v, 
+                    KS.vSpace.w, 
+                    KS.vSpace.weights, 
+                    KS.gas.γ,
+                    KS.gas.μᵣ,
+                    KS.gas.ω,
+                    KS.gas.Pr,
+                    ctr[j].dx,
+                    dt,
+                    resL,
+                    avgL,
+                    Symbol(KS.set.collision),
+                )
+            end
+        elseif KS.set.space[3:4] == "2f"
+            step!(
+                face[i].fw, 
+                face[i].fh, 
+                face[i].fb, 
+                ctr[i].w, 
+                ctr[i].prim, 
+                ctr[i].h,
+                ctr[i].b,
+                face[i+1].fw, 
+                face[i+1].fh, 
+                face[i+1].fb, 
+                KS.vSpace.u, 
+                KS.vSpace.weights, 
+                KS.gas.K, 
+                KS.gas.γ,
+                KS.gas.μᵣ,
+                KS.gas.ω,
+                KS.gas.Pr,
+                ctr[i].dx,
+                dt,
+                resL,
+                avgL,
+                Symbol(KS.set.collision),
+            )
+            step!(
+                face[j].fw, 
+                face[j].fh, 
+                face[j].fb, 
+                ctr[j].w, 
+                ctr[j].prim, 
+                ctr[j].h,
+                ctr[j].b,
+                face[j+1].fw, 
+                face[j+1].fh, 
+                face[j+1].fb, 
+                KS.vSpace.u, 
+                KS.vSpace.weights, 
+                KS.gas.K, 
+                KS.gas.γ,
+                KS.gas.μᵣ,
+                KS.gas.ω,
+                KS.gas.Pr,
+                ctr[j].dx,
+                dt,
+                resL,
+                avgL,
+                Symbol(KS.set.collision),
+            )
+        elseif KS.set.space[3:4] in ["3f", "4f"] # compact form
             step!(KS, face[i], ctr[i], face[i+1], dt, resL, avgL, coll, isMHD)
             step!(KS, face[j], ctr[j], face[j+1], dt, resR, avgR, coll, isMHD)
         else
@@ -1460,26 +1597,6 @@ function update_boundary!(
             ctr[KS.pSpace.nx+i].w .= ctr[i].w
             ctr[KS.pSpace.nx+i].prim .= ctr[i].prim
 
-
-            ctr[1-i].h0 .= ctr[KS.pSpace.nx+1-i].h0
-            ctr[1-i].h1 .= ctr[KS.pSpace.nx+1-i].h1
-            ctr[1-i].h2 .= ctr[KS.pSpace.nx+1-i].h2
-            ctr[1-i].E .= ctr[KS.pSpace.nx+1-i].E
-            ctr[1-i].B .= ctr[KS.pSpace.nx+1-i].B
-            ctr[1-i].ϕ = deepcopy(ctr[KS.pSpace.nx+1-i].ϕ)
-            ctr[1-i].ψ = deepcopy(ctr[KS.pSpace.nx+1-i].ψ)
-            ctr[1-i].lorenz .= ctr[KS.pSpace.nx+1-i].lorenz
-
-            
-            ctr[KS.pSpace.nx+i].h0 .= ctr[i].h0
-            ctr[KS.pSpace.nx+i].h1 .= ctr[i].h1
-            ctr[KS.pSpace.nx+i].h2 .= ctr[i].h2
-            ctr[KS.pSpace.nx+i].E .= ctr[i].E
-            ctr[KS.pSpace.nx+i].B .= ctr[i].B
-            ctr[KS.pSpace.nx+i].ϕ = deepcopy(ctr[i].ϕ)
-            ctr[KS.pSpace.nx+i].ψ = deepcopy(ctr[i].ψ)
-            ctr[KS.pSpace.nx+i].lorenz .= ctr[i].lorenz
-
             if KS.set.space[3:4] == "1f"
                 ctr[1-i].f .= ctr[KS.pSpace.nx+1-i].f
                 ctr[KS.pSpace.nx+i].f .= ctr[i].f
@@ -1533,25 +1650,8 @@ function update_boundary!(
     elseif bc == :balance
         @. ctr[0].w = 0.5 * (ctr[-1].w + ctr[1].w)
         @. ctr[0].prim = 0.5 * (ctr[-1].prim + ctr[1].prim)
-        @. ctr[0].h0 = 0.5 * (ctr[-1].h0 + ctr[1].h0)
-        @. ctr[0].h1 = 0.5 * (ctr[-1].h1 + ctr[1].h1)
-        @. ctr[0].h2 = 0.5 * (ctr[-1].h2 + ctr[1].h2)
-        @. ctr[0].E = 0.5 * (ctr[-1].E + ctr[1].E)
-        @. ctr[0].B = 0.5 * (ctr[-1].B + ctr[1].B)
-        ctr[0].ϕ = 0.5 * (ctr[-1].ϕ + ctr[1].ϕ)
-        ctr[0].ψ = 0.5 * (ctr[-1].ψ + ctr[1].ψ)
-        @. ctr[0].lorenz = 0.5 * (ctr[-1].lorenz + ctr[1].lorenz)
-
         @. ctr[KS.pSpace.nx+1].w = 0.5 * (ctr[KS.pSpace.nx].w + ctr[KS.pSpace.nx+2].w)
         @. ctr[KS.pSpace.nx+1].prim = 0.5 * (ctr[KS.pSpace.nx].prim + ctr[KS.pSpace.nx+2].prim)
-        @. ctr[KS.pSpace.nx+1].h0 = 0.5 * (ctr[KS.pSpace.nx].h0 + ctr[KS.pSpace.nx+2].h0)
-        @. ctr[KS.pSpace.nx+1].h1 = 0.5 * (ctr[KS.pSpace.nx].h1 + ctr[KS.pSpace.nx+2].h1)
-        @. ctr[KS.pSpace.nx+1].h2 = 0.5 * (ctr[KS.pSpace.nx].h2 + ctr[KS.pSpace.nx+2].h2)
-        @. ctr[KS.pSpace.nx+1].E = 0.5 * (ctr[KS.pSpace.nx].E + ctr[KS.pSpace.nx+2].E)
-        @. ctr[KS.pSpace.nx+1].B = 0.5 * (ctr[KS.pSpace.nx].B + ctr[KS.pSpace.nx+2].B)
-        ctr[KS.pSpace.nx+1].ϕ = 0.5 * (ctr[KS.pSpace.nx].ϕ + ctr[KS.pSpace.nx+2].ϕ)
-        ctr[KS.pSpace.nx+1].ψ = 0.5 * (ctr[KS.pSpace.nx].ψ + ctr[KS.pSpace.nx+2].ψ)
-        @. ctr[KS.pSpace.nx+1].lorenz = 0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
 
         if KS.set.space[3:4] == "1f"
             @. ctr[0].f = 0.5 * (ctr[-1].f + ctr[1].f)

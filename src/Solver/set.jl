@@ -36,7 +36,7 @@ struct SolverSet <: AbstractSolverSet
         end
 
         # set
-        set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
+        set = Setup(case, space, flux, collision, nSpecies, interpOrder, limiter, cfl, maxTime)
 
         # physical space
         Dx = parse(Int, space[1])

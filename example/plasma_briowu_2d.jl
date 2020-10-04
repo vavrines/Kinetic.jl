@@ -9,7 +9,7 @@ end
 
 begin
     γ = heat_capacity_ratio(inK, 3)
-    set = Setup(case, space, nSpecies, interpOrder, limiter, cfl, maxTime)
+    set = Setup(case, space, flux, collision, nSpecies, interpOrder, limiter, cfl, maxTime)
     pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
 
     ue0 = umin * sqrt(mi / me)
@@ -145,7 +145,7 @@ end
     #dt = Kinetic.timestep(KS, ctr, simTime)
     #Kinetic.reconstruct!(ks, ctr)
 
-    Kinetic.evolve!(ks, ctr, face, dt; mode=:kfvs, isPlasma=:true)
+    Kinetic.evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=:true)
     # it's equivalent to the following process
     #=
     @inbounds Threads.@threads for i = 1:KS.pSpace.nx+1
