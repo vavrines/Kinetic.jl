@@ -5,6 +5,8 @@
 # setup
 case = shock
 space = 1d1f1v
+flux = kfvs
+collision = bgk
 nSpecies = 1
 interpOrder = 2
 limiter = vanleer
