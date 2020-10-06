@@ -33,6 +33,8 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
+    return nothing
+
 end
 
 # ------------------------------------------------------------
@@ -62,6 +64,8 @@ function flux_kfvs!(
     fw[3] = dt * 0.5 * sum(ω .* u .^ 3 .* f) - 0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
+
+    return nothing
 
 end
 
@@ -98,6 +102,8 @@ function flux_kfvs!(
         0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
+
+    return nothing
 
 end
 
@@ -139,6 +145,8 @@ function flux_kfvs!(
 
     @. fh = dt * u * h - 0.5 * dt^2 * u^2 * sh
     @. fb = dt * u * b - 0.5 * dt^2 * u^2 * sb
+
+    return nothing
 
 end
 
@@ -198,6 +206,8 @@ function flux_kfvs!(
     @. fh1 = dt * u * h1 - 0.5 * dt^2 * u^2 * sh1
     @. fh2 = dt * u * h2 - 0.5 * dt^2 * u^2 * sh2
     @. fh3 = dt * u * h3 - 0.5 * dt^2 * u^2 * sh3
+
+    return nothing
 
 end
 
@@ -266,6 +276,8 @@ function flux_kfvs!(
         )
     end
 
+    return nothing
+
 end
 
 # ------------------------------------------------------------
@@ -301,6 +313,8 @@ function flux_kfvs!(
     fw .*= len
 
     @. ff = (dt * u * f - 0.5 * dt^2 * u^2 * sf) * len
+
+    return nothing
 
 end
 
@@ -348,6 +362,8 @@ function flux_kfvs!(
 
     @. fh = (dt * u * h - 0.5 * dt^2 * u^2 * sh) * len
     @. fb = (dt * u * b - 0.5 * dt^2 * u^2 * sb) * len
+
+    return nothing
 
 end
 
@@ -404,6 +420,8 @@ function flux_kfvs!(
     @. fh0 = (dt * u * h0 - 0.5 * dt^2 * u^2 * sh0) * len
     @. fh1 = (dt * u * h1 - 0.5 * dt^2 * u^2 * sh1) * len
     @. fh2 = (dt * u * h2 - 0.5 * dt^2 * u^2 * sh2) * len
+
+    return nothing
 
 end
 
@@ -490,4 +508,6 @@ function flux_kfvs!(
     @. fh1 *= len
     @. fh2 *= len
 
+    return nothing
+    
 end

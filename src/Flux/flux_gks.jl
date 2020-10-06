@@ -228,6 +228,8 @@ function flux_gks!(
         (Mt[5] + tau * Mt[4]) * primR[1] * MauR - tau * Mt[4] * primR[1] * MauRT
     # @. fw += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
+    return nothing
+
 end
 
 
@@ -316,6 +318,8 @@ function flux_gks!(
     # @. fw += Mt[4] * primL[1] * MuvL + Mt[4] * primR[1] * MuvR
 
     fw .*= dy
+
+    return nothing
 
 end
 
@@ -512,6 +516,8 @@ function flux_gks!(
         ) *
         (1.0 - δ)
 
+    return nothing
+
 end
 
 #--- mixture ---#
@@ -623,6 +629,8 @@ function flux_gks!(
     end
 
     @. fw .* len
+
+    return nothing
 
 end
 
@@ -747,6 +755,8 @@ function flux_ugks!(
         u *
         (aT[1] * B + aT[2] * u * B + 0.5 * aT[3] * (u^2 * B + Mxi[2] * H)) +
         Mt[4] * u * b - Mt[5] * u^2 * sb
+
+    return nothing
 
 end
 
@@ -907,6 +917,8 @@ function flux_ugks!(
     fw .*= len
     fh .*= len
     fb .*= len
+
+    return nothing
 
 end
 
@@ -1145,4 +1157,6 @@ function flux_ugks!(
     @. fh1 *= len
     @. fh2 *= len
 
+    return nothing
+    
 end

@@ -18,6 +18,7 @@ function flux_lax!(
     dx::Real,
 )
     fw .= 0.5 * dt .* (euler_flux(wL, γ)[1] + euler_flux(wR, γ)[1] - dx / dt .* (wR - wL))
+    return nothing
 end
 
 
@@ -59,6 +60,8 @@ function flux_hll!(
     end
 
     fw .*= dt
+
+    return nothing
 
 end
 
@@ -270,4 +273,6 @@ function flux_roe!(
 
     end
 
+    return nothing
+    
 end

@@ -51,4 +51,6 @@ function flux_boundary_maxwell!(
     @. fh = u * hWall * len * dt
     @. fb = u * bWall * len * dt
 
+    return nothing
+    
 end

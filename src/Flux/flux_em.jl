@@ -99,6 +99,8 @@ function flux_em!(
             )
     end
 
+    return nothing
+
 end
 
 
@@ -229,6 +231,8 @@ function flux_emx!(
     femLU .*= -0.5 * dt / (dxL + dxR)
     femLD .*= -0.5 * dt / (dxL + dxR)
 
+    return nothing
+
 end
 
 
@@ -349,4 +353,6 @@ function flux_emy!(
     femLU .*= -0.5 * dt / (dyL + dyR)
     femLD .*= -0.5 * dt / (dyL + dyR)
 
+    return nothing
+    
 end

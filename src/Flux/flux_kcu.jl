@@ -67,6 +67,8 @@ function flux_kcu!(
 
     @. ff = Mt[1] * u * g + Mt[2] * u * f
 
+    return nothing
+
 end
 
 # ------------------------------------------------------------
@@ -137,6 +139,8 @@ function flux_kcu!(
 
     @. fh = Mt[1] * u * Mh + Mt[2] * u * h
     @. fb = Mt[1] * u * Mb + Mt[2] * u * b
+
+    return nothing
 
 end
 
@@ -224,6 +228,8 @@ function flux_kcu!(
     @. fh2 = Mt[1] * u * g2 + Mt[2] * u * h2
     @. fh3 = Mt[1] * u * g3 + Mt[2] * u * h3
 
+    return nothing
+
 end
 
 # ------------------------------------------------------------
@@ -293,6 +299,8 @@ function flux_kcu!(
     fw[4] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* f)) * len
 
     @. ff = (Mt[1] * u * g + Mt[2] * u * f) * len
+
+    return nothing
 
 end
 
@@ -369,6 +377,8 @@ function flux_kcu!(
 
     @. fh = (Mt[1] * u * H + Mt[2] * u * h) * len
     @. fb = (Mt[1] * u * B + Mt[2] * u * b) * len
+
+    return nothing
 
 end
 
@@ -451,6 +461,8 @@ function flux_kcu!(
     @. fh1 = (Mt[1] * u * H1 + Mt[2] * u * h1) * len
     @. fh2 = (Mt[1] * u * H2 + Mt[2] * u * h2) * len
 
+    return nothing
+
 end
 
 # ------------------------------------------------------------
@@ -525,6 +537,8 @@ function flux_kcu!(
 
         @. ff[:, j] = Mt[1, j] * u[:, j] * M[:, j] + Mt[2, j] * u[:, j] * f[:, j]
     end
+
+    return nothing
 
 end
 
@@ -613,6 +627,8 @@ function flux_kcu!(
         @. fh[:, j] = Mt[1, j] * u[:, j] * MH[:, j] + Mt[2, j] * u[:, j] * h[:, j]
         @. fb[:, j] = Mt[1, j] * u[:, j] * MB[:, j] + Mt[2, j] * u[:, j] * b[:, j]
     end
+
+    return nothing
 
 end
 
@@ -724,6 +740,8 @@ function flux_kcu!(
         @. fh2[:, j] = Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
         @. fh3[:, j] = Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
     end
+
+    return nothing
 
 end
 
@@ -838,4 +856,6 @@ function flux_kcu!(
     @. fh1 *= len
     @. fh2 *= len
 
+    return nothing
+    
 end
