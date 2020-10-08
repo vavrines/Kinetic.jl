@@ -1,7 +1,21 @@
 """
 Update flow variables with finite volume formulation
 
-`step!(fwL, w, prim, fwR, γ, dx, RES, AVG)`
+wrapper: `step!(ks, faceL, cell, faceR, dt, res, avg, collision=:bgk, isMHD=:true)`
+
+1d0f: `step!(fwL, w, prim, fwR, γ, dx, RES, AVG)`
+
+1d1f1v: `step!(fwL, ffL, w, prim, f, fwR, ffR, u, weights, 
+γ, μᵣ, ω, Pr, dx, dt, RES, AVG, collision=:bgk)`
+
+1d1f3v: `step!(fwL, ffL, w, prim, f, fwR, ffR, uVelo, vVelo, wVelo, weights, 
+γ, μᵣ, ω, Pr, dx, dt, RES, AVG, collision=:bgk)`
+
+1d2f1v: `step!(fwL, fhL, fbL, w, prim, h, b, fwR, fhR, fbR, u, weights, 
+K, γ, μᵣ, ω, Pr, dx, dt, RES, AVG, collision=:bgk)`
+
+1d2f1v2s: `step!(fwL, fhL, fbL, w, prim, h, b, fwR, fhR, fbR, u, weights, K, γ, mi, ni, me, ne,
+Kn, Pr, dx, dt, RES, AVG, collision=:bgk)`
 
 """
 function step!(

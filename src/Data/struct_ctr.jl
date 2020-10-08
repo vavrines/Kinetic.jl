@@ -1,9 +1,20 @@
 # ============================================================
 # Structs of Control Volume
-# -> array of struct in numerical simulation
+# array of struct -> simulation
 # ============================================================
 
+# ------------------------------------------------------------
+# 1D
+# ------------------------------------------------------------
 
+"""
+1D control volume with no distribution function
+
+    @vars: x, dx, w, prim, sw
+
+`ControlVolume1D(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray)`
+
+"""
 mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
 
     x::F
@@ -14,7 +25,6 @@ mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
     sw::A
 
     function ControlVolume1D(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray)
-
         x = deepcopy(X)
         dx = deepcopy(DX)
 
@@ -23,12 +33,19 @@ mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
         sw = zeros(typeof(W[1]), axes(w))
 
         new{typeof(x),typeof(w)}(x, dx, w, prim, sw)
-
     end
 
 end
 
 
+"""
+1D control volume with 1 distribution function
+
+    @vars: x, dx, w, prim, sw, f, sf
+
+`ControlVolume1D1F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)`
+
+"""
 mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
 
     x::F
@@ -48,7 +65,6 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
         PRIM::AbstractArray,
         F::AbstractArray,
     )
-
         x = deepcopy(X)
         dx = deepcopy(DX)
 
@@ -60,12 +76,19 @@ mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
         sf = zeros(typeof(F[1]), axes(f))
 
         new{typeof(x),typeof(w),typeof(f)}(x, dx, w, prim, sw, f, sf)
-
     end
 
 end
 
 
+"""
+1D control volume with 2 distribution functions
+
+    @vars: x, dx, w, prim, sw, h, b, sh, sb
+
+`ControlVolume1D2F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, H::AbstractArray, B::AbstractArray)`
+
+"""
 mutable struct ControlVolume1D2F{F,A,B} <: AbstractControlVolume1D
 
     x::F
@@ -108,6 +131,14 @@ mutable struct ControlVolume1D2F{F,A,B} <: AbstractControlVolume1D
 end
 
 
+"""
+1D control volume with 3 distribution functions
+
+    @vars: x, dx, w, prim, sw, h0, h1, h2, sh0, sh1, sh2, E, B, ϕ, ψ, lorenz
+
+`ControlVolume1D3F(X, DX, W, PRIM, H0, H1, H2, E0, B0, L)`
+
+"""
 mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
 
     x::F
@@ -239,6 +270,14 @@ mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
 end
 
 
+"""
+1D control volume with 4 distribution functions
+
+    @vars: x, dx, w, prim, sw, h0, h1, h2, h3, sh0, sh1, sh2, sh3, E, B, ϕ, ψ, lorenz
+
+`ControlVolume1D4F(X, DX, W, PRIM, H0, H1, H2, H3, E0, B0, L)`
+
+"""
 mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
 
     x::F
@@ -385,7 +424,18 @@ mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
 
 end
 
+# ------------------------------------------------------------
+# 2D
+# ------------------------------------------------------------
 
+"""
+2D control volume with no distribution function
+
+    @vars: x, y, dx, dy, w, prim, sw
+
+`ControlVolume2D(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray)`
+
+"""
 mutable struct ControlVolume2D{F,A,B} <: AbstractControlVolume2D
 
     x::F
@@ -422,6 +472,14 @@ mutable struct ControlVolume2D{F,A,B} <: AbstractControlVolume2D
 end
 
 
+"""
+2D control volume with 1 distribution function
+
+    @vars: x, y, dx, dy, w, prim, sw, f, sf
+
+`ControlVolume2D1F(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)`
+
+"""
 mutable struct ControlVolume2D1F{F,A,B,C,D} <: AbstractControlVolume2D
 
     x::F
@@ -475,6 +533,14 @@ mutable struct ControlVolume2D1F{F,A,B,C,D} <: AbstractControlVolume2D
 end
 
 
+"""
+2D control volume with 2 distribution functions
+
+    @vars: x, y, dx, dy, w, prim, sw, h, b, sh, sb
+
+`ControlVolume2D2F(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray, H::AbstractArray, B::AbstractArray)`
+
+"""
 mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
 
     x::F
@@ -535,6 +601,14 @@ mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
 end
 
 
+"""
+2D control volume with 3 distribution functions
+
+    @vars: x, y, dx, dy, w, prim, sw, h0, h1, h2, sh0, sh1, sh2, E, B, ϕ, ψ, lorenz
+
+`ControlVolume2D3F(X, DX, Y, DY, W, PRIM, H0, H1, H2, E0, B0, L)`
+
+"""
 mutable struct ControlVolume2D3F{F,A,B,C,D,E,F,G} <: AbstractControlVolume2D
 
     x::F

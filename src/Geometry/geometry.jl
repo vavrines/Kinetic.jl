@@ -7,17 +7,29 @@ export PSpace1D, PSpace2D, uniform_mesh, meshgrid
 export UnstructMesh 
 export read_mesh, mesh_connectivity_2D, mesh_center_2D, mesh_area_2D
 
-
 """
 Transform local flow variables to global frame
 
+- 2D: `global_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)`
+- 3D: `global_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})`
+
 """
 function global_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
+    
+    if eltype(w) <: Int
+        G = similar(w, Float64)
+    else
+        G = similar(w)
+    end
 
     if length(w) == 2
-        G = [w[1] * cosa - w[2] * sina, w[1] * sina + w[2] * cosa]
+        G[1] = w[1] * cosa - w[2] * sina
+        G[2] = w[1] * sina + w[2] * cosa
     elseif length(w) == 4
-        G = [w[1], w[2] * cosa - w[3] * sina, w[2] * sina + w[3] * cosa, w[4]]
+        G[1] = w[1]
+        G[2] = w[2] * cosa - w[3] * sina
+        G[3] = w[2] * sina + w[3] * cosa
+        G[4] = w[4]
     else
         throw("local -> global: dimension dismatch")
     end
@@ -26,26 +38,27 @@ function global_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
 
 end
 
-
 function global_frame(
     w::AbstractArray{<:Real,1},
     dirccos::AbstractArray{<:Real,2},
 )
 
+    if eltype(w) <: Int
+        G = similar(w, Float64)
+    else
+        G = similar(w)
+    end
+
     if length(w) == 3
-        G = [
-            w[1] * dirccos[1, 1] + w[2] * dirccos[2, 1] + w[3] * dirccos[3, 1],
-            w[1] * dirccos[1, 2] + w[2] * dirccos[2, 2] + w[3] * dirccos[3, 2],
-            w[1] * dirccos[1, 3] + w[2] * dirccos[2, 3] + w[3] * dirccos[3, 3],
-        ]
+        G[1] = w[1] * dirccos[1, 1] + w[2] * dirccos[2, 1] + w[3] * dirccos[3, 1]
+        G[2] = w[1] * dirccos[1, 2] + w[2] * dirccos[2, 2] + w[3] * dirccos[3, 2]
+        G[3] = w[1] * dirccos[1, 3] + w[2] * dirccos[2, 3] + w[3] * dirccos[3, 3]
     elseif length(w) == 5
-        G = [
-            w[1],
-            w[2] * dirccos[1, 1] + w[3] * dirccos[2, 1] + w[4] * dirccos[3, 1],
-            w[2] * dirccos[1, 2] + w[3] * dirccos[2, 2] + w[4] * dirccos[3, 2],
-            w[2] * dirccos[1, 3] + w[3] * dirccos[2, 3] + w[4] * dirccos[3, 3],
-            w[5],
-        ]
+        G[1] = w[1]
+        G[2] = w[2] * dirccos[1, 1] + w[3] * dirccos[2, 1] + w[4] * dirccos[3, 1]
+        G[3] = w[2] * dirccos[1, 2] + w[3] * dirccos[2, 2] + w[4] * dirccos[3, 2]
+        G[4] = w[2] * dirccos[1, 3] + w[3] * dirccos[2, 3] + w[4] * dirccos[3, 3]
+        G[5] = w[5]
     else
         throw("local -> global: dimension dismatch")
     end
@@ -58,13 +71,26 @@ end
 """
 Transform global flow variables to local frame
 
+- 2D: `local_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)`
+- 3D: `local_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})`
+
 """
 function local_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
 
+    if eltype(w) <: Int
+        L = similar(w, Float64)
+    else
+        L = similar(w)
+    end
+
     if length(w) == 2
-        L = [w[1] * cosa + w[2] * sina, w[2] * cosa - w[1] * sina]
+        L[1] = w[1] * cosa + w[2] * sina
+        L[2] = w[2] * cosa - w[1] * sina
     elseif length(w) == 4
-        L = [w[1], w[2] * cosa + w[3] * sina, w[3] * cosa - w[2] * sina, w[4]]
+        L[1] = w[1]
+        L[2] = w[2] * cosa + w[3] * sina
+        L[3] = w[3] * cosa - w[2] * sina
+        L[4] = w[4]
     else
         throw("global -> local: dimension dismatch")
     end
@@ -72,27 +98,28 @@ function local_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
     return L
 
 end
-
 
 function local_frame(
     w::AbstractArray{<:Real,1},
     dirccos::AbstractArray{<:Real,2},
 )
 
+    if eltype(w) <: Int
+        L = similar(w, Float64)
+    else
+        L = similar(w)
+    end
+
     if length(w) == 3
-        L = [
-            w[1] * dirccos[1, 1] + w[2] * dirccos[1, 2] + w[3] * dirccos[1, 3],
-            w[1] * dirccos[2, 1] + w[2] * dirccos[2, 2] + w[3] * dirccos[2, 3],
-            w[1] * dirccos[3, 1] + w[2] * dirccos[3, 2] + w[3] * dirccos[3, 3],
-        ]
+        L[1] = w[1] * dirccos[1, 1] + w[2] * dirccos[1, 2] + w[3] * dirccos[1, 3]
+        L[2] = w[1] * dirccos[2, 1] + w[2] * dirccos[2, 2] + w[3] * dirccos[2, 3]
+        L[3] = w[1] * dirccos[3, 1] + w[2] * dirccos[3, 2] + w[3] * dirccos[3, 3]
     elseif length(w) == 5
-        L = [
-            w[1],
-            w[2] * dirccos[1, 1] + w[3] * dirccos[1, 2] + w[4] * dirccos[1, 3],
-            w[2] * dirccos[2, 1] + w[3] * dirccos[2, 2] + w[4] * dirccos[2, 3],
-            w[2] * dirccos[3, 1] + w[3] * dirccos[3, 2] + w[4] * dirccos[3, 3],
-            w[5],
-        ]
+        L[1] = w[1]
+        L[2] = w[2] * dirccos[1, 1] + w[3] * dirccos[1, 2] + w[4] * dirccos[1, 3]
+        L[3] = w[2] * dirccos[2, 1] + w[3] * dirccos[2, 2] + w[4] * dirccos[2, 3]
+        L[4] = w[2] * dirccos[3, 1] + w[3] * dirccos[3, 2] + w[4] * dirccos[3, 3]
+        L[5] = w[5]
     else
         throw("global -> local: dimension dismatch")
     end
@@ -100,7 +127,6 @@ function local_frame(
     return L
 
 end
-
 
 # ------------------------------------------------------------
 # Structured Mesh
@@ -108,6 +134,8 @@ end
 
 """
 1D physical space with structured mesh
+
+    @consts: x0, x1, nx, x, dx
 
 """
 struct PSpace1D <: AbstractPhysicalSpace
@@ -153,6 +181,8 @@ end # struct
 
 """
 2D Physical space with structured mesh
+
+    @consts: x0, x1, nx, y0, y1, ny, x, y, dx, dy
 
 """
 struct PSpace2D <: AbstractPhysicalSpace
@@ -219,6 +249,8 @@ end # struct
 """
 Generate uniform mesh
 
+`uniform_mesh(x0::Real, xnum::Int, dx::Real)`
+
 """
 function uniform_mesh(x0::Real, xnum::Int, dx::Real)
 
@@ -234,8 +266,9 @@ end
 
 """
 Equivalent structured mesh generator as matlab
-* 2D
-* 3D
+
+* 2D: `meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1})`
+* 3D: `meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1}, z::AbstractArray{<:Real,1})`
 
 """
 function meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1})
@@ -266,6 +299,8 @@ end
 """
 Physical space with unstructured mesh
 
+    @consts: nodes, cells
+
 """
 struct UnstructMesh{A,B} <: AbstractPhysicalSpace
 
@@ -281,8 +316,12 @@ end # struct
 
 """
 Read mesh file
-* nodes : are saved with 3D coordinates (z=0 for 2D case)
-* cells : node ids inside cells
+
+`read_mesh(file)`
+
+* @return nodes : are saved with 3D coordinates (z=0 for 2D case)
+* @return cells : node ids inside cells
+
 """
 function read_mesh(file)
     meshio = pyimport("meshio")
@@ -296,6 +335,8 @@ end
 
 """
 Compute connectivity of 2D unstructured mesh
+
+`mesh_connectivity_2D(cells::AbstractArray{<:Int,2})`
 
 """
 function mesh_connectivity_2D(cells::AbstractArray{<:Int,2})
@@ -351,6 +392,8 @@ end
 
 """
 Compute areas of 2D elements
+
+`mesh_area_2D(nodes::AbstractArray{<:AbstractFloat,2}, cells::AbstractArray{<:Int,2})`
 
 """
 function mesh_area_2D(
@@ -415,8 +458,13 @@ end
 """
 Compute central points of 2D elements
 
+`mesh_center_2D(nodes::AbstractArray{<:AbstractFloat,2}, cells::AbstractArray{<:Int,2})`
+
 """
-function mesh_center_2D(nodes, cells)
+function mesh_center_2D(
+    nodes::AbstractArray{<:AbstractFloat,2},
+    cells::AbstractArray{<:Int,2},
+)
 
     cellMidPoints = zeros(size(cells, 1), 2)
     for i in axes(cellMidPoints, 1) # nCells

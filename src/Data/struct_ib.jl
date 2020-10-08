@@ -2,7 +2,12 @@
 # Structs of Initial and Boundary Conditions
 # ============================================================
 
+"""
+Initial & boundary condition with no distribution function
 
+    @consts: wL, primL, bcL, wR, primR, bcR, bcU, bcD
+
+"""
 struct IB{A} <: AbstractCondition
 
     wL::A
@@ -33,6 +38,12 @@ struct IB{A} <: AbstractCondition
 end
 
 
+"""
+Initial & boundary condition with 1 distribution function
+
+    @consts: wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD
+
+"""
 struct IB1F{A,B} <: AbstractCondition
 
     wL::A
@@ -67,6 +78,12 @@ struct IB1F{A,B} <: AbstractCondition
 end
 
 
+"""
+Initial & boundary condition with 2 distribution functions
+
+    @consts: wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD
+
+"""
 struct IB2F{A,B} <: AbstractCondition
 
     # initial condition
@@ -105,6 +122,12 @@ struct IB2F{A,B} <: AbstractCondition
 end
 
 
+"""
+Initial & boundary condition with 3 distribution functions
+
+    @consts: wL, primL, h0L, h1L, h2L, bcL, EL, BL, lorenzL, wR, primR, h0R, h1R, h2R, bcR, ER, BR, lorenzR, bcU, bcD
+
+"""
 struct IB3F{A,B,C,D} <: AbstractCondition
 
     # initial/boundary condition
@@ -180,6 +203,12 @@ struct IB3F{A,B,C,D} <: AbstractCondition
 end
 
 
+"""
+Initial & boundary condition with 4 distribution functions
+
+    @consts: wL, primL, h0L, h1L, h2L, h3L, bcL, EL, BL, lorenzL, wR, primR, h0R, h1R, h2R, h3R, bcR, ER, BR, lorenzR, bcU, bcD
+
+"""
 struct IB4F{A,B,C,D} <: AbstractCondition
 
     # initial/boundary condition

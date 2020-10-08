@@ -3,10 +3,13 @@
 # http://www.cfdbooks.com/
 # ============================================================
 
-
 """
 Lax-Friedrichs flux
-* P. D. Lax, Weak Solutions of Nonlinear Hyperbolic Equations and Their Numerical Computation, Commun. Pure and Applied Mathematics, 7, 159-193, 1954.
+
+`flux_lax!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1}, γ::Real, dt::Real, dx::Real)`
+
+_P. D. Lax, Weak Solutions of Nonlinear Hyperbolic Equations and Their Numerical Computation, 
+Commun. Pure and Applied Mathematics, 7, 159-193, 1954._
 
 """
 function flux_lax!(
@@ -25,8 +28,10 @@ end
 """
 HLL flux for the Euler equations
 
-* @arg: variables at left & right sides of interface
-* @arg: specific heat ratio
+`flux_hll!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1}, γ::Real, dt::Real)`
+
+* @args: variables at left & right sides of interface
+* @args: specific heat ratio
 
 """
 function flux_hll!(
@@ -69,13 +74,16 @@ end
 """
 Roe's flux with entropy fix
 
-* P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference Schemes, Journal of Computational Physics, 43, pp. 357-372.
-* http://cfdbooks.com/cfdcodes.html
+`flux_roe!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1},
+    γ::Real, dt::Real, n = [1.0, 0.0]::AbstractArray{<:Real,1})`
 
-* @arg primL[1:4] = left state (rhoL, uL, vL, pL)
-* @arg primR[1:4] = right state (rhoR, uR, vR, pR)
-* @arg γ: specific heat ratio
-* @arg n[2]: unit face normal (L -> R)
+_P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference Schemes, Journal of Computational Physics, 43, pp. 357-372._
+(_cf. http://cfdbooks.com/cfdcodes.html_)
+
+* @args primL[1:4] = left state (rhoL, uL, vL, pL)
+* @args primR[1:4] = right state (rhoR, uR, vR, pR)
+* @args γ: specific heat ratio
+* @args n[2]: unit face normal (L -> R)
 
 """
 function flux_roe!(

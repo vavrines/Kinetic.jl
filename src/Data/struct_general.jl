@@ -2,9 +2,10 @@
 # General Structs
 # ============================================================
 
-
 """
-Structure of computational setup
+Computational setup
+
+    @consts: case, space, flux, collision, nSpecies, interpOrder, limiter, cfl, maxTime
 
 """
 struct Setup{S,I,E,F} <: AbstractSetup
@@ -47,7 +48,9 @@ end
 
 
 """
-Structure of gas property
+Gas property
+
+    @consts: Kn, Ma, Pr, K, γ, ω, αᵣ, ωᵣ, μᵣ
 
 """
 struct Gas{A,B,C,D,E,F,G,H,I} <: AbstractProperty
@@ -100,7 +103,9 @@ end
 
 
 """
-Structure of multi-component gas property
+Multi-component gas property
+
+    @consts: Kn, Ma, Pr, K, γ, mi, ni, me, ne
 
 """
 struct Mixture{A,B,C,D,E,F,G,H,I} <: AbstractProperty
@@ -155,7 +160,9 @@ end
 
 
 """
-Structure of 1D plasma property
+1D plasma property
+
+    @consts: Kn, Ma, Pr, K, γ, mi, ni, me, ne, lD, rL, sol, χ, ν, Ap, An, D
 
 """
 struct Plasma1D{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P} <: AbstractProperty
@@ -282,7 +289,9 @@ end
 
 
 """
-Structure of 2D plasma property
+2D plasma property
+
+    @consts: Kn, Ma, Pr, K, γ, mi, ni, me, ne, lD, rL, sol, χ, ν, A1p, A1n, A2p, A2n, D1, D2
 
 """
 struct Plasma2D{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P} <: AbstractProperty
