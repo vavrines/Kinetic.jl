@@ -1,7 +1,7 @@
 # Kinetic.jl
 
 ![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
-![](https://img.shields.io/badge/docs-dev-blue.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
 <!--
 [![Coverage Status](https://coveralls.io/repos/github/vavrines/Kinetic.jl/badge.svg?branch=master)](https://coveralls.io/github/vavrines/Kinetic.jl?branch=master)
 -->
