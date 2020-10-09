@@ -6,6 +6,15 @@ using Documenter, Kinetic
 
 makedocs(
     sitename="Kinetic.jl",
+    modules = [Kinetic],
+    pages = Any[
+        "index.md",
+        "type.md",
+        "API" => [
+            "api_io.md",
+            "api_math.md",
+            ],
+    ]
 )
 
 deploydocs(
