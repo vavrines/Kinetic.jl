@@ -14,6 +14,13 @@ makedocs(
         "API" => [
             "api_io.md",
             "api_math.md",
+            "api_geometry.md",
+            "api_theory.md",
+            "api_phase.md",
+            "api_reconstruct.md",
+            "api_flux.md",
+            "api_config.md",
+            "api_solver.md",
             ],
     ]
 )
