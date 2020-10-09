@@ -4,6 +4,7 @@
 <!--
 [![Coverage Status](https://coveralls.io/repos/github/vavrines/Kinetic.jl/badge.svg?branch=master)](https://coveralls.io/github/vavrines/Kinetic.jl?branch=master)
 -->
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://xiaotianbai/Kinetic.jl/dev)
 
 This Julia package serves as a tool box for theoretical and numerical studies towards the kinetic theory of gases, photons, plasmas and neutrons. 
 It can be used to solve either Boltzmann and related model equations
