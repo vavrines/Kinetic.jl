@@ -2,21 +2,10 @@
 
 codecov: true
 coveralls: true
-
 language: julia
-os:
-  - linux
 julia:
   - 1.5
   - nightly
-
-matrix:
-  allow_failures:
-    - julia: nightly
-  fast_finish: true
-
-notifications:
-  email: false
 
 after_success:
   # push coverage results to Coveralls
@@ -25,12 +14,14 @@ after_success:
   #- julia -e 'import Pkg; Pkg.add("Coverage"); cd(Pkg.dir("Kinetic")); using Coverage; Codecov.submit(Codecov.process_folder())'
 
 jobs:
+  allow_failures:
+    - julia: nightly
+  fast_finish: true
   include:
     - stage: "Documentation"
       julia: 1.5
       os: linux
       script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
-                                               Pkg.instantiate()'
-        - julia --project=docs/ docs/make.jl
+      - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+      - julia --project=docs/ docs/make.jl
       after_success: skip
