@@ -4,4 +4,10 @@ Pkg.add("Documenter")
 
 using Documenter, Kinetic
 
-makedocs(sitename="Kinetic.jl")
+makedocs(
+    sitename="Kinetic.jl",
+)
+
+deploydocs(
+    repo = "github.com/ethemidori/Solaris.jl.git",
+)
