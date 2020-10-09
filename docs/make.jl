@@ -9,5 +9,5 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/ethemidori/Solaris.jl.git",
+    repo = "github.com/vavrines/Kinetic.jl.git",
 )
