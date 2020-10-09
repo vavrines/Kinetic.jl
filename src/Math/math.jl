@@ -9,6 +9,8 @@ export central_diff, central_diff!, upwind_diff, upwind_diff!, unstruct_diff
 """
 Python linspace function
 
+    linspace(start::Real, stop::Real, n::Int)
+
 """
 linspace(start::Real, stop::Real, n::Int) = collect(range(start, stop = stop, length = n))
 
@@ -16,12 +18,16 @@ linspace(start::Real, stop::Real, n::Int) = collect(range(start, stop = stop, le
 """
 Heaviside step function
 
+    heaviside(x::Real)
+
 """
 heaviside(x::Real) = ifelse(x >= 0, 1.0, 0.0)
 
 
 """
-Fortran sign() function
+Fortran sign function
+
+    fortsign(x::Real, y::Real)
 
 """
 fortsign(x::Real, y::Real) = abs(x) * sign(y)
@@ -29,6 +35,8 @@ fortsign(x::Real, y::Real) = abs(x) * sign(y)
 
 """
 Split matrix into row vectors
+
+    mat_split(m::AbstractArray)
 
 """
 function mat_split(m::AbstractArray)
@@ -52,6 +60,10 @@ end
 """
 Central difference
 
+    central_diff(y::AbstractArray{<:Any,1}, x::AbstractArray{<:Any,1})
+
+    central_diff(y::AbstractArray{<:Any,1}, dx::Any)
+
 """
 function central_diff(y::AbstractArray{<:Any,1}, x::AbstractArray{<:Any,1})
 
@@ -71,7 +83,6 @@ function central_diff(y::AbstractArray{<:Any,1}, x::AbstractArray{<:Any,1})
 
 end
 
-
 function central_diff(y::AbstractArray{<:Any,1}, dx::Any)
     x = ones(eltype(y), axes(y)) .* dx
     dy = central_diff(y, x)
@@ -80,6 +91,14 @@ function central_diff(y::AbstractArray{<:Any,1}, dx::Any)
 end
 
 
+"""
+Central difference
+
+    central_diff!(dy::AbstractArray{<:Any,1}, y::AbstractArray{<:Any,1}, x::AbstractArray{<:Any,1})
+
+    central_diff!(dy::AbstractArray{<:Any,1}, y::AbstractArray{<:Any,1}, dx::Any)
+
+"""
 function central_diff!(
     dy::AbstractArray{<:Any,1},
     y::AbstractArray{<:Any,1},
@@ -100,7 +119,6 @@ function central_diff!(
 
 end
 
-
 function central_diff!(dy::AbstractArray{<:Any,1}, y::AbstractArray{<:Any,1}, dx::Any)
     x = ones(eltype(y), axes(y)) .* dx
     central_diff!(dy, y, x)
@@ -109,6 +127,14 @@ end
 
 """
 Upwind difference
+
+    upwind_diff(
+        y::AbstractArray{<:Any,1},
+        x::AbstractArray{<:Any,1};
+        stream = :right::Symbol,
+    )
+
+    upwind_diff(y::AbstractArray{<:Any,1}, dx::Any; stream = :right::Symbol)
 
 """
 function upwind_diff(
@@ -141,7 +167,6 @@ function upwind_diff(
 
 end
 
-
 function upwind_diff(y::AbstractArray{<:Any,1}, dx::Any; stream = :right::Symbol)
     x = ones(eltype(y), axes(y)) .* dx
     dy = upwind_diff(y, x, stream = stream)
@@ -150,6 +175,24 @@ function upwind_diff(y::AbstractArray{<:Any,1}, dx::Any; stream = :right::Symbol
 end
 
 
+"""
+Upwind difference
+
+    upwind_diff!(
+        dy::AbstractArray{<:Any,1},
+        y::AbstractArray{<:Any,1},
+        x::AbstractArray{<:Any,1};
+        stream = :right::Symbol,
+    )
+
+    upwind_diff!(
+        dy::AbstractArray{<:Any,1},
+        y::AbstractArray{<:Any,1},
+        dx::Any;
+        stream = :right::Symbol,
+    )
+    
+"""
 function upwind_diff!(
     dy::AbstractArray{<:Any,1},
     y::AbstractArray{<:Any,1},
@@ -181,7 +224,6 @@ function upwind_diff!(
 
 end
 
-
 function upwind_diff!(
     dy::AbstractArray{<:Any,1},
     y::AbstractArray{<:Any,1},
@@ -195,6 +237,15 @@ end
 
 """
 Finite difference for pseudo-unstructured mesh
+
+    unstruct_diff(
+        u::AbstractArray{<:Any,1},
+        x::AbstractArray{<:Any,1},
+        nx::Int;
+        mode = :central::Symbol,
+    )
+
+    unstruct_diff(u::Function, x::AbstractArray{<:Any,2}, nx::Int, dim::Int; mode = :central::Symbol)
 
 """
 function unstruct_diff(
@@ -221,7 +272,7 @@ function unstruct_diff(
 end
 
 
-function unstruct_diff(u::Function, x::AbstractArray{<:Any,2}, nx::Int, dim::Int; mode = :central::Symbol,)
+function unstruct_diff(u::Function, x::AbstractArray{<:Any,2}, nx::Int, dim::Int; mode = :central::Symbol)
     uu = reshape(u(x), (nx, :))
     xx = reshape(x[dim, :], (nx, :))
     dux = zeros(eltype(x), axes(xx))
@@ -249,9 +300,12 @@ end
 
 
 """
-Gauss Legendre integral for fast spectral method `lgwt(N::Int, a::Real, b::Real)`
-* @arg: number of quadrature points N, integral range [a, b]
-* @arg: quadrature points x & weights w
+Gauss Legendre integral for fast spectral method 
+
+    lgwt(N::Int, a::Real, b::Real)
+
+* @args: number of quadrature points N, integral range [a, b]
+* @args: quadrature points x & weights w
 
 """
 function lgwt(N::Int, a::Real, b::Real)
@@ -300,6 +354,8 @@ end
 
 """
 Extract subarray except the last column
+
+    extract_last(a::AbstractArray, idx::Int; mode=:view::Symbol)
 
 """
 function extract_last(a::AbstractArray, idx::Int; mode=:view::Symbol)

@@ -1,16 +1,18 @@
 # ============================================================
-# Input Methods
+# I/O Methods
 # ============================================================
 
 export read_dict, write_jld, plot_line
 
-
 """
 Read text into dictionary
 
-* @param[in]  filename   :   configuration text file
-* @param[in]  allowed    :   keywords
-* @return     vars       :   dictionary with values of variables
+    read_dict(filename::String, allowed)
+    read_dict(filename::String)
+
+* @args filename: configuration text file
+* @args allowed: keywords
+* @return vars: dictionary with values of variables
 
 """
 function read_dict(filename::String, allowed)
@@ -49,7 +51,6 @@ function read_dict(filename::String, allowed)
 
 end
 
-
 function read_dict(filename::String)
 
     f = open(filename)
@@ -82,7 +83,7 @@ end
 """
 Write data into JLD2
 
-`write_jld(KS, ctr, t)`
+    write_jld(KS, ctr, t)
 
 """
 function write_jld(
@@ -102,7 +103,7 @@ end
 """
 Plot 1D profile
 
-`plot_line(KS, ctr; backend)`
+    plot_line(KS, ctr; backend)
 
 """
 function plot_line(

@@ -10,6 +10,7 @@ makedocs(
     pages = Any[
         "index.md",
         "type.md",
+        "algorithm.md",
         "API" => [
             "api_io.md",
             "api_math.md",

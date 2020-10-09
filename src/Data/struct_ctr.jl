@@ -10,9 +10,9 @@
 """
 1D control volume with no distribution function
 
-    @vars: x, dx, w, prim, sw
+    ControlVolume1D(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray)
 
-`ControlVolume1D(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray)`
+- @vars: x, dx, w, prim, sw
 
 """
 mutable struct ControlVolume1D{F,A} <: AbstractControlVolume1D
@@ -40,10 +40,10 @@ end
 
 """
 1D control volume with 1 distribution function
+    
+    ControlVolume1D1F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)
 
-    @vars: x, dx, w, prim, sw, f, sf
-
-`ControlVolume1D1F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)`
+- @vars: x, dx, w, prim, sw, f, sf
 
 """
 mutable struct ControlVolume1D1F{F,A,B} <: AbstractControlVolume1D
@@ -84,9 +84,9 @@ end
 """
 1D control volume with 2 distribution functions
 
-    @vars: x, dx, w, prim, sw, h, b, sh, sb
+    ControlVolume1D2F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, H::AbstractArray, B::AbstractArray)
 
-`ControlVolume1D2F(X::Real, DX::Real, W::AbstractArray, PRIM::AbstractArray, H::AbstractArray, B::AbstractArray)`
+- @vars: x, dx, w, prim, sw, h, b, sh, sb
 
 """
 mutable struct ControlVolume1D2F{F,A,B} <: AbstractControlVolume1D
@@ -134,9 +134,9 @@ end
 """
 1D control volume with 3 distribution functions
 
-    @vars: x, dx, w, prim, sw, h0, h1, h2, sh0, sh1, sh2, E, B, ϕ, ψ, lorenz
+    ControlVolume1D3F(X, DX, W, PRIM, H0, H1, H2, E0, B0, L)
 
-`ControlVolume1D3F(X, DX, W, PRIM, H0, H1, H2, E0, B0, L)`
+- @vars: x, dx, w, prim, sw, h0, h1, h2, sh0, sh1, sh2, E, B, ϕ, ψ, lorenz
 
 """
 mutable struct ControlVolume1D3F{F,A,B,C,D,E} <: AbstractControlVolume1D
@@ -273,9 +273,9 @@ end
 """
 1D control volume with 4 distribution functions
 
-    @vars: x, dx, w, prim, sw, h0, h1, h2, h3, sh0, sh1, sh2, sh3, E, B, ϕ, ψ, lorenz
+    ControlVolume1D4F(X, DX, W, PRIM, H0, H1, H2, H3, E0, B0, L)
 
-`ControlVolume1D4F(X, DX, W, PRIM, H0, H1, H2, H3, E0, B0, L)`
+- @vars: x, dx, w, prim, sw, h0, h1, h2, h3, sh0, sh1, sh2, sh3, E, B, ϕ, ψ, lorenz
 
 """
 mutable struct ControlVolume1D4F{F,A,B,C,D,E} <: AbstractControlVolume1D
@@ -431,9 +431,9 @@ end
 """
 2D control volume with no distribution function
 
-    @vars: x, y, dx, dy, w, prim, sw
+    ControlVolume2D(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray)
 
-`ControlVolume2D(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray)`
+- @vars: x, y, dx, dy, w, prim, sw
 
 """
 mutable struct ControlVolume2D{F,A,B} <: AbstractControlVolume2D
@@ -475,9 +475,9 @@ end
 """
 2D control volume with 1 distribution function
 
-    @vars: x, y, dx, dy, w, prim, sw, f, sf
+    ControlVolume2D1F(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)
 
-`ControlVolume2D1F(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray, F::AbstractArray)`
+- @vars: x, y, dx, dy, w, prim, sw, f, sf
 
 """
 mutable struct ControlVolume2D1F{F,A,B,C,D} <: AbstractControlVolume2D
@@ -536,9 +536,9 @@ end
 """
 2D control volume with 2 distribution functions
 
-    @vars: x, y, dx, dy, w, prim, sw, h, b, sh, sb
+    ControlVolume2D2F(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray, H::AbstractArray, B::AbstractArray)
 
-`ControlVolume2D2F(X::Real, DX::Real, Y::Real, DY::Real, W::AbstractArray, PRIM::AbstractArray, H::AbstractArray, B::AbstractArray)`
+- @vars: x, y, dx, dy, w, prim, sw, h, b, sh, sb
 
 """
 mutable struct ControlVolume2D2F{F,A,B,C,D} <: AbstractControlVolume2D
@@ -604,9 +604,9 @@ end
 """
 2D control volume with 3 distribution functions
 
-    @vars: x, y, dx, dy, w, prim, sw, h0, h1, h2, sh0, sh1, sh2, E, B, ϕ, ψ, lorenz
+    ControlVolume2D3F(X, DX, Y, DY, W, PRIM, H0, H1, H2, E0, B0, L)
 
-`ControlVolume2D3F(X, DX, Y, DY, W, PRIM, H0, H1, H2, E0, B0, L)`
+- @vars: x, y, dx, dy, w, prim, sw, h0, h1, h2, sh0, sh1, sh2, E, B, ϕ, ψ, lorenz
 
 """
 mutable struct ControlVolume2D3F{F,A,B,C,D,E,F,G} <: AbstractControlVolume2D
