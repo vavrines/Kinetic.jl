@@ -1,10 +1,9 @@
 """
-Calculate slope of particle distribution function, 
-assuming a = a1 + u * a2 + 0.5 * u^2 * a3
+Calculate slope of particle distribution function, assuming a = a1 + u * a2 + 0.5 * u^2 * a3
+    
+    pdf_slope(u::Real, Δ::Real)
 
-`pdf_slope(u::Real, Δ::Real)`
-
-`pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, inK::Real)`
+    pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, inK::Real)
 
 """
 pdf_slope(u::Real, Δ::Real) = Δ / u
