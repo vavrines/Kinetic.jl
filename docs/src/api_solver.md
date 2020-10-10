@@ -1,12 +1,12 @@
 # Solver
 
 ```@docs
-initialize
+Kinetic.initialize
 init_fvm
 SolverSet
 set_ib
 solve!
-timestep
+Kinetic.timestep
 reconstruct!
 evolve!
 update!
