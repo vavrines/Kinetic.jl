@@ -8,6 +8,8 @@
 
 ![](https://i.postimg.cc/ncXfgjXd/dancing-circles.gif =250x)
 
+<img src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif" width="200"/>
+
 This Julia package serves as a tool box for theoretical and numerical studies towards the kinetic theory of gases, photons, plasmas and neutrons. 
 It can be used to solve either Boltzmann and related model equations
 
