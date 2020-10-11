@@ -10,15 +10,33 @@ export weno5
 # Slope limiter functions
 # ------------------------------------------------------------
 
+"""
+van Leer limiter
+
+    vanleer(sL::Real, sR::Real)
+
+"""
 vanleer(sL::Real, sR::Real) =
     (fortsign(1.0, sL) + fortsign(1.0, sR)) * abs(sL) * abs(sR) /
     (abs(sL) + abs(sR) + 1.e-7)
 
 
+"""
+minmod limiter
+
+    minmod(sL::Real, sR::Real)
+    
+"""
 minmod(sL::Real, sR::Real) =
     0.5 * (fortsign(1.0, sL) + fortsign(1.0, sR)) * min(abs(sR), abs(sL))
 
 
+"""
+superbee limiter
+
+    superbee(sL::Real, sR::Real)
+    
+"""
 function superbee(sL::Real, sR::Real)
 
     if sR >= 0.5 * sL && sR <= 2.0 * sL
@@ -32,8 +50,13 @@ function superbee(sL::Real, sR::Real)
 end
 
 
-vanalbaba(sL, sR) = (sL^2 * sR + sL * sR^2) / (sL^2 + sR^2 + 1.e-7)
+"""
+van Albaba limiter
 
+    vanalbaba(sL::Real, sR::Real)
+    
+"""
+vanalbaba(sL::Real, sR::Real) = (sL^2 * sR + sL * sR^2) / (sL^2 + sR^2 + 1.e-7)
 
 # ------------------------------------------------------------
 # Reconstruction methodologies
