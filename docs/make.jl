@@ -8,9 +8,10 @@ makedocs(
     sitename="Kinetic.jl",
     modules = [Kinetic],
     pages = Any[
-        "index.md",
-        "type.md",
-        "algorithm.md",
+        "Home" => "index.md",
+        "Installation" => "install.md",
+        "Type" => "type.md",
+        "Algorithm" => "algorithm.md",
         "API" => [
             "api_io.md",
             "api_math.md",
