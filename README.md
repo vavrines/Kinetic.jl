@@ -8,7 +8,7 @@
 
 <img src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif" width="300"/>
 
-This Julia package serves as a tool box for theoretical and numerical studies towards the kinetic theory of gases, photons, plasmas and neutrons. 
+This Julia package serves as a toolbox for theoretical and numerical studies towards the kinetic theory of gases, photons, plasmas and neutrons.
 It can be used to solve either Boltzmann and related model equations
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial&space;f}{\partial&space;t}&plus;&space;\mathbf&space;u&space;\cdot&space;\nabla_\mathbf&space;x&space;f&space;&plus;&space;\mathbf&space;a&space;\cdot&space;\nabla_\mathbf&space;u&space;f&space;=&space;\int_{\mathcal&space;R^3}&space;\int_{\mathcal&space;S^2}&space;B&space;(f(\mathbf&space;u_*')f(\mathbf&space;u')-f(\mathbf&space;u_*)&space;f(\mathbf&space;u))&space;d\Omega&space;d\mathbf&space;u_*" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial&space;f}{\partial&space;t}&plus;&space;\mathbf&space;u&space;\cdot&space;\nabla_\mathbf&space;x&space;f&space;&plus;&space;\mathbf&space;a&space;\cdot&space;\nabla_\mathbf&space;u&space;f&space;=&space;\int_{\mathcal&space;R^3}&space;\int_{\mathcal&space;S^2}&space;B&space;(f(\mathbf&space;u_*')f(\mathbf&space;u')-f(\mathbf&space;u_*)&space;f(\mathbf&space;u))&space;d\Omega&space;d\mathbf&space;u_*" title="\frac{\partial f}{\partial t}+ \mathbf u \cdot \nabla_\mathbf x f + \mathbf a \cdot \nabla_\mathbf u f = \int_{\mathcal R^3} \int_{\mathcal S^2} B (f(\mathbf u_*')f(\mathbf u')-f(\mathbf u_*) f(\mathbf u)) d\Omega d\mathbf u_*" /></a>
@@ -17,16 +17,11 @@ or their upscaling moment system
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" title="\frac{\partial \mathbf W}{\partial t} + \nabla_\mathbf x \cdot \mathbf F = \mathbf S" /></a>
 
-The finite volume method (FVM) is employed in all cases. 
+## Documentation
 
-The package is compatible with Julia 1.3 or newer version. 
-To make use of it, execute `Julia` and type
-```julia
-julia> ]
-(v1.3) pkg> add Kinetic
-```
-This will install Kinetic and all its dependencies.
-After that, load the package,
-```julia
-julia> using Kinetic
-```
+For information on using the package,
+[see the stable documentation](https://xiaotianbai.com/Kinetic.jl/dev/).
+
+## Contributing
+
+If you have further questions regarding Kinetic.jl or have got an idea on improving it, please feel free to get in touch. Open an issue or pull request if you'd like to work on a new feature or if you're new to open-source and want to find a cool little project or issue to work on that fits your interests. We're more than happy to help along the way.
