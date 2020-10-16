@@ -1,6 +1,6 @@
 # Installation Instructions
 
-_Kinetic.jl_ is a registered Julialang package in the official entry.
+Kinetic.jl is a registered Julialang package in the official entry.
 You can install the latest version using the built-in package manager (accessed by pressing `]` in the `Julia` command prompt) to add the package and instantiate/build all dependencies.
 
 ```julia
@@ -14,7 +14,7 @@ After that, load the package,
 julia> using Kinetic
 ```
 
-_Kinetic.jl_ can be updated to the latest tagged release from the package manager by typing
+Kinetic.jl can be updated to the latest tagged release from the package manager by typing
 ```julia
 (v1.5) pkg> update Kinetic
 ```
