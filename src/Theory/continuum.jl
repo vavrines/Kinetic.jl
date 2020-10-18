@@ -161,18 +161,37 @@ end
 """
 Calculate electromagnetic coeffcients in hyperbolic Maxwell's equations
 
+    em_coefficients(
+        prim::A,
+        E::B,
+        B::C,
+        mr,
+        lD,
+        rL,
+        dt,
+    ) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,1},C<:AbstractArray{<:Real,1}}
+
 """
 function em_coefficients(
-    prim::A, 
-    E::B, 
-    B::C, 
-    mr, 
-    lD, 
-    rL, 
+    prim::A,
+    E::B,
+    B::C,
+    mr,
+    lD,
+    rL,
     dt,
 ) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,1},C<:AbstractArray{<:Real,1}}
 
-    A = zeros(9, 9)
+    if eltype(W) <: Int
+        A = zeros(9, 9)
+        b = zeros(9)
+    else
+        A = similar(prim, 9, 9)
+        A .= 0.
+        b = similar(prim, 9)
+        b .= 0.
+    end
+
     A[1, 1] = -1.0 / (2.0 * rL)
     A[2, 2] = -1.0 / (2.0 * rL)
     A[3, 3] = -1.0 / (2.0 * rL)
@@ -210,7 +229,6 @@ function em_coefficients(
     A[8, 8] = -(prim[1, 2] * mr) / (2.0 * rL * lD^2)
     A[9, 9] = -(prim[1, 2] * mr) / (2.0 * rL * lD^2)
 
-    b = zeros(9)
     b[1] =
         prim[2, 1] / (dt) + E[1] / (2.0 * rL) - B[2] * prim[4, 1] / (2.0 * rL) +
         B[3] * prim[3, 1] / (2.0 * rL)
@@ -247,26 +265,30 @@ end
 """
 Theoretical flux of linear advection equation
 
+    advection_flux(u, a)
+
 """
-advection_flux(u::Real, a::Real) = a * u
+advection_flux(u, a) = a * u
 
 
 """
 Theoretical flux of Burgers' equation
 
+    burgers_flux(u)
+
 """
-burgers_flux(u::Real) = 0.5 * u^2
+burgers_flux(u) = 0.5 * u^2
 
 
 """
 Theoretical fluxes of Euler Equations
 
-    euler_flux(w::A, γ::B; frame = :cartesian::Symbol) where {A<:AbstractArray{<:Real,1}, B<:Real}
+    euler_flux(w::A, γ; frame = :cartesian::Symbol) where {A<:AbstractArray{<:Real,1}}
 
 * @return: flux tuple
 
 """
-function euler_flux(w::A, γ::B; frame = :cartesian::Symbol) where {A<:AbstractArray{<:Real,1},B<:Real}
+function euler_flux(w::A, γ; frame = :cartesian::Symbol) where {A<:AbstractArray{<:Real,1}}
 
     prim = conserve_prim(w, γ)
     p = 0.5 * prim[1] / prim[end]
@@ -327,12 +349,12 @@ end
 """
 Flux Jacobian of Euler Equations
 
-    euler_jacobi(w::A, γ::B) where {A<:AbstractArray{<:Real,1}, B<:Real}
+    euler_jacobi(w::A, γ) where {A<:AbstractArray{<:Real,1}}
 
 * @return: Jacobian matrix A
 
 """
-function euler_jacobi(w::A, γ::B) where {A<:AbstractArray{<:Real,1},B<:Real}
+function euler_jacobi(w::A, γ) where {A<:AbstractArray{<:Real,1}}
 
     if eltype(w) <: Int
         A = similar(w, Float64, 3, 3)
