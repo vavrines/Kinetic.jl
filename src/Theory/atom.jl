@@ -8,7 +8,7 @@ Calculate slope of particle distribution function, assuming a = a1 + u * a2 + 0.
 """
 pdf_slope(u, Δ) = Δ / u
 
-function pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,1},B<:AbstractArray{<:Real,1}}
+function pdf_slope(prim::X, sw::Y, inK) where {X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
 
     sl = similar(sw, axes(prim))
 
@@ -63,10 +63,10 @@ end
 Calculate slope of multi-component particle distribution function, 
 assuming `a = a1 + u * a2 + 0.5 * u^2 * a3`
 
-    mixture_pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,2}}
+    mixture_pdf_slope(prim::X, sw::Y, inK) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,2}}
 
 """
-function mixture_pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,2}}
+function mixture_pdf_slope(prim::X, sw::Y, inK) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,2}}
 
     sl = similar(sw, axes(prim))
 
@@ -82,18 +82,73 @@ end
 """
 Maxwellian in discrete form
 
-* @arg: particle velocity quadrature points
-* @arg: density, velocity and inverse of temperature
+* @args: particle velocity quadrature points
+* @args: density, velocity and inverse of temperature
 * @return: Maxwellian distribution function
 
 """
-maxwellian(u::AbstractArray{<:AbstractFloat,1}, ρ::Real, U::Real, λ::Real) =
-    @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2) #// 1V
+maxwellian(u::T, ρ, U, λ) where {T<:AbstractArray{<:AbstractFloat,1}} =
+    @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2) # 1V
 
-maxwellian(u::AbstractArray{<:AbstractFloat,1}, prim::AbstractArray{<:Real,1}) =
+maxwellian(u::X, prim::Y) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}}=
     maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
-function mixture_maxwellian(u::AbstractArray{<:AbstractFloat,2}, prim::AbstractArray{<:Real,2})
+#--- 2V ---#
+maxwellian(
+    u::T,
+    v::T,
+    ρ,
+    U,
+    V,
+    λ,
+) where {T<:AbstractArray{<:AbstractFloat,2}} = @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
+
+maxwellian(
+    u::X,
+    v::X,
+    prim::Y,
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}} = maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
+
+#--- 3V ---#
+maxwellian(
+    u::T,
+    v::T,
+    w::T,
+    ρ,
+    U,
+    V,
+    W,
+    λ,
+) where {T<:AbstractArray{<:AbstractFloat,3}} = @. ρ * sqrt((λ / π)^3) * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
+
+maxwellian(
+    u::X,
+    v::X,
+    w::X,
+    prim::Y,
+) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,1}} = maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
+
+
+"""
+Multi-component Maxwellian in discrete form
+
+    mixture_maxwellian(u::X, prim::Y) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,2}}
+    
+    mixture_maxwellian(
+        u::X,
+        v::X,
+        prim::Y,
+    ) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,2}}
+
+    mixture_maxwellian(
+        u::X,
+        v::X,
+        w::X,
+        prim::Y,
+    ) where {X<:AbstractArray{<:AbstractFloat,4},Y<:AbstractArray{<:Real,2}}
+
+"""
+function mixture_maxwellian(u::X, prim::Y) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,2}}
     mixM = similar(u)
     for j in axes(mixM, 2)
         mixM[:, j] .= maxwellian(u[:, j], prim[:, j])
@@ -102,27 +157,11 @@ function mixture_maxwellian(u::AbstractArray{<:AbstractFloat,2}, prim::AbstractA
     return mixM
 end
 
-#--- 2V ---#
-maxwellian(
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ρ::Real,
-    U::Real,
-    V::Real,
-    λ::Real,
-) = @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
-
-maxwellian(
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    prim::AbstractArray{<:Real,1},
-) = maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
-
 function mixture_maxwellian(
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    prim::AbstractArray{<:Real,2},
-)
+    u::X,
+    v::X,
+    prim::Y,
+) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,2}}
     mixM = similar(u)
     for k in axes(mixM, 3)
         mixM[:, :, k] .= maxwellian(u[:, :, k], v[:, :, k], prim[:, k])
@@ -131,31 +170,12 @@ function mixture_maxwellian(
     return mixM
 end
 
-#--- 3V ---#
-maxwellian(
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    ρ::Real,
-    U::Real,
-    V::Real,
-    W::Real,
-    λ::Real,
-) = @. ρ * sqrt((λ / π)^3) * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
-
-maxwellian(
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    prim::AbstractArray{<:Real,1},
-) = maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
-
 function mixture_maxwellian(
-    u::AbstractArray{<:AbstractFloat,4},
-    v::AbstractArray{<:AbstractFloat,4},
-    w::AbstractArray{<:AbstractFloat,4},
-    prim::AbstractArray{<:Real,2},
-)
+    u::X,
+    v::X,
+    w::X,
+    prim::Y,
+) where {X<:AbstractArray{<:AbstractFloat,4},Y<:AbstractArray{<:Real,2}}
     mixM = similar(u)
     for l in axes(mixM, 4)
         mixM[:, :, :, l] .=
@@ -175,12 +195,12 @@ Shakhov non-equilibrium part
 
 """
 function shakhov(
-    u::AbstractArray{<:AbstractFloat,1},
-    M::AbstractArray{<:AbstractFloat,1},
-    q::Real,
-    prim::AbstractArray{<:Real,1},
-    Pr::Real,
-) #// 1F1V
+    u::X,
+    M::X,
+    q,
+    prim::Y,
+    Pr,
+) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}} # 1F1V
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        (u - prim[2]) *
@@ -194,14 +214,14 @@ end
 
 #--- 2F1V ---#
 function shakhov(
-    u::AbstractArray{<:AbstractFloat,1},
-    H::AbstractArray{<:AbstractFloat,1},
-    B::AbstractArray{<:AbstractFloat,1},
-    q::Real,
-    prim::AbstractArray{<:Real,1},
-    Pr::Real,
-    K::Real,
-)
+    u::T,
+    H::T,
+    B::T,
+    q,
+    prim::X,
+    Pr,
+    K,
+) where {T<:AbstractArray{<:AbstractFloat,1},X<:AbstractArray{<:Real,1}}
 
     H_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        (u - prim[2]) *
@@ -220,13 +240,13 @@ end
 
 #--- 1F2V ---#
 function shakhov(
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    M::AbstractArray{<:AbstractFloat,2},
-    q::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:Real,1},
-    Pr::Real,
-)
+    u::T,
+    v::T,
+    M::T,
+    q::X,
+    prim::Y,
+    Pr,
+) where {T<:AbstractArray{<:AbstractFloat,2},X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}}
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        ((u - prim[2]) * q[1] + (v - prim[3]) * q[2]) *
@@ -239,15 +259,15 @@ end
 
 #--- 2F2V ---#
 function shakhov(
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    H::AbstractArray{<:AbstractFloat,2},
-    B::AbstractArray{<:AbstractFloat,2},
-    q::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:Real,1},
-    Pr::Real,
-    K::Real,
-)
+    u::T,
+    v::T,
+    H::T,
+    B::T,
+    q::X,
+    prim::Y,
+    Pr,
+    K,
+) where {T<:AbstractArray{<:AbstractFloat,2},X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
 
     H_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        ((u - prim[2]) * q[1] + (v - prim[3]) * q[2]) *
@@ -264,14 +284,14 @@ end
 
 #--- 1F3V ---#
 function shakhov(
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    M::AbstractArray{<:AbstractFloat,3},
-    q::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:Real,1},
-    Pr::Real,
-)
+    u::T,
+    v::T,
+    w::T,
+    M::T,
+    q::X,
+    prim::Y,
+    Pr,
+) where{T<:AbstractArray{<:AbstractFloat,3},X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        ((u - prim[2]) * q[1] + (v - prim[3]) * q[2] + (w - prim[4]) * q[3]) *
@@ -291,10 +311,10 @@ Reduced distribution function
 
 """
 function reduce_distribution(
-    f::AbstractArray{<:AbstractFloat,2},
-    weights::AbstractArray{<:AbstractFloat,1},
-    dim = 1::Int,
-)
+    f::X,
+    weights::Y,
+    dim = 1,
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:AbstractFloat,1}}
 
     if dim == 1
         h = similar(f, axes(f, 1))
@@ -315,10 +335,10 @@ function reduce_distribution(
 end
 
 function reduce_distribution(
-    f::AbstractArray{<:AbstractFloat,3},
-    weights::AbstractArray{<:AbstractFloat,2},
-    dim = 1::Int,
-)
+    f::X,
+    weights::Y,
+    dim = 1,
+) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:AbstractFloat,2}}
 
     if dim == 1
         h = similar(f, axes(f, 1))
@@ -343,12 +363,12 @@ function reduce_distribution(
 end
 
 function reduce_distribution(
-    f::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    weights::AbstractArray{<:AbstractFloat,2},
-    dim = 1::Int,
-)
+    f::X,
+    v::X,
+    w::X,
+    weights::Y,
+    dim = 1,
+) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:AbstractFloat,2}}
 
     if dim == 1
         h = similar(f, axes(f, 1))
@@ -389,17 +409,16 @@ Recover full distribution function from reduced ones
 * @return f : particle distribution function with 3D velocity space
 
 """
-
 function full_distribution(
-    h::AbstractArray{<:AbstractFloat,1},
-    b::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    weights::AbstractArray{<:AbstractFloat,1},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    ρ::Real,
-    γ = 5 / 3::Real,
-)
+    h::X,
+    b::X,
+    u::X,
+    weights::X,
+    v::Y,
+    w::Y,
+    ρ,
+    γ = 5 / 3,
+) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,3}}
 
     @assert length(h) == size(v, 1) throw(DimensionMismatch("reduced and full distribution function mismatch"))
 
@@ -415,15 +434,16 @@ function full_distribution(
 end
 
 full_distribution(
-    h::AbstractArray{<:AbstractFloat,1},
-    b::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    weights::AbstractArray{<:AbstractFloat,1},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    prim::AbstractArray{<:Real,1},
-    γ = 5 / 3::Real,
-) = full_distribution(h, b, u, weights, v, w, prim[1], γ)
+    h::X,
+    b::X,
+    u::X,
+    weights::X,
+    v::Y,
+    w::Y,
+    prim::Z,
+    γ = 5 / 3,
+) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,3},Z<:AbstractArray{<:Real,1}} = 
+    full_distribution(h, b, u, weights, v, w, prim[1], γ)
 
 
 """
@@ -431,7 +451,7 @@ Calculate reference viscosity
 * variable hard sphere (VHS) model
 
 """
-ref_vhs_vis(Kn::Real, alpha::Real, omega::Real) =
+ref_vhs_vis(Kn, alpha, omega) =
     5.0 * (alpha + 1.0) * (alpha + 2.0) * √π /
     (4.0 * alpha * (5.0 - 2.0 * omega) * (7.0 - 2.0 * omega)) * Kn
 
@@ -441,7 +461,7 @@ Calculate collision time
 * variable hard sphere (VHS) model
 
 """
-vhs_collision_time(prim::AbstractArray{<:Real,1}, muRef::Real, omega::Real) =
+vhs_collision_time(prim::T, muRef, omega) where {T<:AbstractArray{<:Real,1}} =
     muRef * 2.0 * prim[end]^(1.0 - omega) / prim[1]
 
 
@@ -449,7 +469,7 @@ vhs_collision_time(prim::AbstractArray{<:Real,1}, muRef::Real, omega::Real) =
 # Calculate effective Knudsen number for fast spectral method
 * hard sphere (HS) model
 """
-hs_boltz_kn(mu_ref::Real, alpha::Real) =
+hs_boltz_kn(mu_ref, alpha) =
     64 * sqrt(2.0)^alpha / 5.0 * gamma((alpha + 3) / 2) * gamma(2.0) * sqrt(pi) * mu_ref
 
 
@@ -458,19 +478,19 @@ Calculate collision kernel for fast spectral method
 
 """
 function kernel_mode(
-    M::Int,
-    umax::Real,
-    vmax::Real,
-    wmax::Real,
-    du::Real,
-    dv::Real,
-    dw::Real,
-    unum::Int,
-    vnum::Int,
-    wnum::Int,
-    alpha::Real;
-    quad_num = 64,
-)
+    M::I,
+    umax::R,
+    vmax::R,
+    wmax::R,
+    du::R,
+    dv::R,
+    dw::R,
+    unum::I,
+    vnum::I,
+    wnum::I,
+    alpha::R;
+    quad_num = 64::I,
+) where {I<:Int,R<:Real}
 
     supp = sqrt(2.0) * 2.0 * max(umax, vmax, wmax) / (3.0 + sqrt(2.0))
 
@@ -530,13 +550,13 @@ Calculate collision operator with FFT-based fast spectral method
 
 """
 function boltzmann_fft(
-    f::AbstractArray{<:Real,3},
-    Kn::Real,
-    M::Int,
-    ϕ::AbstractArray{<:Real,4},
-    ψ::AbstractArray{<:Real,4},
-    phipsi::AbstractArray{<:Real,3},
-)
+    f::X,
+    Kn::R,
+    M::I,
+    ϕ::Y,
+    ψ::Y,
+    phipsi::X,
+) where {X<:AbstractArray{<:Real,3},Y<:AbstractArray{<:Real,4},R<:Real,I<:Int}
 
     f_spec = f .+ 0im
     bfft!(f_spec)
@@ -567,15 +587,19 @@ function boltzmann_fft(
 end
 
 
+"""
+Calculate collision operator with FFT-based fast spectral method
+
+"""
 function boltzmann_fft!(
-    Q::AbstractArray{<:Real,3},
-    f::AbstractArray{<:Real,3},
-    Kn::Real,
-    M::Int,
-    ϕ::AbstractArray{<:Real,4},
-    ψ::AbstractArray{<:Real,4},
-    phipsi::AbstractArray{<:Real,3},
-)
+    Q::X,
+    f::X,
+    Kn::R,
+    M::I,
+    ϕ::Y,
+    ψ::Y,
+    phipsi::X,
+) where {X<:AbstractArray{<:Real,3},Y<:AbstractArray{<:Real,4},R<:Real,I<:Int}
 
     f_spec = f .+ 0im
     bfft!(f_spec)
@@ -618,13 +642,13 @@ Calculate mixture collision time from AAP model
 
 """
 function aap_hs_collision_time(
-    prim::AbstractArray{<:Real,2},
-    mi::Real,
-    ni::Real,
-    me::Real,
-    ne::Real,
-    kn::Real,
-)
+    prim::T,
+    mi,
+    ni,
+    me,
+    ne,
+    kn,
+) where {T<:AbstractArray{<:Real,2}}
 
     ν = similar(prim, 2)
 
@@ -661,14 +685,14 @@ Calculate mixture primitive variables from AAP model
 
 """
 function aap_hs_prim(
-    prim::AbstractArray{<:Real,2},
-    tau::AbstractArray{<:Real,1},
-    mi::Real,
-    ni::Real,
-    me::Real,
-    ne::Real,
-    kn::Real,
-)
+    prim::X,
+    tau::Y,
+    mi,
+    ni,
+    me,
+    ne,
+    kn,
+) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,1}}
 
     mixprim = similar(prim)
 
@@ -961,27 +985,27 @@ end
 """
 Shift distribution function by external force
 
-`shift_pdf!(
-    f::AbstractArray{<:AbstractFloat,1},
-    a::Real,
-    du::AbstractFloat,
-    dt::Real,
-)`
+    shift_pdf!(
+        f::T,
+        a,
+        du,
+        dt,
+    ) where {T<:AbstractArray{<:AbstractFloat,1}}
 
-`shift_pdf!(
-    f::AbstractArray{<:AbstractFloat,2},
-    a::AbstractArray{<:Real,1},
-    du::AbstractArray{<:AbstractFloat,1},
-    dt::Real,
-)`
+    shift_pdf!(
+        f::X,
+        a::Y,
+        du::Z,
+        dt,
+    ) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1},Z<:AbstractArray{<:AbstractFloat,1}}
 
 """
 function shift_pdf!(
-    f::AbstractArray{<:AbstractFloat,1},
-    a::Real,
-    du::AbstractFloat,
-    dt::Real,
-)
+    f::T,
+    a,
+    du,
+    dt,
+) where {T<:AbstractArray{<:AbstractFloat,1}}
 
     q0 = eachindex(f) |> first # for OffsetArray
     q1 = eachindex(f) |> last
@@ -1019,11 +1043,11 @@ end
 
 #--- multi-component gas ---#
 function shift_pdf!(
-    f::AbstractArray{<:AbstractFloat,2},
-    a::AbstractArray{<:Real,1},
-    du::AbstractArray{<:AbstractFloat,1},
-    dt::Real,
-)
+    f::X,
+    a::Y,
+    du::Z,
+    dt,
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1},Z<:AbstractArray{<:AbstractFloat,1}}
     for j in axes(f, 2)
         _f = @view f[:, j]
         shift_pdf!(_f, a[j], du[j], dt)
