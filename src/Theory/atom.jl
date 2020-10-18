@@ -109,13 +109,15 @@ maxwellian(
     U,
     V,
     λ,
-) where {T<:AbstractArray{<:AbstractFloat,2}} = @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
+) where {T<:AbstractArray{<:AbstractFloat,2}} = 
+    @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
 maxwellian(
     u::X,
     v::X,
     prim::Y,
-) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}} = maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}} = 
+    maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
 
 #--- 3V ---#
 maxwellian(
@@ -127,14 +129,16 @@ maxwellian(
     V,
     W,
     λ,
-) where {T<:AbstractArray{<:AbstractFloat,3}} = @. ρ * sqrt((λ / π)^3) * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
+) where {T<:AbstractArray{<:AbstractFloat,3}} = 
+    @. ρ * sqrt((λ / π)^3) * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
 
 maxwellian(
     u::X,
     v::X,
     w::X,
     prim::Y,
-) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,1}} = maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
+) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,1}} = 
+    maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
 
 
 """
@@ -156,13 +160,18 @@ Multi-component Maxwellian in discrete form
     ) where {X<:AbstractArray{<:AbstractFloat,4},Y<:AbstractArray{<:Real,2}}
 
 """
-function mixture_maxwellian(u::X, prim::Y) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,2}}
+function mixture_maxwellian(
+    u::X, 
+    prim::Y,
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,2}}
+    
     mixM = similar(u)
     for j in axes(mixM, 2)
         mixM[:, j] .= maxwellian(u[:, j], prim[:, j])
     end
 
     return mixM
+    
 end
 
 function mixture_maxwellian(
@@ -170,12 +179,14 @@ function mixture_maxwellian(
     v::X,
     prim::Y,
 ) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,2}}
+
     mixM = similar(u)
     for k in axes(mixM, 3)
         mixM[:, :, k] .= maxwellian(u[:, :, k], v[:, :, k], prim[:, k])
     end
 
     return mixM
+
 end
 
 function mixture_maxwellian(
@@ -184,6 +195,7 @@ function mixture_maxwellian(
     w::X,
     prim::Y,
 ) where {X<:AbstractArray{<:AbstractFloat,4},Y<:AbstractArray{<:Real,2}}
+
     mixM = similar(u)
     for l in axes(mixM, 4)
         mixM[:, :, :, l] .=
@@ -191,6 +203,7 @@ function mixture_maxwellian(
     end
 
     return mixM
+
 end
 
 
