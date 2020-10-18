@@ -162,7 +162,15 @@ end
 Calculate electromagnetic coeffcients in hyperbolic Maxwell's equations
 
 """
-function em_coefficients(prim::A, E::B, B::C, mr, lD, rL, dt) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,1},C<:AbstractArray{<:Real,1}}
+function em_coefficients(
+    prim::A, 
+    E::B, 
+    B::C, 
+    mr, 
+    lD, 
+    rL, 
+    dt,
+) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,1},C<:AbstractArray{<:Real,1}}
 
     A = zeros(9, 9)
     A[1, 1] = -1.0 / (2.0 * rL)
