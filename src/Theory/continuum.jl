@@ -5,7 +5,7 @@
 """
 Transform primitive -> conservative variables
 
-    prim_conserve(prim::A, γ) where {A<:AbstractArray{<:Real,1}}
+    prim_conserve(prim::T, γ) where {T<:AbstractArray{<:Real,1}}
 
     prim_conserve(ρ, U, λ, γ)
 
@@ -14,7 +14,7 @@ Transform primitive -> conservative variables
     prim_conserve(ρ, U, V, W, λ, γ)
 
 """
-function prim_conserve(prim::A, γ) where {A<:AbstractArray{<:Real,1}}
+function prim_conserve(prim::T, γ) where {T<:AbstractArray{<:Real,1}}
 
     if eltype(prim) <: Int
         W = similar(prim, Float64)
@@ -30,7 +30,9 @@ function prim_conserve(prim::A, γ) where {A<:AbstractArray{<:Real,1}}
         W[1] = prim[1]
         W[2] = prim[1] * prim[2]
         W[3] = prim[1] * prim[3]
-        W[4] = 0.5 * prim[1] / prim[4] / (γ - 1.0) + 0.5 * prim[1] * (prim[2]^2 + prim[3]^2)
+        W[4] =
+            0.5 * prim[1] / prim[4] / (γ - 1.0) +
+            0.5 * prim[1] * (prim[2]^2 + prim[3]^2)
     elseif length(prim) == 5 # 3D
         W[1] = prim[1]
         W[2] = prim[1] * prim[2]
@@ -57,10 +59,10 @@ prim_conserve(ρ, U, V, W, λ, γ) = prim_conserve([ρ, U, V, W, λ], γ)
 """
 Transform multi-component primitive -> conservative variables
 
-    mixture_prim_conserve(prim::A, γ) where {A<:AbstractArray{<:Real,2}}
+    mixture_prim_conserve(prim::T, γ) where {T<:AbstractArray{<:Real,2}}
 
 """
-function mixture_prim_conserve(prim::A, γ) where {A<:AbstractArray{<:Real,2}}
+function mixture_prim_conserve(prim::T, γ) where {T<:AbstractArray{<:Real,2}}
 
     if eltype(prim) <: Int
         w = similar(prim, Float64)
@@ -82,13 +84,13 @@ Transform conservative -> primitive variables
 
 * scalar: pseudo primitive vector for scalar conservation laws
 
-    conserve_prim(u) 
+    conserve_prim(u)
 
     conserve_prim(u, a)
 
 * vector: primitive vector for Euler, Navier-Stokes and extended equations
 
-    conserve_prim(W::A, γ) where {A<:AbstractArray{<:Real,1}}
+    conserve_prim(W::T, γ) where {T<:AbstractArray{<:Real,1}}
 
     conserve_prim(ρ, M, E, γ)
 
@@ -99,7 +101,7 @@ conserve_prim(u) = [u, 0.5 * u, 1.0]
 
 conserve_prim(u, a) = [u, a, 1.0]
 
-function conserve_prim(W::A, γ) where {A<:AbstractArray{<:Real,1}}
+function conserve_prim(W::T, γ) where {T<:AbstractArray{<:Real,1}}
 
     if eltype(W) <: Int
         prim = similar(W, Float64)
@@ -115,13 +117,16 @@ function conserve_prim(W::A, γ) where {A<:AbstractArray{<:Real,1}}
         prim[1] = W[1]
         prim[2] = W[2] / W[1]
         prim[3] = W[3] / W[1]
-        prim[4] = 0.5 * W[1] / (γ - 1.0) / (W[4] - 0.5 * (W[2]^2 + W[3]^2) / W[1])
+        prim[4] =
+            0.5 * W[1] / (γ - 1.0) / (W[4] - 0.5 * (W[2]^2 + W[3]^2) / W[1])
     elseif length(W) == 5 # 3D
         prim[1] = W[1]
         prim[2] = W[2] / W[1]
         prim[3] = W[3] / W[1]
         prim[4] = W[4] / W[1]
-        prim[5] = 0.5 * W[1] / (γ - 1.0) / (W[5] - 0.5 * (W[2]^2 + W[3]^2 + W[4]^2) / W[1])
+        prim[5] =
+            0.5 * W[1] / (γ - 1.0) /
+            (W[5] - 0.5 * (W[2]^2 + W[3]^2 + W[4]^2) / W[1])
     else
         throw("w -> prim : dimension dismatch")
     end
@@ -138,10 +143,10 @@ conserve_prim(ρ, MX, MY, E, γ) = conserve_prim([ρ, MX, MY, E], γ)
 """
 Transform multi-component conservative -> primitive variables
 
-    mixture_conserve_prim(W::A, γ) where {A<:AbstractArray{<:Real,2}}
+    mixture_conserve_prim(W::T, γ) where {T<:AbstractArray{<:Real,2}}
 
 """
-function mixture_conserve_prim(W::A, γ) where {A<:AbstractArray{<:Real,2}}
+function mixture_conserve_prim(W::T, γ) where {T<:AbstractArray{<:Real,2}}
 
     if eltype(W) <: Int
         prim = similar(W, Float64)
@@ -162,25 +167,29 @@ end
 Calculate electromagnetic coeffcients in hyperbolic Maxwell's equations
 
     em_coefficients(
-        prim::A,
-        E::B,
-        B::C,
+        prim::X,
+        E::Y,
+        B::Z,
         mr,
         lD,
         rL,
         dt,
-    ) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,1},C<:AbstractArray{<:Real,1}}
+    ) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,1},Z<:AbstractArray{<:Real,1}}
 
 """
 function em_coefficients(
-    prim::A,
-    E::B,
-    B::C,
+    prim::X,
+    E::Y,
+    B::Z,
     mr,
     lD,
     rL,
     dt,
-) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,1},C<:AbstractArray{<:Real,1}}
+) where {
+    X<:AbstractArray{<:Real,2},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:Real,1},
+}
 
     if eltype(W) <: Int
         A = zeros(9, 9)
@@ -239,13 +248,16 @@ function em_coefficients(
         prim[4, 1] / (dt) + E[3] / (2.0 * rL) - B[1] * prim[3, 1] / (2.0 * rL) +
         B[2] * prim[2, 1] / (2.0 * rL)
     b[4] =
-        prim[2, 2] / (dt) - mr * E[1] / (2.0 * rL) + mr * B[2] * prim[4, 2] / (2.0 * rL) -
+        prim[2, 2] / (dt) - mr * E[1] / (2.0 * rL) +
+        mr * B[2] * prim[4, 2] / (2.0 * rL) -
         mr * B[3] * prim[3, 2] / (2.0 * rL)
     b[5] =
-        prim[3, 2] / (dt) - mr * E[2] / (2.0 * rL) + mr * B[3] * prim[2, 2] / (2.0 * rL) -
+        prim[3, 2] / (dt) - mr * E[2] / (2.0 * rL) +
+        mr * B[3] * prim[2, 2] / (2.0 * rL) -
         mr * B[1] * prim[4, 2] / (2.0 * rL)
     b[6] =
-        prim[4, 2] / (dt) - mr * E[3] / (2.0 * rL) + mr * B[1] * prim[3, 2] / (2.0 * rL) -
+        prim[4, 2] / (dt) - mr * E[3] / (2.0 * rL) +
+        mr * B[1] * prim[3, 2] / (2.0 * rL) -
         mr * B[2] * prim[2, 2] / (2.0 * rL)
     b[7] =
         E[1] / (dt) - prim[1, 1] * prim[2, 1] / (2.0 * rL * lD^2) +
@@ -288,7 +300,11 @@ Theoretical fluxes of Euler Equations
 * @return: flux tuple
 
 """
-function euler_flux(w::A, γ; frame = :cartesian::Symbol) where {A<:AbstractArray{<:Real,1}}
+function euler_flux(
+    w::T,
+    γ;
+    frame = :cartesian::Symbol,
+) where {T<:AbstractArray{<:Real,1}}
 
     prim = conserve_prim(w, γ)
     p = 0.5 * prim[1] / prim[end]
@@ -349,12 +365,12 @@ end
 """
 Flux Jacobian of Euler Equations
 
-    euler_jacobi(w::A, γ) where {A<:AbstractArray{<:Real,1}}
+    euler_jacobi(w::T, γ) where {T<:AbstractArray{<:Real,1}}
 
 * @return: Jacobian matrix A
 
 """
-function euler_jacobi(w::A, γ) where {A<:AbstractArray{<:Real,1}}
+function euler_jacobi(w::T, γ) where {T<:AbstractArray{<:Real,1}}
 
     if eltype(w) <: Int
         A = similar(w, Float64, 3, 3)
