@@ -225,6 +225,8 @@ burgers_flux(u::Real) = 0.5 * u^2
 """
 Theoretical fluxes of Euler Equations
 
+    euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame = :cartesian::Symbol)
+
 * @return: flux tuple
 
 """
@@ -233,21 +235,28 @@ function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame = :cartesian::Sy
     prim = conserve_prim(w, γ)
     p = 0.5 * prim[1] / prim[end]
 
+    if eltype(w) <: Int
+        F = similar(w, Float64)
+        G = similar(w, Float64)
+        H = similar(w, Float64)
+    else
+        F = similar(w)
+        G = similar(w)
+        H = similar(w)
+    end
+
     if length(w) == 3
-        F = zeros(axes(w))
         F[1] = w[2]
         F[2] = w[2]^2 / w[1] + p
         F[3] = (w[3] + p) * w[2] / w[1]
 
         return (F,)
     elseif length(w) == 4
-        F = zeros(axes(w))
         F[1] = w[2]
         F[2] = w[2]^2 / w[1] + p
         F[3] = w[2] * w[3] / w[1]
         F[4] = (w[end] + p) * w[2] / w[1]
 
-        G = zeros(axes(w))
         G[1] = w[3]
         G[2] = w[3] * w[2] / w[1]
         G[3] = w[3]^2 / w[1] + p
@@ -255,21 +264,18 @@ function euler_flux(w::AbstractArray{<:Real,1}, γ::Real; frame = :cartesian::Sy
 
         return F, G
     elseif length(w) == 5
-        F = zeros(axes(w))
         F[1] = w[2]
         F[2] = w[2]^2 / w[1] + p
         F[3] = w[2] * w[3] / w[1]
         F[4] = w[2] * w[4] / w[1]
         F[5] = (w[end] + p) * w[2] / w[1]
 
-        G = zeros(axes(w))
         G[1] = w[3]
         G[2] = w[3] * w[2] / w[1]
         G[3] = w[3]^2 / w[1] + p
         G[4] = w[3] * w[4] / w[1]
         G[5] = (w[end] + p) * w[3] / w[1]
 
-        H = zeros(axes(w))
         H[1] = w[4]
         H[2] = w[4] * w[2] / w[1]
         H[3] = w[4] * w[3] / w[1]
@@ -285,10 +291,18 @@ end
 """
 Flux Jacobian of Euler Equations
 
+    euler_jacobi(w::AbstractArray{<:Real,1}, γ::Real)
+
+* @return: Jacobian matrix A
+
 """
 function euler_jacobi(w::AbstractArray{<:Real,1}, γ::Real)
 
-    A = zeros(eltype(w), 3, 3)
+    if eltype(w) <: Int
+        A = similar(w, Float64, 3, 3)
+    else
+        A = similar(w, 3, 3)
+    end
 
     A[1, 1] = 0.0
     A[1, 2] = 1.0

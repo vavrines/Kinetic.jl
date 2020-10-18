@@ -1,19 +1,20 @@
 # ============================================================
-# Kinetic.jl : Kinetic Theory, Modeling and Simulation Toolbox
+# Kinetic.jl : Toolbox for Kinetic Modeling & Simulation
 # ============================================================
 
 module Kinetic
 
 using Dates
+using OffsetArrays
+using CUDA
 using LinearAlgebra
 using FastGaussQuadrature
-using OffsetArrays
 using SpecialFunctions
 using FFTW
 using OrdinaryDiffEq
+using Plots
 using FileIO
 using JLD2
-using Plots
 using PyCall
 using ProgressMeter
 
