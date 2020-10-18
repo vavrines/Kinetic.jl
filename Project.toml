@@ -4,7 +4,6 @@ authors = ["Tianbai Xiao <tianbaixiao@gmail.com>"]
 version = "0.5.1"
 
 [deps]
-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
@@ -21,7 +20,6 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-CUDA = "^1"
 Conda = "^1"
 FFTW = "^1"
 FastGaussQuadrature = "0.2, 0.3, 0.4"

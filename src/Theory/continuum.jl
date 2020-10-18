@@ -5,8 +5,16 @@
 """
 Transform primitive -> conservative variables
 
+    prim_conserve(prim::A, γ::B) where {A<:AbstractArray{<:Real,1}, B<:Real}
+
+    prim_conserve(ρ, U, λ, γ)
+
+    prim_conserve(ρ, U, V, λ, γ)
+
+    prim_conserve(ρ, U, V, W, λ, γ)
+
 """
-function prim_conserve(prim::AbstractArray{<:Real,1}, γ::Real)
+function prim_conserve(prim::A, γ::B) where {A<:AbstractArray{<:Real,1}, B<:Real}
 
     if eltype(prim) <: Int
         W = similar(prim, Float64)
@@ -32,19 +40,28 @@ function prim_conserve(prim::AbstractArray{<:Real,1}, γ::Real)
             0.5 * prim[1] / prim[5] / (γ - 1.0) +
             0.5 * prim[1] * (prim[2]^2 + prim[3]^2 + prim[4]^2)
     else
-        println("prim -> w : dimension error")
+        throw("prim -> w : dimension error")
     end
 
     return W
 
 end
 
-prim_conserve(ρ::Real, U::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, λ], γ)
+prim_conserve(ρ, U, λ, γ) = prim_conserve([ρ, U, λ], γ)
 
-prim_conserve(ρ::Real, U::Real, V::Real, λ::Real, γ::Real) = prim_conserve([ρ, U, V, λ], γ)
+prim_conserve(ρ, U, V, λ, γ) = prim_conserve([ρ, U, V, λ], γ)
+
+prim_conserve(ρ, U, V, W, λ, γ) = prim_conserve([ρ, U, V, W, λ], γ)
 
 
-function mixture_prim_conserve(prim::AbstractArray{<:Real,2}, γ::Real)
+"""
+Transform multi-component primitive -> conservative variables
+
+    mixture_prim_conserve(prim::A, γ::B) where {A<:AbstractArray{<:Real,2}, B<:Real}
+
+"""
+function mixture_prim_conserve(prim::A, γ::B) where {A<:AbstractArray{<:Real,2}, B<:Real}
+    
     if eltype(prim) <: Int
         w = similar(prim, Float64)
     else
@@ -56,6 +73,7 @@ function mixture_prim_conserve(prim::AbstractArray{<:Real,2}, γ::Real)
     end
 
     return w
+
 end
 
 
@@ -66,9 +84,9 @@ Transform conservative -> primitive variables
 * vector: primitive vector for Euler, Navier-Stokes and extended equations
 
 """
-conserve_prim(u::Real) = [u, 0.5 * u, 1.0]
+conserve_prim(u::T) where {T<:Real} = [u, 0.5 * u, 1.0]
 
-conserve_prim(u::Real, a::Real) = [u, a, 1.0]
+conserve_prim(u::A, a::B) where {A,B<:Real} = [u, a, 1.0]
 
 function conserve_prim(W::AbstractArray{<:Real,1}, γ::Real)
 

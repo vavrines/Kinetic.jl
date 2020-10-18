@@ -6,7 +6,6 @@ module Kinetic
 
 using Dates
 using OffsetArrays
-using CUDA
 using LinearAlgebra
 using FastGaussQuadrature
 using SpecialFunctions
