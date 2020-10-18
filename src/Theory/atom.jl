@@ -1,6 +1,6 @@
 """
 Calculate slope of particle distribution function, assuming a = a1 + u * a2 + 0.5 * u^2 * a3
-    
+
     pdf_slope(u, Δ)
 
     pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,1},B<:AbstractArray{<:Real,1}}
@@ -9,8 +9,8 @@ Calculate slope of particle distribution function, assuming a = a1 + u * a2 + 0.
 pdf_slope(u, Δ) = Δ / u
 
 function pdf_slope(
-    prim::X, 
-    sw::Y, 
+    prim::X,
+    sw::Y,
     inK,
 ) where {X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
 
@@ -23,7 +23,9 @@ function pdf_slope(
                 2.0 * sw[3] - 2.0 * prim[2] * sw[2] +
                 sw[1] * (prim[2]^2 - 0.5 * (inK + 1.0) / prim[3])
             )
-        sl[2] = 2.0 * prim[3] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[3]
+        sl[2] =
+            2.0 * prim[3] / prim[1] * (sw[2] - prim[2] * sw[1]) -
+            prim[2] * sl[3]
         sl[1] =
             sw[1] / prim[1] - prim[2] * sl[2] -
             0.5 * (prim[2]^2 + 0.5 * (inK + 1.0) / prim[3]) * sl[3]
@@ -35,8 +37,12 @@ function pdf_slope(
                 2.0 * sw[4] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] +
                 sw[1] * (prim[2]^2 + prim[3]^2 - 0.5 * (inK + 2.0) / prim[4])
             )
-        sl[3] = 2.0 * prim[4] / prim[1] * (sw[3] - prim[3] * sw[1]) - prim[3] * sl[4]
-        sl[2] = 2.0 * prim[4] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[4]
+        sl[3] =
+            2.0 * prim[4] / prim[1] * (sw[3] - prim[3] * sw[1]) -
+            prim[3] * sl[4]
+        sl[2] =
+            2.0 * prim[4] / prim[1] * (sw[2] - prim[2] * sw[1]) -
+            prim[2] * sl[4]
         sl[1] =
             sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] -
             0.5 * (prim[2]^2 + prim[3]^2 + 0.5 * (inK + 2.0) / prim[4]) * sl[4]
@@ -47,14 +53,26 @@ function pdf_slope(
             4.0 * prim[5]^2 / (inK + 3.0) / prim[1] * (
                 2.0 * sw[5] - 2.0 * prim[2] * sw[2] - 2.0 * prim[3] * sw[3] -
                 2.0 * prim[4] * sw[4] +
-                sw[1] * (prim[2]^2 + prim[3]^2 + prim[4]^2 - 0.5 * (inK + 3.0) / prim[5])
+                sw[1] * (
+                    prim[2]^2 + prim[3]^2 + prim[4]^2 -
+                    0.5 * (inK + 3.0) / prim[5]
+                )
             )
-        sl[4] = 2.0 * prim[5] / prim[1] * (sw[4] - prim[4] * sw[1]) - prim[4] * sl[5]
-        sl[3] = 2.0 * prim[5] / prim[1] * (sw[3] - prim[3] * sw[1]) - prim[3] * sl[5]
-        sl[2] = 2.0 * prim[5] / prim[1] * (sw[2] - prim[2] * sw[1]) - prim[2] * sl[5]
+        sl[4] =
+            2.0 * prim[5] / prim[1] * (sw[4] - prim[4] * sw[1]) -
+            prim[4] * sl[5]
+        sl[3] =
+            2.0 * prim[5] / prim[1] * (sw[3] - prim[3] * sw[1]) -
+            prim[3] * sl[5]
+        sl[2] =
+            2.0 * prim[5] / prim[1] * (sw[2] - prim[2] * sw[1]) -
+            prim[2] * sl[5]
         sl[1] =
-            sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] - prim[4] * sl[4] -
-            0.5 * (prim[2]^2 + prim[3]^2 + prim[4]^2 + 0.5 * (inK + 3.0) / prim[5]) * sl[5]
+            sw[1] / prim[1] - prim[2] * sl[2] - prim[3] * sl[3] -
+            prim[4] * sl[4] -
+            0.5 *
+            (prim[2]^2 + prim[3]^2 + prim[4]^2 + 0.5 * (inK + 3.0) / prim[5]) *
+            sl[5]
 
     end
 
@@ -64,15 +82,15 @@ end
 
 
 """
-Calculate slope of multi-component particle distribution function, 
+Calculate slope of multi-component particle distribution function,
 assuming `a = a1 + u * a2 + 0.5 * u^2 * a3`
 
     mixture_pdf_slope(prim::X, sw::Y, inK) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,2}}
 
 """
 function mixture_pdf_slope(
-    prim::X, 
-    sw::Y, 
+    prim::X,
+    sw::Y,
     inK,
 ) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,2}}
 
@@ -99,28 +117,20 @@ maxwellian(u::T, ρ, U, λ) where {T<:AbstractArray{<:AbstractFloat,1}} =
     @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2) # 1V
 
 maxwellian(
-    u::X, 
-    prim::Y
-) where {
-    X<:AbstractArray{<:AbstractFloat,1},
-    Y<:AbstractArray{<:Real,1}} = maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
+    u::X,
+    prim::Y,
+) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}} =
+    maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 #--- 2V ---#
-maxwellian(
-    u::T,
-    v::T,
-    ρ,
-    U,
-    V,
-    λ,
-) where {T<:AbstractArray{<:AbstractFloat,2}} = 
+maxwellian(u::T, v::T, ρ, U, V, λ) where {T<:AbstractArray{<:AbstractFloat,2}} =
     @. ρ * (λ / π) * exp(-λ * ((u - U)^2 + (v - V)^2))
 
 maxwellian(
     u::X,
     v::X,
     prim::Y,
-) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}} = 
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}} =
     maxwellian(u, v, prim[1], prim[2], prim[3], prim[end]) # in case of input with length 5
 
 #--- 3V ---#
@@ -133,7 +143,7 @@ maxwellian(
     V,
     W,
     λ,
-) where {T<:AbstractArray{<:AbstractFloat,3}} = 
+) where {T<:AbstractArray{<:AbstractFloat,3}} =
     @. ρ * sqrt((λ / π)^3) * exp(-λ * ((u - U)^2 + (v - V)^2 + (w - W)^2))
 
 maxwellian(
@@ -141,7 +151,7 @@ maxwellian(
     v::X,
     w::X,
     prim::Y,
-) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,1}} = 
+) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,1}} =
     maxwellian(u, v, w, prim[1], prim[2], prim[3], prim[4], prim[5])
 
 
@@ -149,7 +159,7 @@ maxwellian(
 Multi-component Maxwellian in discrete form
 
     mixture_maxwellian(u::X, prim::Y) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,2}}
-    
+
     mixture_maxwellian(
         u::X,
         v::X,
@@ -165,17 +175,17 @@ Multi-component Maxwellian in discrete form
 
 """
 function mixture_maxwellian(
-    u::X, 
+    u::X,
     prim::Y,
 ) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,2}}
-    
+
     mixM = similar(u)
     for j in axes(mixM, 2)
         mixM[:, j] .= maxwellian(u[:, j], prim[:, j])
     end
 
     return mixM
-    
+
 end
 
 function mixture_maxwellian(
@@ -271,7 +281,11 @@ function shakhov(
     q::X,
     prim::Y,
     Pr,
-) where {T<:AbstractArray{<:AbstractFloat,2},X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}}
+) where {
+    T<:AbstractArray{<:AbstractFloat,2},
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:Real,1},
+}
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        ((u - prim[2]) * q[1] + (v - prim[3]) * q[2]) *
@@ -292,7 +306,11 @@ function shakhov(
     prim::Y,
     Pr,
     K,
-) where {T<:AbstractArray{<:AbstractFloat,2},X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
+) where {
+    T<:AbstractArray{<:AbstractFloat,2},
+    X<:AbstractArray{<:Real,1},
+    Y<:AbstractArray{<:Real,1},
+}
 
     H_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        ((u - prim[2]) * q[1] + (v - prim[3]) * q[2]) *
@@ -316,11 +334,19 @@ function shakhov(
     q::X,
     prim::Y,
     Pr,
-) where{T<:AbstractArray{<:AbstractFloat,3},X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
+) where {
+    T<:AbstractArray{<:AbstractFloat,3},
+    X<:AbstractArray{<:Real,1},
+    Y<:AbstractArray{<:Real,1},
+}
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        ((u - prim[2]) * q[1] + (v - prim[3]) * q[2] + (w - prim[4]) * q[3]) *
-       (2.0 * prim[end] * ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) - 5.0) *
+       (
+           2.0 *
+           prim[end] *
+           ((u - prim[2])^2 + (v - prim[3])^2 + (w - prim[4])^2) - 5.0
+       ) *
        M
 
     return M_plus
@@ -339,7 +365,10 @@ function reduce_distribution(
     f::X,
     weights::Y,
     dim = 1,
-) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:AbstractFloat,1}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:AbstractFloat,1},
+}
 
     if dim == 1
         h = similar(f, axes(f, 1))
@@ -363,7 +392,10 @@ function reduce_distribution(
     f::X,
     weights::Y,
     dim = 1,
-) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:AbstractFloat,2}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,3},
+    Y<:AbstractArray{<:AbstractFloat,2},
+}
 
     if dim == 1
         h = similar(f, axes(f, 1))
@@ -393,7 +425,10 @@ function reduce_distribution(
     w::X,
     weights::Y,
     dim = 1,
-) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:AbstractFloat,2}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,3},
+    Y<:AbstractArray{<:AbstractFloat,2},
+}
 
     if dim == 1
         h = similar(f, axes(f, 1))
@@ -443,7 +478,10 @@ function full_distribution(
     w::Y,
     ρ,
     γ = 5 / 3,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,3}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,3},
+}
 
     @assert length(h) == size(v, 1) throw(DimensionMismatch("reduced and full distribution function mismatch"))
 
@@ -452,7 +490,8 @@ function full_distribution(
 
     f = similar(v)
     for k in axes(f, 3), j in axes(f, 2), i in axes(f, 1)
-        f[i, j, k] = h[i] * (λi / π) * exp(-λi * v[i, j, k]^2) * exp(-λi * w[i, j, k]^2)
+        f[i, j, k] =
+            h[i] * (λi / π) * exp(-λi * v[i, j, k]^2) * exp(-λi * w[i, j, k]^2)
     end
 
     return f
@@ -467,8 +506,11 @@ full_distribution(
     w::Y,
     prim::Z,
     γ = 5 / 3,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,3},Z<:AbstractArray{<:Real,1}} = 
-    full_distribution(h, b, u, weights, v, w, prim[1], γ)
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,3},
+    Z<:AbstractArray{<:Real,1},
+} = full_distribution(h, b, u, weights, v, w, prim[1], γ)
 
 
 """
@@ -495,7 +537,11 @@ vhs_collision_time(prim::T, muRef, omega) where {T<:AbstractArray{<:Real,1}} =
 * hard sphere (HS) model
 """
 hs_boltz_kn(mu_ref, alpha) =
-    64 * sqrt(2.0)^alpha / 5.0 * gamma((alpha + 3) / 2) * gamma(2.0) * sqrt(pi) * mu_ref
+    64 * sqrt(2.0)^alpha / 5.0 *
+    gamma((alpha + 3) / 2) *
+    gamma(2.0) *
+    sqrt(pi) *
+    mu_ref
 
 
 """
@@ -546,7 +592,10 @@ function kernel_mode(
                 int_temp = 0.0
                 for id = 1:quad_num
                     int_temp +=
-                        2.0 * gweight[id] * cos(s * abscissa[id]) * (abscissa[id]^alpha)
+                        2.0 *
+                        gweight[id] *
+                        cos(s * abscissa[id]) *
+                        (abscissa[id]^alpha)
                 end
                 phi[i, j, k, idx] = int_temp * sin(theta)
                 # psi
@@ -728,25 +777,26 @@ function aap_hs_prim(
             prim[2, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 2] - prim[2, 1])
         mixprim[2, 2] =
             prim[2, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 1] - prim[2, 2])
         mixprim[3, 1] =
             1.0 / (
-                1.0 / prim[end, 1] - 2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 +
+                1.0 / prim[end, 1] -
+                2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 +
                 tau[1] / kn * 2.0 * mi / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 2] * me / mi - 1.0 / prim[end, 1] +
@@ -755,11 +805,12 @@ function aap_hs_prim(
             )
         mixprim[3, 2] =
             1.0 / (
-                1.0 / prim[end, 2] - 2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 +
+                1.0 / prim[end, 2] -
+                2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 +
                 tau[2] / kn * 2.0 * me / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 1] * mi / me - 1.0 / prim[end, 2] +
@@ -774,42 +825,43 @@ function aap_hs_prim(
             prim[2, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 2] - prim[2, 1])
         mixprim[2, 2] =
             prim[2, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 1] - prim[2, 2])
         mixprim[3, 1] =
             prim[3, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 2] - prim[3, 1])
         mixprim[3, 2] =
             prim[3, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 1] - prim[3, 2])
         mixprim[4, 1] =
             1.0 / (
-                1.0 / prim[end, 1] - 2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
+                1.0 / prim[end, 1] -
+                2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
                 2.0 / 3.0 * (mixprim[3, 1] - prim[3, 1])^2 +
                 tau[1] / kn * 2.0 * mi / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 2] * me / mi - 1.0 / prim[end, 1] +
@@ -819,12 +871,13 @@ function aap_hs_prim(
             )
         mixprim[4, 2] =
             1.0 / (
-                1.0 / prim[end, 2] - 2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
+                1.0 / prim[end, 2] -
+                2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
                 2.0 / 3.0 * (mixprim[3, 2] - prim[3, 2])^2 +
                 tau[2] / kn * 2.0 * me / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 1] * mi / me - 1.0 / prim[end, 2] +
@@ -840,59 +893,60 @@ function aap_hs_prim(
             prim[2, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 2] - prim[2, 1])
         mixprim[2, 2] =
             prim[2, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[2, 1] - prim[2, 2])
         mixprim[3, 1] =
             prim[3, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 2] - prim[3, 1])
         mixprim[3, 2] =
             prim[3, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[3, 1] - prim[3, 2])
         mixprim[4, 1] =
             prim[4, 1] +
             tau[1] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[4, 2] - prim[4, 1])
         mixprim[4, 2] =
             prim[4, 2] +
             tau[2] / kn *
             (
-                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
             ) *
             (prim[4, 1] - prim[4, 2])
         mixprim[5, 1] =
             1.0 / (
-                1.0 / prim[end, 1] - 2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
+                1.0 / prim[end, 1] -
+                2.0 / 3.0 * (mixprim[2, 1] - prim[2, 1])^2 -
                 2.0 / 3.0 * (mixprim[3, 1] - prim[3, 1])^2 -
                 2.0 / 3.0 * (mixprim[4, 1] - prim[4, 1])^2 +
                 tau[1] / kn * 2.0 * mi / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 2] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 2] * me / mi - 1.0 / prim[end, 1] +
@@ -903,13 +957,14 @@ function aap_hs_prim(
             )
         mixprim[5, 2] =
             1.0 / (
-                1.0 / prim[end, 2] - 2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
+                1.0 / prim[end, 2] -
+                2.0 / 3.0 * (mixprim[2, 2] - prim[2, 2])^2 -
                 2.0 / 3.0 * (mixprim[3, 2] - prim[3, 2])^2 -
                 2.0 / 3.0 * (mixprim[4, 2] - prim[4, 2])^2 +
                 tau[2] / kn * 2.0 * me / (mi + me) *
                 (
-                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) / (mi + me) *
-                    sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
+                    4.0 * sqrt(2.0) / (3.0 * sqrt(π)) * prim[1, 1] / (ni + ne) /
+                    (mi + me) * sqrt(1.0 / prim[end, 1] + 1.0 / prim[end, 2])
                 ) *
                 (
                     1.0 / prim[end, 1] * mi / me - 1.0 / prim[end, 2] +
@@ -1025,12 +1080,7 @@ Shift distribution function by external force
     ) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1},Z<:AbstractArray{<:AbstractFloat,1}}
 
 """
-function shift_pdf!(
-    f::T,
-    a,
-    du,
-    dt,
-) where {T<:AbstractArray{<:AbstractFloat,1}}
+function shift_pdf!(f::T, a, du, dt) where {T<:AbstractArray{<:AbstractFloat,1}}
 
     q0 = eachindex(f) |> first # for OffsetArray
     q1 = eachindex(f) |> last
@@ -1072,7 +1122,11 @@ function shift_pdf!(
     a::Y,
     du::Z,
     dt,
-) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1},Z<:AbstractArray{<:AbstractFloat,1}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+}
     for j in axes(f, 2)
         _f = @view f[:, j]
         shift_pdf!(_f, a[j], du[j], dt)
