@@ -8,7 +8,11 @@ Calculate slope of particle distribution function, assuming a = a1 + u * a2 + 0.
 """
 pdf_slope(u, Δ) = Δ / u
 
-function pdf_slope(prim::X, sw::Y, inK) where {X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
+function pdf_slope(
+    prim::X, 
+    sw::Y, 
+    inK,
+) where {X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
 
     sl = similar(sw, axes(prim))
 
@@ -66,7 +70,11 @@ assuming `a = a1 + u * a2 + 0.5 * u^2 * a3`
     mixture_pdf_slope(prim::X, sw::Y, inK) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,2}}
 
 """
-function mixture_pdf_slope(prim::X, sw::Y, inK) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,2}}
+function mixture_pdf_slope(
+    prim::X, 
+    sw::Y, 
+    inK,
+) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{<:Real,2}}
 
     sl = similar(sw, axes(prim))
 
