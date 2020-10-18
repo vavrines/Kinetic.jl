@@ -1,15 +1,14 @@
 """
 Calculate slope of particle distribution function, assuming a = a1 + u * a2 + 0.5 * u^2 * a3
     
-    pdf_slope(u::Real, Δ::Real)
+    pdf_slope(u, Δ)
 
-    pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, inK::Real)
+    pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,1},B<:AbstractArray{<:Real,1}}
 
 """
-pdf_slope(u::Real, Δ::Real) = Δ / u
+pdf_slope(u, Δ) = Δ / u
 
-
-function pdf_slope(prim::AbstractArray{<:Real,1}, sw::AbstractArray{<:Real,1}, inK::Real)
+function pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,1},B<:AbstractArray{<:Real,1}}
 
     sl = similar(sw, axes(prim))
 
@@ -64,10 +63,10 @@ end
 Calculate slope of multi-component particle distribution function, 
 assuming `a = a1 + u * a2 + 0.5 * u^2 * a3`
 
-`mixture_pdf_slope(prim::AbstractArray{<:Real,2}, sw::AbstractArray{<:Real,2}, inK::Real)`
+    mixture_pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,2}}
 
 """
-function mixture_pdf_slope(prim::AbstractArray{<:Real,2}, sw::AbstractArray{<:Real,2}, inK::Real)
+function mixture_pdf_slope(prim::A, sw::B, inK) where {A<:AbstractArray{<:Real,2},B<:AbstractArray{<:Real,2}}
 
     sl = similar(sw, axes(prim))
 

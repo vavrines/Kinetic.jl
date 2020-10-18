@@ -187,9 +187,9 @@ function em_coefficients(
         b = zeros(9)
     else
         A = similar(prim, 9, 9)
-        A .= 0.
+        A .= 0.0
         b = similar(prim, 9)
-        b .= 0.
+        b .= 0.0
     end
 
     A[1, 1] = -1.0 / (2.0 * rL)
