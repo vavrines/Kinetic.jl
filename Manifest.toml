@@ -33,12 +33,6 @@ version = "2.12.0"
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
-[[BinaryProvider]]
-deps = ["Libdl", "Logging", "SHA"]
-git-tree-sha1 = "ecdec412a9abc8db54c0efc5548c64dfce072058"
-uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.5.10"
-
 [[Bzip2_jll]]
 deps = ["Libdl", "Pkg"]
 git-tree-sha1 = "03a44490020826950c68005cafb336e5ba08b7e8"
@@ -175,18 +169,6 @@ git-tree-sha1 = "50ddf44c53698f5e784bbebb3f4b21c5807401b1"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.8.3"
 
-[[Documenter]]
-deps = ["Base64", "Dates", "DocStringExtensions", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "fb1ff838470573adc15c71ba79f8d31328f035da"
-uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.25.2"
-
-[[DocumenterTools]]
-deps = ["Base64", "DocStringExtensions", "Documenter", "FileWatching", "LibGit2", "Sass"]
-git-tree-sha1 = "6fa30234228d9020cbe31e393e9d183e944845bb"
-uuid = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
-version = "0.1.7"
-
 [[ExponentialUtilities]]
 deps = ["LinearAlgebra", "Printf", "Requires", "SparseArrays"]
 git-tree-sha1 = "4e7db935d55d4a11acb74856ee6cb113a7808c6f"
@@ -233,9 +215,6 @@ deps = ["Pkg"]
 git-tree-sha1 = "d367ced062a113d955c0dff847eb36f2565f2894"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 version = "1.4.2"
-
-[[FileWatching]]
-uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[FiniteDiff]]
 deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
@@ -636,12 +615,6 @@ deps = ["Libdl", "SIMDPirates", "VectorizationBase"]
 git-tree-sha1 = "67ae90a18aa8c22bf159318300e765fbd89ddf6e"
 uuid = "476501e8-09a2-5ece-8869-fb82de89a1fa"
 version = "0.5.5"
-
-[[Sass]]
-deps = ["BinaryProvider", "Libdl", "Test"]
-git-tree-sha1 = "de11179555c6363c5a61c4c94376db3498983734"
-uuid = "322a6be2-4ae8-5d68-aaf1-3e960788d1d9"
-version = "0.1.0"
 
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"

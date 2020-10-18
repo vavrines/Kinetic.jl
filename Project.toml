@@ -6,8 +6,6 @@ version = "0.5.0"
 [deps]
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
@@ -23,8 +21,6 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Conda = "^1"
-Documenter = "0.25"
-DocumenterTools = "0.1"
 FFTW = "^1"
 FastGaussQuadrature = "0.2, 0.3, 0.4"
 FileIO = "^1"
