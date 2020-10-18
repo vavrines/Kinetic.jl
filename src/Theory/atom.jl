@@ -98,8 +98,12 @@ Maxwellian in discrete form
 maxwellian(u::T, ρ, U, λ) where {T<:AbstractArray{<:AbstractFloat,1}} =
     @. ρ * sqrt(λ / π) * exp(-λ * (u - U)^2) # 1V
 
-maxwellian(u::X, prim::Y) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}}=
-    maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
+maxwellian(
+    u::X, 
+    prim::Y
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:Real,1}} = maxwellian(u, prim[1], prim[2], prim[end]) # in case of input with length 4/5
 
 #--- 2V ---#
 maxwellian(
