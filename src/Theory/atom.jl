@@ -645,9 +645,9 @@ function boltzmann_fft(
     ψ::Y,
     phipsi::Z,
 ) where {
-    X<:AbstractArray{<:Abstract,3},
-    Y<:AbstractArray{<:Abstract,4},
-    Z<:AbstractArray{<:Abstract,3},
+    X<:AbstractArray{<:AbstractFloat,3},
+    Y<:AbstractArray{<:AbstractFloat,4},
+    Z<:AbstractArray{<:AbstractFloat,3},
     I<:Int,
 }
 
@@ -693,9 +693,9 @@ function boltzmann_fft!(
     ψ::Y,
     phipsi::Z,
 ) where {
-    X<:AbstractArray{<:Abstract,3},
-    Y<:AbstractArray{<:Abstract,4},
-    Z<:AbstractArray{<:Abstract,3},
+    X<:AbstractArray{<:AbstractFloat,3},
+    Y<:AbstractArray{<:AbstractFloat,4},
+    Z<:AbstractArray{<:AbstractFloat,3},
     I<:Int,
 }
 
