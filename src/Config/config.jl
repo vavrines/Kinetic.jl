@@ -7,12 +7,12 @@ export ib_rh, ib_sod, ib_briowu, ib_cavity
 """
 Initialize Rankine-Hugoniot relation
 
-- 1d1f1v: `ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1})`
-- 1d2f1v: `ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)`
-- 1d1f3v: `ib_rh(MaL::Real, gam::Real, u::AbstractArray{Float64,3}, v::AbstractArray{Float64,3}, w::AbstractArray{Float64,3})`
+- 1d1f1v: `ib_rh(MaL, gam, u::T) where {T<:AbstractArray{<:AbstractFloat,1}}`
+- 1d2f1v: `ib_rh(MaL, gam, u::T, K) where {T<:AbstractArray{<:AbstractFloat,1}}`
+- 1d1f3v: `ib_rh(MaL, gam, u::T, v::T, w::T) where {T<:AbstractArray{<:AbstractFloat,3}}`
 
 """
-function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}) # 1D1F1V
+function ib_rh(MaL, gam, u::T) where {T<:AbstractArray{<:AbstractFloat,1}} # 1D1F1V
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
@@ -44,7 +44,7 @@ end
 # ------------------------------------------------------------
 # 1D2F1V
 # ------------------------------------------------------------
-function ib_rh(MaL::Real, gam::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)
+function ib_rh(MaL, gam, u::T, K) where {T<:AbstractArray{<:AbstractFloat,1}}
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
@@ -80,12 +80,12 @@ end
 # 1D1F3V 
 # ------------------------------------------------------------
 function ib_rh(
-    MaL::Real,
-    gam::Real,
-    u::AbstractArray{Float64,3},
-    v::AbstractArray{Float64,3},
-    w::AbstractArray{Float64,3},
-)
+    MaL,
+    gam,
+    u::T,
+    v::T,
+    w::T,
+) where {T<:AbstractArray{<:AbstractFloat,3}}
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 0.0, 0.0, 1.0]
@@ -120,12 +120,12 @@ end
 """
 Initialize Sod shock tube
 
-- 1d1f1v: `ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,1})`
-- 1d1f3v: `ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,3}, v::AbstractArray{<:AbstractFloat,3}, w::AbstractArray{<:AbstractFloat,3})`
-- 1d2f1v: `ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)`
+- 1d1f1v: `ib_sod(γ, u::T) where {T<:AbstractArray{<:AbstractFloat,1}}`
+- 1d1f3v: `ib_sod(γ, u::T, v::T, w::T) where {T<:AbstractArray{<:AbstractFloat,3}}`
+- 1d2f1v: `ib_sod(γ, u::T, K) where {T<:AbstractArray{<:AbstractFloat,1}}`
 
 """
-function ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,1}) # 1D1F1V
+function ib_sod(γ, u::T) where {T<:AbstractArray{<:AbstractFloat,1}} # 1D1F1V
 
     primL = [1.0, 0.0, 1.0]
     primR = [0.125, 0.0, 0.625]
@@ -147,11 +147,11 @@ end
 # 1D1F3V
 # ------------------------------------------------------------
 function ib_sod(
-    γ::Real,
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-)
+    γ,
+    u::T,
+    v::T,
+    w::T,
+) where {T<:AbstractArray{<:AbstractFloat,3}}
 
     primL = [1.0, 0.0, 0.0, 0.0, 1.0]
     primR = [0.125, 0.0, 0.0, 0.0, 0.625]
@@ -172,7 +172,7 @@ end
 # ------------------------------------------------------------
 # 1D2F1V
 # ------------------------------------------------------------
-function ib_sod(γ::Real, u::AbstractArray{<:AbstractFloat,1}, K::Real)
+function ib_sod(γ, u::T, K) where {T<:AbstractArray{<:AbstractFloat,1}}
 
     primL = [1.0, 0.0, 1.0]
     primR = [0.125, 0.0, 0.625]
@@ -197,18 +197,31 @@ end
 """
 Initialize lid-driven cavity
 
-- 2d1f2v: `ib_cavity(gam::Real, Um::Real, Vm::Real, Tm::Real, u::AbstractArray{<:AbstractFloat,2}, v::AbstractArray{<:AbstractFloat,2})`
-- 2d2f2v: `ib_cavity(gam::Real, Um::Real, Vm::Real, Tm::Real, u::AbstractArray{<:AbstractFloat,2}, v::AbstractArray{<:AbstractFloat,2}, K::Real)`
+- 2d1f2v: `ib_cavity(
+    gam,
+    Um,
+    Vm,
+    Tm,
+    u::T,
+    v::T) where {T<:AbstractArray{<:AbstractFloat,2}}`
+- 2d2f2v: `ib_cavity(
+    gam,
+    Um,
+    Vm,
+    Tm,
+    u::T,
+    v::T,
+    K) where {T<:AbstractArray{<:AbstractFloat,2}}`
 
 """
 function ib_cavity(
-    gam::Real,
-    Um::Real,
-    Vm::Real,
-    Tm::Real,
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-) # 2D1F2V
+    gam,
+    Um,
+    Vm,
+    Tm,
+    u::T,
+    v::T,
+) where {T<:AbstractArray{<:AbstractFloat,2}} # 2D1F2V
 
     primL = [1.0, 0.0, 0.0, 1.0]
     primR = deepcopy(primL)
@@ -232,14 +245,14 @@ end
 # 2D2F2V
 # ------------------------------------------------------------
 function ib_cavity(
-    gam::Real,
-    Um::Real,
-    Vm::Real,
-    Tm::Real,
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    K::Real,
-)
+    gam,
+    Um,
+    Vm,
+    Tm,
+    u::T,
+    v::T,
+    K,
+) where {T<:AbstractArray{<:AbstractFloat,2}}
 
     primL = [1.0, 0.0, 0.0, 1.0]
     primR = deepcopy(primL)
@@ -266,10 +279,10 @@ end
 """
 Initialize Brio-Wu MHD shock
 
-`ib_briowu(gam::Real, uspace::AbstractArray{<:AbstractFloat,2}, mi::Real, me::Real)`
+    ib_briowu(gam, uspace::T, mi, me) where {T<:AbstractArray{<:AbstractFloat,2}}
 
 """
-function ib_briowu(gam::Real, uspace::AbstractArray{<:AbstractFloat,2}, mi::Real, me::Real)
+function ib_briowu(gam, uspace::T, mi, me) where {T<:AbstractArray{<:AbstractFloat,2}}
 
     # upstream
     primL = zeros(5, 2)
