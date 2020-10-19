@@ -3,17 +3,19 @@
 # ============================================================
 
 """
-Structure of velocity space
+1D velocity space
+
+- @consts: u0, u1, nu, u, du, weights
 
 """
-struct VSpace1D <: AbstractVelocitySpace
+struct VSpace1D{T<:AbstractArray{Float64,1}} <: AbstractVelocitySpace
 
     u0::Float64
     u1::Float64
     nu::Int64
-    u::AbstractArray{Float64,1}
-    du::AbstractArray{Float64,1}
-    weights::AbstractArray{Float64,1}
+    u::T
+    du::T
+    weights::T
 
     VSpace1D() = VSpace1D(-5, 5, 50)
     VSpace1D(U0::Real, U1::Real) = VSpace1D(U0, U1, 50)
@@ -34,32 +36,38 @@ struct VSpace1D <: AbstractVelocitySpace
         du = similar(u)
         weights = similar(u)
 
-        if TYPE == "rectangle" #// rectangular formula
+        if TYPE == "rectangle" # rectangular
             for i in eachindex(u)
                 u[i] = u0 + (i - 0.5) * δ
                 du[i] = δ
                 weights[i] = δ
             end
-        elseif TYPE == "newton" #// newton-cotes formula
+        elseif TYPE == "newton" # newton-cotes
             for i in eachindex(u)
                 u[i] = u0 + (i - 0.5) * δ
                 du[i] = δ
                 weights[i] = newton_cotes(i + NG, UNUM + NG * 2) * δ
             end
-        elseif TYPE == "gauss" #// gaussian integration
-            println("Gaussian integration coming soon")
+        elseif TYPE == "gauss" # gaussian
+            throw("Gaussian integration coming soon")
         else
-            println("error: no velocity quadrature rule")
+            throw("no velocity quadrature rule found")
         end
 
-        # inner constructor method
-        new(u0, u1, nu, u, du, weights)
+        new{typeof(u)}(u0, u1, nu, u, du, weights)
 
     end # constructor
 
 end # struct
 
-struct VSpace2D <: AbstractVelocitySpace
+
+"""
+2D velocity space
+
+- @consts: u0, u1, nu, v0, v1, nv, u, v, du, dv, weights
+
+"""
+struct VSpace2D{T<:AbstractArray{Float64,2}} <: AbstractVelocitySpace
 
     u0::Float64
     u1::Float64
@@ -67,11 +75,11 @@ struct VSpace2D <: AbstractVelocitySpace
     v0::Float64
     v1::Float64
     nv::Int64
-    u::AbstractArray{Float64,2}
-    v::AbstractArray{Float64,2}
-    du::AbstractArray{Float64,2}
-    dv::AbstractArray{Float64,2}
-    weights::AbstractArray{Float64,2}
+    u::T
+    v::T
+    du::T
+    dv::T
+    weights::T
 
     VSpace2D() = VSpace2D(-5, 5, 28, -5, 5, 28)
     VSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = VSpace2D(U0, U1, 28, V0, V1, 28)
@@ -132,14 +140,20 @@ struct VSpace2D <: AbstractVelocitySpace
             println("error: no velocity quadrature rule")
         end
 
-        # inner constructor method
-        new(u0, u1, nu, v0, v1, nv, u, v, du, dv, weights)
+        new{typeof(u)}(u0, u1, nu, v0, v1, nv, u, v, du, dv, weights)
 
     end # constructor
 
 end # struct
 
-struct VSpace3D <: AbstractVelocitySpace
+
+"""
+3D velocity space
+
+- @consts: u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, w, du, dv, dw, weights
+
+"""
+struct VSpace3D{T<:AbstractArray{Float64,3}} <: AbstractVelocitySpace
 
     u0::Float64
     u1::Float64
@@ -150,13 +164,13 @@ struct VSpace3D <: AbstractVelocitySpace
     w0::Float64
     w1::Float64
     nw::Int64
-    u::AbstractArray{Float64,3}
-    v::AbstractArray{Float64,3}
-    w::AbstractArray{Float64,3}
-    du::AbstractArray{Float64,3}
-    dv::AbstractArray{Float64,3}
-    dw::AbstractArray{Float64,3}
-    weights::AbstractArray{Float64,3}
+    u::T
+    v::T
+    w::T
+    du::T
+    dv::T
+    dw::T
+    weights::T
 
     VSpace3D() = VSpace3D(-5, 5, 28, -5, 5, 28, -5, 5, 28)
     VSpace3D(U0::Real, U1::Real, V0::Real, V1::Real, W0::Real, W1::Real) =
@@ -230,24 +244,27 @@ struct VSpace3D <: AbstractVelocitySpace
             println("error: no velocity quadrature rule")
         end
 
-        # inner constructor method
-        new(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, w, du, dv, dw, weights)
+        new{typeof(u)}(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, w, du, dv, dw, weights)
 
     end # constructor
 
 end # struct
 
-# ------------------------------------------------------------
-# Structure of multi-component velocity space
-# ------------------------------------------------------------
-struct MVSpace1D <: AbstractVelocitySpace
+
+"""
+1D multi-component velocity space
+
+- @consts: u0, u1, nu, u, du, weights
+
+"""
+struct MVSpace1D{T<:AbstractArray{Float64,2}} <: AbstractVelocitySpace
 
     u0::Array{Float64,1}
     u1::Array{Float64,1}
     nu::Int64
-    u::AbstractArray{Float64,2}
-    du::AbstractArray{Float64,2}
-    weights::AbstractArray{Float64,2}
+    u::T
+    du::T
+    weights::T
 
     MVSpace1D() = MVSpace1D(-5, 5, -10, 10, 28)
     MVSpace1D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace1D(U0, U1, V0, V1, 28)
@@ -288,15 +305,20 @@ struct MVSpace1D <: AbstractVelocitySpace
             println("error: no velocity quadrature rule")
         end
 
-        # inner constructor method
-        new(u0, u1, nu, u, du, weights)
+        new{typeof(u)}(u0, u1, nu, u, du, weights)
 
     end # constructor
 
 end # struct
 
 
-struct MVSpace2D <: AbstractVelocitySpace
+"""
+2D multi-component velocity space
+
+- @consts: u0, u1, nu, v0, v1, nv, u, v, du, dv, weights
+
+"""
+struct MVSpace2D{T<:AbstractArray{Float64,3}} <: AbstractVelocitySpace
 
     u0::Array{Float64,1}
     u1::Array{Float64,1}
@@ -304,11 +326,11 @@ struct MVSpace2D <: AbstractVelocitySpace
     v0::Array{Float64,1}
     v1::Array{Float64,1}
     nv::Int64
-    u::AbstractArray{Float64,3}
-    v::AbstractArray{Float64,3}
-    du::AbstractArray{Float64,3}
-    dv::AbstractArray{Float64,3}
-    weights::AbstractArray{Float64,3}
+    u::T
+    v::T
+    du::T
+    dv::T
+    weights::T
 
     MVSpace2D() = MVSpace2D(-5, 5, -10, 10, 28, -5, 5, -10, 10, 28)
     MVSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace2D(U0, U1, U0, U1, 28, V0, V1, V0, V1, 28)
@@ -369,14 +391,20 @@ struct MVSpace2D <: AbstractVelocitySpace
             println("error: no velocity quadrature rule")
         end
 
-        # inner constructor method
-        new(u0, u1, nu, v0, v1, nv, u, v, du, dv, weights)
+        new{typeof(u)}(u0, u1, nu, v0, v1, nv, u, v, du, dv, weights)
 
     end # constructor
 
 end # struct
 
-struct MVSpace3D <: AbstractVelocitySpace
+
+"""
+3D multi-component velocity space
+
+- @consts: u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, w, du, dv, dw, weights
+
+"""
+struct MVSpace3D{T<:AbstractArray{Float64,4}} <: AbstractVelocitySpace
 
     u0::Array{Float64,1}
     u1::Array{Float64,1}
@@ -387,13 +415,13 @@ struct MVSpace3D <: AbstractVelocitySpace
     w0::Array{Float64,1}
     w1::Array{Float64,1}
     nw::Int64
-    u::AbstractArray{Float64,4}
-    v::AbstractArray{Float64,4}
-    w::AbstractArray{Float64,4}
-    du::AbstractArray{Float64,4}
-    dv::AbstractArray{Float64,4}
-    dw::AbstractArray{Float64,4}
-    weights::AbstractArray{Float64,4}
+    u::T
+    v::T
+    w::T
+    du::T
+    dv::T
+    dw::T
+    weights::T
 
     MVSpace3D() = 
         MVSpace3D(-5, 5, -10, 10, 20, -5, 5, -10, 10, 20, -5, 5, -10, 10, 20)
@@ -474,7 +502,7 @@ struct MVSpace3D <: AbstractVelocitySpace
         end
 
         # inner constructor method
-        new(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, v, du, dv, dw, weights)
+        new{typeof(u)}(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, v, du, dv, dw, weights)
 
     end # constructor
 
@@ -484,8 +512,10 @@ end # struct
 """
 Newton-Cotes rule
 
+    newton_cotes(idx::T, num::T) where {T<:Int}
+
 """
-function newton_cotes(idx::Int, num::Int)
+function newton_cotes(idx::T, num::T) where {T<:Int}
 
     if idx == 1 || idx == num
         nc_coeff = 14.0 / 45.0

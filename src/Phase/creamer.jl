@@ -6,10 +6,10 @@
 """
 Spherical linear interpolation
 
-`slerp(pt1::AbstractArray{<:Real,1}, pt2::AbstractArray{<:Real,1}, n::Int)`
+    slerp(pt1::T, pt2::T, n::I) where {T<:AbstractArray{<:Real,1},I<:Int}
 
 """
-function slerp(pt1::AbstractArray{<:Real,1}, pt2::AbstractArray{<:Real,1}, n::Int)
+function slerp(pt1::T, pt2::T, n::I) where {T<:AbstractArray{<:Real,1},I<:Int}
     if norm(pt1 - pt2) < 1e-10 # same points
         return repeat(pt1, 1, n) # return n copies of that point
     end
@@ -25,14 +25,14 @@ end
 """
 Cleaner for all duplicate (non unique) entries of quadrature points and triangles
 
-`unique(Points::Array{Float64,2}, Triangles::Array{Int64,2})`
+    unique(Points::X, Triangles::Y) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Int,2}}
 
 * @arg Points : quadrature points
 * @arg Triangles : triangulation
 * @return xyz & triangulation : new quadrature points and triangulation
 
 """
-function unique(Points::Array{Float64,2}, Triangles::Array{Int64,2})
+function unique(Points::X, Triangles::Y) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Int,2}}
 
     nPoints = size(Points)[2]
     nTriangles = size(Triangles)[2]
@@ -121,11 +121,11 @@ end
 
 
 function area(
-    A::AbstractArray{<:Real,1},
-    B::AbstractArray{<:Real,1},
-    C::AbstractArray{<:Real,1},
+    A::T,
+    B::T,
+    C::T,
     geometry = :plane::Symbol,
-)
+) where {T<:AbstractArray{<:Real,1}}
 
     if geometry == :plane
         alpha = angle(B, A, C)
@@ -148,12 +148,16 @@ function area(
 end
 
 
+"""
+Args order (B,A,C) isn't a mistake
+
+"""
 function angle(
-    B::AbstractArray{<:Real,1},
-    A::AbstractArray{<:Real,1},
-    C::AbstractArray{<:Real,1},
+    B::T,
+    A::T,
+    C::T,
     geometry = :plane::Symbol,
-)
+) where {T<:AbstractArray{<:Real,1}}
 
     if geometry == :plane
         u, v = A - B, C - A
@@ -180,10 +184,10 @@ end
 
 
 function distance(
-    v1::AbstractArray{<:Real,1},
-    v2::AbstractArray{<:Real,1},
+    v1::T,
+    v2::T,
     geometry = :plane::Symbol,
-)
+) where {T<:AbstractArray{<:Real,1}}
 
     if geometry == :plane
         return norm(v1 - v2)
@@ -201,7 +205,7 @@ function distance(
 end
 
 
-function muphi_xyz!(muphi::AbstractArray{<:Real,2}, xyz::AbstractArray{<:Real,2})
+function muphi_xyz!(muphi::T, xyz::T) where {T<:AbstractArray{<:Real,2}}
     n = size(xyz, 1)
     for i = 1:n
         xyz[i, 1] = sqrt(1 - muphi[i, 1]^2) * cos(muphi[i, 2])
@@ -211,7 +215,7 @@ function muphi_xyz!(muphi::AbstractArray{<:Real,2}, xyz::AbstractArray{<:Real,2}
 end
 
 
-function xyz_muphi!(xyz::AbstractArray{<:Real,2}, muphi::AbstractArray{<:Real,2})
+function xyz_muphi!(xyz::T, muphi::T) where {T<:AbstractArray{<:Real,2}}
     n = size(xyz, 1)
     for i = 1:n
         muphi[i, 1] = xyz[i, 3]

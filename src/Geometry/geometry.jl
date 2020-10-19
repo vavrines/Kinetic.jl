@@ -14,7 +14,7 @@ Transform local flow variables to global frame
 - 3D: `global_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})`
 
 """
-function global_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
+function global_frame(w::T, cosa, sina) where {T<:AbstractArray{<:Real,1}}
     
     if eltype(w) <: Int
         G = similar(w, Float64)
@@ -39,9 +39,9 @@ function global_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
 end
 
 function global_frame(
-    w::AbstractArray{<:Real,1},
-    dirccos::AbstractArray{<:Real,2},
-)
+    w::T,
+    dirccos::X,
+) where {T<:AbstractArray{<:Real,1},X<:AbstractArray{<:Real,2}}
 
     if eltype(w) <: Int
         G = similar(w, Float64)
@@ -75,7 +75,7 @@ Transform global flow variables to local frame
 - 3D: `local_frame(w::AbstractArray{<:Real,1}, dirccos::AbstractArray{<:Real,2})`
 
 """
-function local_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
+function local_frame(w::T, cosa, sina) where {T<:AbstractArray{<:Real,1}}
 
     if eltype(w) <: Int
         L = similar(w, Float64)
@@ -100,9 +100,9 @@ function local_frame(w::AbstractArray{<:Real,1}, cosa::Real, sina::Real)
 end
 
 function local_frame(
-    w::AbstractArray{<:Real,1},
-    dirccos::AbstractArray{<:Real,2},
-)
+    w::T,
+    dirccos::X,
+) where {T<:AbstractArray{<:Real,1},X<:AbstractArray{<:Real,2}}
 
     if eltype(w) <: Int
         L = similar(w, Float64)
@@ -138,14 +138,24 @@ end
     @consts: x0, x1, nx, x, dx
 
 """
-struct PSpace1D <: AbstractPhysicalSpace
+struct PSpace1D{T<:AbstractArray{Float64,1}} <: AbstractPhysicalSpace
 
     x0::Float64
     x1::Float64
     nx::Int64
-    x::AbstractArray{Float64,1}
-    dx::AbstractArray{Float64,1}
+    x::T
+    dx::T
 
+    function PSpace1D(
+        X0::Float64,
+        X1::Float64,
+        XNUM::Int64,
+        X::AbstractArray{Float64,1},
+        DX::AbstractArray{Float64,1},
+    )
+        new{typeof(X)}(X0, X1, XNUM, X, DX)
+    end
+    
     PSpace1D() = PSpace1D(0, 1, 100)
     PSpace1D(X0::Real, X1::Real) = PSpace1D(X0, X1, 100)
 
@@ -153,7 +163,7 @@ struct PSpace1D <: AbstractPhysicalSpace
         X0::Real,
         X1::Real,
         XNUM::Int,
-        TYPE = "uniform"::String,
+        TYPE = "uniform"::AbstractString,
         NG = 0::Int,
     )
 
@@ -164,7 +174,7 @@ struct PSpace1D <: AbstractPhysicalSpace
         x = OffsetArray{Float64}(undef, 1-NG:nx+NG)
         dx = similar(x)
 
-        if TYPE == "uniform" # // uniform mesh
+        if TYPE == "uniform" # uniform mesh
             for i in eachindex(x)
                 x[i] = x0 + (i - 0.5) * δ
                 dx[i] = δ
@@ -172,7 +182,7 @@ struct PSpace1D <: AbstractPhysicalSpace
         end
 
         # inner constructor method
-        new(x0, x1, nx, x, dx)
+        new{typeof(x)}(x0, x1, nx, x, dx)
 
     end
 
@@ -185,7 +195,7 @@ end # struct
     @consts: x0, x1, nx, y0, y1, ny, x, y, dx, dy
 
 """
-struct PSpace2D <: AbstractPhysicalSpace
+struct PSpace2D{T<:AbstractArray{Float64,2}} <: AbstractPhysicalSpace
 
     x0::Float64
     x1::Float64
@@ -193,10 +203,25 @@ struct PSpace2D <: AbstractPhysicalSpace
     y0::Float64
     y1::Float64
     ny::Int64
-    x::AbstractArray{Float64,2}
-    y::AbstractArray{Float64,2}
-    dx::AbstractArray{Float64,2}
-    dy::AbstractArray{Float64,2}
+    x::T
+    y::T
+    dx::T
+    dy::T
+
+    function PSpace1D(
+        X0::Float64,
+        X1::Float64,
+        XNUM::Int64,
+        Y0::Float64,
+        Y1::Float64,
+        YNUM::Int64,
+        X::AbstractArray{Float64,2},
+        Y::AbstractArray{Float64,2},
+        DX::AbstractArray{Float64,2},
+        DY::AbstractArray{Float64,2},
+    )
+        new{typeof(X)}(X0, X1, XNUM, Y0, Y1, YNUM, X, Y, DX, DY)
+    end
 
     PSpace2D() = PSpace2D(0, 1, 45, 0, 1, 45)
     PSpace2D(X0::Real, X1::Real, Y0::Real, Y1::Real) =
@@ -239,7 +264,7 @@ struct PSpace2D <: AbstractPhysicalSpace
         end
 
         # inner constructor method
-        new(x0, x1, nx, y0, y1, ny, x, y, dx, dy)
+        new{typeof(x)}(x0, x1, nx, y0, y1, ny, x, y, dx, dy)
 
     end
 
@@ -252,7 +277,7 @@ Generate uniform mesh
 `uniform_mesh(x0::Real, xnum::Int, dx::Real)`
 
 """
-function uniform_mesh(x0::Real, xnum::Int, dx::Real)
+function uniform_mesh(x0, xnum::T, dx) where {T<:Int}
 
     points = zeros(xnum)
     for i = 1:xnum
@@ -271,26 +296,26 @@ Equivalent structured mesh generator as matlab
 * 3D: `meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1}, z::AbstractArray{<:Real,1})`
 
 """
-function meshgrid(x::AbstractArray{<:Real,1}, y::AbstractArray{<:Real,1})
+function meshgrid(x::T, y::T) where {T<:AbstractArray{<:Real,1}}
     X = [i for j in y, i in x]
     Y = [j for j in y, i in x]
 
     return X, Y
 end
 
-
 function meshgrid(
-    x::AbstractArray{<:Real,1},
-    y::AbstractArray{<:Real,1},
-    z::AbstractArray{<:Real,1},
-)
+    x::T,
+    y::T,
+    z::T,
+) where {T<:AbstractArray{<:Real,1}}
+
     X = [i for k in z, j in y, i in x]
     Y = [j for k in z, j in y, i in x]
     Z = [k for k in z, j in y, i in x]
 
     return X, Y, Z
-end
 
+end
 
 # ------------------------------------------------------------
 # Unstructured Mesh
@@ -307,7 +332,7 @@ struct UnstructMesh{A,B} <: AbstractPhysicalSpace
     nodes::A # locations of vertex points
     cells::B # node indices of elements
 
-    function UnstructMesh(nodes, cells)
+    function UnstructMesh(nodes::AbstractArray, cells::AbstractArray)
         new{typeof(nodes),typeof(cells)}(nodes, cells)
     end
 
@@ -323,7 +348,7 @@ Read mesh file
 * @return cells : node ids inside cells
 
 """
-function read_mesh(file)
+function read_mesh(file::T) where {T<:AbstractString}
     meshio = pyimport("meshio")
     m0 = meshio.read(file)
     nodes = m0.points
@@ -339,7 +364,7 @@ Compute connectivity of 2D unstructured mesh
 `mesh_connectivity_2D(cells::AbstractArray{<:Int,2})`
 
 """
-function mesh_connectivity_2D(cells::AbstractArray{<:Int,2})
+function mesh_connectivity_2D(cells::T) where {T<:AbstractArray{<:Int,2}}
 
     nNodesPerCell = size(cells, 2)
     nCells = size(cells, 1)
@@ -397,9 +422,9 @@ Compute areas of 2D elements
 
 """
 function mesh_area_2D(
-    nodes::AbstractArray{<:AbstractFloat,2},
-    cells::AbstractArray{<:Int,2},
-)
+    nodes::X,
+    cells::Y,
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Int,2}}
 
     ΔS = zeros(size(cells, 1))
 
@@ -462,9 +487,9 @@ Compute central points of 2D elements
 
 """
 function mesh_center_2D(
-    nodes::AbstractArray{<:AbstractFloat,2},
-    cells::AbstractArray{<:Int,2},
-)
+    nodes::X,
+    cells::Y,
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Int,2}}
 
     cellMidPoints = zeros(size(cells, 1), 2)
     for i in axes(cellMidPoints, 1) # nCells
