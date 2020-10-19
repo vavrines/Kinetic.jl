@@ -218,10 +218,10 @@ end
 # ------------------------------------------------------------
 #--- 1F1V ---#
 function moments_conserve(
-    f::T,
+    f::X,
     u::T,
     ω::T,
-) where {T<:AbstractArray{<:AbstractFloat,1}}
+) where {X<:AbstractArray{<:AbstractFloat,1},T<:AbstractArray{<:AbstractFloat,1}}
     w = similar(f, 3)
     w[1] = discrete_moments(f, u, ω, 0)
     w[2] = discrete_moments(f, u, ω, 1)
@@ -232,11 +232,11 @@ end
 
 #--- 2F1V ---#
 function moments_conserve(
-    h::T,
-    b::T,
+    h::X,
+    b::X,
     u::T,
     ω::T,
-) where {T<:AbstractArray{<:AbstractFloat,1}}
+) where {X<:AbstractArray{<:AbstractFloat,1},T<:AbstractArray{<:AbstractFloat,1}}
     w = similar(h, 3)
     w[1] = discrete_moments(h, u, ω, 0)
     w[2] = discrete_moments(h, u, ω, 1)
@@ -247,11 +247,11 @@ end
 
 #--- 1F2V ---#
 function moments_conserve(
-    f::T,
+    f::X,
     u::T,
     v::T,
     ω::T,
-) where {T<:AbstractArray{<:AbstractFloat,2}}
+) where {X<:AbstractArray{<:AbstractFloat,2},T<:AbstractArray{<:AbstractFloat,2}}
     w = similar(f, 4)
     w[1] = discrete_moments(f, u, ω, 0)
     w[2] = discrete_moments(f, u, ω, 1)
@@ -263,12 +263,12 @@ end
 
 #--- 2F2V ---#
 function moments_conserve(
-    h::T,
-    b::T,
+    h::X,
+    b::X,
     u::T,
     v::T,
     ω::T,
-) where {T<:AbstractArray{<:AbstractFloat,2}}
+) where {X<:AbstractArray{<:AbstractFloat,2},T<:AbstractArray{<:AbstractFloat,2}}
     w = similar(h, 4)
     w[1] = discrete_moments(h, u, ω, 0)
     w[2] = discrete_moments(h, u, ω, 1)
@@ -285,13 +285,13 @@ end
 
 #--- 3F2V ---#
 function moments_conserve(
-    h0::T,
-    h1::T,
-    h2::T,
+    h0::X,
+    h1::X,
+    h2::X,
     u::T,
     v::T,
     ω::T,
-) where {T<:AbstractArray{<:AbstractFloat,2}}
+) where {X<:AbstractArray{<:AbstractFloat,2},T<:AbstractArray{<:AbstractFloat,2}}
     w = similar(h0, 5)
     w[1] = discrete_moments(h0, u, ω, 0)
     w[2] = discrete_moments(h0, u, ω, 1)
@@ -309,12 +309,12 @@ end
 
 #--- 1F3V ---#
 function moments_conserve(
-    f::T,
+    f::X,
     u::T,
     v::T,
     w::T,
     ω::T,
-) where {T<:AbstractArray{<:AbstractFloat,3}}
+) where {X<:AbstractArray{<:AbstractFloat,3},T<:AbstractArray{<:AbstractFloat,3}}
     moments = similar(f, 5)
 
     moments[1] = discrete_moments(f, u, ω, 0)
@@ -333,13 +333,13 @@ end
 
 #--- 4F1V ---#
 function moments_conserve(
-    h0::T,
-    h1::T,
-    h2::T,
-    h3::T,
+    h0::X,
+    h1::X,
+    h2::X,
+    h3::X,
     u::T,
     ω::T,
-) where {T<:AbstractArray{<:AbstractFloat,1}}
+) where {X<:AbstractArray{<:AbstractFloat,1},T<:AbstractArray{<:AbstractFloat,1}}
     moments = similar(h0, 5)
 
     moments[1] = discrete_moments(h0, u, ω, 0)
@@ -431,32 +431,32 @@ Discrete moments of particle distribution
 * `discrete_moments(f, u, ω, n)`: velocity moments
 
 """
-discrete_moments(f::T, ω::T) where {T<:AbstractArray{<:AbstractFloat,1}} =
+discrete_moments(f::X, ω::T) where {X<:AbstractArray{<:AbstractFloat,1},T<:AbstractArray{<:AbstractFloat,1}} =
     sum(@. ω * f)
 
 #--- 1V ---#
 discrete_moments(
-    f::T,
+    f::X,
     u::T,
     ω::T,
     n,
-) where {T<:AbstractArray{<:AbstractFloat,1}} = sum(@. ω * u^n * f)
+) where {X<:AbstractArray{<:AbstractFloat,1},T<:AbstractArray{<:AbstractFloat,1}} = sum(@. ω * u^n * f)
 
 #--- 2V ---#
 discrete_moments(
-    f::T,
+    f::X,
     u::T,
     ω::T,
     n,
-) where {T<:AbstractArray{<:AbstractFloat,2}} = sum(@. ω * u^n * f)
+) where {X<:AbstractArray{<:AbstractFloat,2},T<:AbstractArray{<:AbstractFloat,2}} = sum(@. ω * u^n * f)
 
 #--- 3V ---#
 discrete_moments(
-    f::T,
+    f::X,
     u::T,
     ω::T,
     n,
-) where {T<:AbstractArray{<:AbstractFloat,3}} = sum(@. ω * u^n * f)
+) where {X<:AbstractArray{<:AbstractFloat,3},T<:AbstractArray{<:AbstractFloat,3}} = sum(@. ω * u^n * f)
 
 
 """
@@ -466,18 +466,26 @@ Calculate stress tensor from particle distribution function
 stress(
     f::X,
     prim::Y,
-    u::X,
-    ω::X,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}} =
+    u::Z,
+    ω::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+} =
     sum(@. ω * (u - prim[2]) * (u - prim[2]) * f)
 
 function stress(
     f::X,
     prim::Y,
-    u::X,
-    v::X,
-    ω::X,
-) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}}
+    u::Z,
+    v::Z,
+    ω::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,2},
+}
 
     P = similar(prim, 2, 2)
 
@@ -498,9 +506,13 @@ Calculate heat flux from particle distribution function
 heat_flux(
     h::X,
     prim::Y,
-    u::X,
-    ω::X,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}} =
+    u::Z,
+    ω::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+} =
     0.5 * sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h) # 1F1V
 
 #--- 2F1V ---#
@@ -508,9 +520,13 @@ heat_flux(
     h::X,
     b::X,
     prim::Y,
-    u::X,
-    ω::X,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}} =
+    u::Z,
+    ω::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+} =
     0.5 * (
         sum(@. ω * (u - prim[2]) * (u - prim[2])^2 * h) +
         sum(@. ω * (u - prim[2]) * b)
@@ -520,10 +536,14 @@ heat_flux(
 function heat_flux(
     h::X,
     prim::Y,
-    u::X,
-    v::X,
-    ω::X,
-) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}}
+    u::Z,
+    v::Z,
+    ω::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,2},
+}
 
     q = similar(h, 2)
     q[1] =
@@ -542,10 +562,14 @@ function heat_flux(
     h::X,
     b::X,
     prim::Y,
-    u::X,
-    v::X,
-    ω::X,
-) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,1}}
+    u::Z,
+    v::Z,
+    ω::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,2},
+}
 
     q = similar(h, 2)
 
@@ -572,11 +596,15 @@ end
 function heat_flux(
     f::X,
     prim::Y,
-    u::X,
-    v::X,
-    w::X,
-    ω::X,
-) where {X<:AbstractArray{<:AbstractFloat,3},Y<:AbstractArray{<:Real,1}}
+    u::Z,
+    v::Z,
+    w::Z,
+    ω::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,3},
+    Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:AbstractFloat,3},
+}
 
     q = similar(f, 3)
 

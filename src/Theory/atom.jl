@@ -231,11 +231,15 @@ Shakhov non-equilibrium part
 """
 function shakhov(
     u::X,
-    M::X,
+    M::Y,
     q,
-    prim::Y,
+    prim::Z,
     Pr,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:Real,1}} # 1F1V
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:Real,1},
+} # 1F1V
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        (u - prim[2]) *
@@ -250,13 +254,17 @@ end
 #--- 2F1V ---#
 function shakhov(
     u::T,
-    H::T,
-    B::T,
+    H::X,
+    B::X,
     q,
-    prim::X,
+    prim::Y,
     Pr,
     K,
-) where {T<:AbstractArray{<:AbstractFloat,1},X<:AbstractArray{<:Real,1}}
+) where {
+    T<:AbstractArray{<:AbstractFloat,1},
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:Real,1}
+}
 
     H_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
        (u - prim[2]) *
@@ -277,14 +285,15 @@ end
 function shakhov(
     u::T,
     v::T,
-    M::T,
-    q::X,
-    prim::Y,
+    M::X,
+    q::Y,
+    prim::Z,
     Pr,
 ) where {
     T<:AbstractArray{<:AbstractFloat,2},
-    X<:AbstractArray{<:AbstractFloat,1},
-    Y<:AbstractArray{<:Real,1},
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:Real,1},
 }
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
@@ -300,16 +309,17 @@ end
 function shakhov(
     u::T,
     v::T,
-    H::T,
-    B::T,
-    q::X,
-    prim::Y,
+    H::X,
+    B::X,
+    q::Y,
+    prim::Z,
     Pr,
     K,
 ) where {
     T<:AbstractArray{<:AbstractFloat,2},
-    X<:AbstractArray{<:Real,1},
+    X<:AbstractArray{<:AbstractFloat,2},
     Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:Real,1},
 }
 
     H_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
@@ -330,14 +340,15 @@ function shakhov(
     u::T,
     v::T,
     w::T,
-    M::T,
-    q::X,
-    prim::Y,
+    M::X,
+    q::Y,
+    prim::Z,
     Pr,
 ) where {
     T<:AbstractArray{<:AbstractFloat,3},
-    X<:AbstractArray{<:Real,1},
+    X<:AbstractArray{<:AbstractFloat,3},
     Y<:AbstractArray{<:Real,1},
+    Z<:AbstractArray{<:Real,1},
 }
 
     M_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *
@@ -421,13 +432,14 @@ end
 
 function reduce_distribution(
     f::X,
-    v::X,
-    w::X,
-    weights::Y,
+    v::Y,
+    w::Y,
+    weights::Z,
     dim = 1,
 ) where {
     X<:AbstractArray{<:AbstractFloat,3},
-    Y<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:AbstractFloat,3},
+    Z<:AbstractArray{<:AbstractFloat,2},
 }
 
     if dim == 1
@@ -472,15 +484,16 @@ Recover full distribution function from reduced ones
 function full_distribution(
     h::X,
     b::X,
-    u::X,
-    weights::X,
-    v::Y,
-    w::Y,
+    u::Y,
+    weights::Y,
+    v::Z,
+    w::Z,
     ρ,
     γ = 5 / 3,
 ) where {
     X<:AbstractArray{<:AbstractFloat,1},
-    Y<:AbstractArray{<:AbstractFloat,3},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:AbstractFloat,3},
 }
 
     @assert length(h) == size(v, 1) throw(DimensionMismatch("reduced and full distribution function mismatch"))
@@ -500,16 +513,17 @@ end
 full_distribution(
     h::X,
     b::X,
-    u::X,
-    weights::X,
-    v::Y,
-    w::Y,
-    prim::Z,
+    u::Y,
+    weights::Y,
+    v::Z,
+    w::Z,
+    prim::A,
     γ = 5 / 3,
 ) where {
     X<:AbstractArray{<:AbstractFloat,1},
-    Y<:AbstractArray{<:AbstractFloat,3},
-    Z<:AbstractArray{<:Real,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:AbstractFloat,3},
+    A<:AbstractArray{<:Real,1},
 } = full_distribution(h, b, u, weights, v, w, prim[1], γ)
 
 
@@ -625,12 +639,17 @@ Calculate collision operator with FFT-based fast spectral method
 """
 function boltzmann_fft(
     f::X,
-    Kn::R,
+    Kn,
     M::I,
     ϕ::Y,
     ψ::Y,
-    phipsi::X,
-) where {X<:AbstractArray{<:Real,3},Y<:AbstractArray{<:Real,4},R<:Real,I<:Int}
+    phipsi::Z,
+) where {
+    X<:AbstractArray{<:Abstract,3},
+    Y<:AbstractArray{<:Abstract,4},
+    Z<:AbstractArray{<:Abstract,3},
+    I<:Int,
+}
 
     f_spec = f .+ 0im
     bfft!(f_spec)
@@ -668,12 +687,17 @@ Calculate collision operator with FFT-based fast spectral method
 function boltzmann_fft!(
     Q::X,
     f::X,
-    Kn::R,
+    Kn,
     M::I,
     ϕ::Y,
     ψ::Y,
-    phipsi::X,
-) where {X<:AbstractArray{<:Real,3},Y<:AbstractArray{<:Real,4},R<:Real,I<:Int}
+    phipsi::Z,
+) where {
+    X<:AbstractArray{<:Abstract,3},
+    Y<:AbstractArray{<:Abstract,4},
+    Z<:AbstractArray{<:Abstract,3},
+    I<:Int,
+}
 
     f_spec = f .+ 0im
     bfft!(f_spec)
