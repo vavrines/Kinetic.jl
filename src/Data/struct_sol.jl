@@ -29,7 +29,11 @@ mutable struct Solution1D1F{A,B} <: AbstractSolution1D
     f::B
     sf::B
 
-    function Solution1D1F(w::AbstractArray, prim::AbstractArray, f::AbstractArray)
+    function Solution1D1F(
+        w::AbstractArray,
+        prim::AbstractArray,
+        f::AbstractArray,
+    )
         sw = [zeros(axes(w[1])) for i in axes(w, 1)]
         sf = [zeros(axes(f[1])) for i in axes(f, 1)]
 
@@ -97,7 +101,8 @@ mutable struct Solution2D{A,B} <: AbstractSolution2D
         w::AbstractArray,
         prim::AbstractArray,
         sw = [
-            zeros((axes(w[1])..., Base.OneTo(2))) for i in axes(w, 1), j in axes(w, 2)
+            zeros((axes(w[1])..., Base.OneTo(2)))
+            for i in axes(w, 1), j in axes(w, 2)
         ]::AbstractArray,
     )
 
@@ -115,9 +120,19 @@ mutable struct Solution2D1F{A,B,C,D} <: AbstractSolution2D
     f::C
     sf::D
 
-    function Solution2D1F(w::AbstractArray, prim::AbstractArray, f::AbstractArray)
-        sw = [zeros((axes(w[1])..., Base.OneTo(2))) for i in axes(w, 1), j in axes(w, 2)]
-        sf = [zeros((axes(f[1])..., Base.OneTo(2))) for i in axes(f, 1), j in axes(f, 2)]
+    function Solution2D1F(
+        w::AbstractArray,
+        prim::AbstractArray,
+        f::AbstractArray,
+    )
+        sw = [
+            zeros((axes(w[1])..., Base.OneTo(2)))
+            for i in axes(w, 1), j in axes(w, 2)
+        ]
+        sf = [
+            zeros((axes(f[1])..., Base.OneTo(2)))
+            for i in axes(f, 1), j in axes(f, 2)
+        ]
 
         new{typeof(w),typeof(sw),typeof(f),typeof(sf)}(w, prim, sw, f, sf)
     end
@@ -151,11 +166,28 @@ mutable struct Solution2D2F{A,B,C,D} <: AbstractSolution2D
         h::AbstractArray,
         b::AbstractArray,
     )
-        sw = [zeros((axes(w[1])..., Base.OneTo(2))) for i in axes(w, 1), j in axes(w, 2)]
-        sh = [zeros((axes(h[1])..., Base.OneTo(2))) for i in axes(h, 1), j in axes(h, 2)]
-        sb = [zeros((axes(b[1])..., Base.OneTo(2))) for i in axes(b, 1), j in axes(b, 2)]
+        sw = [
+            zeros((axes(w[1])..., Base.OneTo(2)))
+            for i in axes(w, 1), j in axes(w, 2)
+        ]
+        sh = [
+            zeros((axes(h[1])..., Base.OneTo(2)))
+            for i in axes(h, 1), j in axes(h, 2)
+        ]
+        sb = [
+            zeros((axes(b[1])..., Base.OneTo(2)))
+            for i in axes(b, 1), j in axes(b, 2)
+        ]
 
-        new{typeof(w),typeof(sw),typeof(h),typeof(sh)}(w, prim, sw, h, b, sh, sb)
+        new{typeof(w),typeof(sw),typeof(h),typeof(sh)}(
+            w,
+            prim,
+            sw,
+            h,
+            b,
+            sh,
+            sb,
+        )
     end
 
     function Solution2D2F(
@@ -167,7 +199,15 @@ mutable struct Solution2D2F{A,B,C,D} <: AbstractSolution2D
         sh::AbstractArray,
         sb::AbstractArray,
     )
-        new{typeof(w),typeof(sw),typeof(h),typeof(sh)}(w, prim, sw, h, b, sh, sb)
+        new{typeof(w),typeof(sw),typeof(h),typeof(sh)}(
+            w,
+            prim,
+            sw,
+            h,
+            b,
+            sh,
+            sb,
+        )
     end
 
 end

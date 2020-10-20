@@ -4,7 +4,7 @@
 
 export global_frame, local_frame
 export PSpace1D, PSpace2D, uniform_mesh, meshgrid
-export UnstructMesh 
+export UnstructMesh
 export read_mesh, mesh_connectivity_2D, mesh_center_2D, mesh_area_2D
 
 """
@@ -15,7 +15,7 @@ Transform local flow variables to global frame
 
 """
 function global_frame(w::T, cosa, sina) where {T<:AbstractArray{<:Real,1}}
-    
+
     if eltype(w) <: Int
         G = similar(w, Float64)
     else
@@ -50,14 +50,20 @@ function global_frame(
     end
 
     if length(w) == 3
-        G[1] = w[1] * dirccos[1, 1] + w[2] * dirccos[2, 1] + w[3] * dirccos[3, 1]
-        G[2] = w[1] * dirccos[1, 2] + w[2] * dirccos[2, 2] + w[3] * dirccos[3, 2]
-        G[3] = w[1] * dirccos[1, 3] + w[2] * dirccos[2, 3] + w[3] * dirccos[3, 3]
+        G[1] =
+            w[1] * dirccos[1, 1] + w[2] * dirccos[2, 1] + w[3] * dirccos[3, 1]
+        G[2] =
+            w[1] * dirccos[1, 2] + w[2] * dirccos[2, 2] + w[3] * dirccos[3, 2]
+        G[3] =
+            w[1] * dirccos[1, 3] + w[2] * dirccos[2, 3] + w[3] * dirccos[3, 3]
     elseif length(w) == 5
         G[1] = w[1]
-        G[2] = w[2] * dirccos[1, 1] + w[3] * dirccos[2, 1] + w[4] * dirccos[3, 1]
-        G[3] = w[2] * dirccos[1, 2] + w[3] * dirccos[2, 2] + w[4] * dirccos[3, 2]
-        G[4] = w[2] * dirccos[1, 3] + w[3] * dirccos[2, 3] + w[4] * dirccos[3, 3]
+        G[2] =
+            w[2] * dirccos[1, 1] + w[3] * dirccos[2, 1] + w[4] * dirccos[3, 1]
+        G[3] =
+            w[2] * dirccos[1, 2] + w[3] * dirccos[2, 2] + w[4] * dirccos[3, 2]
+        G[4] =
+            w[2] * dirccos[1, 3] + w[3] * dirccos[2, 3] + w[4] * dirccos[3, 3]
         G[5] = w[5]
     else
         throw("local -> global: dimension dismatch")
@@ -111,14 +117,20 @@ function local_frame(
     end
 
     if length(w) == 3
-        L[1] = w[1] * dirccos[1, 1] + w[2] * dirccos[1, 2] + w[3] * dirccos[1, 3]
-        L[2] = w[1] * dirccos[2, 1] + w[2] * dirccos[2, 2] + w[3] * dirccos[2, 3]
-        L[3] = w[1] * dirccos[3, 1] + w[2] * dirccos[3, 2] + w[3] * dirccos[3, 3]
+        L[1] =
+            w[1] * dirccos[1, 1] + w[2] * dirccos[1, 2] + w[3] * dirccos[1, 3]
+        L[2] =
+            w[1] * dirccos[2, 1] + w[2] * dirccos[2, 2] + w[3] * dirccos[2, 3]
+        L[3] =
+            w[1] * dirccos[3, 1] + w[2] * dirccos[3, 2] + w[3] * dirccos[3, 3]
     elseif length(w) == 5
         L[1] = w[1]
-        L[2] = w[2] * dirccos[1, 1] + w[3] * dirccos[1, 2] + w[4] * dirccos[1, 3]
-        L[3] = w[2] * dirccos[2, 1] + w[3] * dirccos[2, 2] + w[4] * dirccos[2, 3]
-        L[4] = w[2] * dirccos[3, 1] + w[3] * dirccos[3, 2] + w[4] * dirccos[3, 3]
+        L[2] =
+            w[2] * dirccos[1, 1] + w[3] * dirccos[1, 2] + w[4] * dirccos[1, 3]
+        L[3] =
+            w[2] * dirccos[2, 1] + w[3] * dirccos[2, 2] + w[4] * dirccos[2, 3]
+        L[4] =
+            w[2] * dirccos[3, 1] + w[3] * dirccos[3, 2] + w[4] * dirccos[3, 3]
         L[5] = w[5]
     else
         throw("global -> local: dimension dismatch")
@@ -155,7 +167,7 @@ struct PSpace1D{T<:AbstractArray{Float64,1}} <: AbstractPhysicalSpace
     )
         new{typeof(X)}(X0, X1, XNUM, X, DX)
     end
-    
+
     PSpace1D() = PSpace1D(0, 1, 100)
     PSpace1D(X0::Real, X1::Real) = PSpace1D(X0, X1, 100)
 
@@ -303,11 +315,7 @@ function meshgrid(x::T, y::T) where {T<:AbstractArray{<:Real,1}}
     return X, Y
 end
 
-function meshgrid(
-    x::T,
-    y::T,
-    z::T,
-) where {T<:AbstractArray{<:Real,1}}
+function meshgrid(x::T, y::T, z::T) where {T<:AbstractArray{<:Real,1}}
 
     X = [i for k in z, j in y, i in x]
     Y = [j for k in z, j in y, i in x]
@@ -377,7 +385,8 @@ function mesh_connectivity_2D(cells::T) where {T<:AbstractArray{<:Int,2}}
     for i = 1:nCells, k = 1:nNodesPerCell
         isNewEdge = true
         for j = 1:counter
-            if tmpEdgeNodes[j, :] == [cells[i, k], cells[i, k%nNodesPerCell+1]] ||
+            if tmpEdgeNodes[j, :] ==
+               [cells[i, k], cells[i, k%nNodesPerCell+1]] ||
                tmpEdgeNodes[j, :] == [cells[i, k%nNodesPerCell+1], cells[i, k]]
                 isNewEdge = false
                 tmpEdgeCells[j, 2] = i
@@ -399,7 +408,8 @@ function mesh_connectivity_2D(cells::T) where {T<:AbstractArray{<:Int,2}}
     for i = 1:nCells, k = 1:nNodesPerCell, j = 1:nEdges
         if edgeNodes[j, 1] == cells[i, k] &&
            edgeNodes[j, 2] == cells[i, k%nNodesPerCell+1] ||
-           edgeNodes[j, 1] == cells[i, k%nNodesPerCell+1] && edgeNodes[j, 2] == cells[i, k]
+           edgeNodes[j, 1] == cells[i, k%nNodesPerCell+1] &&
+           edgeNodes[j, 2] == cells[i, k]
             if edgeCells[j, 1] != i && edgeCells[j, 2] == i
                 cellNeighbors[i, k] = edgeCells[j, 1]
             elseif edgeCells[j, 1] == i && edgeCells[j, 2] != i
@@ -436,7 +446,8 @@ function mesh_area_2D(
                     (nodes[cells[i, 2], 2] - nodes[cells[i, 3], 2]) +
                     nodes[cells[i, 2], 1] *
                     (nodes[cells[i, 3], 2] - nodes[cells[i, 1], 2]) +
-                    nodes[cells[i, 3], 1] * (nodes[cells[i, 1], 2] - nodes[cells[i, 2], 2])
+                    nodes[cells[i, 3], 1] *
+                    (nodes[cells[i, 1], 2] - nodes[cells[i, 2], 2])
                 ) / 2,
             )
         end
@@ -470,7 +481,12 @@ function mesh_area_2D(
 
             ΔS[i] = sqrt(
                 (T - a) * (T - b) * (T - c) * (T - d) -
-                a * b * c * d * cos(0.5 * (alpha + beta)) * cos(0.5 * (alpha + beta)),
+                a *
+                b *
+                c *
+                d *
+                cos(0.5 * (alpha + beta)) *
+                cos(0.5 * (alpha + beta)),
             )
         end
     end
@@ -502,4 +518,3 @@ function mesh_center_2D(
     return cellMidPoints
 
 end
-

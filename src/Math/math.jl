@@ -12,7 +12,8 @@ Python linspace function
     linspace(start::Real, stop::Real, n::Int)
 
 """
-linspace(start, stop, n::T) where {T<:Int} = collect(range(start, stop = stop, length = n))
+linspace(start, stop, n::T) where {T<:Int} =
+    collect(range(start, stop = stop, length = n))
 
 
 """
@@ -119,7 +120,11 @@ function central_diff!(
 
 end
 
-function central_diff!(dy::AbstractArray{<:Any,1}, y::AbstractArray{<:Any,1}, dx::Any)
+function central_diff!(
+    dy::AbstractArray{<:Any,1},
+    y::AbstractArray{<:Any,1},
+    dx::Any,
+)
     x = ones(eltype(y), axes(y)) .* dx
     central_diff!(dy, y, x)
 end
@@ -167,7 +172,11 @@ function upwind_diff(
 
 end
 
-function upwind_diff(y::AbstractArray{<:Any,1}, dx::Any; stream = :right::Symbol)
+function upwind_diff(
+    y::AbstractArray{<:Any,1},
+    dx::Any;
+    stream = :right::Symbol,
+)
     x = ones(eltype(y), axes(y)) .* dx
     dy = upwind_diff(y, x, stream = stream)
 
@@ -191,7 +200,7 @@ Upwind difference
         dx::Any;
         stream = :right::Symbol,
     )
-    
+
 """
 function upwind_diff!(
     dy::AbstractArray{<:Any,1},
@@ -272,7 +281,13 @@ function unstruct_diff(
 end
 
 
-function unstruct_diff(u::Function, x::AbstractArray{<:Any,2}, nx::Int, dim::Int; mode = :central::Symbol)
+function unstruct_diff(
+    u::Function,
+    x::AbstractArray{<:Any,2},
+    nx::Int,
+    dim::Int;
+    mode = :central::Symbol,
+)
     uu = reshape(u(x), (nx, :))
     xx = reshape(x[dim, :], (nx, :))
     dux = zeros(eltype(x), axes(xx))
@@ -300,7 +315,7 @@ end
 
 
 """
-Gauss Legendre integral for fast spectral method 
+Gauss Legendre integral for fast spectral method
 
     lgwt(N::Int, a::Real, b::Real)
 
@@ -324,9 +339,14 @@ function lgwt(N::Int, a::Real, b::Real)
     # initial guess
     for i = 1:N1
         y[i] =
-            cos((2.0 * (i - 1.0) + 1.0) * 4.0 * atan(1.0) / (2.0 * (N - 1.0) + 2.0)) +
-            0.27 / N1 *
-            sin(4.0 * atan(1.0) * (-1.0 + i * 2.0 / (N1 - 1.0)) * (N - 1.0) / N2)
+            cos(
+                (2.0 * (i - 1.0) + 1.0) * 4.0 * atan(1.0) /
+                (2.0 * (N - 1.0) + 2.0),
+            ) +
+            0.27 / N1 * sin(
+                4.0 * atan(1.0) * (-1.0 + i * 2.0 / (N1 - 1.0)) * (N - 1.0) /
+                N2,
+            )
         y0[i] = 2.0
     end
 
@@ -336,7 +356,8 @@ function lgwt(N::Int, a::Real, b::Real)
         L[:, 1] .= 1.0
         L[:, 2] .= y
         for k = 2:N1
-            @. L[:, k+1] = ((2.0 * k - 1.0) * y * L[:, k] - (k - 1) * L[:, k-1]) / k
+            @. L[:, k+1] =
+                ((2.0 * k - 1.0) * y * L[:, k] - (k - 1) * L[:, k-1]) / k
         end
         @. Lp = N2 * (L[:, N1] - y * L[:, N2]) / (1.0 - y^2)
         @. y0 = y
@@ -358,7 +379,7 @@ Extract subarray except the last column
     extract_last(a::AbstractArray, idx::Int; mode=:view::Symbol)
 
 """
-function extract_last(a::AbstractArray, idx::Int; mode=:view::Symbol)
+function extract_last(a::AbstractArray, idx::Int; mode = :view::Symbol)
     if mode == :copy
 
         if ndims(a) == 2
@@ -370,7 +391,7 @@ function extract_last(a::AbstractArray, idx::Int; mode=:view::Symbol)
         elseif ndims(a) == 5
             sw = a[:, :, :, :, idx]
         end
-              
+
     elseif mode == :view
 
         if ndims(a) == 2

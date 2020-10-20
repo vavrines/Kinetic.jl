@@ -72,7 +72,18 @@ struct IB1F{A,B} <: AbstractCondition
         bcU = deepcopy(bcR)::AbstractArray,
         bcD = deepcopy(bcR)::AbstractArray,
     )
-        new{typeof(wL),typeof(fL)}(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
+        new{typeof(wL),typeof(fL)}(
+            wL,
+            primL,
+            fL,
+            bcL,
+            wR,
+            primR,
+            fR,
+            bcR,
+            bcU,
+            bcD,
+        )
     end
 
 end
@@ -116,7 +127,20 @@ struct IB2F{A,B} <: AbstractCondition
         bcU = deepcopy(bcR)::AbstractArray,
         bcD = deepcopy(bcR)::AbstractArray,
     )
-        new{typeof(wL),typeof(hL)}(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
+        new{typeof(wL),typeof(hL)}(
+            wL,
+            primL,
+            hL,
+            bL,
+            bcL,
+            wR,
+            primR,
+            hR,
+            bR,
+            bcR,
+            bcU,
+            bcD,
+        )
     end
 
 end

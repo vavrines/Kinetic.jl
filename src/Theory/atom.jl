@@ -263,7 +263,7 @@ function shakhov(
 ) where {
     T<:AbstractArray{<:AbstractFloat,1},
     X<:AbstractArray{<:AbstractFloat,1},
-    Y<:AbstractArray{<:Real,1}
+    Y<:AbstractArray{<:Real,1},
 }
 
     H_plus = @. 0.8 * (1.0 - Pr) * prim[end]^2 / prim[1] *

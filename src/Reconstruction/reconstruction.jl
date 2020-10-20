@@ -25,7 +25,7 @@ vanleer(sL::T, sR::T) where {T} =
 minmod limiter
 
     minmod(sL::Real, sR::Real)
-    
+
 """
 minmod(sL::T, sR::T) where {T} =
     0.5 * (fortsign(1.0, sL) + fortsign(1.0, sR)) * min(abs(sR), abs(sL))
@@ -35,12 +35,14 @@ minmod(sL::T, sR::T) where {T} =
 superbee limiter
 
     superbee(sL::Real, sR::Real)
-    
+
 """
 function superbee(sL::T, sR::T) where {T}
 
     if sR >= 0.5 * sL && sR <= 2.0 * sL
-        return 0.5 * (fortsign(1.0, sL) + fortsign(1.0, sR)) * max(abs(sL), abs(sR))
+        return 0.5 *
+               (fortsign(1.0, sL) + fortsign(1.0, sR)) *
+               max(abs(sL), abs(sR))
     elseif sR < 0.5 * sL && sR > 2.0 * sL
         return (fortsign(1.0, sL) + fortsign(1.0, sR)) * min(abs(sL), abs(sR))
     else
@@ -54,9 +56,10 @@ end
 van Albaba limiter
 
     vanalbaba(sL::Real, sR::Real)
-    
+
 """
-vanalbaba(sL::T, sR::T) where {T} = (sL^2 * sR + sL * sR^2) / (sL^2 + sR^2 + 1.e-7)
+vanalbaba(sL::T, sR::T) where {T} =
+    (sL^2 * sR + sL * sR^2) / (sL^2 + sR^2 + 1.e-7)
 
 # ------------------------------------------------------------
 # Reconstruction methodologies
@@ -216,7 +219,14 @@ function reconstruct3(
 
     s = zeros(axes(wL))
     for k in axes(s, 3), j in axes(s, 2)
-        s[:, j, k] .= reconstruct3(wL[:, j, k], wN[:, j, k], wR[:, j, k], ΔxL, ΔxR, limiter)
+        s[:, j, k] .= reconstruct3(
+            wL[:, j, k],
+            wN[:, j, k],
+            wR[:, j, k],
+            ΔxL,
+            ΔxR,
+            limiter,
+        )
     end
 
     return s
@@ -281,7 +291,15 @@ function reconstruct3!(
 
     for k in axes(sw, 3), j in axes(sw, 2)
         swjk = @view sw[:, j, k]
-        reconstruct3!(swjk, wL[:, j, k], wN[:, j, k], wR[:, j, k], ΔxL, ΔxR, limiter)
+        reconstruct3!(
+            swjk,
+            wL[:, j, k],
+            wN[:, j, k],
+            wR[:, j, k],
+            ΔxL,
+            ΔxR,
+            limiter,
+        )
     end
 
 end
@@ -298,7 +316,15 @@ function reconstruct3!(
 
     for l in axes(sw, 4), k in axes(sw, 3), j in axes(sw, 2)
         sjkl = @view sw[:, j, k, l]
-        reconstruct3!(sjkl, wL[:, j, k, l], wN[:, j, k, l], wR[:, j, k, l], ΔxL, ΔxR, limiter)
+        reconstruct3!(
+            sjkl,
+            wL[:, j, k, l],
+            wN[:, j, k, l],
+            wR[:, j, k, l],
+            ΔxL,
+            ΔxR,
+            limiter,
+        )
     end
 
 end
@@ -314,9 +340,13 @@ function weno5(wL2::T, wL1::T, wN::T, wR1::T, wR2::T) where {T}
 
     ϵ = 1e-6
 
-    β0 = 13.0 / 12.0 * (wN - 2.0 * wR1 + wR2)^2 + 1.0 / 4.0 * (3.0 * wN - 4.0 * wR1 + wR2)^2
+    β0 =
+        13.0 / 12.0 * (wN - 2.0 * wR1 + wR2)^2 +
+        1.0 / 4.0 * (3.0 * wN - 4.0 * wR1 + wR2)^2
     β1 = 13.0 / 12.0 * (wL1 - 2.0 * wN + wR1)^2 + 1.0 / 4.0 * (wL1 - wR1)^2
-    β2 = 13.0 / 12.0 * (wL2 - 2.0 * wL1 + wN)^2 + 1.0 / 4.0 * (wL2 - 4.0 * wL1 + 3.0 * wN)^2
+    β2 =
+        13.0 / 12.0 * (wL2 - 2.0 * wL1 + wN)^2 +
+        1.0 / 4.0 * (wL2 - 4.0 * wL1 + 3.0 * wN)^2
 
     #--- right interface ---#
     dr0 = 0.3

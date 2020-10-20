@@ -78,7 +78,7 @@ end
 """
 1D cell interface with 3 distribution functions
 
-    @vars: fw, fh0, fh1, fh2, femL, femR, 
+    @vars: fw, fh0, fh1, fh2, femL, femR,
 
 - deterministic: `Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})`
 - stochastic: `Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})`
@@ -93,7 +93,11 @@ mutable struct Interface1D3F{A,B,C} <: AbstractInterface1D
     femL::C
     femR::C
 
-    function Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})
+    function Interface1D3F(
+        w::AbstractArray,
+        f::AbstractArray,
+        E::AbstractArray{<:Real,1},
+    )
         fw = zeros(eltype(w), axes(w))
         fh0 = zeros(eltype(f), axes(f))
         fh1 = zeros(eltype(f), axes(f))
@@ -104,7 +108,11 @@ mutable struct Interface1D3F{A,B,C} <: AbstractInterface1D
         new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, femL, femR)
     end
 
-    function Interface1D3F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})
+    function Interface1D3F(
+        w::AbstractArray,
+        f::AbstractArray,
+        E::AbstractArray{<:Real,2},
+    )
         fw = zeros(eltype(w), axes(w))
         fh0 = zeros(eltype(f), axes(f))
         fh1 = zeros(eltype(f), axes(f))
@@ -121,7 +129,7 @@ end
 """
 1D cell interface with 4 distribution functions
 
-    @vars: fw, fh0, fh1, fh2, fh3, femL, femR, 
+    @vars: fw, fh0, fh1, fh2, fh3, femL, femR,
 
 - deterministic: `Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})`
 - stochastic: `Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})`
@@ -137,7 +145,11 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
     femL::C
     femR::C
 
-    function Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,1})
+    function Interface1D4F(
+        w::AbstractArray,
+        f::AbstractArray,
+        E::AbstractArray{<:Real,1},
+    )
         fw = zeros(eltype(w), axes(w))
         fh0 = zeros(eltype(f), axes(f))
         fh1 = zeros(eltype(f), axes(f))
@@ -146,10 +158,22 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
         femL = zeros(eltype(E), 8)
         femR = zeros(eltype(E), 8)
 
-        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, fh3, femL, femR)
+        new{typeof(fw),typeof(fh0),typeof(femL)}(
+            fw,
+            fh0,
+            fh1,
+            fh2,
+            fh3,
+            femL,
+            femR,
+        )
     end
 
-    function Interface1D4F(w::AbstractArray, f::AbstractArray, E::AbstractArray{<:Real,2})
+    function Interface1D4F(
+        w::AbstractArray,
+        f::AbstractArray,
+        E::AbstractArray{<:Real,2},
+    )
         fw = zeros(eltype(w), axes(w))
         fh0 = zeros(eltype(f), axes(f))
         fh1 = zeros(eltype(f), axes(f))
@@ -158,7 +182,15 @@ mutable struct Interface1D4F{A,B,C} <: AbstractInterface1D
         femL = zeros(eltype(E), 8, axes(E, 2))
         femR = zeros(eltype(E), 8, axes(E, 2))
 
-        new{typeof(fw),typeof(fh0),typeof(femL)}(fw, fh0, fh1, fh2, fh3, femL, femR)
+        new{typeof(fw),typeof(fh0),typeof(femL)}(
+            fw,
+            fh0,
+            fh1,
+            fh2,
+            fh3,
+            femL,
+            femR,
+        )
     end
 
 end
@@ -209,7 +241,13 @@ mutable struct Interface2D1F{A,B,C,D} <: AbstractInterface2D
     fw::C
     ff::D
 
-    function Interface2D1F(L::Real, C::Real, S::Real, w::AbstractArray, f::AbstractArray)
+    function Interface2D1F(
+        L::Real,
+        C::Real,
+        S::Real,
+        w::AbstractArray,
+        f::AbstractArray,
+    )
         len = L
         n = [C, S]
 
@@ -239,7 +277,13 @@ mutable struct Interface2D2F{A,B,C,D} <: AbstractInterface2D
     fh::D
     fb::D
 
-    function Interface2D2F(L::Real, C::Real, S::Real, w::AbstractArray, f::AbstractArray)
+    function Interface2D2F(
+        L::Real,
+        C::Real,
+        S::Real,
+        w::AbstractArray,
+        f::AbstractArray,
+    )
         len = L
         n = [C, S]
 

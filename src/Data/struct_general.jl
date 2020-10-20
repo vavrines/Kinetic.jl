@@ -131,7 +131,7 @@ struct Mixture{A,B,C,D,E,F,G,H,I} <: AbstractProperty
         me::Real,
         ne::Real,
     )
-    
+
         # inner constructor method
         new{
             typeof(Kn),

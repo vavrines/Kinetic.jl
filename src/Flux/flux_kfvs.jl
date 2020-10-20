@@ -70,7 +70,9 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * 0.5 * sum(ω .* u .^ 3 .* f) - 0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
+    fw[3] =
+        dt * 0.5 * sum(ω .* u .^ 3 .* f) -
+        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 4 .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -109,11 +111,16 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
-    fw[4] = dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
+    fw[3] =
+        dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
+    fw[4] =
+        dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
     fw[5] =
         dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* f) -
-        0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
+        0.5 *
+        dt^2 *
+        0.5 *
+        sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
 
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
@@ -340,7 +347,8 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] = dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sf)
+    fw[3] =
+        dt * sum(ω .* v .* u .* f) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sf)
     fw[4] =
         dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* f) -
         0.5 * dt^2 * 0.5 * sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sf)
@@ -390,7 +398,8 @@ function flux_kfvs!(
     # --- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh)
     fw[2] = dt * sum(ω .* u .^ 2 .* h) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh)
-    fw[3] = dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sh)
+    fw[3] =
+        dt * sum(ω .* v .* u .* h) - 0.5 * dt^2 * sum(ω .* v .* u .^ 2 .* sh)
     fw[4] =
         dt * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) -
         0.5 *
@@ -451,14 +460,20 @@ function flux_kfvs!(
     #--- calculate fluxes ---#
     fw[1] = dt * sum(ω .* u .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh0)
     fw[2] = dt * sum(ω .* u .^ 2 .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh0)
-    fw[3] = dt * sum(ω .* u .* v .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sh0)
+    fw[3] =
+        dt * sum(ω .* u .* v .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sh0)
     fw[4] = dt * sum(ω .* u .* h1) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh1)
     fw[5] =
-        dt * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h0) + sum(ω .* u .* h2)) -
+        dt *
+        0.5 *
+        (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h0) + sum(ω .* u .* h2)) -
         0.5 *
         dt^2 *
         0.5 *
-        (sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sh0) + sum(ω .* u .^ 2 .* sh2))
+        (
+            sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2) .* sh0) +
+            sum(ω .* u .^ 2 .* sh2)
+        )
 
     fw .*= len
     @. fh0 = (dt * u * h0 - 0.5 * dt^2 * u^2 * sh0) * len
@@ -521,7 +536,9 @@ function flux_kfvs!(
             0.5 * dt^2 * sum(ω[:, :, j] .* u[:, :, j] .^ 3 .* sh0[:, :, j])
         fw[3, j] =
             dt * sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j]) -
-            0.5 * dt^2 * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* v[:, :, j] .* sh0[:, :, j])
+            0.5 *
+            dt^2 *
+            sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* v[:, :, j] .* sh0[:, :, j])
         fw[4, j] =
             dt * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j]) -
             0.5 * dt^2 * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh1[:, :, j])
@@ -530,8 +547,8 @@ function flux_kfvs!(
             0.5 *
             (
                 sum(
-                    ω[:, :, j] .* u[:, :, j] .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .*
-                    h0[:, :, j],
+                    ω[:, :, j] .* u[:, :, j] .*
+                    (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .* h0[:, :, j],
                 ) + sum(ω[:, :, j] .* u[:, :, j] .* h2[:, :, j])
             ) -
             0.5 *
@@ -539,17 +556,20 @@ function flux_kfvs!(
             0.5 *
             (
                 sum(
-                    ω[:, :, j] .* u[:, :, j] .^ 2 .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .*
-                    sh0[:, :, j],
+                    ω[:, :, j] .* u[:, :, j] .^ 2 .*
+                    (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .* sh0[:, :, j],
                 ) + sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* sh2[:, :, j])
             )
 
         @. fh0[:, :, j] =
-            dt * u[:, :, j] * h0[:, :, j] - 0.5 * dt^2 * u[:, :, j]^2 * sh0[:, :, j]
+            dt * u[:, :, j] * h0[:, :, j] -
+            0.5 * dt^2 * u[:, :, j]^2 * sh0[:, :, j]
         @. fh1[:, :, j] =
-            dt * u[:, :, j] * h1[:, :, j] - 0.5 * dt^2 * u[:, :, j]^2 * sh1[:, :, j]
+            dt * u[:, :, j] * h1[:, :, j] -
+            0.5 * dt^2 * u[:, :, j]^2 * sh1[:, :, j]
         @. fh2[:, :, j] =
-            dt * u[:, :, j] * h2[:, :, j] - 0.5 * dt^2 * u[:, :, j]^2 * sh2[:, :, j]
+            dt * u[:, :, j] * h2[:, :, j] -
+            0.5 * dt^2 * u[:, :, j]^2 * sh2[:, :, j]
     end
 
     @. fw *= len
@@ -558,5 +578,5 @@ function flux_kfvs!(
     @. fh2 *= len
 
     return nothing
-    
+
 end

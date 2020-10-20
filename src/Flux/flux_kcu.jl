@@ -403,7 +403,11 @@ function flux_kcu!(
     fw[1] += Mt[2] * sum(ω .* u .* h) * len
     fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h) * len
     fw[3] += Mt[2] * sum(ω .* v .* u .* h) * len
-    fw[4] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) * len
+    fw[4] +=
+        Mt[2] *
+        0.5 *
+        (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h) + sum(ω .* u .* b)) *
+        len
 
     @. fh = (Mt[1] * u * H + Mt[2] * u * h) * len
     @. fb = (Mt[1] * u * B + Mt[2] * u * b) * len
@@ -490,7 +494,10 @@ function flux_kcu!(
     fw[2] += Mt[2] * sum(ω .* u .^ 2 .* h0)
     fw[3] += Mt[2] * sum(ω .* v .* u .* h0)
     fw[4] += Mt[2] * sum(ω .* u .* h1)
-    fw[5] += Mt[2] * 0.5 * (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h0) + sum(ω .* u .* h2))
+    fw[5] +=
+        Mt[2] *
+        0.5 *
+        (sum(ω .* u .* (u .^ 2 .+ v .^ 2) .* h0) + sum(ω .* u .* h2))
 
     @. fw *= len
     @. fh0 = (Mt[1] * u * H0 + Mt[2] * u * h0) * len
@@ -577,7 +584,8 @@ function flux_kcu!(
         fw[2, j] += Mt[2, j] * sum(ω[:, j] .* u[:, j] .^ 2 .* f[:, j])
         fw[3, j] += Mt[2, j] * 0.5 * sum(ω[:, j] .* u[:, j] .^ 3 .* f[:, j])
 
-        @. ff[:, j] = Mt[1, j] * u[:, j] * M[:, j] + Mt[2, j] * u[:, j] * f[:, j]
+        @. ff[:, j] =
+            Mt[1, j] * u[:, j] * M[:, j] + Mt[2, j] * u[:, j] * f[:, j]
     end
 
     return nothing
@@ -670,10 +678,15 @@ function flux_kcu!(
         fw[3, j] +=
             Mt[2, j] *
             0.5 *
-            (sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) + sum(ω[:, j] .* u[:, j] .* b[:, j]))
+            (
+                sum(ω[:, j] .* u[:, j] .^ 3 .* h[:, j]) +
+                sum(ω[:, j] .* u[:, j] .* b[:, j])
+            )
 
-        @. fh[:, j] = Mt[1, j] * u[:, j] * MH[:, j] + Mt[2, j] * u[:, j] * h[:, j]
-        @. fb[:, j] = Mt[1, j] * u[:, j] * MB[:, j] + Mt[2, j] * u[:, j] * b[:, j]
+        @. fh[:, j] =
+            Mt[1, j] * u[:, j] * MH[:, j] + Mt[2, j] * u[:, j] * h[:, j]
+        @. fb[:, j] =
+            Mt[1, j] * u[:, j] * MB[:, j] + Mt[2, j] * u[:, j] * b[:, j]
     end
 
     return nothing
@@ -789,10 +802,14 @@ function flux_kcu!(
                 sum(ω[:, j] .* u[:, j] .* h3[:, j])
             )
 
-        @. fh0[:, j] = Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
-        @. fh1[:, j] = Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
-        @. fh2[:, j] = Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
-        @. fh3[:, j] = Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
+        @. fh0[:, j] =
+            Mt[1, j] * u[:, j] * g0[:, j] + Mt[2, j] * u[:, j] * h0[:, j]
+        @. fh1[:, j] =
+            Mt[1, j] * u[:, j] * g1[:, j] + Mt[2, j] * u[:, j] * h1[:, j]
+        @. fh2[:, j] =
+            Mt[1, j] * u[:, j] * g2[:, j] + Mt[2, j] * u[:, j] * h2[:, j]
+        @. fh3[:, j] =
+            Mt[1, j] * u[:, j] * g3[:, j] + Mt[2, j] * u[:, j] * h3[:, j]
     end
 
     return nothing
@@ -865,7 +882,7 @@ function flux_kcu!(
     if !isMHD
         prim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
     end
-    
+
     Mt = zeros(2, 2)
     @. Mt[2, :] = tau * (1.0 - exp(-dt / tau)) # f0
     @. Mt[1, :] = dt - Mt[2, :] # M0
@@ -891,24 +908,29 @@ function flux_kcu!(
     for j in axes(fw, 2)
         fw[1, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h0[:, :, j])
         fw[2, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .^ 2 .* h0[:, :, j])
-        fw[3, j] += Mt[2, j] * sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j])
+        fw[3, j] +=
+            Mt[2, j] *
+            sum(ω[:, :, j] .* v[:, :, j] .* u[:, :, j] .* h0[:, :, j])
         fw[4, j] += Mt[2, j] * sum(ω[:, :, j] .* u[:, :, j] .* h1[:, :, j])
         fw[5, j] +=
             Mt[2, j] *
             0.5 *
             (
                 sum(
-                    ω[:, :, j] .* u[:, :, j] .* (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .*
-                    h0[:, :, j],
+                    ω[:, :, j] .* u[:, :, j] .*
+                    (u[:, :, j] .^ 2 .+ v[:, :, j] .^ 2) .* h0[:, :, j],
                 ) + sum(ω[:, :, j] .* u[:, :, j] .* h2[:, :, j])
             )
 
         @. fh0[:, :, j] =
-            Mt[1, j] * u[:, :, j] * H0[:, :, j] + Mt[2, j] * u[:, :, j] * h0[:, :, j]
+            Mt[1, j] * u[:, :, j] * H0[:, :, j] +
+            Mt[2, j] * u[:, :, j] * h0[:, :, j]
         @. fh1[:, :, j] =
-            Mt[1, j] * u[:, :, j] * H1[:, :, j] + Mt[2, j] * u[:, :, j] * h1[:, :, j]
+            Mt[1, j] * u[:, :, j] * H1[:, :, j] +
+            Mt[2, j] * u[:, :, j] * h1[:, :, j]
         @. fh2[:, :, j] =
-            Mt[1, j] * u[:, :, j] * H2[:, :, j] + Mt[2, j] * u[:, :, j] * h2[:, :, j]
+            Mt[1, j] * u[:, :, j] * H2[:, :, j] +
+            Mt[2, j] * u[:, :, j] * h2[:, :, j]
     end
 
     @. fw *= len
@@ -917,5 +939,5 @@ function flux_kcu!(
     @. fh2 *= len
 
     return nothing
-    
+
 end

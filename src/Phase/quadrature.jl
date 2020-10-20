@@ -30,7 +30,7 @@ function legendre_quadrature(n::T) where {T<:Int}
     z = mu[range] .* ones(size(phi))'
     weights = 2.0 * pi / n * repeat(gaussweights[range], 1, 2 * n)
 
-    # assign 
+    # assign
     pointsxyz[:, 1] .= x[:]
     pointsxyz[:, 2] .= y[:]
     pointsxyz[:, 3] .= z[:]
@@ -174,7 +174,10 @@ Create quadrature weights from points and triangulation
 * @return weights : quadrature weights
 
 """
-function quadrature_weights(xyz::X, triangles::Y) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{Int,2}}
+function quadrature_weights(
+    xyz::X,
+    triangles::Y,
+) where {X<:AbstractArray{<:Real,2},Y<:AbstractArray{Int,2}}
 
     weights = zeros(axes(xyz, 1))
     nTriangles = size(triangles, 1)
@@ -187,7 +190,7 @@ function quadrature_weights(xyz::X, triangles::Y) where {X<:AbstractArray{<:Real
         # get three nodes of a triangle
         i, j, k = triangles[n, :]
 
-        # get the corresponding points 
+        # get the corresponding points
         x = xyz[i, :]
         y = xyz[j, :]
         z = xyz[k, :]

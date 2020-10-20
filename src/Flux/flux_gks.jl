@@ -154,7 +154,10 @@ function flux_gks!(
     dx::Real,
     swL = zeros(eltype(fw), axes(wL))::X,
     swR = zeros(eltype(fw), axes(wR))::X,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,1}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+}
 
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
@@ -246,7 +249,10 @@ function flux_gks!(
     dy::Real,
     swL = zeros(eltype(fw), axes(wL))::X,
     swR = zeros(eltype(fw), axes(wR))::X,
-) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,1}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+}
 
     Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
     Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
@@ -544,10 +550,7 @@ function flux_gks!(
     len,
     swL = zeros(eltype(fw), axes(wL))::X,
     swR = zeros(eltype(fw), axes(wR))::X,
-) where {
-    X<:AbstractArray{<:AbstractFloat,2},
-    Y<:AbstractArray{<:Real,2},
-}
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Real,2}}
 
     primL = mixture_conserve_prim(wL, γ)
     primR = mixture_conserve_prim(wR, γ)
@@ -988,7 +991,7 @@ function flux_ugks!(
 
     #--- reconstruct initial distribution ---#
     δ = heaviside.(u)
-    
+
     h0 = @. h0L * δ + h0R * (1.0 - δ)
     h1 = @. h1L * δ + h1R * (1.0 - δ)
     h2 = @. h2L * δ + h2R * (1.0 - δ)
@@ -1184,5 +1187,5 @@ function flux_ugks!(
     @. fh2 *= len
 
     return nothing
-    
+
 end

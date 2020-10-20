@@ -138,7 +138,10 @@ function mixture_moments_conserve(
     f::X,
     u::T,
     ω::T,
-) where {X<:AbstractArray{<:AbstractFloat,2},T<:AbstractArray{<:AbstractFloat,2}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    T<:AbstractArray{<:AbstractFloat,2},
+}
 
     w = similar(f, 3, size(f, 2))
     for j in axes(w, 2)
@@ -155,7 +158,10 @@ function mixture_moments_conserve(
     b::X,
     u::T,
     ω::T,
-) where {X<:AbstractArray{<:AbstractFloat,2},T<:AbstractArray{<:AbstractFloat,2}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    T<:AbstractArray{<:AbstractFloat,2},
+}
 
     w = similar(h, 3, size(h, 2))
     for j in axes(w, 2)
@@ -174,7 +180,10 @@ function mixture_moments_conserve(
     h3::X,
     u::T,
     ω::T,
-) where {X<:AbstractArray{<:AbstractFloat,2},T<:AbstractArray{<:AbstractFloat,2}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    T<:AbstractArray{<:AbstractFloat,2},
+}
 
     moments = similar(h0, 5, size(h0, 2))
     for j in axes(moments, 2)
@@ -198,7 +207,10 @@ function mixture_moments_conserve(
     u::T,
     v::T,
     ω::T,
-) where {X<:AbstractArray{<:AbstractFloat,3},T<:AbstractArray{<:AbstractFloat,3}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,3},
+    T<:AbstractArray{<:AbstractFloat,3},
+}
 
     w = similar(f, 4, size(f, 3))
     for j in axes(w, 2)
@@ -217,7 +229,10 @@ function mixture_moments_conserve(
     u::T,
     v::T,
     ω::T,
-) where {X<:AbstractArray{<:AbstractFloat,3},T<:AbstractArray{<:AbstractFloat,3}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,3},
+    T<:AbstractArray{<:AbstractFloat,3},
+}
 
     w = similar(h, 4, size(f, 3))
     for j in axes(w, 2)
@@ -242,8 +257,11 @@ function mixture_moments_conserve(
     u::T,
     v::T,
     ω::T,
-) where {X<:AbstractArray{<:AbstractFloat,3},T<:AbstractArray{<:AbstractFloat,3}}
-    
+) where {
+    X<:AbstractArray{<:AbstractFloat,3},
+    T<:AbstractArray{<:AbstractFloat,3},
+}
+
     w = similar(h0, 5, size(h0, 3))
     for j in axes(w, 2)
         w[:, j] .= moments_conserve(
@@ -267,7 +285,10 @@ function mixture_moments_conserve(
     v::T,
     w::T,
     ω::T,
-) where {X<:AbstractArray{<:AbstractFloat,4},T<:AbstractArray{<:AbstractFloat,4}}
+) where {
+    X<:AbstractArray{<:AbstractFloat,4},
+    T<:AbstractArray{<:AbstractFloat,4},
+}
 
     moments = similar(f, 5, size(f, 4))
     for j in axes(w, 2)

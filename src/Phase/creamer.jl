@@ -32,7 +32,10 @@ Cleaner for all duplicate (non unique) entries of quadrature points and triangle
 * @return xyz & triangulation : new quadrature points and triangulation
 
 """
-function unique(Points::X, Triangles::Y) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Int,2}}
+function unique(
+    Points::X,
+    Triangles::Y,
+) where {X<:AbstractArray{<:AbstractFloat,2},Y<:AbstractArray{<:Int,2}}
 
     nPoints = size(Points)[2]
     nTriangles = size(Triangles)[2]

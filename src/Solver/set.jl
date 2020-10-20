@@ -36,7 +36,17 @@ struct SolverSet <: AbstractSolverSet
         end
 
         # set
-        set = Setup(case, space, flux, collision, nSpecies, interpOrder, limiter, cfl, maxTime)
+        set = Setup(
+            case,
+            space,
+            flux,
+            collision,
+            nSpecies,
+            interpOrder,
+            limiter,
+            cfl,
+            maxTime,
+        )
 
         # physical space
         Dx = parse(Int, space[1])
@@ -62,47 +72,57 @@ struct SolverSet <: AbstractSolverSet
             end
         elseif Dv == 2
             if nSpecies == 1
-                vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
+                vSpace = VSpace2D(
+                    umin,
+                    umax,
+                    nu,
+                    vmin,
+                    vmax,
+                    nv,
+                    vMeshType,
+                    nug,
+                    nvg,
+                )
             elseif nSpecies == 2
                 ue0 = umin * sqrt(mi / me)
                 ue1 = umax * sqrt(mi / me)
                 ve0 = vmin * sqrt(mi / me)
                 ve1 = vmax * sqrt(mi / me)
                 vSpace = MVSpace2D(
-                            umin, 
-                            umax, 
-                            ue0, 
-                            ue1, 
-                            nu, 
-                            vmin, 
-                            vmax, 
-                            ve0, 
-                            ve1, 
-                            nv, 
-                            vMeshType, 
-                            nug, 
-                            nvg,
-                        )
+                    umin,
+                    umax,
+                    ue0,
+                    ue1,
+                    nu,
+                    vmin,
+                    vmax,
+                    ve0,
+                    ve1,
+                    nv,
+                    vMeshType,
+                    nug,
+                    nvg,
+                )
             else
                 throw("The velocity space only supports up to two species.")
             end
         elseif Dv == 3
             if nSpecies == 1
                 vSpace = VSpace3D(
-                            umin,
-                            umax,
-                            nu,
-                            vmin,
-                            vmax,
-                            nv,
-                            wmin,
-                            wmax,
-                            nw,
-                            vMeshType,
-                            nug,
-                            nvg,
-                            nwg,
-                        )
+                    umin,
+                    umax,
+                    nu,
+                    vmin,
+                    vmax,
+                    nv,
+                    wmin,
+                    wmax,
+                    nw,
+                    vMeshType,
+                    nug,
+                    nvg,
+                    nwg,
+                )
             elseif nSpecies == 2
                 ue0 = umin * sqrt(mi / me)
                 ue1 = umax * sqrt(mi / me)
@@ -111,26 +131,26 @@ struct SolverSet <: AbstractSolverSet
                 we0 = wmin * sqrt(mi / me)
                 we1 = wmax * sqrt(mi / me)
                 vSpace = MVSpace3D(
-                            umin, 
-                            umax, 
-                            ue0, 
-                            ue1, 
-                            nu, 
-                            vmin, 
-                            vmax, 
-                            ve0, 
-                            ve1, 
-                            nv, 
-                            wmin,
-                            wmax,
-                            we0,
-                            we1,
-                            nw,
-                            vMeshType, 
-                            nug, 
-                            nvg,
-                            nwg,
-                        )
+                    umin,
+                    umax,
+                    ue0,
+                    ue1,
+                    nu,
+                    vmin,
+                    vmax,
+                    ve0,
+                    ve1,
+                    nv,
+                    wmin,
+                    wmax,
+                    we0,
+                    we1,
+                    nw,
+                    vMeshType,
+                    nug,
+                    nvg,
+                    nwg,
+                )
             else
                 throw("The velocity space only supports up to two species.")
             end
@@ -171,6 +191,19 @@ struct SolverSet <: AbstractSolverSet
             kne = knudsen * (me / mi)
             if !(@isdefined rL) && !(@isdefined echi) # undefined plasma args
                 gas = Mixture(
+                    [knudsen, kne],
+                    mach,
+                    prandtl,
+                    inK,
+                    γ,
+                    mi,
+                    ni,
+                    me,
+                    ne,
+                )
+            else
+                if Dx == 1
+                    gas = Plasma1D(
                         [knudsen, kne],
                         mach,
                         prandtl,
@@ -180,42 +213,29 @@ struct SolverSet <: AbstractSolverSet
                         ni,
                         me,
                         ne,
+                        lD,
+                        rL,
+                        sol,
+                        echi,
+                        bnu,
                     )
-            else
-                if Dx == 1
-                    gas = Plasma1D(
-                            [knudsen, kne],
-                            mach,
-                            prandtl,
-                            inK,
-                            γ,
-                            mi,
-                            ni,
-                            me,
-                            ne,
-                            lD,
-                            rL,
-                            sol,
-                            echi,
-                            bnu,
-                        )
                 elseif Dx == 2
                     gas = Plasma2D(
-                            [knudsen, kne],
-                            mach,
-                            prandtl,
-                            inK,
-                            γ,
-                            mi,
-                            ni,
-                            me,
-                            ne,
-                            lD,
-                            rL,
-                            sol,
-                            echi,
-                            bnu,
-                        )
+                        [knudsen, kne],
+                        mach,
+                        prandtl,
+                        inK,
+                        γ,
+                        mi,
+                        ni,
+                        me,
+                        ne,
+                        lD,
+                        rL,
+                        sol,
+                        echi,
+                        bnu,
+                    )
                 else
                     throw("The plasma property only supports up to 2D case.")
                 end
@@ -250,12 +270,20 @@ end # struct
 Generate AbstractIB
 
 """
-function set_ib(set::T, vSpace, gas, uLid = 0.15, vLid = 0.0, tLid = 1.0) where {T<:AbstractSetup}
+function set_ib(
+    set::T,
+    vSpace,
+    gas,
+    uLid = 0.15,
+    vLid = 0.0,
+    tLid = 1.0,
+) where {T<:AbstractSetup}
 
     if set.case == "shock"
 
         if set.space[3:end] == "1f1v"
-            wL, primL, fL, bcL, wR, primR, fR, bcR = ib_rh(gas.Ma, gas.γ, vSpace.u)
+            wL, primL, fL, bcL, wR, primR, fR, bcR =
+                ib_rh(gas.Ma, gas.γ, vSpace.u)
             ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
         elseif set.space[3:end] == "1f3v"
             wL, primL, fL, bcL, wR, primR, fR, bcR =

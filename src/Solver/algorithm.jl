@@ -17,7 +17,7 @@ function solve!(
     Y<:AbstractArray{<:AbstractControlVolume,1},
     Z<:AbstractArray{<:AbstractInterface1D,1},
 }
-    
+
     #--- initial checkpoint ---#
     write_jld(KS, ctr, simTime)
 
@@ -117,7 +117,7 @@ Reconstructor
 
 """
 function reconstruct!(
-    KS::X, 
+    KS::X,
     ctr::Y,
 ) where {X<:AbstractSolverSet,Y<:AbstractArray{<:AbstractControlVolume,1}}
 
@@ -240,7 +240,7 @@ function reconstruct!(
 end
 
 function reconstruct!(
-    KS::X, 
+    KS::X,
     ctr::Y,
 ) where {X<:AbstractSolverSet,Y<:AbstractArray{ControlVolume2D2F,2}}
 
@@ -250,8 +250,8 @@ function reconstruct!(
 
     #--- conservative variables ---#
     # boundary
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        swL = extract_last(ctr[1, j].sw, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        swL = extract_last(ctr[1, j].sw, 1, mode = :view)
         reconstruct2!(
             swL,
             ctr[1, j].w,
@@ -259,7 +259,7 @@ function reconstruct!(
             0.5 * (ctr[1, j].dx + ctr[2, j].dx),
         )
 
-        swR = extract_last(ctr[KS.pSpace.nx, j].sw, 1, mode=:view)
+        swR = extract_last(ctr[KS.pSpace.nx, j].sw, 1, mode = :view)
         reconstruct2!(
             swR,
             ctr[KS.pSpace.nx-1, j].w,
@@ -268,8 +268,8 @@ function reconstruct!(
         )
     end
 
-    @inbounds Threads.@threads for i in 1:KS.pSpace.nx
-        swD = extract_last(ctr[i, 1].sw, 2, mode=:view)
+    @inbounds Threads.@threads for i = 1:KS.pSpace.nx
+        swD = extract_last(ctr[i, 1].sw, 2, mode = :view)
         reconstruct2!(
             swD,
             ctr[i, 1].w,
@@ -277,7 +277,7 @@ function reconstruct!(
             0.5 * (ctr[i, 1].dy + ctr[i, 2].dy),
         )
 
-        swU = extract_last(ctr[i, KS.pSpace.ny].sw, 2, mode=:view)
+        swU = extract_last(ctr[i, KS.pSpace.ny].sw, 2, mode = :view)
         reconstruct2!(
             swU,
             ctr[i, KS.pSpace.ny-1].w,
@@ -287,9 +287,9 @@ function reconstruct!(
     end
 
     # inner
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        for i in 2:KS.pSpace.nx-1
-            sw = extract_last(ctr[i, j].sw, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        for i = 2:KS.pSpace.nx-1
+            sw = extract_last(ctr[i, j].sw, 1, mode = :view)
             reconstruct3!(
                 sw,
                 ctr[i-1, j].w,
@@ -302,9 +302,9 @@ function reconstruct!(
         end
     end
 
-    @inbounds Threads.@threads for j in 2:KS.pSpace.ny-1
-        for i in 1:KS.pSpace.nx
-            sw = extract_last(ctr[i, j].sw, 2, mode=:view)
+    @inbounds Threads.@threads for j = 2:KS.pSpace.ny-1
+        for i = 1:KS.pSpace.nx
+            sw = extract_last(ctr[i, j].sw, 2, mode = :view)
             reconstruct3!(
                 sw,
                 ctr[i, j-1].w,
@@ -319,15 +319,15 @@ function reconstruct!(
 
     #--- particle distribution function ---#
     # boundary
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        shL = extract_last(ctr[1, j].sh, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        shL = extract_last(ctr[1, j].sh, 1, mode = :view)
         reconstruct2!(
             shL,
             ctr[1, j].h,
             ctr[2, j].h,
             0.5 * (ctr[1, j].dx + ctr[2, j].dx),
         )
-        sbL = extract_last(ctr[1, j].sb, 1, mode=:view)
+        sbL = extract_last(ctr[1, j].sb, 1, mode = :view)
         reconstruct2!(
             sbL,
             ctr[1, j].b,
@@ -335,14 +335,14 @@ function reconstruct!(
             0.5 * (ctr[1, j].dx + ctr[2, j].dx),
         )
 
-        shR = extract_last(ctr[KS.pSpace.nx, j].sh, 1, mode=:view)
+        shR = extract_last(ctr[KS.pSpace.nx, j].sh, 1, mode = :view)
         reconstruct2!(
             shR,
             ctr[KS.pSpace.nx-1, j].h,
             ctr[KS.pSpace.nx, j].h,
             0.5 * (ctr[KS.pSpace.nx-1, j].dx + ctr[KS.pSpace.nx, j].dx),
         )
-        sbR = extract_last(ctr[KS.pSpace.nx, j].sb, 1, mode=:view)
+        sbR = extract_last(ctr[KS.pSpace.nx, j].sb, 1, mode = :view)
         reconstruct2!(
             sbR,
             ctr[KS.pSpace.nx-1, j].b,
@@ -351,15 +351,15 @@ function reconstruct!(
         )
     end
 
-    @inbounds Threads.@threads for i in 1:KS.pSpace.nx
-        shD = extract_last(ctr[i, 1].sh, 2, mode=:view)
+    @inbounds Threads.@threads for i = 1:KS.pSpace.nx
+        shD = extract_last(ctr[i, 1].sh, 2, mode = :view)
         reconstruct2!(
             shD,
             ctr[i, 1].h,
             ctr[i, 2].h,
             0.5 * (ctr[i, 1].dy + ctr[i, 2].dy),
         )
-        sbD = extract_last(ctr[i, 1].sb, 2, mode=:view)
+        sbD = extract_last(ctr[i, 1].sb, 2, mode = :view)
         reconstruct2!(
             sbD,
             ctr[i, 1].b,
@@ -367,14 +367,14 @@ function reconstruct!(
             0.5 * (ctr[i, 1].dy + ctr[i, 2].dy),
         )
 
-        shU = extract_last(ctr[i, KS.pSpace.ny].sh, 2, mode=:view)
+        shU = extract_last(ctr[i, KS.pSpace.ny].sh, 2, mode = :view)
         reconstruct2!(
             shU,
             ctr[i, KS.pSpace.ny-1].h,
             ctr[i, KS.pSpace.ny].h,
             0.5 * (ctr[i, KS.pSpace.ny-1].dx + ctr[i, KS.pSpace.ny].dx),
         )
-        sbU = extract_last(ctr[i, KS.pSpace.ny].sb, 2, mode=:view)
+        sbU = extract_last(ctr[i, KS.pSpace.ny].sb, 2, mode = :view)
         reconstruct2!(
             sbU,
             ctr[i, KS.pSpace.ny-1].b,
@@ -384,9 +384,9 @@ function reconstruct!(
     end
 
     # inner
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        for i in 2:KS.pSpace.nx-1
-            sh = extract_last(ctr[i, j].sh, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        for i = 2:KS.pSpace.nx-1
+            sh = extract_last(ctr[i, j].sh, 1, mode = :view)
             reconstruct3!(
                 sh,
                 ctr[i-1, j].h,
@@ -397,7 +397,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
 
-            sb = extract_last(ctr[i, j].sb, 1, mode=:view)
+            sb = extract_last(ctr[i, j].sb, 1, mode = :view)
             reconstruct3!(
                 sb,
                 ctr[i-1, j].b,
@@ -410,9 +410,9 @@ function reconstruct!(
         end
     end
 
-    @inbounds Threads.@threads for j in 2:KS.pSpace.ny-1
-        for i in 1:KS.pSpace.nx
-            sh = extract_last(ctr[i, j].sh, 2, mode=:view)
+    @inbounds Threads.@threads for j = 2:KS.pSpace.ny-1
+        for i = 1:KS.pSpace.nx
+            sh = extract_last(ctr[i, j].sh, 2, mode = :view)
             reconstruct3!(
                 sh,
                 ctr[i, j-1].h,
@@ -423,7 +423,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
 
-            sb = extract_last(ctr[i, j].sb, 2, mode=:view)
+            sb = extract_last(ctr[i, j].sb, 2, mode = :view)
             reconstruct3!(
                 sb,
                 ctr[i, j-1].b,
@@ -439,7 +439,7 @@ function reconstruct!(
 end
 
 function reconstruct!(
-    KS::X, 
+    KS::X,
     ctr::Y,
 ) where {X<:AbstractSolverSet,Y<:AbstractArray{ControlVolume2D3F,2}}
 
@@ -449,8 +449,8 @@ function reconstruct!(
 
     #--- macroscopic variables ---#
     # boundary
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        swL = extract_last(ctr[1, j].sw, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        swL = extract_last(ctr[1, j].sw, 1, mode = :view)
         reconstruct2!(
             swL,
             ctr[1, j].w,
@@ -458,7 +458,7 @@ function reconstruct!(
             0.5 * (ctr[1, j].dx + ctr[2, j].dx),
         )
 
-        swR = extract_last(ctr[KS.pSpace.nx, j].sw, 1, mode=:view)
+        swR = extract_last(ctr[KS.pSpace.nx, j].sw, 1, mode = :view)
         reconstruct2!(
             swR,
             ctr[KS.pSpace.nx-1, j].w,
@@ -467,8 +467,8 @@ function reconstruct!(
         )
     end
 
-    @inbounds Threads.@threads for i in 1:KS.pSpace.nx
-        swD = extract_last(ctr[i, 1].sw, 2, mode=:view)
+    @inbounds Threads.@threads for i = 1:KS.pSpace.nx
+        swD = extract_last(ctr[i, 1].sw, 2, mode = :view)
         reconstruct2!(
             swD,
             ctr[i, 1].w,
@@ -476,7 +476,7 @@ function reconstruct!(
             0.5 * (ctr[i, 1].dy + ctr[i, 2].dy),
         )
 
-        swU = extract_last(ctr[i, KS.pSpace.ny].sw, 2, mode=:view)
+        swU = extract_last(ctr[i, KS.pSpace.ny].sw, 2, mode = :view)
         reconstruct2!(
             swU,
             ctr[i, KS.pSpace.ny-1].w,
@@ -486,9 +486,9 @@ function reconstruct!(
     end
 
     # inner
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        for i in 2:KS.pSpace.nx-1
-            sw = extract_last(ctr[i, j].sw, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        for i = 2:KS.pSpace.nx-1
+            sw = extract_last(ctr[i, j].sw, 1, mode = :view)
             reconstruct3!(
                 sw,
                 ctr[i-1, j].w,
@@ -501,9 +501,9 @@ function reconstruct!(
         end
     end
 
-    @inbounds Threads.@threads for j in 2:KS.pSpace.ny-1
-        for i in 1:KS.pSpace.nx
-            sw = extract_last(ctr[i, j].sw, 2, mode=:view)
+    @inbounds Threads.@threads for j = 2:KS.pSpace.ny-1
+        for i = 1:KS.pSpace.nx
+            sw = extract_last(ctr[i, j].sw, 2, mode = :view)
             reconstruct3!(
                 sw,
                 ctr[i, j-1].w,
@@ -518,22 +518,22 @@ function reconstruct!(
 
     #--- particle distribution function ---#
     # boundary
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        s0L = extract_last(ctr[1, j].sh0, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        s0L = extract_last(ctr[1, j].sh0, 1, mode = :view)
         reconstruct2!(
             s0L,
             ctr[1, j].h0,
             ctr[2, j].h0,
             0.5 * (ctr[1, j].dx + ctr[2, j].dx),
         )
-        s1L = extract_last(ctr[1, j].sh1, 1, mode=:view)
+        s1L = extract_last(ctr[1, j].sh1, 1, mode = :view)
         reconstruct2!(
             s1L,
             ctr[1, j].h1,
             ctr[2, j].h1,
             0.5 * (ctr[1, j].dx + ctr[2, j].dx),
         )
-        s2L = extract_last(ctr[1, j].sh2, 1, mode=:view)
+        s2L = extract_last(ctr[1, j].sh2, 1, mode = :view)
         reconstruct2!(
             s2L,
             ctr[1, j].h2,
@@ -541,21 +541,21 @@ function reconstruct!(
             0.5 * (ctr[1, j].dx + ctr[2, j].dx),
         )
 
-        s0R = extract_last(ctr[KS.pSpace.nx, j].sh0, 1, mode=:view)
+        s0R = extract_last(ctr[KS.pSpace.nx, j].sh0, 1, mode = :view)
         reconstruct2!(
             s0R,
             ctr[KS.pSpace.nx-1, j].h0,
             ctr[KS.pSpace.nx, j].h0,
             0.5 * (ctr[KS.pSpace.nx-1, j].dx + ctr[KS.pSpace.nx, j].dx),
         )
-        s1R = extract_last(ctr[KS.pSpace.nx, j].sh1, 1, mode=:view)
+        s1R = extract_last(ctr[KS.pSpace.nx, j].sh1, 1, mode = :view)
         reconstruct2!(
             s1R,
             ctr[KS.pSpace.nx-1, j].h1,
             ctr[KS.pSpace.nx, j].h1,
             0.5 * (ctr[KS.pSpace.nx-1, j].dx + ctr[KS.pSpace.nx, j].dx),
         )
-        s2R = extract_last(ctr[KS.pSpace.nx, j].sh2, 1, mode=:view)
+        s2R = extract_last(ctr[KS.pSpace.nx, j].sh2, 1, mode = :view)
         reconstruct2!(
             s2R,
             ctr[KS.pSpace.nx-1, j].h2,
@@ -564,22 +564,22 @@ function reconstruct!(
         )
     end
 
-    @inbounds Threads.@threads for i in 1:KS.pSpace.nx
-        s0D = extract_last(ctr[i, 1].sh0, 2, mode=:view)
+    @inbounds Threads.@threads for i = 1:KS.pSpace.nx
+        s0D = extract_last(ctr[i, 1].sh0, 2, mode = :view)
         reconstruct2!(
             s0D,
             ctr[i, 1].h0,
             ctr[i, 2].h0,
             0.5 * (ctr[i, 1].dy + ctr[i, 2].dy),
         )
-        s1D = extract_last(ctr[i, 1].sh1, 2, mode=:view)
+        s1D = extract_last(ctr[i, 1].sh1, 2, mode = :view)
         reconstruct2!(
             s1D,
             ctr[i, 1].h1,
             ctr[i, 2].h1,
             0.5 * (ctr[i, 1].dy + ctr[i, 2].dy),
         )
-        s2D = extract_last(ctr[i, 1].sh2, 2, mode=:view)
+        s2D = extract_last(ctr[i, 1].sh2, 2, mode = :view)
         reconstruct2!(
             s2D,
             ctr[i, 1].h2,
@@ -587,21 +587,21 @@ function reconstruct!(
             0.5 * (ctr[i, 1].dy + ctr[i, 2].dy),
         )
 
-        s0U = extract_last(ctr[i, KS.pSpace.ny].sh0, 2, mode=:view)
+        s0U = extract_last(ctr[i, KS.pSpace.ny].sh0, 2, mode = :view)
         reconstruct2!(
             s0U,
             ctr[i, KS.pSpace.ny-1].h0,
             ctr[i, KS.pSpace.ny].h0,
             0.5 * (ctr[i, KS.pSpace.ny-1].dx + ctr[i, KS.pSpace.ny].dx),
         )
-        s1U = extract_last(ctr[i, KS.pSpace.ny].sh1, 2, mode=:view)
+        s1U = extract_last(ctr[i, KS.pSpace.ny].sh1, 2, mode = :view)
         reconstruct2!(
             s1U,
             ctr[i, KS.pSpace.ny-1].h1,
             ctr[i, KS.pSpace.ny].h1,
             0.5 * (ctr[i, KS.pSpace.ny-1].dx + ctr[i, KS.pSpace.ny].dx),
         )
-        s2U = extract_last(ctr[i, KS.pSpace.ny].sh2, 2, mode=:view)
+        s2U = extract_last(ctr[i, KS.pSpace.ny].sh2, 2, mode = :view)
         reconstruct2!(
             s2U,
             ctr[i, KS.pSpace.ny-1].h2,
@@ -611,9 +611,9 @@ function reconstruct!(
     end
 
     # inner
-    @inbounds Threads.@threads for j in 1:KS.pSpace.ny
-        for i in 2:KS.pSpace.nx-1
-            sh0 = extract_last(ctr[i, j].sh0, 1, mode=:view)
+    @inbounds Threads.@threads for j = 1:KS.pSpace.ny
+        for i = 2:KS.pSpace.nx-1
+            sh0 = extract_last(ctr[i, j].sh0, 1, mode = :view)
             reconstruct3!(
                 sh0,
                 ctr[i-1, j].h0,
@@ -624,7 +624,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
 
-            sh1 = extract_last(ctr[i, j].sh1, 1, mode=:view)
+            sh1 = extract_last(ctr[i, j].sh1, 1, mode = :view)
             reconstruct3!(
                 sh1,
                 ctr[i-1, j].h1,
@@ -635,7 +635,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
 
-            sh2 = extract_last(ctr[i, j].sh2, 1, mode=:view)
+            sh2 = extract_last(ctr[i, j].sh2, 1, mode = :view)
             reconstruct3!(
                 sh2,
                 ctr[i-1, j].h2,
@@ -648,9 +648,9 @@ function reconstruct!(
         end
     end
 
-    @inbounds Threads.@threads for j in 2:KS.pSpace.ny-1
-        for i in 1:KS.pSpace.nx
-            sh0 = extract_last(ctr[i, j].sh0, 2, mode=:view)
+    @inbounds Threads.@threads for j = 2:KS.pSpace.ny-1
+        for i = 1:KS.pSpace.nx
+            sh0 = extract_last(ctr[i, j].sh0, 2, mode = :view)
             reconstruct3!(
                 sh0,
                 ctr[i, j-1].h0,
@@ -661,7 +661,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
 
-            sh1 = extract_last(ctr[i, j].sh1, 2, mode=:view)
+            sh1 = extract_last(ctr[i, j].sh1, 2, mode = :view)
             reconstruct3!(
                 sh1,
                 ctr[i, j-1].h1,
@@ -672,7 +672,7 @@ function reconstruct!(
                 Symbol(KS.set.limiter),
             )
 
-            sh2 = extract_last(ctr[i, j].sh2, 2, mode=:view)
+            sh2 = extract_last(ctr[i, j].sh2, 2, mode = :view)
             reconstruct3!(
                 sh2,
                 ctr[i, j-1].h2,
@@ -1116,13 +1116,13 @@ function update!(
     end
 
     update_boundary!(
-        KS, 
-        ctr, 
-        face, 
-        dt, 
-        residual; 
-        coll=coll, 
-        bc=bc, 
+        KS,
+        ctr,
+        face,
+        dt,
+        residual;
+        coll = coll,
+        bc = bc,
         isMHD = false,
     )
 
@@ -1209,13 +1209,13 @@ function update!(
     end
 
     update_boundary!(
-        KS, 
-        ctr, 
-        face, 
-        dt, 
-        residual; 
-        coll = coll, 
-        bc = bc, 
+        KS,
+        ctr,
+        face,
+        dt,
+        residual;
+        coll = coll,
+        bc = bc,
         isMHD = false,
     )
 
@@ -1240,17 +1240,7 @@ function update!(
     sumAvg = zeros(axes(KS.ib.wL))
 
     @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
-        step!(
-            KS,
-            face[i],
-            ctr[i],
-            face[i+1],
-            dt,
-            sumRes,
-            sumAvg,
-            coll,
-            isMHD
-        )
+        step!(KS, face[i], ctr[i], face[i+1], dt, sumRes, sumAvg, coll, isMHD)
     end
 
     for i in eachindex(residual)
@@ -1258,13 +1248,13 @@ function update!(
     end
 
     update_boundary!(
-        KS, 
-        ctr, 
-        face, 
-        dt, 
-        residual; 
-        coll = coll, 
-        bc = bc, 
+        KS,
+        ctr,
+        face,
+        dt,
+        residual;
+        coll = coll,
+        bc = bc,
         isMHD = isMHD,
     )
 
@@ -1363,18 +1353,8 @@ function update!(
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
 
-    @inbounds Threads.@threads for i in 2:KS.pSpace.nx-1
-        step!(
-            KS,
-            face[i],
-            ctr[i],
-            face[i+1],
-            dt,
-            sumRes,
-            sumAvg,
-            coll,
-            isMHD,
-        )
+    @inbounds Threads.@threads for i = 2:KS.pSpace.nx-1
+        step!(KS, face[i], ctr[i], face[i+1], dt, sumRes, sumAvg, coll, isMHD)
     end
 
     for i in eachindex(residual)
@@ -1382,13 +1362,13 @@ function update!(
     end
 
     update_boundary!(
-        KS, 
-        ctr, 
-        face, 
-        dt, 
-        residual; 
-        coll = coll, 
-        bc = bc, 
+        KS,
+        ctr,
+        face,
+        dt,
+        residual;
+        coll = coll,
+        bc = bc,
         isMHD = isMHD,
     )
 
@@ -1419,20 +1399,38 @@ function update_boundary!(
         i = 1
         j = KS.pSpace.nx
         if KS.set.space[3:4] == "0f"
-            step!(face[i].fw, ctr[i].w, ctr[i].prim, face[i+1].fw, KS.gas.γ, ctr[i].dx, resL, avgL)
-            step!(face[j].fw, ctr[j].w, ctr[j].prim, face[j+1].fw, KS.gas.γ, ctr[j].dx, resR, avgR)
+            step!(
+                face[i].fw,
+                ctr[i].w,
+                ctr[i].prim,
+                face[i+1].fw,
+                KS.gas.γ,
+                ctr[i].dx,
+                resL,
+                avgL,
+            )
+            step!(
+                face[j].fw,
+                ctr[j].w,
+                ctr[j].prim,
+                face[j+1].fw,
+                KS.gas.γ,
+                ctr[j].dx,
+                resR,
+                avgR,
+            )
         elseif KS.set.space[3:4] == "1f"
             if KS.set.space[5:6] == "1v"
                 step!(
-                    face[i].fw, 
-                    face[i].ff, 
-                    ctr[i].w, 
-                    ctr[i].prim, 
-                    ctr[i].f, 
-                    face[i+1].fw, 
-                    face[i+1].ff, 
-                    KS.vSpace.u, 
-                    KS.vSpace.weights, 
+                    face[i].fw,
+                    face[i].ff,
+                    ctr[i].w,
+                    ctr[i].prim,
+                    ctr[i].f,
+                    face[i+1].fw,
+                    face[i+1].ff,
+                    KS.vSpace.u,
+                    KS.vSpace.weights,
                     KS.gas.γ,
                     KS.gas.μᵣ,
                     KS.gas.ω,
@@ -1444,15 +1442,15 @@ function update_boundary!(
                     Symbol(KS.set.collision),
                 )
                 step!(
-                    face[j].fw, 
-                    face[j].ff, 
-                    ctr[j].w, 
-                    ctr[j].prim, 
-                    ctr[j].f, 
-                    face[j+1].fw, 
-                    face[j+1].ff, 
-                    KS.vSpace.u, 
-                    KS.vSpace.weights, 
+                    face[j].fw,
+                    face[j].ff,
+                    ctr[j].w,
+                    ctr[j].prim,
+                    ctr[j].f,
+                    face[j+1].fw,
+                    face[j+1].ff,
+                    KS.vSpace.u,
+                    KS.vSpace.weights,
                     KS.gas.γ,
                     KS.gas.μᵣ,
                     KS.gas.ω,
@@ -1465,16 +1463,16 @@ function update_boundary!(
                 )
             elseif KS.set.space[5:6] == "3v"
                 step!(
-                    face[i].fw, 
-                    face[i].ff, 
-                    ctr[i].w, 
-                    ctr[i].prim, 
-                    face[i+1].fw, 
-                    face[i+1].ff, 
-                    KS.vSpace.u, 
-                    KS.vSpace.v, 
-                    KS.vSpace.w, 
-                    KS.vSpace.weights, 
+                    face[i].fw,
+                    face[i].ff,
+                    ctr[i].w,
+                    ctr[i].prim,
+                    face[i+1].fw,
+                    face[i+1].ff,
+                    KS.vSpace.u,
+                    KS.vSpace.v,
+                    KS.vSpace.w,
+                    KS.vSpace.weights,
                     KS.gas.γ,
                     KS.gas.μᵣ,
                     KS.gas.ω,
@@ -1486,16 +1484,16 @@ function update_boundary!(
                     Symbol(KS.set.collision),
                 )
                 step!(
-                    face[j].fw, 
-                    face[j].ff, 
-                    ctr[j].w, 
-                    ctr[j].prim, 
-                    face[j+1].fw, 
-                    face[j+1].ff, 
-                    KS.vSpace.u, 
-                    KS.vSpace.v, 
-                    KS.vSpace.w, 
-                    KS.vSpace.weights, 
+                    face[j].fw,
+                    face[j].ff,
+                    ctr[j].w,
+                    ctr[j].prim,
+                    face[j+1].fw,
+                    face[j+1].ff,
+                    KS.vSpace.u,
+                    KS.vSpace.v,
+                    KS.vSpace.w,
+                    KS.vSpace.weights,
                     KS.gas.γ,
                     KS.gas.μᵣ,
                     KS.gas.ω,
@@ -1509,19 +1507,19 @@ function update_boundary!(
             end
         elseif KS.set.space[3:4] == "2f"
             step!(
-                face[i].fw, 
-                face[i].fh, 
-                face[i].fb, 
-                ctr[i].w, 
-                ctr[i].prim, 
+                face[i].fw,
+                face[i].fh,
+                face[i].fb,
+                ctr[i].w,
+                ctr[i].prim,
                 ctr[i].h,
                 ctr[i].b,
-                face[i+1].fw, 
-                face[i+1].fh, 
-                face[i+1].fb, 
-                KS.vSpace.u, 
-                KS.vSpace.weights, 
-                KS.gas.K, 
+                face[i+1].fw,
+                face[i+1].fh,
+                face[i+1].fb,
+                KS.vSpace.u,
+                KS.vSpace.weights,
+                KS.gas.K,
                 KS.gas.γ,
                 KS.gas.μᵣ,
                 KS.gas.ω,
@@ -1533,19 +1531,19 @@ function update_boundary!(
                 Symbol(KS.set.collision),
             )
             step!(
-                face[j].fw, 
-                face[j].fh, 
-                face[j].fb, 
-                ctr[j].w, 
-                ctr[j].prim, 
+                face[j].fw,
+                face[j].fh,
+                face[j].fb,
+                ctr[j].w,
+                ctr[j].prim,
                 ctr[j].h,
                 ctr[j].b,
-                face[j+1].fw, 
-                face[j+1].fh, 
-                face[j+1].fb, 
-                KS.vSpace.u, 
-                KS.vSpace.weights, 
-                KS.gas.K, 
+                face[j+1].fw,
+                face[j+1].fh,
+                face[j+1].fb,
+                KS.vSpace.u,
+                KS.vSpace.weights,
+                KS.gas.K,
                 KS.gas.γ,
                 KS.gas.μᵣ,
                 KS.gas.ω,
@@ -1566,12 +1564,13 @@ function update_boundary!(
     end
 
     for i in eachindex(residual)
-        residual[i] += sqrt((resL[i] + resR[i]) * 2) / (avgL[i] + avgR[i] + 1.e-7)
+        residual[i] +=
+            sqrt((resL[i] + resR[i]) * 2) / (avgL[i] + avgR[i] + 1.e-7)
     end
 
     ng = 1 - first(eachindex(KS.pSpace.x))
     if bc == :extra
-        for i in 1:ng
+        for i = 1:ng
             ctr[1-i].w .= ctr[1].w
             ctr[1-i].prim .= ctr[1].prim
             ctr[KS.pSpace.nx+i].w .= ctr[KS.pSpace.nx].w
@@ -1628,7 +1627,7 @@ function update_boundary!(
             end
         end
     elseif bc == :period
-        for i in 1:ng
+        for i = 1:ng
             ctr[1-i].w .= ctr[KS.pSpace.nx+1-i].w
             ctr[1-i].prim .= ctr[KS.pSpace.nx+1-i].prim
             ctr[KS.pSpace.nx+i].w .= ctr[i].w
@@ -1687,17 +1686,22 @@ function update_boundary!(
     elseif bc == :balance
         @. ctr[0].w = 0.5 * (ctr[-1].w + ctr[1].w)
         @. ctr[0].prim = 0.5 * (ctr[-1].prim + ctr[1].prim)
-        @. ctr[KS.pSpace.nx+1].w = 0.5 * (ctr[KS.pSpace.nx].w + ctr[KS.pSpace.nx+2].w)
-        @. ctr[KS.pSpace.nx+1].prim = 0.5 * (ctr[KS.pSpace.nx].prim + ctr[KS.pSpace.nx+2].prim)
+        @. ctr[KS.pSpace.nx+1].w =
+            0.5 * (ctr[KS.pSpace.nx].w + ctr[KS.pSpace.nx+2].w)
+        @. ctr[KS.pSpace.nx+1].prim =
+            0.5 * (ctr[KS.pSpace.nx].prim + ctr[KS.pSpace.nx+2].prim)
 
         if KS.set.space[3:4] == "1f"
             @. ctr[0].f = 0.5 * (ctr[-1].f + ctr[1].f)
-            @. ctr[KS.pSpace.nx+1].f = 0.5 * (ctr[KS.pSpace.nx].f + ctr[KS.pSpace.nx+2].f)
+            @. ctr[KS.pSpace.nx+1].f =
+                0.5 * (ctr[KS.pSpace.nx].f + ctr[KS.pSpace.nx+2].f)
         elseif KS.set.space[3:4] == "2f"
             @. ctr[0].h = 0.5 * (ctr[-1].h + ctr[1].h)
             @. ctr[0].b = 0.5 * (ctr[-1].b + ctr[1].b)
-            @. ctr[KS.pSpace.nx+1].h = 0.5 * (ctr[KS.pSpace.nx].h + ctr[KS.pSpace.nx+2].h)
-            @. ctr[KS.pSpace.nx+1].b = 0.5 * (ctr[KS.pSpace.nx].b + ctr[KS.pSpace.nx+2].b)
+            @. ctr[KS.pSpace.nx+1].h =
+                0.5 * (ctr[KS.pSpace.nx].h + ctr[KS.pSpace.nx+2].h)
+            @. ctr[KS.pSpace.nx+1].b =
+                0.5 * (ctr[KS.pSpace.nx].b + ctr[KS.pSpace.nx+2].b)
         elseif KS.set.space[3:4] == "3f"
             @. ctr[0].h0 = 0.5 * (ctr[-1].h0 + ctr[1].h0)
             @. ctr[0].h1 = 0.5 * (ctr[-1].h1 + ctr[1].h1)
@@ -1708,14 +1712,22 @@ function update_boundary!(
             ctr[0].ψ = 0.5 * (ctr[-1].ψ + ctr[1].ψ)
             @. ctr[0].lorenz = 0.5 * (ctr[-1].lorenz + ctr[1].lorenz)
 
-            @. ctr[KS.pSpace.nx+1].h0 = 0.5 * (ctr[KS.pSpace.nx].h0 + ctr[KS.pSpace.nx+2].h0)
-            @. ctr[KS.pSpace.nx+1].h1 = 0.5 * (ctr[KS.pSpace.nx].h1 + ctr[KS.pSpace.nx+2].h1)
-            @. ctr[KS.pSpace.nx+1].h2 = 0.5 * (ctr[KS.pSpace.nx].h2 + ctr[KS.pSpace.nx+2].h2)
-            @. ctr[KS.pSpace.nx+1].E = 0.5 * (ctr[KS.pSpace.nx].E + ctr[KS.pSpace.nx+2].E)
-            @. ctr[KS.pSpace.nx+1].B = 0.5 * (ctr[KS.pSpace.nx].B + ctr[KS.pSpace.nx+2].B)
-            ctr[KS.pSpace.nx+1].ϕ = 0.5 * (ctr[KS.pSpace.nx].ϕ + ctr[KS.pSpace.nx+2].ϕ)
-            ctr[KS.pSpace.nx+1].ψ = 0.5 * (ctr[KS.pSpace.nx].ψ + ctr[KS.pSpace.nx+2].ψ)
-            @. ctr[KS.pSpace.nx+1].lorenz = 0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
+            @. ctr[KS.pSpace.nx+1].h0 =
+                0.5 * (ctr[KS.pSpace.nx].h0 + ctr[KS.pSpace.nx+2].h0)
+            @. ctr[KS.pSpace.nx+1].h1 =
+                0.5 * (ctr[KS.pSpace.nx].h1 + ctr[KS.pSpace.nx+2].h1)
+            @. ctr[KS.pSpace.nx+1].h2 =
+                0.5 * (ctr[KS.pSpace.nx].h2 + ctr[KS.pSpace.nx+2].h2)
+            @. ctr[KS.pSpace.nx+1].E =
+                0.5 * (ctr[KS.pSpace.nx].E + ctr[KS.pSpace.nx+2].E)
+            @. ctr[KS.pSpace.nx+1].B =
+                0.5 * (ctr[KS.pSpace.nx].B + ctr[KS.pSpace.nx+2].B)
+            ctr[KS.pSpace.nx+1].ϕ =
+                0.5 * (ctr[KS.pSpace.nx].ϕ + ctr[KS.pSpace.nx+2].ϕ)
+            ctr[KS.pSpace.nx+1].ψ =
+                0.5 * (ctr[KS.pSpace.nx].ψ + ctr[KS.pSpace.nx+2].ψ)
+            @. ctr[KS.pSpace.nx+1].lorenz =
+                0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
         elseif KS.set.space[3:4] == "4f"
             @. ctr[0].h0 = 0.5 * (ctr[-1].h0 + ctr[1].h0)
             @. ctr[0].h1 = 0.5 * (ctr[-1].h1 + ctr[1].h1)
@@ -1727,15 +1739,24 @@ function update_boundary!(
             ctr[0].ψ = 0.5 * (ctr[-1].ψ + ctr[1].ψ)
             @. ctr[0].lorenz = 0.5 * (ctr[-1].lorenz + ctr[1].lorenz)
 
-            @. ctr[KS.pSpace.nx+1].h0 = 0.5 * (ctr[KS.pSpace.nx].h0 + ctr[KS.pSpace.nx+2].h0)
-            @. ctr[KS.pSpace.nx+1].h1 = 0.5 * (ctr[KS.pSpace.nx].h1 + ctr[KS.pSpace.nx+2].h1)
-            @. ctr[KS.pSpace.nx+1].h2 = 0.5 * (ctr[KS.pSpace.nx].h2 + ctr[KS.pSpace.nx+2].h2)
-            @. ctr[KS.pSpace.nx+1].h3 = 0.5 * (ctr[KS.pSpace.nx].h3 + ctr[KS.pSpace.nx+2].h3)
-            @. ctr[KS.pSpace.nx+1].E = 0.5 * (ctr[KS.pSpace.nx].E + ctr[KS.pSpace.nx+2].E)
-            @. ctr[KS.pSpace.nx+1].B = 0.5 * (ctr[KS.pSpace.nx].B + ctr[KS.pSpace.nx+2].B)
-            ctr[KS.pSpace.nx+1].ϕ = 0.5 * (ctr[KS.pSpace.nx].ϕ + ctr[KS.pSpace.nx+2].ϕ)
-            ctr[KS.pSpace.nx+1].ψ = 0.5 * (ctr[KS.pSpace.nx].ψ + ctr[KS.pSpace.nx+2].ψ)
-            @. ctr[KS.pSpace.nx+1].lorenz = 0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
+            @. ctr[KS.pSpace.nx+1].h0 =
+                0.5 * (ctr[KS.pSpace.nx].h0 + ctr[KS.pSpace.nx+2].h0)
+            @. ctr[KS.pSpace.nx+1].h1 =
+                0.5 * (ctr[KS.pSpace.nx].h1 + ctr[KS.pSpace.nx+2].h1)
+            @. ctr[KS.pSpace.nx+1].h2 =
+                0.5 * (ctr[KS.pSpace.nx].h2 + ctr[KS.pSpace.nx+2].h2)
+            @. ctr[KS.pSpace.nx+1].h3 =
+                0.5 * (ctr[KS.pSpace.nx].h3 + ctr[KS.pSpace.nx+2].h3)
+            @. ctr[KS.pSpace.nx+1].E =
+                0.5 * (ctr[KS.pSpace.nx].E + ctr[KS.pSpace.nx+2].E)
+            @. ctr[KS.pSpace.nx+1].B =
+                0.5 * (ctr[KS.pSpace.nx].B + ctr[KS.pSpace.nx+2].B)
+            ctr[KS.pSpace.nx+1].ϕ =
+                0.5 * (ctr[KS.pSpace.nx].ϕ + ctr[KS.pSpace.nx+2].ϕ)
+            ctr[KS.pSpace.nx+1].ψ =
+                0.5 * (ctr[KS.pSpace.nx].ψ + ctr[KS.pSpace.nx+2].ψ)
+            @. ctr[KS.pSpace.nx+1].lorenz =
+                0.5 * (ctr[KS.pSpace.nx].lorenz + ctr[KS.pSpace.nx+2].lorenz)
         else
             throw("incorrect amount of distribution functions")
         end

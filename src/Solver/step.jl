@@ -5,13 +5,13 @@ wrapper: `step!(ks, faceL, cell, faceR, dt, res, avg, collision=:bgk, isMHD=:tru
 
 1d0f: `step!(fwL, w, prim, fwR, γ, dx, RES, AVG)`
 
-1d1f1v: `step!(fwL, ffL, w, prim, f, fwR, ffR, u, weights, 
+1d1f1v: `step!(fwL, ffL, w, prim, f, fwR, ffR, u, weights,
 γ, μᵣ, ω, Pr, dx, dt, RES, AVG, collision=:bgk)`
 
-1d1f3v: `step!(fwL, ffL, w, prim, f, fwR, ffR, uVelo, vVelo, wVelo, weights, 
+1d1f3v: `step!(fwL, ffL, w, prim, f, fwR, ffR, uVelo, vVelo, wVelo, weights,
 γ, μᵣ, ω, Pr, dx, dt, RES, AVG, collision=:bgk)`
 
-1d2f1v: `step!(fwL, fhL, fbL, w, prim, h, b, fwR, fhR, fbR, u, weights, 
+1d2f1v: `step!(fwL, fhL, fbL, w, prim, h, b, fwR, fhR, fbR, u, weights,
 K, γ, μᵣ, ω, Pr, dx, dt, RES, AVG, collision=:bgk)`
 
 1d2f1v2s: `step!(fwL, fhL, fbL, w, prim, h, b, fwR, fhR, fbR, u, weights, K, γ, mi, ni, me, ne,
@@ -32,7 +32,7 @@ function step!(
     Y<:AbstractArray{<:AbstractFloat,1},
 }
 
-#// 1D0F
+    #// 1D0F
 
     #--- store W^n and calculate H^n,\tau^n ---#
     w_old = deepcopy(w)
@@ -407,13 +407,28 @@ function step!(
         end
         end
         =#
-        
+
         # explicit
-        tau = aap_hs_collision_time(cell.prim, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
-        mprim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+        tau = aap_hs_collision_time(
+            cell.prim,
+            KS.gas.mi,
+            KS.gas.ni,
+            KS.gas.me,
+            KS.gas.ne,
+            KS.gas.Kn[1],
+        )
+        mprim = aap_hs_prim(
+            cell.prim,
+            tau,
+            KS.gas.mi,
+            KS.gas.ni,
+            KS.gas.me,
+            KS.gas.ne,
+            KS.gas.Kn[1],
+        )
         mw = mixture_prim_conserve(mprim, KS.gas.γ)
-        for k=1:2
-            @. cell.w[:,k] += (mw[:,k] - w_old[:,k]) * dt / tau[k]
+        for k = 1:2
+            @. cell.w[:, k] += (mw[:, k] - w_old[:, k]) * dt / tau[k]
         end
         cell.prim .= mixture_conserve_prim(cell.w, KS.gas.γ)
     end
@@ -541,7 +556,15 @@ function step!(
     if isMHD == true
         prim = deepcopy(cell.prim)
     else
-        prim = aap_hs_prim(cell.prim, tau, KS.gas.mi, KS.gas.ni, KS.gas.me, KS.gas.ne, KS.gas.Kn[1])
+        prim = aap_hs_prim(
+            cell.prim,
+            tau,
+            KS.gas.mi,
+            KS.gas.ni,
+            KS.gas.me,
+            KS.gas.ne,
+            KS.gas.Kn[1],
+        )
     end
     g = mixture_maxwellian(KS.vSpace.u, prim)
 
@@ -656,7 +679,7 @@ function step!(
     cell.ϕ -= dt * (faceL.femR[7] + faceR.femL[7]) / cell.dx
     cell.ψ -= dt * (faceL.femR[8] + faceR.femL[8]) / cell.dx
 
-    for i in 1:3
+    for i = 1:3
         if 1 ∈ vcat(isnan.(cell.E), isnan.(cell.B))
             @warn "electromagnetic update is NaN"
         end

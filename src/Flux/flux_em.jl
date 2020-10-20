@@ -63,17 +63,21 @@ function flux_em!(
     slop[8, 8] = 0.0
 
     limiter = zeros(8, 8)
-    limiter[3, 1] = -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
+    limiter[3, 1] =
+        -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
     limiter[5, 1] = 0.5 * sol * (BL[2] - BLL[2]) - 0.5 * (EL[3] - ELL[3])
-    limiter[2, 2] = 0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[2] - ELL[2])
+    limiter[2, 2] =
+        0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[2] - ELL[2])
     limiter[6, 2] = 0.5 * sol * (BL[3] - BLL[3]) + 0.5 * (EL[2] - ELL[2])
     limiter[1, 3] = 0.5 * sol * χ * (EL[1] - ELL[1])
     limiter[7, 3] = 0.5 * χ * (EL[1] - ELL[1])
     limiter[4, 4] = 0.0
     limiter[8, 4] = 0.0
-    limiter[3, 5] = -0.5 * sol^2 * (BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
+    limiter[3, 5] =
+        -0.5 * sol^2 * (BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
     limiter[5, 5] = -0.5 * sol * (BRR[2] - BR[2]) - 0.5 * (ERR[3] - ER[3])
-    limiter[2, 6] = 0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
+    limiter[2, 6] =
+        0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
     limiter[6, 6] = -0.5 * sol * (BRR[3] - BR[3]) + 0.5 * (ERR[2] - ER[2])
     limiter[1, 7] = -0.5 * sol * χ * (ERR[1] - ER[1])
     limiter[7, 7] = 0.5 * χ * (ERR[1] - ER[1])
@@ -81,9 +85,12 @@ function flux_em!(
     limiter[8, 8] = 0.0
 
     for i = 1:8
-        limiter_theta = sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
-        slop[:, i] .*=
-            max(0.0, min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta))
+        limiter_theta =
+            sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
+        slop[:, i] .*= max(
+            0.0,
+            min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta),
+        )
     end
 
     for i = 1:8
@@ -93,8 +100,8 @@ function flux_em!(
             An[i, 7] * (ϕR - ϕL) +
             An[i, 8] * (ψR - ψL) +
             0.5 * sum(
-                fortsign.(1.0, D) .* (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .*
-                slop[i, :],
+                fortsign.(1.0, D) .*
+                (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .* slop[i, :],
             )
         femR[i] =
             sum(Ap[i, 1:3] .* (ER .- EL)) +
@@ -102,8 +109,8 @@ function flux_em!(
             Ap[i, 7] * (ϕR - ϕL) +
             Ap[i, 8] * (ψR - ψL) -
             0.5 * sum(
-                fortsign.(1.0, D) .* (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .*
-                slop[i, :],
+                fortsign.(1.0, D) .*
+                (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .* slop[i, :],
             )
     end
 
@@ -115,8 +122,8 @@ end
 """
 Wave propagation method for 2D Maxwell's equations
 
-`flux_emx!(femL, femR, femLU, femLD, femRU, femRD, 
-ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR, 
+`flux_emx!(femL, femR, femLU, femLD, femRU, femRD,
+ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR,
 dxL, dxR, A1p, A1n, A2p, A2n, D, sol, χ, ν, dt)`
 
 * @args: {E, B, ϕ, ψ} in left-left, left, right, and right-right cells
@@ -182,17 +189,21 @@ function flux_emx!(
     slop[8, 8] = 0.0
 
     limiter = zeros(8, 8)
-    limiter[3, 1] = -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
+    limiter[3, 1] =
+        -0.5 * sol^2 * (BL[2] - BLL[2]) + 0.5 * sol * (EL[3] - ELL[3])
     limiter[5, 1] = 0.5 * sol * (BL[2] - BLL[2]) - 0.5 * (EL[3] - ELL[3])
-    limiter[2, 2] = 0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[2] - ELL[2])
+    limiter[2, 2] =
+        0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[2] - ELL[2])
     limiter[6, 2] = 0.5 * sol * (BL[3] - BLL[3]) + 0.5 * (EL[2] - ELL[2])
     limiter[1, 3] = 0.5 * sol * χ * (EL[1] - ELL[1])
     limiter[7, 3] = 0.5 * χ * (EL[1] - ELL[1])
     limiter[4, 4] = 0.0
     limiter[8, 4] = 0.0
-    limiter[3, 5] = -0.5 * sol^2 * (BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
+    limiter[3, 5] =
+        -0.5 * sol^2 * (BRR[2] - BR[2]) - 0.5 * sol * (ERR[3] - ER[3])
     limiter[5, 5] = -0.5 * sol * (BRR[2] - BR[2]) - 0.5 * (ERR[3] - ER[3])
-    limiter[2, 6] = 0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
+    limiter[2, 6] =
+        0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[2] - ER[2])
     limiter[6, 6] = -0.5 * sol * (BRR[3] - BR[3]) + 0.5 * (ERR[2] - ER[2])
     limiter[1, 7] = -0.5 * sol * χ * (ERR[1] - ER[1])
     limiter[7, 7] = 0.5 * χ * (ERR[1] - ER[1])
@@ -200,9 +211,12 @@ function flux_emx!(
     limiter[8, 8] = 0.0
 
     for i = 1:8
-        limiter_theta = sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
-        slop[:, i] .*=
-            max(0.0, min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta))
+        limiter_theta =
+            sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
+        slop[:, i] .*= max(
+            0.0,
+            min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta),
+        )
     end
 
     for i = 1:8
@@ -212,8 +226,8 @@ function flux_emx!(
             A1n[i, 7] * (ϕR - ϕL) +
             A1n[i, 8] * (ψR - ψL) +
             0.5 * sum(
-                fortsign.(1.0, D) .* (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .*
-                slop[i, :],
+                fortsign.(1.0, D) .*
+                (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .* slop[i, :],
             )
         femR[i] =
             sum(A1p[i, 1:3] .* (ER .- EL)) +
@@ -221,19 +235,23 @@ function flux_emx!(
             A1p[i, 7] * (ϕR - ϕL) +
             A1p[i, 8] * (ψR - ψL) -
             0.5 * sum(
-                fortsign.(1.0, D) .* (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .*
-                slop[i, :],
+                fortsign.(1.0, D) .*
+                (1.0 .- dt ./ (0.5 * (dxL + dxR)) .* abs.(D)) .* slop[i, :],
             )
     end
 
     # high order correction
     for i = 1:8
         femL[i] +=
-            0.5 *
-            sum(fortsign.(1.0, D) .* (1.0 .- dt / (dxL + dxR) * abs.(D)) .* slop[i, :])
+            0.5 * sum(
+                fortsign.(1.0, D) .* (1.0 .- dt / (dxL + dxR) * abs.(D)) .*
+                slop[i, :],
+            )
         femR[i] -=
-            0.5 *
-            sum(fortsign.(1.0, D) .* (1.0 .- dt / (dxL + dxR) * abs.(D)) .* slop[i, :])
+            0.5 * sum(
+                fortsign.(1.0, D) .* (1.0 .- dt / (dxL + dxR) * abs.(D)) .*
+                slop[i, :],
+            )
     end
 
     # transverse correction
@@ -256,8 +274,8 @@ end
 """
 Wave propagation method for 2D Maxwell's equations
 
-`flux_emx!(femL, femR, femLU, femLD, femRU, femRD, 
-ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR, 
+`flux_emx!(femL, femR, femLU, femLD, femRU, femRD,
+ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR,
 dxL, dxR, A1p, A1n, A2p, A2n, D, sol, χ, ν, dt)`
 
 * @args: {E, B, ϕ, ψ} in left-left, left, right, and right-right cells
@@ -318,17 +336,21 @@ function flux_emy!(
     slop[8, 8] = 0.0
 
     limiter = zeros(8, 8)
-    limiter[3, 1] = 0.5 * sol^2 * (BL[1] - BLL[1]) + 0.5 * sol * (EL[3] - ELL[3])
+    limiter[3, 1] =
+        0.5 * sol^2 * (BL[1] - BLL[1]) + 0.5 * sol * (EL[3] - ELL[3])
     limiter[4, 1] = 0.5 * sol * (BL[1] - BLL[1]) + 0.5 * (EL[3] - ELL[3])
-    limiter[1, 2] = -0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[1] - ELL[1])
+    limiter[1, 2] =
+        -0.5 * sol^2 * (BL[3] - BLL[3]) + 0.5 * sol * (EL[1] - ELL[1])
     limiter[6, 2] = 0.5 * sol * (BL[3] - BLL[3]) - 0.5 * (EL[1] - ELL[1])
     limiter[2, 3] = 0.5 * sol * χ * (EL[2] - ELL[2])
     limiter[7, 3] = 0.5 * χ * (EL[2] - ELL[2])
     limiter[5, 4] = 0.0
     limiter[8, 4] = 0.0
-    limiter[3, 5] = 0.5 * sol^2 * (BRR[1] - BR[1]) - 0.5 * sol * (ERR[3] - ER[3])
+    limiter[3, 5] =
+        0.5 * sol^2 * (BRR[1] - BR[1]) - 0.5 * sol * (ERR[3] - ER[3])
     limiter[4, 5] = -0.5 * sol * (BRR[1] - BR[1]) + 0.5 * (ERR[3] - ER[3])
-    limiter[1, 6] = -0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[1] - ER[1])
+    limiter[1, 6] =
+        -0.5 * sol^2 * (BRR[3] - BR[3]) - 0.5 * sol * (ERR[1] - ER[1])
     limiter[6, 6] = -0.5 * sol * (BRR[3] - BR[3]) - 0.5 * (ERR[1] - ER[1])
     limiter[2, 7] = -0.5 * sol * χ * (ERR[2] - ER[2])
     limiter[7, 7] = 0.5 * χ * (ERR[2] - ER[2])
@@ -336,9 +358,12 @@ function flux_emy!(
     limiter[8, 8] = 0.0
 
     for i = 1:8
-        limiter_theta = sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
-        slop[:, i] .*=
-            max(0.0, min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta))
+        limiter_theta =
+            sum(slop[:, i] .* limiter[:, i]) / (sum(slop[:, i] .^ 2) + 1.e-7)
+        slop[:, i] .*= max(
+            0.0,
+            min(min((1.0 + limiter_theta) / 2.0, 2.0), 2.0 * limiter_theta),
+        )
     end
 
     for i = 1:8
@@ -348,8 +373,8 @@ function flux_emy!(
             A2n[i, 7] * (ϕR - ϕL) +
             A2n[i, 8] * (ψR - ψL) +
             0.5 * sum(
-                fortsign.(1.0, D) .* (1.0 .- dt ./ (0.5 * (dyL + dyR)) .* abs.(D)) .*
-                slop[i, :],
+                fortsign.(1.0, D) .*
+                (1.0 .- dt ./ (0.5 * (dyL + dyR)) .* abs.(D)) .* slop[i, :],
             )
         femR[i] =
             sum(A2p[i, 1:3] .* (ER .- EL)) +
@@ -357,19 +382,23 @@ function flux_emy!(
             A2p[i, 7] * (ϕR - ϕL) +
             A2p[i, 8] * (ψR - ψL) -
             0.5 * sum(
-                fortsign.(1.0, D) .* (1.0 .- dt ./ (0.5 * (dyL + dyR)) .* abs.(D)) .*
-                slop[i, :],
+                fortsign.(1.0, D) .*
+                (1.0 .- dt ./ (0.5 * (dyL + dyR)) .* abs.(D)) .* slop[i, :],
             )
     end
 
     # high order correction
     for i = 1:8
         femL[i] +=
-            0.5 *
-            sum(fortsign.(1.0, D) .* (1.0 .- dt / (dyL + dyR) .* abs.(D)) .* slop[i, :])
+            0.5 * sum(
+                fortsign.(1.0, D) .* (1.0 .- dt / (dyL + dyR) .* abs.(D)) .*
+                slop[i, :],
+            )
         femR[i] -=
-            0.5 *
-            sum(fortsign.(1.0, D) .* (1.0 .- dt / (dyL + dyR) .* abs.(D)) .* slop[i, :])
+            0.5 * sum(
+                fortsign.(1.0, D) .* (1.0 .- dt / (dyL + dyR) .* abs.(D)) .*
+                slop[i, :],
+            )
     end
 
     # transverse correction
@@ -385,5 +414,5 @@ function flux_emy!(
     femLD .*= -0.5 * dt / (dyL + dyR)
 
     return nothing
-    
+
 end

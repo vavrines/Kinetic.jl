@@ -82,7 +82,8 @@ struct VSpace2D{T<:AbstractArray{Float64,2}} <: AbstractVelocitySpace
     weights::T
 
     VSpace2D() = VSpace2D(-5, 5, 28, -5, 5, 28)
-    VSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = VSpace2D(U0, U1, 28, V0, V1, 28)
+    VSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) =
+        VSpace2D(U0, U1, 28, V0, V1, 28)
 
     function VSpace2D(
         U0::Real,
@@ -204,7 +205,12 @@ struct VSpace3D{T<:AbstractArray{Float64,3}} <: AbstractVelocitySpace
         w1 = Float64(W1)
         nw = WNUM
         δw = (w1 - w0) / nw
-        u = OffsetArray{Float64}(undef, 1-NGU:nu+NGU, 1-NGV:nv+NGV, 1-NGW:nw+NGW)
+        u = OffsetArray{Float64}(
+            undef,
+            1-NGU:nu+NGU,
+            1-NGV:nv+NGV,
+            1-NGW:nw+NGW,
+        )
         v = similar(u)
         w = similar(u)
         du = similar(u)
@@ -244,7 +250,24 @@ struct VSpace3D{T<:AbstractArray{Float64,3}} <: AbstractVelocitySpace
             println("error: no velocity quadrature rule")
         end
 
-        new{typeof(u)}(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, w, du, dv, dw, weights)
+        new{typeof(u)}(
+            u0,
+            u1,
+            nu,
+            v0,
+            v1,
+            nv,
+            w0,
+            w1,
+            nw,
+            u,
+            v,
+            w,
+            du,
+            dv,
+            dw,
+            weights,
+        )
 
     end # constructor
 
@@ -267,7 +290,8 @@ struct MVSpace1D{T<:AbstractArray{Float64,2}} <: AbstractVelocitySpace
     weights::T
 
     MVSpace1D() = MVSpace1D(-5, 5, -10, 10, 28)
-    MVSpace1D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace1D(U0, U1, V0, V1, 28)
+    MVSpace1D(U0::Real, U1::Real, V0::Real, V1::Real) =
+        MVSpace1D(U0, U1, V0, V1, 28)
 
     function MVSpace1D(
         Ui0::Real,
@@ -333,7 +357,8 @@ struct MVSpace2D{T<:AbstractArray{Float64,3}} <: AbstractVelocitySpace
     weights::T
 
     MVSpace2D() = MVSpace2D(-5, 5, -10, 10, 28, -5, 5, -10, 10, 28)
-    MVSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) = MVSpace2D(U0, U1, U0, U1, 28, V0, V1, V0, V1, 28)
+    MVSpace2D(U0::Real, U1::Real, V0::Real, V1::Real) =
+        MVSpace2D(U0, U1, U0, U1, 28, V0, V1, V0, V1, 28)
 
     function MVSpace2D(
         Ui0::Real,
@@ -423,9 +448,9 @@ struct MVSpace3D{T<:AbstractArray{Float64,4}} <: AbstractVelocitySpace
     dw::T
     weights::T
 
-    MVSpace3D() = 
+    MVSpace3D() =
         MVSpace3D(-5, 5, -10, 10, 20, -5, 5, -10, 10, 20, -5, 5, -10, 10, 20)
-    MVSpace3D(U0::Real, U1::Real, V0::Real, V1::Real, W0::Real, W1::Real) = 
+    MVSpace3D(U0::Real, U1::Real, V0::Real, V1::Real, W0::Real, W1::Real) =
         MVSpace3D(U0, U1, U0, U1, 20, V0, V1, V0, V1, 20, W0, W1, W0, W1, 20)
 
     function MVSpace3D(
@@ -463,7 +488,13 @@ struct MVSpace3D{T<:AbstractArray{Float64,4}} <: AbstractVelocitySpace
         nw = WNUM
         δw = (w1 .- w0) ./ nw
 
-        u = OffsetArray{Float64}(undef, 1-NGU:nu+NGU, 1-NGV:nv+NGV, 1-NGW:nw+NGW, 1:2)
+        u = OffsetArray{Float64}(
+            undef,
+            1-NGU:nu+NGU,
+            1-NGV:nv+NGV,
+            1-NGW:nw+NGW,
+            1:2,
+        )
         v = similar(u)
         w = similar(u)
         du = similar(u)
@@ -472,7 +503,11 @@ struct MVSpace3D{T<:AbstractArray{Float64,4}} <: AbstractVelocitySpace
         weights = similar(u)
 
         if TYPE == "rectangle" # rectangular formula
-            for l in axes(u, 4), k in axes(u, 3), j in axes(u, 2), i in axes(u, 1)
+            for l in axes(u, 4),
+                k in axes(u, 3),
+                j in axes(u, 2),
+                i in axes(u, 1)
+
                 u[i, j, k, l] = u0[l] + (i - 0.5) * δu[l]
                 v[i, j, k, l] = v0[l] + (j - 0.5) * δv[l]
                 w[i, j, k, l] = w0[l] + (k - 0.5) * δw[l]
@@ -482,7 +517,11 @@ struct MVSpace3D{T<:AbstractArray{Float64,4}} <: AbstractVelocitySpace
                 weights[i, j, k, l] = δu[l] * δv[l] * δw[l]
             end
         elseif TYPE == "newton" # newton-cotes formula
-            for l in axes(u, 4), k in axes(u, 3), j in axes(u, 2), i in axes(u, 1)
+            for l in axes(u, 4),
+                k in axes(u, 3),
+                j in axes(u, 2),
+                i in axes(u, 1)
+
                 u[i, j, k, l] = u0[l] + (i - 0.5) * δu[l]
                 v[i, j, k, l] = v0[l] + (j - 0.5) * δv[l]
                 w[i, j, k, l] = w0[l] + (k - 0.5) * δw[l]
@@ -502,7 +541,24 @@ struct MVSpace3D{T<:AbstractArray{Float64,4}} <: AbstractVelocitySpace
         end
 
         # inner constructor method
-        new{typeof(u)}(u0, u1, nu, v0, v1, nv, w0, w1, nw, u, v, v, du, dv, dw, weights)
+        new{typeof(u)}(
+            u0,
+            u1,
+            nu,
+            v0,
+            v1,
+            nv,
+            w0,
+            w1,
+            nw,
+            u,
+            v,
+            v,
+            du,
+            dv,
+            dw,
+            weights,
+        )
 
     end # constructor
 
