@@ -12,7 +12,7 @@ Python linspace function
     linspace(start::Real, stop::Real, n::Int)
 
 """
-linspace(start::Real, stop::Real, n::Int) = collect(range(start, stop = stop, length = n))
+linspace(start, stop, n::T) where {T<:Int} = collect(range(start, stop = stop, length = n))
 
 
 """
@@ -21,7 +21,7 @@ Heaviside step function
     heaviside(x::Real)
 
 """
-heaviside(x::Real) = ifelse(x >= 0, 1.0, 0.0)
+heaviside(x::T) where {T<:Real} = ifelse(x >= 0, 1.0, 0.0)
 
 
 """
@@ -30,7 +30,7 @@ Fortran sign function
     fortsign(x::Real, y::Real)
 
 """
-fortsign(x::Real, y::Real) = abs(x) * sign(y)
+fortsign(x::T, y) where {T<:Real} = abs(x) * sign(y)
 
 
 """
@@ -39,7 +39,7 @@ Split matrix into row vectors
     mat_split(m::AbstractArray)
 
 """
-function mat_split(m::AbstractArray)
+function mat_split(m::T) where {T<:AbstractArray}
 
     if ndims(m) == 2
         nx = eltype(m).([1.0 0.0])

@@ -8,11 +8,15 @@ Solution algorithm
 
 """
 function solve!(
-    KS::SolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1},
-    face::Array{<:AbstractInterface1D,1},
-    simTime::Float64,
-)
+    KS::X,
+    ctr::Y,
+    face::Z,
+    simTime,
+) where {
+    X<:AbstractSolverSet,
+    Y<:AbstractArray{<:AbstractControlVolume,1},
+    Z<:AbstractArray{<:AbstractInterface1D,1},
+}
     
     #--- initial checkpoint ---#
     write_jld(KS, ctr, simTime)
@@ -66,10 +70,10 @@ Timestep calculator
 
 """
 function timestep(
-    KS::SolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1},
-    simTime::Real,
-)
+    KS::X,
+    ctr::Y,
+    simTime,
+) where {X<:AbstractSolverSet,Y<:AbstractArray{<:AbstractControlVolume,1}}
 
     tmax = 0.0
 
@@ -112,7 +116,10 @@ Reconstructor
 * 2D solver: `reconstruct!(KS::SolverSet, ctr::AbstractArray{ControlVolume2D2F,2})`
 
 """
-function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1D,1})
+function reconstruct!(
+    KS::X, 
+    ctr::Y,
+) where {X<:AbstractSolverSet,Y<:AbstractArray{<:AbstractControlVolume,1}}
 
     if KS.set.interpOrder == 1
         return
@@ -232,7 +239,10 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{<:AbstractControlVolume1
 
 end
 
-function reconstruct!(KS::SolverSet, ctr::AbstractArray{ControlVolume2D2F,2})
+function reconstruct!(
+    KS::X, 
+    ctr::Y,
+) where {X<:AbstractSolverSet,Y<:AbstractArray{ControlVolume2D2F,2}}
 
     if KS.set.interpOrder == 1
         return
@@ -428,7 +438,10 @@ function reconstruct!(KS::SolverSet, ctr::AbstractArray{ControlVolume2D2F,2})
 
 end
 
-function reconstruct!(KS::SolverSet, ctr::AbstractArray{ControlVolume2D3F,2})
+function reconstruct!(
+    KS::X, 
+    ctr::Y,
+) where {X<:AbstractSolverSet,Y<:AbstractArray{ControlVolume2D3F,2}}
 
     if KS.set.interpOrder == 1
         return
@@ -680,14 +693,18 @@ Evolution
 
 """
 function evolve!(
-    KS::SolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1},
-    face::Array{<:AbstractInterface1D,1},
-    dt::Real;
+    KS::X,
+    ctr::Y,
+    face::Z,
+    dt;
     mode = Symbol(KS.set.flux)::Symbol,
     isPlasma = false::Bool,
     isMHD = false::Bool,
-)
+) where {
+    X<:AbstractSolverSet,
+    Y<:AbstractArray{<:AbstractControlVolume1D,1},
+    Z<:AbstractArray{<:AbstractInterface1D,1},
+}
 
     #if KS.set.case == "heat"
     #		flux_maxwell!(KS.ib.bcL, face[1], ctr[1], 1, dt)
@@ -1027,14 +1044,18 @@ Update flow variables
 
 """
 function update!(
-    KS::SolverSet,
-    ctr::AbstractArray{ControlVolume1D1F,1},
-    face::Array{Interface1D1F,1},
-    dt::Real,
-    residual::Array{<:AbstractFloat}; # 1D / 2D
+    KS::X,
+    ctr::Y,
+    face::Z,
+    dt,
+    residual; # 1D / 2D
     coll = :bgk::Symbol,
     bc = :fix::Symbol,
-)
+) where {
+    X<:AbstractSolverSet,
+    Y<:AbstractArray{ControlVolume1D1F,1},
+    Z<:AbstractArray{Interface1D1F,1},
+}
 
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
@@ -1108,14 +1129,18 @@ function update!(
 end
 
 function update!(
-    KS::SolverSet,
-    ctr::AbstractArray{ControlVolume1D2F,1},
-    face::Array{Interface1D2F,1},
-    dt::Real,
-    residual::Array{<:AbstractFloat}; # 1D / 2D
+    KS::X,
+    ctr::Y,
+    face::Z,
+    dt,
+    residual; # 1D / 2D
     coll = :bgk::Symbol,
     bc = :extra::Symbol,
-)
+) where {
+    X<:AbstractSolverSet,
+    Y<:AbstractArray{ControlVolume1D2F,1},
+    Z<:AbstractArray{Interface1D2F,1},
+}
 
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
@@ -1197,15 +1222,19 @@ function update!(
 end
 
 function update!(
-    KS::SolverSet,
-    ctr::AbstractArray{ControlVolume1D3F,1},
-    face::Array{Interface1D3F,1},
-    dt::Real,
-    residual::Array{<:AbstractFloat}; # 1D / 2D
+    KS::X,
+    ctr::Y,
+    face::Z,
+    dt,
+    residual; # 1D / 2D
     coll = :bgk::Symbol,
     bc = :extra::Symbol,
     isMHD = true::Bool,
-)
+) where {
+    X<:AbstractSolverSet,
+    Y<:AbstractArray{ControlVolume1D3F,1},
+    Z<:AbstractArray{Interface1D3F,1},
+}
 
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
@@ -1317,15 +1346,19 @@ function update!(
 end
 
 function update!(
-    KS::SolverSet,
-    ctr::AbstractArray{ControlVolume1D4F,1},
-    face::Array{Interface1D4F,1},
-    dt::Real,
-    residual::Array{<:AbstractFloat}; # 1D / 2D
+    KS::X,
+    ctr::Y,
+    face::Z,
+    dt,
+    residual; # 1D / 2D
     coll = :bgk::Symbol,
     bc = :extra::Symbol,
     isMHD = true::Bool,
-)
+) where {
+    X<:AbstractSolverSet,
+    Y<:AbstractArray{ControlVolume1D4F,1},
+    Z<:AbstractArray{Interface1D4F,1},
+}
 
     sumRes = zeros(axes(KS.ib.wL))
     sumAvg = zeros(axes(KS.ib.wL))
@@ -1363,15 +1396,19 @@ end
 
 
 function update_boundary!(
-    KS::SolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1},
-    face::Array{<:AbstractInterface1D,1},
-    dt::Real,
-    residual::Array{<:AbstractFloat};
+    KS::X,
+    ctr::Y,
+    face::Z,
+    dt,
+    residual;
     coll::Symbol,
     bc::Symbol,
     isMHD::Bool,
-)
+) where {
+    X<:AbstractSolverSet,
+    Y<:AbstractArray{<:AbstractControlVolume1D,1},
+    Z<:AbstractArray{<:AbstractInterface1D,1},
+}
 
     resL = zeros(axes(KS.ib.wL))
     avgL = zeros(axes(KS.ib.wL))

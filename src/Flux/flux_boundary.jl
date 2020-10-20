@@ -7,20 +7,26 @@ Maxwell's diffusive boundary flux
 
 """
 function flux_boundary_maxwell!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh::AbstractArray{<:AbstractFloat,2},
-    fb::AbstractArray{<:AbstractFloat,2},
-    bc::Array{<:Real,1},
-    h::AbstractArray{<:AbstractFloat,2},
-    b::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    inK::Real,
-    dt::Real,
-    len::Real,
-    rot = 1::Real,
-)
+    fw::T1,
+    fh::T2,
+    fb::T2,
+    bc::T3,
+    h::T4,
+    b::T4,
+    u::T5,
+    v::T5,
+    ω::T5,
+    inK,
+    dt,
+    len,
+    rot = 1,
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:AbstractFloat,2},
+    T3<:Array{<:Real,1},
+    T4<:AbstractArray{<:AbstractFloat,2},
+    T5<:AbstractArray{<:AbstractFloat,2},
+}
 
     @assert length(bc) == 4
 

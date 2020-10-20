@@ -26,7 +26,7 @@ struct SolverSet <: AbstractSolverSet
     SolverSet(set, pSpace, vSpace, gas, ib, outputFolder) =
         new(set, pSpace, vSpace, gas, ib, outputFolder)
 
-    function SolverSet(configfilename::String)
+    function SolverSet(configfilename::T) where {T<:AbstractString}
 
         # generate variables from configuration file
         dict = read_dict(configfilename)
@@ -250,7 +250,7 @@ end # struct
 Generate AbstractIB
 
 """
-function set_ib(set, vSpace, gas, uLid = 0.15, vLid = 0.0, tLid = 1.0)
+function set_ib(set::T, vSpace, gas, uLid = 0.15, vLid = 0.0, tLid = 1.0) where {T<:AbstractSetup}
 
     if set.case == "shock"
 

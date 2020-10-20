@@ -19,15 +19,20 @@ Kn, Pr, dx, dt, RES, AVG, collision=:bgk)`
 
 """
 function step!(
-    fwL::AbstractArray{<:AbstractFloat,1},
-    w::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:AbstractFloat,1},
-    fwR::AbstractArray{<:AbstractFloat,1},
-    γ::Real,
-    dx::Real,
-    RES::AbstractArray{<:AbstractFloat,1},
-    AVG::AbstractArray{<:AbstractFloat,1},
-) #// 1D0F
+    fwL::X,
+    w::Y,
+    prim::Y,
+    fwR::X,
+    γ,
+    dx,
+    RES,
+    AVG,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+}
+
+#// 1D0F
 
     #--- store W^n and calculate H^n,\tau^n ---#
     w_old = deepcopy(w)
@@ -46,25 +51,31 @@ end
 # 1D1F1V
 # ------------------------------------------------------------
 function step!(
-    fwL::AbstractArray{<:AbstractFloat,1},
-    ffL::AbstractArray{<:AbstractFloat,1},
-    w::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:AbstractFloat,1},
-    f::AbstractArray{<:AbstractFloat,1},
-    fwR::AbstractArray{<:AbstractFloat,1},
-    ffR::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    weights::AbstractArray{<:AbstractFloat,1},
-    γ::Real,
-    μᵣ::Real,
-    ω::Real,
-    Pr::Real,
-    dx::Real,
-    dt::Real,
-    RES::AbstractArray{<:AbstractFloat,1},
-    AVG::AbstractArray{<:AbstractFloat,1},
+    fwL::T1,
+    ffL::T2,
+    w::T3,
+    prim::T3,
+    f::T4,
+    fwR::T1,
+    ffR::T2,
+    u::T5,
+    weights::T5,
+    γ,
+    μᵣ,
+    ω,
+    Pr,
+    dx,
+    dt,
+    RES,
+    AVG,
     collision = :bgk::Symbol,
-)
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:AbstractFloat,1},
+    T3<:AbstractArray{<:AbstractFloat,1},
+    T4<:AbstractArray{<:AbstractFloat,1},
+    T5<:AbstractArray{<:AbstractFloat,1},
+}
 
     #--- store W^n and calculate H^n,\tau^n ---#
     w_old = deepcopy(w)
@@ -101,27 +112,33 @@ end
 # 1D1F3V
 # ------------------------------------------------------------
 function step!(
-    fwL::AbstractArray{<:AbstractFloat,1},
-    ffL::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:AbstractFloat,1},
-    f::AbstractArray{<:AbstractFloat,3},
-    fwR::AbstractArray{<:AbstractFloat,1},
-    ffR::AbstractArray{<:AbstractFloat,3},
-    uVelo::AbstractArray{<:AbstractFloat,3},
-    vVelo::AbstractArray{<:AbstractFloat,3},
-    wVelo::AbstractArray{<:AbstractFloat,3}, # avoid conflict with w
-    weights::AbstractArray{<:AbstractFloat,3},
-    γ::Real,
-    μᵣ::Real,
-    ω::Real,
-    Pr::Real,
-    dx::Real,
-    dt::Real,
-    RES::Array{<:AbstractFloat,1},
-    AVG::Array{<:AbstractFloat,1},
+    fwL::T1,
+    ffL::T2,
+    w::T3,
+    prim::T3,
+    f::T4,
+    fwR::T1,
+    ffR::T2,
+    uVelo::T5,
+    vVelo::T5,
+    wVelo::T5, # avoid conflict with w
+    weights::T5,
+    γ,
+    μᵣ,
+    ω,
+    Pr,
+    dx,
+    dt,
+    RES,
+    AVG,
     collision = :bgk::Symbol,
-)
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:AbstractFloat,3},
+    T3<:AbstractArray{<:AbstractFloat,1},
+    T4<:AbstractArray{<:AbstractFloat,3},
+    T5<:AbstractArray{<:AbstractFloat,3},
+}
 
     #--- store W^n and calculate shakhov term ---#
     w_old = deepcopy(w)
@@ -161,29 +178,35 @@ end
 
 #--- 1D2F1V ---#
 function step!(
-    fwL::AbstractArray{<:AbstractFloat,1},
-    fhL::AbstractArray{<:AbstractFloat,1},
-    fbL::AbstractArray{<:AbstractFloat,1},
-    w::AbstractArray{<:AbstractFloat,1},
-    prim::AbstractArray{<:AbstractFloat,1},
-    h::AbstractArray{<:AbstractFloat,1},
-    b::AbstractArray{<:AbstractFloat,1},
-    fwR::AbstractArray{<:AbstractFloat,1},
-    fhR::AbstractArray{<:AbstractFloat,1},
-    fbR::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    weights::AbstractArray{<:AbstractFloat,1},
-    K::Real,
-    γ::Real,
-    μᵣ::Real,
-    ω::Real,
-    Pr::Real,
-    dx::Real,
-    dt::Real,
-    RES::AbstractArray{<:AbstractFloat,1},
-    AVG::AbstractArray{<:AbstractFloat,1},
+    fwL::T1,
+    fhL::T2,
+    fbL::T2,
+    w::T3,
+    prim::T3,
+    h::T4,
+    b::T4,
+    fwR::T1,
+    fhR::T2,
+    fbR::T2,
+    u::T5,
+    weights::T5,
+    K,
+    γ,
+    μᵣ,
+    ω,
+    Pr,
+    dx,
+    dt,
+    RES,
+    AVG,
     collision = :bgk::Symbol,
-)
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:AbstractFloat,1},
+    T3<:AbstractArray{<:AbstractFloat,1},
+    T4<:AbstractArray{<:AbstractFloat,1},
+    T5<:AbstractArray{<:AbstractFloat,1},
+}
 
     #--- store W^n and calculate shakhov term ---#
     w_old = deepcopy(w)
@@ -223,32 +246,38 @@ end
 
 #--- 1D2F1V mixture ---#
 function step!(
-    fwL::AbstractArray{<:AbstractFloat,2},
-    fhL::AbstractArray{<:AbstractFloat,2},
-    fbL::AbstractArray{<:AbstractFloat,2},
-    w::AbstractArray{<:AbstractFloat,2},
-    prim::AbstractArray{<:AbstractFloat,2},
-    h::AbstractArray{<:AbstractFloat,2},
-    b::AbstractArray{<:AbstractFloat,2},
-    fwR::AbstractArray{<:AbstractFloat,2},
-    fhR::AbstractArray{<:AbstractFloat,2},
-    fbR::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    weights::AbstractArray{<:AbstractFloat,2},
-    inK::Real,
-    γ::Real,
-    mi::Real,
-    ni::Real,
-    me::Real,
-    ne::Real,
-    Kn::Real,
-    Pr::Real,
-    dx::Real,
-    dt::Real,
-    RES::AbstractArray{<:AbstractFloat,2},
-    AVG::AbstractArray{<:AbstractFloat,2},
+    fwL::T1,
+    fhL::T2,
+    fbL::T2,
+    w::T3,
+    prim::T3,
+    h::T4,
+    b::T4,
+    fwR::T1,
+    fhR::T2,
+    fbR::T2,
+    u::T5,
+    weights::T5,
+    inK,
+    γ,
+    mi,
+    ni,
+    me,
+    ne,
+    Kn,
+    Pr,
+    dx,
+    dt,
+    RES,
+    AVG,
     collision = :bgk::Symbol,
-)
+) where {
+    T1<:AbstractArray{<:AbstractFloat,2},
+    T2<:AbstractArray{<:AbstractFloat,2},
+    T3<:AbstractArray{<:AbstractFloat,2},
+    T4<:AbstractArray{<:AbstractFloat,2},
+    T5<:AbstractArray{<:AbstractFloat,2},
+}
 
     #--- update conservative flow variables ---#
     # w^n
@@ -328,16 +357,16 @@ end
 
 #--- 1D4F1V ---#
 function step!(
-    KS::SolverSet,
+    KS::T,
     faceL::Interface1D4F,
     cell::ControlVolume1D4F,
     faceR::Interface1D4F,
-    dt::AbstractFloat,
-    RES::Array{<:AbstractFloat,2},
-    AVG::Array{<:AbstractFloat,2},
+    dt,
+    RES,
+    AVG,
     collision = :bgk::Symbol,
     isMHD = true::Bool,
-)
+) where {T<:AbstractSolverSet}
 
     #--- update conservative flow variables: step 1 ---#
     # w^n
@@ -540,16 +569,16 @@ end
 
 #--- 1D3F2V ---#
 function step!(
-    KS::SolverSet,
+    KS::T,
     faceL::Interface1D3F,
     cell::ControlVolume1D3F,
     faceR::Interface1D3F,
-    dt::AbstractFloat,
-    RES::Array{<:AbstractFloat,2},
-    AVG::Array{<:AbstractFloat,2},
+    dt,
+    RES,
+    AVG,
     collision = :bgk::Symbol,
     isMHD = true::Bool,
-)
+) where {T<:AbstractSolverSet}
 
     #--- update conservative flow variables: step 1 ---#
     # w^n

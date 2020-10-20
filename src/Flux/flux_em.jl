@@ -11,30 +11,36 @@ Wave propagation method for Maxwell's equations
 
 """
 function flux_em!(
-    femL::AbstractArray{<:Real,1},
-    femR::AbstractArray{<:Real,1},
-    ELL::AbstractArray{<:Real,1},
-    BLL::AbstractArray{<:Real,1},
-    EL::AbstractArray{<:Real,1},
-    BL::AbstractArray{<:Real,1},
-    ER::AbstractArray{<:Real,1},
-    BR::AbstractArray{<:Real,1},
-    ERR::AbstractArray{<:Real,1},
-    BRR::AbstractArray{<:Real,1},
-    ϕL::Real,
-    ϕR::Real,
-    ψL::Real,
-    ψR::Real,
-    dxL::Real, # NO need to multiply 0.5
-    dxR::Real, # NO need to multiply 0.5
-    Ap::AbstractArray{<:Real,2},
-    An::AbstractArray{<:Real,2},
-    D::AbstractArray{<:Real,1},
-    sol::Real,
-    χ::Real,
-    ν::Real,
-    dt::Real,
-)
+    femL::T1,
+    femR::T1,
+    ELL::T2,
+    BLL::T2,
+    EL::T2,
+    BL::T2,
+    ER::T2,
+    BR::T2,
+    ERR::T2,
+    BRR::T2,
+    ϕL,
+    ϕR,
+    ψL,
+    ψR,
+    dxL, # NO need to multiply 0.5
+    dxR, # NO need to multiply 0.5
+    Ap::T3,
+    An::T3,
+    D::T4,
+    sol,
+    χ,
+    ν,
+    dt,
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:Real,1},
+    T3<:AbstractArray{<:Real,2},
+    T4<:AbstractArray{<:Real,1},
+}
+
 
     @assert length(femL) == length(femR) == 8
 
@@ -121,36 +127,41 @@ dxL, dxR, A1p, A1n, A2p, A2n, D, sol, χ, ν, dt)`
 
 """
 function flux_emx!(
-    femL::AbstractArray{<:Real,1},
-    femR::AbstractArray{<:Real,1},
-    femLU::AbstractArray{<:Real,1},
-    femLD::AbstractArray{<:Real,1},
-    femRU::AbstractArray{<:Real,1},
-    femRD::AbstractArray{<:Real,1},
-    ELL::AbstractArray{<:Real,1},
-    BLL::AbstractArray{<:Real,1},
-    EL::AbstractArray{<:Real,1},
-    BL::AbstractArray{<:Real,1},
-    ER::AbstractArray{<:Real,1},
-    BR::AbstractArray{<:Real,1},
-    ERR::AbstractArray{<:Real,1},
-    BRR::AbstractArray{<:Real,1},
-    ϕL::Real,
-    ϕR::Real,
-    ψL::Real,
-    ψR::Real,
-    dxL::Real, # NO need to multiply 0.5
-    dxR::Real, # NO need to multiply 0.5
-    A1p::AbstractArray{<:Real,2},
-    A1n::AbstractArray{<:Real,2},
-    A2p::AbstractArray{<:Real,2},
-    A2n::AbstractArray{<:Real,2},
-    D::AbstractArray{<:Real,1},
-    sol::Real,
-    χ::Real,
-    ν::Real,
-    dt::Real,
-)
+    femL::X,
+    femR::X,
+    femLU::X,
+    femLD::X,
+    femRU::X,
+    femRD::X,
+    ELL::Y,
+    BLL::Y,
+    EL::Y,
+    BL::Y,
+    ER::Y,
+    BR::Y,
+    ERR::Y,
+    BRR::Y,
+    ϕL,
+    ϕR,
+    ψL,
+    ψR,
+    dxL, # NO need to multiply 0.5
+    dxR, # NO need to multiply 0.5
+    A1p::A,
+    A1n::A,
+    A2p::A,
+    A2n::A,
+    D::B,
+    sol,
+    χ,
+    ν,
+    dt,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:Real,1},
+    A<:AbstractArray{<:Real,2},
+    B<:AbstractArray{<:Real,1},
+}
 
     slop = zeros(8, 8)
     slop[3, 1] = -0.5 * sol^2 * (BR[2] - BL[2]) + 0.5 * sol * (ER[3] - EL[3])

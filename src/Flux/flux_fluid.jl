@@ -13,13 +13,13 @@ Commun. Pure and Applied Mathematics, 7, 159-193, 1954._
 
 """
 function flux_lax!(
-    fw::AbstractArray{<:Real,1},
-    wL::AbstractArray{<:Real,1},
-    wR::AbstractArray{<:Real,1},
-    γ::Real,
-    dt::Real,
-    dx::Real,
-)
+    fw::X,
+    wL::Y,
+    wR::Y,
+    γ,
+    dt,
+    dx,
+) where {X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
     fw .= 0.5 * dt .* (euler_flux(wL, γ)[1] + euler_flux(wR, γ)[1] - dx / dt .* (wR - wL))
     return nothing
 end
@@ -35,12 +35,12 @@ HLL flux for the Euler equations
 
 """
 function flux_hll!(
-    fw::AbstractArray{<:Real,1},
-    wL::AbstractArray{<:Real,1},
-    wR::AbstractArray{<:Real,1},
-    γ::Real,
-    dt::Real,
-)
+    fw::X,
+    wL::Y,
+    wR::Y,
+    γ,
+    dt,
+) where {X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1}}
 
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
@@ -87,13 +87,13 @@ _P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference Scheme
 
 """
 function flux_roe!(
-    fw::AbstractArray{<:Real,1},
-    wL::AbstractArray{<:Real,1},
-    wR::AbstractArray{<:Real,1},
-    γ::Real,
-    dt::Real,
-    n = [1.0, 0.0]::AbstractArray{<:Real,1},
-)
+    fw::X,
+    wL::Y,
+    wR::Y,
+    γ,
+    dt,
+    n = [1.0, 0.0]::Z,
+) where {X<:AbstractArray{<:Real,1},Y<:AbstractArray{<:Real,1},Z<:AbstractArray{<:Real,1}}
 
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)

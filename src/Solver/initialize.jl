@@ -7,7 +7,7 @@
 Initialize solver from input file
 
 """
-function initialize(configfilename::String)
+function initialize(configfilename::T) where {T<:AbstractString}
 
     println("==============================================================")
     println("Kinetic.jl")
@@ -43,7 +43,7 @@ end
 Initialize finite volume method
 
 """
-function init_fvm(KS::SolverSet)
+function init_fvm(KS::T) where {T<:AbstractSolverSet}
 
     if KS.set.space[1:2] == "1d"
 

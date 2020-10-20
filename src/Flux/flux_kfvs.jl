@@ -15,14 +15,18 @@ Kinetic flux vector splitting (KFVS) flux
 
 """
 function flux_kfvs!(
-    ff::AbstractArray{<:AbstractFloat,1},
-    fL::AbstractArray{<:AbstractFloat,1},
-    fR::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    dt::AbstractFloat,
-    sfL = zeros(eltype(fL), axes(fL))::AbstractArray{<:AbstractFloat,1},
-    sfR = zeros(eltype(fR), axes(fR))::AbstractArray{<:AbstractFloat,1},
-) #// 1F1V flux of pure DOM
+    ff::X,
+    fL::Y,
+    fR::Y,
+    u::Z,
+    dt,
+    sfL = zeros(eltype(fL), axes(fL))::Y,
+    sfR = zeros(eltype(fR), axes(fR))::Y,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+} # 1F1V flux of pure DOM
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -41,16 +45,21 @@ end
 # 1F1V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    ff::AbstractArray{<:AbstractFloat,1},
-    fL::AbstractArray{<:AbstractFloat,1},
-    fR::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-    dt::AbstractFloat,
-    sfL = zeros(eltype(fL), axes(fL))::AbstractArray{<:AbstractFloat,1},
-    sfR = zeros(eltype(fR), axes(fR))::AbstractArray{<:AbstractFloat,1},
-)
+    fw::X,
+    ff::Y,
+    fL::Z,
+    fR::Z,
+    u::A,
+    ω::A,
+    dt,
+    sfL = zeros(eltype(fL), axes(fL))::Z,
+    sfR = zeros(eltype(fR), axes(fR))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+    A<:AbstractArray{<:AbstractFloat,1},
+}
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -73,18 +82,23 @@ end
 # 1F3V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    ff::AbstractArray{<:AbstractFloat,3},
-    fL::AbstractArray{<:AbstractFloat,3},
-    fR::AbstractArray{<:AbstractFloat,3},
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    w::AbstractArray{<:AbstractFloat,3},
-    ω::AbstractArray{<:AbstractFloat,3},
-    dt::AbstractFloat,
-    sfL = zeros(eltype(fL), axes(fL))::AbstractArray{<:AbstractFloat,3},
-    sfR = zeros(eltype(fR), axes(fR))::AbstractArray{<:AbstractFloat,3},
-)
+    fw::X,
+    ff::Y,
+    fL::Z,
+    fR::Z,
+    u::A,
+    v::A,
+    w::A,
+    ω::A,
+    dt,
+    sfL = zeros(eltype(fL), axes(fL))::Z,
+    sfR = zeros(eltype(fR), axes(fR))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,3},
+    Z<:AbstractArray{<:AbstractFloat,3},
+    A<:AbstractArray{<:AbstractFloat,3},
+}
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -111,21 +125,26 @@ end
 # 2F1V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh::AbstractArray{<:AbstractFloat,1},
-    fb::AbstractArray{<:AbstractFloat,1},
-    hL::AbstractArray{<:AbstractFloat,1},
-    bL::AbstractArray{<:AbstractFloat,1},
-    hR::AbstractArray{<:AbstractFloat,1},
-    bR::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-    dt::AbstractFloat,
-    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,1},
-    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,1},
-    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,1},
-    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,1},
-)
+    fw::X,
+    fh::Y,
+    fb::Y,
+    hL::Z,
+    bL::Z,
+    hR::Z,
+    bR::Z,
+    u::A,
+    ω::A,
+    dt,
+    shL = zeros(eltype(hL), axes(hL))::Z,
+    sbL = zeros(eltype(bL), axes(bL))::Z,
+    shR = zeros(eltype(hR), axes(hR))::Z,
+    sbR = zeros(eltype(bR), axes(bR))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+    A<:AbstractArray{<:AbstractFloat,1},
+}
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -154,31 +173,36 @@ end
 # 4F1V flux (single component)
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh0::AbstractArray{<:AbstractFloat,1},
-    fh1::AbstractArray{<:AbstractFloat,1},
-    fh2::AbstractArray{<:AbstractFloat,1},
-    fh3::AbstractArray{<:AbstractFloat,1},
-    h0L::AbstractArray{<:AbstractFloat,1},
-    h1L::AbstractArray{<:AbstractFloat,1},
-    h2L::AbstractArray{<:AbstractFloat,1},
-    h3L::AbstractArray{<:AbstractFloat,1},
-    h0R::AbstractArray{<:AbstractFloat,1},
-    h1R::AbstractArray{<:AbstractFloat,1},
-    h2R::AbstractArray{<:AbstractFloat,1},
-    h3R::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-    dt::AbstractFloat,
-    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,1},
-    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,1},
-    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,1},
-    sh3L = zeros(eltype(h3L), axes(h3L))::AbstractArray{<:AbstractFloat,1},
-    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,1},
-    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,1},
-    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,1},
-    sh3R = zeros(eltype(h3R), axes(h3R))::AbstractArray{<:AbstractFloat,1},
-)
+    fw::X,
+    fh0::Y,
+    fh1::Y,
+    fh2::Y,
+    fh3::Y,
+    h0L::Z,
+    h1L::Z,
+    h2L::Z,
+    h3L::Z,
+    h0R::Z,
+    h1R::Z,
+    h2R::Z,
+    h3R::Z,
+    u::A,
+    ω::A,
+    dt,
+    sh0L = zeros(eltype(h0L), axes(h0L))::Z,
+    sh1L = zeros(eltype(h1L), axes(h1L))::Z,
+    sh2L = zeros(eltype(h2L), axes(h2L))::Z,
+    sh3L = zeros(eltype(h3L), axes(h3L))::Z,
+    sh0R = zeros(eltype(h0R), axes(h0R))::Z,
+    sh1R = zeros(eltype(h1R), axes(h1R))::Z,
+    sh2R = zeros(eltype(h2R), axes(h2R))::Z,
+    sh3R = zeros(eltype(h3R), axes(h3R))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,1},
+    Z<:AbstractArray{<:AbstractFloat,1},
+    A<:AbstractArray{<:AbstractFloat,1},
+}
 
     #--- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -215,31 +239,36 @@ end
 # 4F1V flux (multiple component)
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,2},
-    fh0::AbstractArray{<:AbstractFloat,2},
-    fh1::AbstractArray{<:AbstractFloat,2},
-    fh2::AbstractArray{<:AbstractFloat,2},
-    fh3::AbstractArray{<:AbstractFloat,2},
-    h0L::AbstractArray{<:AbstractFloat,2},
-    h1L::AbstractArray{<:AbstractFloat,2},
-    h2L::AbstractArray{<:AbstractFloat,2},
-    h3L::AbstractArray{<:AbstractFloat,2},
-    h0R::AbstractArray{<:AbstractFloat,2},
-    h1R::AbstractArray{<:AbstractFloat,2},
-    h2R::AbstractArray{<:AbstractFloat,2},
-    h3R::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    dt::AbstractFloat,
-    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,2},
-    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,2},
-    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,2},
-    sh3L = zeros(eltype(h3L), axes(h3L))::AbstractArray{<:AbstractFloat,2},
-    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,2},
-    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,2},
-    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,2},
-    sh3R = zeros(eltype(h3R), axes(h3R))::AbstractArray{<:AbstractFloat,2},
-)
+    fw::X,
+    fh0::Y,
+    fh1::Y,
+    fh2::Y,
+    fh3::Y,
+    h0L::Z,
+    h1L::Z,
+    h2L::Z,
+    h3L::Z,
+    h0R::Z,
+    h1R::Z,
+    h2R::Z,
+    h3R::Z,
+    u::A,
+    ω::A,
+    dt,
+    sh0L = zeros(eltype(h0L), axes(h0L))::Z,
+    sh1L = zeros(eltype(h1L), axes(h1L))::Z,
+    sh2L = zeros(eltype(h2L), axes(h2L))::Z,
+    sh3L = zeros(eltype(h3L), axes(h3L))::Z,
+    sh0R = zeros(eltype(h0R), axes(h0R))::Z,
+    sh1R = zeros(eltype(h1R), axes(h1R))::Z,
+    sh2R = zeros(eltype(h2R), axes(h2R))::Z,
+    sh3R = zeros(eltype(h3R), axes(h3R))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:AbstractFloat,2},
+    Z<:AbstractArray{<:AbstractFloat,2},
+    A<:AbstractArray{<:AbstractFloat,2},
+}
 
     for j in axes(fw, 2)
         _fw = @view fw[:, j]
@@ -284,18 +313,23 @@ end
 # 1F2V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    ff::AbstractArray{<:AbstractFloat,2},
-    fL::AbstractArray{<:AbstractFloat,2},
-    fR::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    dt::Real,
-    len::Real,
-    sfL = zeros(eltype(fL), axes(fL))::AbstractArray{<:AbstractFloat,2},
-    sfR = zeros(eltype(fR), axes(fR))::AbstractArray{<:AbstractFloat,2},
-)
+    fw::X,
+    ff::Y,
+    fL::Z,
+    fR::Z,
+    u::A,
+    v::A,
+    ω::A,
+    dt,
+    len,
+    sfL = zeros(eltype(fL), axes(fL))::Z,
+    sfR = zeros(eltype(fR), axes(fR))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,2},
+    Z<:AbstractArray{<:AbstractFloat,2},
+    A<:AbstractArray{<:AbstractFloat,2},
+}
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -322,23 +356,28 @@ end
 # 2F2V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh::AbstractArray{<:AbstractFloat,2},
-    fb::AbstractArray{<:AbstractFloat,2},
-    hL::AbstractArray{<:AbstractFloat,2},
-    bL::AbstractArray{<:AbstractFloat,2},
-    hR::AbstractArray{<:AbstractFloat,2},
-    bR::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    dt::Real,
-    len::Real,
-    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,2},
-    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,2},
-    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,2},
-    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,2},
-)
+    fw::X,
+    fh::Y,
+    fb::Y,
+    hL::Z,
+    bL::Z,
+    hR::Z,
+    bR::Z,
+    u::A,
+    v::A,
+    ω::A,
+    dt,
+    len,
+    shL = zeros(eltype(hL), axes(hL))::Z,
+    sbL = zeros(eltype(bL), axes(bL))::Z,
+    shR = zeros(eltype(hR), axes(hR))::Z,
+    sbR = zeros(eltype(bR), axes(bR))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,2},
+    Z<:AbstractArray{<:AbstractFloat,2},
+    A<:AbstractArray{<:AbstractFloat,2},
+}
 
     # --- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -371,28 +410,33 @@ end
 # 3F2V flux (single component)
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh0::AbstractArray{<:AbstractFloat,2},
-    fh1::AbstractArray{<:AbstractFloat,2},
-    fh2::AbstractArray{<:AbstractFloat,2},
-    h0L::AbstractArray{<:AbstractFloat,2},
-    h1L::AbstractArray{<:AbstractFloat,2},
-    h2L::AbstractArray{<:AbstractFloat,2},
-    h0R::AbstractArray{<:AbstractFloat,2},
-    h1R::AbstractArray{<:AbstractFloat,2},
-    h2R::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    dt::Real,
-    len::Real,
-    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,2},
-    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,2},
-    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,2},
-    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,2},
-    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,2},
-    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,2},
-)
+    fw::X,
+    fh0::Y,
+    fh1::Y,
+    fh2::Y,
+    h0L::Z,
+    h1L::Z,
+    h2L::Z,
+    h0R::Z,
+    h1R::Z,
+    h2R::Z,
+    u::A,
+    v::A,
+    ω::A,
+    dt,
+    len,
+    sh0L = zeros(eltype(h0L), axes(h0L))::Z,
+    sh1L = zeros(eltype(h1L), axes(h1L))::Z,
+    sh2L = zeros(eltype(h2L), axes(h2L))::Z,
+    sh0R = zeros(eltype(h0R), axes(h0R))::Z,
+    sh1R = zeros(eltype(h1R), axes(h1R))::Z,
+    sh2R = zeros(eltype(h2R), axes(h2R))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,2},
+    Z<:AbstractArray{<:AbstractFloat,2},
+    A<:AbstractArray{<:AbstractFloat,2},
+}
 
     #--- upwind reconstruction ---#
     δ = heaviside.(u)
@@ -429,28 +473,33 @@ end
 # 3F2V flux (multiple component)
 # ------------------------------------------------------------
 function flux_kfvs!(
-    fw::AbstractArray{<:AbstractFloat,2},
-    fh0::AbstractArray{<:AbstractFloat,3},
-    fh1::AbstractArray{<:AbstractFloat,3},
-    fh2::AbstractArray{<:AbstractFloat,3},
-    h0L::AbstractArray{<:AbstractFloat,3},
-    h1L::AbstractArray{<:AbstractFloat,3},
-    h2L::AbstractArray{<:AbstractFloat,3},
-    h0R::AbstractArray{<:AbstractFloat,3},
-    h1R::AbstractArray{<:AbstractFloat,3},
-    h2R::AbstractArray{<:AbstractFloat,3},
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    ω::AbstractArray{<:AbstractFloat,3},
-    dt::Real,
-    len::Real,
-    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,3},
-    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,3},
-    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,3},
-    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,3},
-    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,3},
-    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,3},
-)
+    fw::X,
+    fh0::Y,
+    fh1::Y,
+    fh2::Y,
+    h0L::Z,
+    h1L::Z,
+    h2L::Z,
+    h0R::Z,
+    h1R::Z,
+    h2R::Z,
+    u::A,
+    v::A,
+    ω::A,
+    dt,
+    len,
+    sh0L = zeros(eltype(h0L), axes(h0L))::Z,
+    sh1L = zeros(eltype(h1L), axes(h1L))::Z,
+    sh2L = zeros(eltype(h2L), axes(h2L))::Z,
+    sh0R = zeros(eltype(h0R), axes(h0R))::Z,
+    sh1R = zeros(eltype(h1R), axes(h1R))::Z,
+    sh2R = zeros(eltype(h2R), axes(h2R))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:AbstractFloat,3},
+    Z<:AbstractArray{<:AbstractFloat,3},
+    A<:AbstractArray{<:AbstractFloat,3},
+}
 
     #--- reconstruct initial distribution ---#
     δ = heaviside.(u)

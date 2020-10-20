@@ -12,7 +12,7 @@ Gas kinetic Navier-Stokes flux
 * @return: scalar flux
 
 """
-function flux_gks(u::Real, μ::Real, dt::Real, su = 0.0::Real, a = 0::Real)
+function flux_gks(u::T, μ, dt, su = 0.0, a = 0) where {T<:Real}
 
     prim = ifelse(a == 0, conserve_prim(u), conserve_prim(u, a))
 
@@ -44,16 +44,16 @@ function flux_gks(u::Real, μ::Real, dt::Real, su = 0.0::Real, a = 0::Real)
 end
 
 function flux_gks(
-    uL::Real,
-    uR::Real,
-    μ::Real,
-    dt::Real,
-    dxL::Real,
-    dxR::Real,
-    suL = 0.0::Real,
-    suR = 0.0::Real,
-    a = 0::Real,
-)
+    uL::T,
+    uR::T,
+    μ,
+    dt,
+    dxL,
+    dxR,
+    suL = 0.0,
+    suR = 0.0,
+    a = 0,
+) where {T<:Real}
 
     primL = ifelse(a == 0, conserve_prim(uL), conserve_prim(uL, a))
     primR = ifelse(a == 0, conserve_prim(uR), conserve_prim(uR, a))
@@ -143,18 +143,18 @@ Gas kinetic Navier-Stokes flux
 
 """
 function flux_gks!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    wL::AbstractArray{<:AbstractFloat,1},
-    wR::AbstractArray{<:AbstractFloat,1},
+    fw::X,
+    wL::Y,
+    wR::Y,
     γ::Real,
     inK::Real,
     μᵣ::Real,
     ω::Real,
     dt::Real,
     dx::Real,
-    swL = zeros(eltype(fw), axes(wL))::AbstractArray{<:AbstractFloat,1},
-    swR = zeros(eltype(fw), axes(wR))::AbstractArray{<:AbstractFloat,1},
-)
+    swL = zeros(eltype(fw), axes(wL))::X,
+    swR = zeros(eltype(fw), axes(wR))::X,
+) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,1}}
 
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
@@ -234,9 +234,9 @@ end
 
 
 function flux_gks!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    wL::AbstractArray{<:AbstractFloat,1},
-    wR::AbstractArray{<:AbstractFloat,1},
+    fw::X,
+    wL::Y,
+    wR::Y,
     γ::Real,
     inK::Real,
     μᵣ::Real,
@@ -244,9 +244,9 @@ function flux_gks!(
     dt::Real,
     dx::Real,
     dy::Real,
-    swL = zeros(eltype(fw), axes(wL))::AbstractArray{<:AbstractFloat,1},
-    swR = zeros(eltype(fw), axes(wR))::AbstractArray{<:AbstractFloat,1},
-)
+    swL = zeros(eltype(fw), axes(wL))::X,
+    swR = zeros(eltype(fw), axes(wR))::X,
+) where {X<:AbstractArray{<:AbstractFloat,1},Y<:AbstractArray{<:AbstractFloat,1}}
 
     Mu1, Mv1, Mxi1, MuL1, MuR1 = gauss_moments(primL, inK)
     Mu2, Mv2, Mxi2, MuL2, MuR2 = gauss_moments(primR, inK)
@@ -325,31 +325,37 @@ end
 
 #--- 1D2V ---#
 function flux_gks!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh::AbstractArray{<:AbstractFloat,1},
-    fb::AbstractArray{<:AbstractFloat,1},
-    wL::AbstractArray{<:Real,1},
-    hL::AbstractArray{<:AbstractFloat,1},
-    bL::AbstractArray{<:AbstractFloat,1},
-    wR::AbstractArray{<:Real,1},
-    hR::AbstractArray{<:AbstractFloat,1},
-    bR::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-    inK::Real,
-    γ::Real,
-    visRef::Real,
-    visIdx::Real,
-    dt::Real,
-    dxL::Real,
-    dxR::Real,
-    swL = zeros(eltype(fw), axes(wL))::AbstractArray{<:AbstractFloat,1},
-    swR = zeros(eltype(fw), axes(wR))::AbstractArray{<:AbstractFloat,1},
-    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,1},
-    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,1},
-    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,1},
-    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,1},
-)
+    fw::T1,
+    fh::T2,
+    fb::T2,
+    wL::T3,
+    hL::T4,
+    bL::T4,
+    wR::T3,
+    hR::T4,
+    bR::T4,
+    u::T5,
+    ω::T5,
+    inK,
+    γ,
+    visRef,
+    visIdx,
+    dt,
+    dxL,
+    dxR,
+    swL = zeros(eltype(fw), axes(wL))::T1,
+    swR = zeros(eltype(fw), axes(wR))::T1,
+    shL = zeros(eltype(hL), axes(hL))::T4,
+    sbL = zeros(eltype(bL), axes(bL))::T4,
+    shR = zeros(eltype(hR), axes(hR))::T4,
+    sbR = zeros(eltype(bR), axes(bR))::T4,
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:AbstractFloat,1},
+    T3<:AbstractArray{<:Real,1},
+    T4<:AbstractArray{<:AbstractFloat,1},
+    T5<:AbstractArray{<:AbstractFloat,1},
+}
 
     primL = conserve_prim(wL, γ)
     primR = conserve_prim(wR, γ)
@@ -522,23 +528,26 @@ end
 
 #--- mixture ---#
 function flux_gks!(
-    fw::AbstractArray{<:AbstractFloat,2},
-    wL::AbstractArray{<:Real,2},
-    wR::AbstractArray{<:Real,2},
-    inK::Real,
-    γ::Real,
-    mi::Real,
-    ni::Real,
-    me::Real,
-    ne::Real,
-    Kn::Real,
-    dt::Real,
-    dxL::Real,
-    dxR::Real,
-    len::Real,
-    swL = zeros(eltype(fw), axes(wL))::AbstractArray{<:AbstractFloat,2},
-    swR = zeros(eltype(fw), axes(wR))::AbstractArray{<:AbstractFloat,2},
-)
+    fw::X,
+    wL::Y,
+    wR::Y,
+    inK,
+    γ,
+    mi,
+    ni,
+    me,
+    ne,
+    Kn,
+    dt,
+    dxL,
+    dxR,
+    len,
+    swL = zeros(eltype(fw), axes(wL))::X,
+    swR = zeros(eltype(fw), axes(wR))::X,
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:Real,2},
+}
 
     primL = mixture_conserve_prim(wL, γ)
     primR = mixture_conserve_prim(wR, γ)
@@ -636,7 +645,7 @@ end
 
 
 """
-Unified gas kinetic scheme (UGKS) flux
+Unified gas kinetic scheme (UGKS)
 
 * @arg: particle distribution functions and their slopes at left/right sides of interface
 * @arg: particle velocity quadrature points and weights
@@ -644,30 +653,36 @@ Unified gas kinetic scheme (UGKS) flux
 
 """
 function flux_ugks!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh::AbstractArray{<:AbstractFloat,1},
-    fb::AbstractArray{<:AbstractFloat,1},
-    wL::AbstractArray{<:Real,1},
-    hL::AbstractArray{<:AbstractFloat,1},
-    bL::AbstractArray{<:AbstractFloat,1},
-    wR::AbstractArray{<:Real,1},
-    hR::AbstractArray{<:AbstractFloat,1},
-    bR::AbstractArray{<:AbstractFloat,1},
-    u::AbstractArray{<:AbstractFloat,1},
-    ω::AbstractArray{<:AbstractFloat,1},
-    inK::Real,
-    γ::Real,
-    visRef::Real,
-    visIdx::Real,
-    pr::Real,
-    dt::Real,
-    dxL::Real,
-    dxR::Real,
-    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,1},
-    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,1},
-    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,1},
-    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,1},
-) # 1D2F flux
+    fw::T1,
+    fh::T2,
+    fb::T2,
+    wL::T3,
+    hL::T4,
+    bL::T4,
+    wR::T3,
+    hR::T4,
+    bR::T4,
+    u::T5,
+    ω::T5,
+    inK,
+    γ,
+    visRef,
+    visIdx,
+    pr,
+    dt,
+    dxL,
+    dxR,
+    shL = zeros(eltype(hL), axes(hL))::T4,
+    sbL = zeros(eltype(bL), axes(bL))::T4,
+    shR = zeros(eltype(hR), axes(hR))::T4,
+    sbR = zeros(eltype(bR), axes(bR))::T4,
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:AbstractFloat,1},
+    T3<:AbstractArray{<:Real,1},
+    T4<:AbstractArray{<:AbstractFloat,1},
+    T5<:AbstractArray{<:AbstractFloat,1},
+} # 1D2F flux
 
     #--- reconstruct initial distribution ---#
     δ = heaviside.(u)
@@ -760,34 +775,39 @@ function flux_ugks!(
 
 end
 
-
 function flux_ugks!(
-    fw::AbstractArray{<:AbstractFloat,1},
-    fh::AbstractArray{<:AbstractFloat,2},
-    fb::AbstractArray{<:AbstractFloat,2},
-    wL::AbstractArray{<:Real,1},
-    hL::AbstractArray{<:AbstractFloat,2},
-    bL::AbstractArray{<:AbstractFloat,2},
-    wR::AbstractArray{<:Real,1},
-    hR::AbstractArray{<:AbstractFloat,2},
-    bR::AbstractArray{<:AbstractFloat,2},
-    u::AbstractArray{<:AbstractFloat,2},
-    v::AbstractArray{<:AbstractFloat,2},
-    ω::AbstractArray{<:AbstractFloat,2},
-    inK::Real,
-    γ::Real,
-    visRef::Real,
-    visIdx::Real,
-    pr::Real,
-    dt::Real,
-    dxL::Real,
-    dxR::Real,
-    len::Real,
-    shL = zeros(eltype(hL), axes(hL))::AbstractArray{<:AbstractFloat,2},
-    sbL = zeros(eltype(bL), axes(bL))::AbstractArray{<:AbstractFloat,2},
-    shR = zeros(eltype(hR), axes(hR))::AbstractArray{<:AbstractFloat,2},
-    sbR = zeros(eltype(bR), axes(bR))::AbstractArray{<:AbstractFloat,2},
-) # 2D2F flux
+    fw::T1,
+    fh::T2,
+    fb::T2,
+    wL::T3,
+    hL::T4,
+    bL::T4,
+    wR::T3,
+    hR::T4,
+    bR::T4,
+    u::T5,
+    v::T5,
+    ω::T5,
+    inK,
+    γ,
+    visRef,
+    visIdx,
+    pr,
+    dt,
+    dxL,
+    dxR,
+    len,
+    shL = zeros(eltype(hL), axes(hL))::T4,
+    sbL = zeros(eltype(bL), axes(bL))::T4,
+    shR = zeros(eltype(hR), axes(hR))::T4,
+    sbR = zeros(eltype(bR), axes(bR))::T4,
+) where {
+    T1<:AbstractArray{<:AbstractFloat,1},
+    T2<:AbstractArray{<:AbstractFloat,2},
+    T3<:AbstractArray{<:Real,1},
+    T4<:AbstractArray{<:AbstractFloat,2},
+    T5<:AbstractArray{<:AbstractFloat,2},
+} # 2D2F flux
 
     #--- reconstruct initial distribution ---#
     δ = heaviside.(u)
@@ -926,39 +946,45 @@ end
 # 3F2V with AAP model
 # ------------------------------------------------------------
 function flux_ugks!(
-    fw::AbstractArray{<:AbstractFloat,2},
-    fh0::AbstractArray{<:AbstractFloat,3},
-    fh1::AbstractArray{<:AbstractFloat,3},
-    fh2::AbstractArray{<:AbstractFloat,3},
-    wL::AbstractArray{<:Real,2},
-    h0L::AbstractArray{<:AbstractFloat,3},
-    h1L::AbstractArray{<:AbstractFloat,3},
-    h2L::AbstractArray{<:AbstractFloat,3},
-    wR::AbstractArray{<:Real,2},
-    h0R::AbstractArray{<:AbstractFloat,3},
-    h1R::AbstractArray{<:AbstractFloat,3},
-    h2R::AbstractArray{<:AbstractFloat,3},
-    u::AbstractArray{<:AbstractFloat,3},
-    v::AbstractArray{<:AbstractFloat,3},
-    ω::AbstractArray{<:AbstractFloat,3},
-    inK::Real,
-    γ::Real,
-    mi::Real,
-    ni::Real,
-    me::Real,
-    ne::Real,
-    Kn::Real,
-    dt::Real,
-    dxL::Real,
-    dxR::Real,
-    len::Real,
-    sh0L = zeros(eltype(h0L), axes(h0L))::AbstractArray{<:AbstractFloat,3},
-    sh1L = zeros(eltype(h1L), axes(h1L))::AbstractArray{<:AbstractFloat,3},
-    sh2L = zeros(eltype(h2L), axes(h2L))::AbstractArray{<:AbstractFloat,3},
-    sh0R = zeros(eltype(h0R), axes(h0R))::AbstractArray{<:AbstractFloat,3},
-    sh1R = zeros(eltype(h1R), axes(h1R))::AbstractArray{<:AbstractFloat,3},
-    sh2R = zeros(eltype(h2R), axes(h2R))::AbstractArray{<:AbstractFloat,3},
-)
+    fw::T1,
+    fh0::T2,
+    fh1::T2,
+    fh2::T2,
+    wL::T3,
+    h0L::T4,
+    h1L::T4,
+    h2L::T4,
+    wR::T3,
+    h0R::T4,
+    h1R::T4,
+    h2R::T4,
+    u::T5,
+    v::T5,
+    ω::T5,
+    inK,
+    γ,
+    mi,
+    ni,
+    me,
+    ne,
+    Kn,
+    dt,
+    dxL,
+    dxR,
+    len,
+    sh0L = zeros(eltype(h0L), axes(h0L))::T4,
+    sh1L = zeros(eltype(h1L), axes(h1L))::T4,
+    sh2L = zeros(eltype(h2L), axes(h2L))::T4,
+    sh0R = zeros(eltype(h0R), axes(h0R))::T4,
+    sh1R = zeros(eltype(h1R), axes(h1R))::T4,
+    sh2R = zeros(eltype(h2R), axes(h2R))::T4,
+) where {
+    T1<:AbstractArray{<:AbstractFloat,2},
+    T2<:AbstractArray{<:AbstractFloat,3},
+    T3<:AbstractArray{<:Real,2},
+    T4<:AbstractArray{<:AbstractFloat,3},
+    T5<:AbstractArray{<:AbstractFloat,3},
+}
 
     #--- reconstruct initial distribution ---#
     δ = heaviside.(u)

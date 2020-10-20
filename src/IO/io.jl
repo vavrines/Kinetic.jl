@@ -15,7 +15,7 @@ Read text into dictionary
 * @return vars: dictionary with values of variables
 
 """
-function read_dict(filename::String, allowed)
+function read_dict(filename::T, allowed) where {T<:AbstractString}
 
     #println("Reading config from $filename")
     f = open(filename)
@@ -51,7 +51,7 @@ function read_dict(filename::String, allowed)
 
 end
 
-function read_dict(filename::String)
+function read_dict(filename::T) where {T<:AbstractString}
 
     f = open(filename)
     vars = Dict{String,Any}()
@@ -87,10 +87,10 @@ Write data into JLD2
 
 """
 function write_jld(
-    KS::AbstractSolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume,1},
-    t = 0::Real,
-)
+    KS::X,
+    ctr::Y,
+    t = 0,
+) where {X<:AbstractSolverSet,Y<:AbstractArray{<:AbstractControlVolume,1}}
 
     strIter = string(t)
     fileOut = KS.outputFolder * "data/t=" * strIter * ".jld2"
@@ -107,10 +107,10 @@ Plot 1D profile
 
 """
 function plot_line(
-    KS::AbstractSolverSet,
-    ctr::AbstractArray{<:AbstractControlVolume1D,1};
+    KS::X,
+    ctr::Y;
     backend = :plots::Symbol,
-)
+) where {X<:AbstractSolverSet,Y<:AbstractArray{<:AbstractControlVolume,1}}
 
     pltx = KS.pSpace.x[1:KS.pSpace.nx]
     plty = zeros(KS.pSpace.nx, 6)
