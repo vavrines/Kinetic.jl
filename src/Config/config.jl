@@ -130,7 +130,7 @@ Initialize Sod shock tube
 """
 function ib_sod(γ, u::T) where {T<:AbstractArray{<:AbstractFloat,1}} # 1D1F1V
 
-    primL = [1.0, 0.0, 1.0]
+    primL = [1.0, 0.0, 0.5]
     primR = [0.125, 0.0, 0.625]
 
     wL = prim_conserve(primL, γ)
@@ -151,7 +151,7 @@ end
 # ------------------------------------------------------------
 function ib_sod(γ, u::T, v::T, w::T) where {T<:AbstractArray{<:AbstractFloat,3}}
 
-    primL = [1.0, 0.0, 0.0, 0.0, 1.0]
+    primL = [1.0, 0.0, 0.0, 0.0, 0.5]
     primR = [0.125, 0.0, 0.0, 0.0, 0.625]
 
     wL = prim_conserve(primL, γ)
@@ -172,7 +172,7 @@ end
 # ------------------------------------------------------------
 function ib_sod(γ, u::T, K) where {T<:AbstractArray{<:AbstractFloat,1}}
 
-    primL = [1.0, 0.0, 1.0]
+    primL = [1.0, 0.0, 0.5]
     primR = [0.125, 0.0, 0.625]
 
     wL = prim_conserve(primL, γ)
