@@ -291,7 +291,7 @@ function set_ib(
             ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
         elseif set.space[3:end] == "2f1v"
             wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
-                ib_rh(gas.mach, gas.γ, vSpace.u, gas.K)
+                ib_rh(gas.mach, gas.γ, gas.K, vSpace.u)
             ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
         end
 
@@ -306,7 +306,7 @@ function set_ib(
             ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR)
         elseif set.space[3:end] == "2f1v"
             wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR =
-                ib_sod(gas.γ, vSpace.u, gas.K)
+                ib_sod(gas.γ, gas.K, vSpace.u)
             ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR)
         end
 
@@ -333,7 +333,7 @@ function set_ib(
         bcR,
         ER,
         BR,
-        lorenzR = ib_briowu(gas.γ, vSpace.u, gas.mi, gas.me)
+        lorenzR = ib_briowu(gas.γ, gas.mi, gas.me, vSpace.u)
 
         ib = IB4F(
             wL,
@@ -366,7 +366,7 @@ function set_ib(
             ib = IB1F(wL, primL, fL, bcL, wR, primR, fR, bcR, bcU, bcD)
         elseif set.space[3:end] == "2f2v"
             wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD =
-                ib_cavity(gas.γ, uLid, vLid, tLid, vSpace.u, vSpace.v, gas.K)
+                ib_cavity(gas.γ, gas.K, uLid, vLid, tLid, vSpace.u, vSpace.v)
             ib = IB2F(wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR, bcU, bcD)
         end
 

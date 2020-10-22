@@ -2,7 +2,7 @@
 # Solver
 # ============================================================
 
-export SolverSet
+export SolverSet, set_ib
 
 include("set.jl")
 include("algorithm.jl")

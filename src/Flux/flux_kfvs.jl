@@ -28,13 +28,13 @@ function flux_kfvs!(
     Z<:AbstractArray{<:AbstractFloat,1},
 } # 1F1V flux of pure DOM
 
-    # --- upwind reconstruction ---#
+    # upwind reconstruction
     δ = heaviside.(u)
 
     f = @. fL * δ + fR * (1.0 - δ)
     sf = @. sfL * δ + sfR * (1.0 - δ)
 
-    # --- calculate fluxes ---#
+    # calculate flux
     @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
 
     return nothing
@@ -61,13 +61,13 @@ function flux_kfvs!(
     A<:AbstractArray{<:AbstractFloat,1},
 }
 
-    # --- upwind reconstruction ---#
+    # upwind reconstruction
     δ = heaviside.(u)
 
     f = @. fL * δ + fR * (1.0 - δ)
     sf = @. sfL * δ + sfR * (1.0 - δ)
 
-    # --- calculate fluxes ---#
+    # calculate fluxes
     fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
     fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
     fw[3] =
@@ -171,6 +171,66 @@ function flux_kfvs!(
 
     @. fh = dt * u * h - 0.5 * dt^2 * u^2 * sh
     @. fb = dt * u * b - 0.5 * dt^2 * u^2 * sb
+
+    return nothing
+
+end
+
+#--- mixture ---#
+function flux_kfvs!(
+    fw::X,
+    fh::Y,
+    fb::Y,
+    hL::Z,
+    bL::Z,
+    hR::Z,
+    bR::Z,
+    u::A,
+    ω::A,
+    dt,
+    shL = zeros(eltype(hL), axes(hL))::Z,
+    sbL = zeros(eltype(bL), axes(bL))::Z,
+    shR = zeros(eltype(hR), axes(hR))::Z,
+    sbR = zeros(eltype(bR), axes(bR))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:AbstractFloat,2},
+    Z<:AbstractArray{<:AbstractFloat,2},
+    A<:AbstractArray{<:AbstractFloat,2},
+}
+
+    for j in axes(fw, 2)
+        _fw = @view fw[:, j]
+        _fh = @view fh[:, j]
+        _fb = @view fb[:, j]
+        _hL = @view hL[:, j]
+        _bL = @view bL[:, j]
+        _hR = @view hR[:, j]
+        _bR = @view bR[:, j]
+        _u = @view u[:, j]
+        _ω = @view ω[:, j]
+        _shL = @view shL[:, j]
+        _sbL = @view sbL[:, j]
+        _shR = @view shR[:, j]
+        _sbR = @view sbR[:, j]
+
+        flux_kfvs!(
+            _fw,
+            _fh,
+            _fb,
+            _hL,
+            _bL,
+            _hR,
+            _bR,
+            _u,
+            _ω,
+            dt,
+            _shL,
+            _sbL,
+            _shR,
+            _sbR,
+        )
+    end
 
     return nothing
 

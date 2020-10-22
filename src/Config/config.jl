@@ -45,7 +45,7 @@ end
 # ------------------------------------------------------------
 # 1D2F1V
 # ------------------------------------------------------------
-function ib_rh(MaL, gam, u::T, K) where {T<:AbstractArray{<:AbstractFloat,1}}
+function ib_rh(MaL, gam, K, u::T) where {T<:AbstractArray{<:AbstractFloat,1}}
 
     #--- calculate Rankine-Hugoniot relation ---#
     primL = [1.0, MaL * sqrt(gam / 2.0), 1.0]
@@ -119,6 +119,48 @@ function ib_rh(
 
 end
 
+# ------------------------------------------------------------
+# 1D2F1V (mixture)
+# ------------------------------------------------------------
+function Kinetic.ib_rh(MaL, gam, K, mi, me, ni, ne, u::T) where {T<:AbstractArray{<:AbstractFloat,2}}
+
+    MaR = sqrt((MaL^2 * (gam - 1.0) + 2.0) / (2.0 * gam * MaL^2 - (gam - 1.0)))
+    ratioT =
+        (1.0 + (gam - 1.0) / 2.0 * MaL^2) *
+        (2.0 * gam / (gam - 1.0) * MaL^2 - 1.0) /
+        (MaL^2 * (2.0 * gam / (gam - 1.0) + (gam - 1.0) / 2.0))
+
+    primL = zeros(3, 2)
+    primL[:, 1] .= [mi, MaL * sqrt(gam / 2.0), mi / 1.0]
+    primL[:, 2] .= [me, MaL * sqrt(gam / 2.0), me / 1.0]
+
+    primR = zeros(3, 2)
+    for j in 1:2
+        primR[1, j] = primL[1, j] * (gam + 1.0) * MaL^2 / ((gam - 1.0) * MaL^2 + 2.0)
+        primR[2, j] = MaR * sqrt(gam / 2.0 / (mi * ni + me * ne)) * sqrt(ratioT)
+        primR[3, j] = primL[3, j] / ratioT
+    end
+
+    wL = mixture_prim_conserve(primL, gam)
+    wR = mixture_prim_conserve(primR, gam)
+
+    hL = mixture_maxwellian(u, primL)
+    hR = mixture_maxwellian(u, primR)
+
+    bL = similar(hL)
+    bR = similar(hR)
+    for j in 1:2
+        bL[:, j] = hL[:, j] .* K ./ (2.0 .* primL[end, j])
+        bR[:, j] = hR[:, j] .* K ./ (2.0 .* primR[end, j])
+    end
+
+    bcL = deepcopy(primL)
+    bcR = deepcopy(primR)
+
+    return wL, primL, hL, bL, bcL, wR, primR, hR, bR, bcR
+
+end
+
 
 """
 Initialize Sod shock tube
@@ -170,7 +212,7 @@ end
 # ------------------------------------------------------------
 # 1D2F1V
 # ------------------------------------------------------------
-function ib_sod(γ, u::T, K) where {T<:AbstractArray{<:AbstractFloat,1}}
+function ib_sod(γ, K, u::T) where {T<:AbstractArray{<:AbstractFloat,1}}
 
     primL = [1.0, 0.0, 0.5]
     primR = [0.125, 0.0, 0.625]
@@ -244,12 +286,12 @@ end
 # ------------------------------------------------------------
 function ib_cavity(
     gam,
+    K,
     Um,
     Vm,
     Tm,
     u::T,
     v::T,
-    K,
 ) where {T<:AbstractArray{<:AbstractFloat,2}}
 
     primL = [1.0, 0.0, 0.0, 1.0]
@@ -282,9 +324,9 @@ Initialize Brio-Wu MHD shock
 """
 function ib_briowu(
     gam,
-    uspace::T,
     mi,
     me,
+    uspace::T,
 ) where {T<:AbstractArray{<:AbstractFloat,2}}
 
     # upstream

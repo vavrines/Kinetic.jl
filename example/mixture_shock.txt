@@ -1,0 +1,40 @@
+# ------------------------------------------------------------
+# Configuration of multi-component shock structure
+# ------------------------------------------------------------
+
+# setup
+case = brio-wu
+space = 1d2f1v
+flux = kfvs
+collision = bgk
+nSpecies = 2
+interpOrder = 2
+limiter = minmod
+cfl = 0.5
+maxTime = 100
+
+# physical space
+x0 = -25
+x1 = 25
+nx = 100
+pMeshType = uniform
+nxg = 1
+
+# velocity space
+umin = -5
+umax = 5
+nu = 48
+vMeshType = rectangle
+nug = 0
+
+# gas
+knudsen = 1
+mach = 2
+prandtl = 1
+inK = 2
+
+mi = 1
+ni = 0.5
+me = 0.5
+ne = 0.5
+

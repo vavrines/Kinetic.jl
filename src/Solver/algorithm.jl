@@ -92,11 +92,12 @@ function timestep(
             prim = ctr[i].prim
             sos = sound_speed(prim, KS.gas.γ)
             vmax = max(maximum(KS.vSpace.u1), maximum(abs.(prim[2, :]))) + sos
-            tmax = ifelse(
-                KS.set.space[3:4] in ["3f", "4f"],
-                max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx), # speed of light
-                max(tmax, vmax / ctr[i].dx),
-            )
+
+            if KS.set.space[3:4] in ["3f", "4f"]
+                tmax = max(tmax, vmax / ctr[i].dx, KS.gas.sol / ctr[i].dx)
+            else
+                tmax = max(tmax, vmax / ctr[i].dx)
+            end
         end
 
     end
@@ -1187,7 +1188,7 @@ function update!(
                 face[i+1].fb,
                 KS.vSpace.u,
                 KS.vSpace.weights,
-                KS.gas.inK,
+                KS.gas.K,
                 KS.gas.γ,
                 KS.gas.mi,
                 KS.gas.ni,
@@ -1195,7 +1196,7 @@ function update!(
                 KS.gas.ne,
                 KS.gas.Kn[1],
                 KS.gas.Pr,
-                dx,
+                ctr[i].dx,
                 dt,
                 sumRes,
                 sumAvg,

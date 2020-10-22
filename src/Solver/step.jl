@@ -337,7 +337,7 @@ function step!(
     #mprim = deepcopy(prim)
     mprim = aap_hs_prim(prim, tau, mi, ni, me, ne, Kn)
 
-    H = mixture_maxwellian(KS.vSpace.u, mprim)
+    H = mixture_maxwellian(u, mprim)
     B = similar(H)
     for j in axes(B, 2)
         B[:, j] = H[:, j] * inK / (2.0 * mprim[end, j])
