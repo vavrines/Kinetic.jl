@@ -1,17 +1,17 @@
 """
 Kinetic flux vector splitting (KFVS) flux
 
-* DOM: `flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)`
-* 1D1F1V: `flux_kfvs!(fw, ff, fL, fR, u, ω, dt, sfL, sfR)`
-* 1D1F3V: `flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt, sfL, sfR)`
-* 1D2F1V: `flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt, shL, sbL, shR, sbR)`
-* 1D4F1V: `flux_kfvs!(fw, fh0, fh1, fh2, fh3, h0L, h1L, h2L, h3L, h0R, h1R, h2R, h3R, u, ω, dt, sh0L, sh1L, sh2L, sh3L, sh0R, sh1R, sh2R, sh3R)`
-* 2D1F2V: `flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len, sfL, sfR)`
-* 2D2F2V: `flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, v, ω, dt, len, shL, sbL, shR, sbR)`
+    DOM: `flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)`
+    1D1F1V: `flux_kfvs!(fw, ff, fL, fR, u, ω, dt, sfL, sfR)`
+    1D1F3V: `flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt, sfL, sfR)`
+    1D2F1V: `flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt, shL, sbL, shR, sbR)`
+    1D4F1V: `flux_kfvs!(fw, fh0, fh1, fh2, fh3, h0L, h1L, h2L, h3L, h0R, h1R, h2R, h3R, u, ω, dt, sh0L, sh1L, sh2L, sh3L, sh0R, sh1R, sh2R, sh3R)`
+    2D1F2V: `flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len, sfL, sfR)`
+    2D2F2V: `flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, v, ω, dt, len, shL, sbL, shR, sbR)`
 
-* @arg: particle distribution functions and their left/right slopes
-* @arg: particle velocity quadrature points and weights
-* @arg: time step and cell size
+- @args: particle distribution functions and their left/right slopes
+- @args: particle velocity quadrature points and weights
+- @args: time step and cell size
 
 """
 function flux_kfvs!(
@@ -26,7 +26,7 @@ function flux_kfvs!(
     X<:AbstractArray{<:AbstractFloat,1},
     Y<:AbstractArray{<:AbstractFloat,1},
     Z<:AbstractArray{<:AbstractFloat,1},
-} # 1F1V flux of pure DOM
+} # 1F1V flux for pure DOM
 
     # upwind reconstruction
     δ = heaviside.(u)
@@ -80,49 +80,46 @@ function flux_kfvs!(
 
 end
 
-# ------------------------------------------------------------
-# 1F3V flux
-# ------------------------------------------------------------
+#--- mixture ---#
 function flux_kfvs!(
     fw::X,
     ff::Y,
     fL::Z,
     fR::Z,
     u::A,
-    v::A,
-    w::A,
     ω::A,
     dt,
-    sfL = zeros(eltype(fL), axes(fL))::Z,
-    sfR = zeros(eltype(fR), axes(fR))::Z,
+    sfL = zeros(eltype(hL), axes(hL))::Z,
+    sfR = zeros(eltype(hR), axes(hR))::Z,
 ) where {
-    X<:AbstractArray{<:AbstractFloat,1},
-    Y<:AbstractArray{<:AbstractFloat,3},
-    Z<:AbstractArray{<:AbstractFloat,3},
-    A<:AbstractArray{<:AbstractFloat,3},
+    X<:AbstractArray{<:AbstractFloat,2},
+    Y<:AbstractArray{<:AbstractFloat,2},
+    Z<:AbstractArray{<:AbstractFloat,2},
+    A<:AbstractArray{<:AbstractFloat,2},
 }
 
-    # --- upwind reconstruction ---#
-    δ = heaviside.(u)
+    for j in axes(fw, 2)
+        _fw = @view fw[:, j]
+        _ff = @view ff[:, j]
+        _fL = @view fL[:, j]
+        _fR = @view fR[:, j]
+        _u = @view u[:, j]
+        _ω = @view ω[:, j]
+        _sfL = @view sfL[:, j]
+        _sfR = @view sfR[:, j]
 
-    f = @. fL * δ + fR * (1.0 - δ)
-    sf = @. sfL * δ + sfR * (1.0 - δ)
-
-    # --- calculate fluxes ---#
-    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
-    fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
-    fw[3] =
-        dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
-    fw[4] =
-        dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
-    fw[5] =
-        dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* f) -
-        0.5 *
-        dt^2 *
-        0.5 *
-        sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
-
-    @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
+        flux_kfvs!(
+            _fw,
+            _ff,
+            _fL,
+            _fR,
+            _u,
+            _ω,
+            dt,
+            _sfL,
+            _sfR,
+        )
+    end
 
     return nothing
 
@@ -153,7 +150,7 @@ function flux_kfvs!(
     A<:AbstractArray{<:AbstractFloat,1},
 }
 
-    # --- upwind reconstruction ---#
+    # upwind reconstruction
     δ = heaviside.(u)
 
     h = @. hL * δ + hR * (1.0 - δ)
@@ -162,7 +159,7 @@ function flux_kfvs!(
     sh = @. shL * δ + shR * (1.0 - δ)
     sb = @. sbL * δ + sbR * (1.0 - δ)
 
-    # --- calculate fluxes ---#
+    # calculate fluxes
     fw[1] = dt * sum(ω .* u .* h) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh)
     fw[2] = dt * sum(ω .* u .^ 2 .* h) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh)
     fw[3] =
@@ -237,7 +234,55 @@ function flux_kfvs!(
 end
 
 # ------------------------------------------------------------
-# 4F1V flux (single component)
+# 1F3V flux
+# ------------------------------------------------------------
+function flux_kfvs!(
+    fw::X,
+    ff::Y,
+    fL::Z,
+    fR::Z,
+    u::A,
+    v::A,
+    w::A,
+    ω::A,
+    dt,
+    sfL = zeros(eltype(fL), axes(fL))::Z,
+    sfR = zeros(eltype(fR), axes(fR))::Z,
+) where {
+    X<:AbstractArray{<:AbstractFloat,1},
+    Y<:AbstractArray{<:AbstractFloat,3},
+    Z<:AbstractArray{<:AbstractFloat,3},
+    A<:AbstractArray{<:AbstractFloat,3},
+}
+
+    # upwind reconstruction
+    δ = heaviside.(u)
+
+    f = @. fL * δ + fR * (1.0 - δ)
+    sf = @. sfL * δ + sfR * (1.0 - δ)
+
+    # calculate fluxes
+    fw[1] = dt * sum(ω .* u .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sf)
+    fw[2] = dt * sum(ω .* u .^ 2 .* f) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sf)
+    fw[3] =
+        dt * sum(ω .* u .* v .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* v .* sf)
+    fw[4] =
+        dt * sum(ω .* u .* w .* f) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* w .* sf)
+    fw[5] =
+        dt * 0.5 * sum(ω .* u .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* f) -
+        0.5 *
+        dt^2 *
+        0.5 *
+        sum(ω .* u .^ 2 .* (u .^ 2 .+ v .^ 2 .+ w .^ 2) .* sf)
+
+    @. ff = dt * u * f - 0.5 * dt^2 * u^2 * sf
+
+    return nothing
+
+end
+
+# ------------------------------------------------------------
+# 4F1V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::X,
@@ -271,7 +316,7 @@ function flux_kfvs!(
     A<:AbstractArray{<:AbstractFloat,1},
 }
 
-    #--- upwind reconstruction ---#
+    # upwind reconstruction
     δ = heaviside.(u)
 
     h0 = @. h0L * δ + h0R * (1.0 - δ)
@@ -284,7 +329,7 @@ function flux_kfvs!(
     sh2 = @. sh2L * δ + sh2R * (1.0 - δ)
     sh3 = @. sh3L * δ + sh3R * (1.0 - δ)
 
-    # --- calculate fluxes ---#
+    # calculate fluxes
     fw[1] = dt * sum(ω .* u .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh0)
     fw[2] = dt * sum(ω .* u .^ 2 .* h0) - 0.5 * dt^2 * sum(ω .* u .^ 3 .* sh0)
     fw[3] = dt * sum(ω .* u .* h1) - 0.5 * dt^2 * sum(ω .* u .^ 2 .* sh1)
@@ -302,9 +347,7 @@ function flux_kfvs!(
 
 end
 
-# ------------------------------------------------------------
-# 4F1V flux (multiple component)
-# ------------------------------------------------------------
+#--- mixture ---#
 function flux_kfvs!(
     fw::X,
     fh0::Y,
@@ -476,7 +519,7 @@ function flux_kfvs!(
 end
 
 # ------------------------------------------------------------
-# 3F2V flux (single component)
+# 3F2V flux
 # ------------------------------------------------------------
 function flux_kfvs!(
     fw::X,
@@ -544,9 +587,7 @@ function flux_kfvs!(
 
 end
 
-# ------------------------------------------------------------
-# 3F2V flux (multiple component)
-# ------------------------------------------------------------
+#--- mixture ---#
 function flux_kfvs!(
     fw::X,
     fh0::Y,

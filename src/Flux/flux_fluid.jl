@@ -6,7 +6,7 @@
 """
 Lax-Friedrichs flux
 
-`flux_lax!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1}, γ::Real, dt::Real, dx::Real)`
+    flux_lax!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1}, γ::Real, dt::Real, dx::Real)
 
 _P. D. Lax, Weak Solutions of Nonlinear Hyperbolic Equations and Their Numerical Computation,
 Commun. Pure and Applied Mathematics, 7, 159-193, 1954._
@@ -30,7 +30,7 @@ end
 """
 HLL flux for the Euler equations
 
-`flux_hll!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1}, γ::Real, dt::Real)`
+    flux_hll!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1}, γ::Real, dt::Real)
 
 * @args: variables at left & right sides of interface
 * @args: specific heat ratio
@@ -76,8 +76,8 @@ end
 """
 Roe's flux with entropy fix
 
-`flux_roe!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1},
-    γ::Real, dt::Real, n = [1.0, 0.0]::AbstractArray{<:Real,1})`
+    flux_roe!(fw::AbstractArray{<:Real,1}, wL::AbstractArray{<:Real,1}, wR::AbstractArray{<:Real,1},
+    γ::Real, dt::Real, n = [1.0, 0.0]::AbstractArray{<:Real,1})
 
 _P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference Schemes, Journal of Computational Physics, 43, pp. 357-372._
 (_cf. http://cfdbooks.com/cfdcodes.html_)

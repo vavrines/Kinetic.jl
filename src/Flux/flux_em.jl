@@ -1,7 +1,7 @@
 """
 Wave propagation method for Maxwell's equations
 
-`flux_em!(femL, femR, ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR, dxL, dxR, Ap, An, D, sol, χ, ν, dt)`
+    flux_em!(femL, femR, ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR, dxL, dxR, Ap, An, D, sol, χ, ν, dt)
 
 * @args: {E, B, ϕ, ψ} in left-left, left, right, and right-right cells
 * @args: eigenmatrix (A -> A+ & A-), eigenvalue (D)
@@ -122,9 +122,9 @@ end
 """
 Wave propagation method for 2D Maxwell's equations
 
-`flux_emx!(femL, femR, femLU, femLD, femRU, femRD,
-ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR,
-dxL, dxR, A1p, A1n, A2p, A2n, D, sol, χ, ν, dt)`
+    flux_emx!(femL, femR, femLU, femLD, femRU, femRD,
+    ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR,
+    dxL, dxR, A1p, A1n, A2p, A2n, D, sol, χ, ν, dt)
 
 * @args: {E, B, ϕ, ψ} in left-left, left, right, and right-right cells
 * @args: eigenmatrix (A -> A+ & A-), eigenvalue (D)
@@ -274,9 +274,9 @@ end
 """
 Wave propagation method for 2D Maxwell's equations
 
-`flux_emx!(femL, femR, femLU, femLD, femRU, femRD,
-ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR,
-dxL, dxR, A1p, A1n, A2p, A2n, D, sol, χ, ν, dt)`
+    flux_emx!(femL, femR, femLU, femLD, femRU, femRD,
+    ELL, BLL, EL, BL, ER, BR, ERR, BRR, ϕL, ϕR, ψL, ψR,
+    dxL, dxR, A1p, A1n, A2p, A2n, D, sol, χ, ν, dt)
 
 * @args: {E, B, ϕ, ψ} in left-left, left, right, and right-right cells
 * @args: eigenmatrix (A -> A+ & A-), eigenvalue (D)

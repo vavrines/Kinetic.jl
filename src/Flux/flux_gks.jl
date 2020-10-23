@@ -1,14 +1,13 @@
 """
 Gas kinetic Navier-Stokes flux
 
-`flux_gks(u::Real, μ::Real, dt::Real, su = 0.0::Real, a = 0::Real)`
+    flux_gks(u::Real, μ::Real, dt::Real, su = 0.0::Real, a = 0::Real)
+    flux_gks(uL::Real, uR::Real, μ::Real, dt::Real, dxL::Real,
+        dxR::Real, suL = 0.0::Real, suR = 0.0::Real, a = 0::Real)
 
-`flux_gks(uL::Real, uR::Real, μ::Real, dt::Real, dxL::Real,
-    dxR::Real, suL = 0.0::Real, suR = 0.0::Real, a = 0::Real)`
-
-* @arg: conservative scalars and their slopes
-* @arg: viscosity
-* @arg: time step and cell size
+* @args: conservative scalars and their slopes
+* @args: viscosity
+* @args: time step and cell size
 * @return: scalar flux
 
 """
@@ -134,12 +133,12 @@ end
 """
 Gas kinetic Navier-Stokes flux
 
-* 1D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, swL, swR)
-* 2D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, dy, swL, swR)
+    1D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, swL, swR)
+    2D: flux_gks!(fw, wL, wR, γ, K, μᵣ, ω, dt, dx, dy, swL, swR)
 
-* @arg: conservative variables and their left/right slopes
-* @arg: molecular and thermodynamic parameters
-* @arg: time step and cell size
+* @args: conservative variables and their left/right slopes
+* @args: molecular and thermodynamic parameters
+* @args: time step and cell size
 
 """
 function flux_gks!(
@@ -650,9 +649,9 @@ end
 """
 Unified gas kinetic scheme (UGKS)
 
-* @arg: particle distribution functions and their slopes at left/right sides of interface
-* @arg: particle velocity quadrature points and weights
-* @arg: time step
+* @args: particle distribution functions and their slopes at left/right sides of interface
+* @args: particle velocity quadrature points and weights
+* @args: time step
 
 """
 function flux_ugks!(

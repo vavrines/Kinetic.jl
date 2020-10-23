@@ -1,9 +1,9 @@
 """
 Maxwell's diffusive boundary flux
 
-* @arg: particle distribution functions and their slopes at left/right sides of interface
-* @arg: particle velocity quadrature points and weights
-* @arg: time step
+* @args: particle distribution functions and their slopes at left/right sides of interface
+* @args: particle velocity quadrature points and weights
+* @args: time step
 
 """
 function flux_boundary_maxwell!(
