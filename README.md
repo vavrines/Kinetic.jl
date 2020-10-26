@@ -5,6 +5,7 @@
 <!--
 [![Coverage Status](https://coveralls.io/repos/github/vavrines/Kinetic.jl/badge.svg?branch=master)](https://coveralls.io/github/vavrines/Kinetic.jl?branch=master)
 -->
+![](https://zenodo.org/badge/243490351.svg)
 
 <img src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif" width="300"/>
 
