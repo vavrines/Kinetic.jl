@@ -47,9 +47,9 @@ version = "1.16.0+6"
 
 [[ChainRulesCore]]
 deps = ["LinearAlgebra", "MuladdMacro", "SparseArrays"]
-git-tree-sha1 = "aebbda0a7c644bd8739b34f2a1b1e48f114aab49"
+git-tree-sha1 = "d41ca57a864c23444ad80e9d30beeea192fe9446"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.9.17"
+version = "0.9.18"
 
 [[CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -650,9 +650,9 @@ version = "1.0.7"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
-git-tree-sha1 = "892484bb5c9feefb46a3e3064721d4e50d02e5cf"
+git-tree-sha1 = "173c7250ccd7c98615b04c669eb13fa7fab494b0"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.9.0"
+version = "1.9.1"
 
 [[Printf]]
 deps = ["Unicode"]
