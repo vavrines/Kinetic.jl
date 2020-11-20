@@ -4,7 +4,7 @@
 
 export SolverSet, set_ib
 
-include("set.jl")
-include("algorithm.jl")
-include("step.jl")
-include("initialize.jl")
+include("solver_set.jl")
+include("solver_process.jl")
+include("solver_step.jl")
+include("solver_init.jl")

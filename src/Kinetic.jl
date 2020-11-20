@@ -14,8 +14,10 @@ using OrdinaryDiffEq
 using Plots
 using FileIO
 using JLD2
-using PyCall
 using ProgressMeter
+using PyCall
+using Flux: Chain
+using DiffEqFlux: FastChain
 
 include("Data/data.jl")
 include("IO/io.jl")
@@ -27,5 +29,6 @@ include("Reconstruction/reconstruction.jl")
 include("Flux/flux.jl")
 include("Config/config.jl")
 include("Solver/solver.jl")
+include("Neural/neural.jl")
 
 end

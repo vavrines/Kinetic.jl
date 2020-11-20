@@ -1,6 +1,7 @@
 # Kinetic.jl
 
 ![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
+![CI](https://github.com/vavrines/Kinetic.jl/workflows/CI/badge.svg)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
 ![](https://zenodo.org/badge/243490351.svg)
 <!--
