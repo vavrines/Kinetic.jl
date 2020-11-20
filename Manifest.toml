@@ -382,6 +382,12 @@ git-tree-sha1 = "81690084b6198a2e1da36fcfda16eeca9f9f24e4"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.1"
 
+[[JSON3]]
+deps = ["Dates", "Mmap", "Parsers", "StructTypes", "UUIDs"]
+git-tree-sha1 = "961ef1c3e5c8a595d5bec270a9007429ef12ed10"
+uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+version = "1.5.1"
+
 [[JpegTurbo_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "9aff0587d9603ea0de2c6f6300d9f9492bbefbd3"
@@ -817,6 +823,12 @@ deps = ["Adapt", "DataAPI", "Tables"]
 git-tree-sha1 = "8099ed9fb90b6e754d6ba8c6ed8670f010eadca0"
 uuid = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
 version = "0.4.4"
+
+[[StructTypes]]
+deps = ["Dates", "UUIDs"]
+git-tree-sha1 = "1ed04f622a39d2e5a6747c3a70be040c00333933"
+uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
+version = "1.1.0"
 
 [[SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
