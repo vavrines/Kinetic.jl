@@ -737,7 +737,7 @@ function flux_ugks!(
         Mt[3] * prim[1] * MauT
 
     #--- calculate flux from f0 ---#
-    H = maxwellian(u, v, prim)
+    H = maxwellian(u, prim)
     B = H .* inK ./ (2.0 * prim[end])
 
     fw[1] += Mt[4] * sum(ω .* u .* h) - Mt[5] * sum(ω .* u .^ 2 .* sh)
