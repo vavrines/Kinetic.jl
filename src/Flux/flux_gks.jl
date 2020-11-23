@@ -726,10 +726,10 @@ function flux_ugks!(
     Mt[3] = dt^2 / 2.0 - tau * Mt[1]
 
     #--- calculate flux from M0 ---#
-    Muv = moments_conserve(Mu, Mv, Mxi, 1, 0, 0)
-    MauL = moments_conserve_slope(aL, MuL, Mv, Mxi, 2, 0)
-    MauR = moments_conserve_slope(aR, MuR, Mv, Mxi, 2, 0)
-    MauT = moments_conserve_slope(aT, Mu, Mv, Mxi, 1, 0)
+    Muv = moments_conserve(Mu, Mxi, 1, 0)
+    MauL = moments_conserve_slope(aL, MuL, Mxi, 2)
+    MauR = moments_conserve_slope(aR, MuR, Mxi, 2)
+    MauT = moments_conserve_slope(aT, Mu, Mxi, 1)
 
     @. fw =
         Mt[1] * prim[1] * Muv +
