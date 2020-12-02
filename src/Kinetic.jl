@@ -1,34 +1,16 @@
 # ============================================================
-# Kinetic.jl : Toolbox for Kinetic Modeling & Simulation
+# Kinetic.jl : A lightweight Julialang toolbox for kinetic 
+#              theory and scientific machine learning
+# Copyright (c) 2020 Tianbai Xiao <tianbaixiao@gmail.com>
 # ============================================================
 
 module Kinetic
 
-using Dates
-using OffsetArrays
-using LinearAlgebra
-using FastGaussQuadrature
-using SpecialFunctions
-using FFTW
-using OrdinaryDiffEq
-using Plots
-using FileIO
-using JLD2
-using ProgressMeter
-using PyCall
-using Flux: Chain
-using DiffEqFlux: FastChain
+using Reexport
+@reexport using KitBase
+using Flux
+using DiffEqFlux
 
-include("Data/data.jl")
-include("IO/io.jl")
-include("Math/math.jl")
-include("Geometry/geometry.jl")
-include("Theory/theory.jl")
-include("Phase/phase.jl")
-include("Reconstruction/reconstruction.jl")
-include("Flux/flux.jl")
-include("Config/config.jl")
-include("Solver/solver.jl")
 include("Neural/neural.jl")
 
 end
