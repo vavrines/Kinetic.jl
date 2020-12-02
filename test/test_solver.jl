@@ -1,1 +1,1 @@
-ks, ctr, face, simTime = Kinetic.initialize("config.txt")
+ks, ctr, face, simTime = KitBase.initialize("config.txt")
