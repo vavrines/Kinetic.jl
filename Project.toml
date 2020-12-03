@@ -5,17 +5,15 @@ version = "0.6.0"
 
 [deps]
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
-DiffEqFlux = "aae7a2af-3d4f-5e19-a356-7da93b79d9d0"
-Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 KitBase = "86eed249-3a28-466f-8d3a-596821e1af9a"
+KitML = "b2531deb-9288-45c6-8f4a-0220551da45d"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 Conda = "^1"
-DiffEqFlux = "^1"
-Flux = "0.11"
 KitBase = "0.1"
+KitML = "0.1"
 PyCall = "^1"
 Reexport = "0.2"
 julia = "^1"

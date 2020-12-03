@@ -8,9 +8,6 @@ module Kinetic
 
 using Reexport
 @reexport using KitBase
-using Flux
-using DiffEqFlux
-
-include("Neural/neural.jl")
+@reexport using KitML
 
 end
