@@ -6,8 +6,8 @@ using Documenter, Kinetic
 using Kinetic: KitBase, KitML
 
 makedocs(
-    sitename="Kinetic.jl",
-    modules = [Kinetic],
+    sitename= "Kinetic.jl",
+    modules = [Kinetic, KitBase, KitML],
     pages = Any[
         "Home" => "index.md",
         "Installation" => "install.md",
