@@ -19,3 +19,8 @@ Kinetic.KitBase.Interface2D
 Kinetic.KitBase.Interface2D1F
 Kinetic.KitBase.Interface2D2F
 ```
+
+```@autodocs
+Modules = [KitBase]
+Order = [:function, :type]
+```

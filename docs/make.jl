@@ -3,6 +3,7 @@ import Pkg
 Pkg.add("Documenter")
 
 using Documenter, Kinetic
+using Kinetic: KitBase, KitML
 
 makedocs(
     sitename="Kinetic.jl",
