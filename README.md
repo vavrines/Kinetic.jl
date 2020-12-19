@@ -14,12 +14,12 @@
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
 ![](https://zenodo.org/badge/243490351.svg)
 
-**Kinetic.jl** is a lightweight [Julia](https://julialang.org) toolbox for the study of kinetic theory and scientific machine learning. The main module here consists of [KitBase.jl](https://github.com/vavrines/KitBase.jl) with basic physics and [KitML.jl](https://github.com/vavrines/KitML.jl) with neural dynamics. The high-performance Fortran library [KitFort.jl](https://github.com/vavrines/KitFort.jl) can be optionally imported when the executing efficiency becomes the first priority. The status of continuous integration and coverage in the ecosystem is as follows.
+**Kinetic.jl** is a lightweight [Julia](https://julialang.org) toolbox for the study of kinetic theory and scientific machine learning. The main module here consists of [KitBase.jl](https://github.com/vavrines/KitBase.jl) with basic physics and [KitML.jl](https://github.com/vavrines/KitML.jl) with neural dynamics. The high-performance Fortran library [KitFort.jl](https://github.com/vavrines/KitFort.jl) can be optionally imported when the executing efficiency becomes the first priority. The status of continuous integration and coverage in the ecosystem is listed as follows.
 
 | Kinetic | KitBase | KitML | KitFort |
 | ----------   | --------- | ---------------- | ------ |
 | ![CI](https://github.com/vavrines/Kinetic.jl/workflows/CI/badge.svg) | ![CI](https://github.com/vavrines/KitBase.jl/workflows/CI/badge.svg) | ![CI](https://github.com/vavrines/KitML.jl/workflows/CI/badge.svg) | ![CI](https://github.com/vavrines/KitFort.jl/workflows/CI/badge.svg) |
-| [![codecov](https://codecov.io/gh/vavrines/Kinetic.jl/branch/master/graph/badge.svg?token=mMtuTG3qMo)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://codecov.io/gh/vavrines/KitBase.jl/branch/main/graph/badge.svg?token=vGgQhyGJ6L)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://codecov.io/gh/vavrines/KitML.jl/branch/main/graph/badge.svg?token=OnazyqLA4K)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://codecov.io/gh/vavrines/KitFort.jl/branch/main/graph/badge.svg?token=67tfVc3AtW)](https://codecov.io/gh/vavrines/KitFort.jl) |
+| [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl.svg)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl.svg)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl.svg)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl.svg)](https://codecov.io/gh/vavrines/KitFort.jl) |
 
 ## Formulation
 
