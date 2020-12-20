@@ -14,7 +14,7 @@
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
 ![](https://zenodo.org/badge/243490351.svg)
 
-**Kinetic.jl** is a lightweight [Julia](https://julialang.org) toolbox for the study of kinetic theory and scientific machine learning. The main module here consists of [KitBase.jl](https://github.com/vavrines/KitBase.jl) with basic physics and [KitML.jl](https://github.com/vavrines/KitML.jl) with neural dynamics. The high-performance Fortran library [KitFort.jl](https://github.com/vavrines/KitFort.jl) can be optionally imported when the executing efficiency becomes the first priority. The status of continuous integration and coverage in the ecosystem is listed as follows.
+**Kinetic.jl** is a lightweight [Julia](https://julialang.org) toolbox for the study of kinetic theory and scientific machine learning. The main module here consists of [KitBase.jl](https://github.com/vavrines/KitBase.jl) with basic physics and [KitML.jl](https://github.com/vavrines/KitML.jl) with neural dynamics. The high-performance Fortran library [KitFort.jl](https://github.com/vavrines/KitFort.jl) can be optionally imported when the executing efficiency becomes the first priority. A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) is built together to locate all the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia). The status of continuous integration and coverage for the ecosystem is listed.
 
 | Kinetic | KitBase | KitML | KitFort |
 | ----------   | --------- | ---------------- | ------ |
