@@ -5,16 +5,16 @@ Copyright (c) 2020 Tianbai Xiao <<tianbaixiao@gmail.com>>
 """
 module Kinetic
 
-export 動
+export 転
 
 """
 Lightweight Framework for Kinetic Theory and Scientific Machine Learning
 
 轻量化的动理论建模和计算框架
 
-"動" means "motion" in Chinese
+"転" means "rolling" in Japannese
 """
-const 動 = Kinetic
+const 転 = Kinetic
 
 using Reexport
 @reexport using KitBase
