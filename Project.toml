@@ -15,7 +15,7 @@ Conda = "^1"
 KitBase = "0.1, 0.2"
 KitML = "0.1"
 PyCall = "^1"
-Reexport = "0.2"
+Reexport = "0.2, 1.0"
 julia = "^1"
 
 [extras]
