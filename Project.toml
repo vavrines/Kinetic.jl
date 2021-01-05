@@ -4,7 +4,6 @@ authors = ["Tianbai Xiao <tianbaixiao@gmail.com>"]
 version = "0.6.0"
 
 [deps]
-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 KitBase = "86eed249-3a28-466f-8d3a-596821e1af9a"
 KitML = "b2531deb-9288-45c6-8f4a-0220551da45d"
@@ -12,7 +11,6 @@ PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
-CUDA = "^2"
 Conda = "^1"
 KitBase = "0.3"
 KitML = "0.1"

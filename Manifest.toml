@@ -559,8 +559,6 @@ version = "0.3.2"
 [[KitML]]
 deps = ["DiffEqFlux", "Flux", "KitBase", "Optim", "OrdinaryDiffEq"]
 git-tree-sha1 = "dad690e6e7d7793844ad81da32b9e03aa368d726"
-repo-rev = "main"
-repo-url = "https://github.com/vavrines/KitML.jl.git"
 uuid = "b2531deb-9288-45c6-8f4a-0220551da45d"
 version = "0.1.1"
 

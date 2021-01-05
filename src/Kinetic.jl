@@ -20,28 +20,8 @@ Lightweight Framework for Computational Fluid Dynamics and Scientific Machine Le
 """
 const 転 = Kinetic
 
-using CUDA
 using Reexport
 @reexport using KitBase
 @reexport using KitML
-
-function __init__()
-    threads = Threads.nthreads()
-    if threads == 1
-        @info "Kinetic will run serially"
-    elseif threads > 1
-        @info "Kinetic will run with $threads threads"
-    end
-
-    if has_cuda()
-        @info "Kinetic will enable CUDA devices"
-        for (i, dev) in enumerate(CUDA.devices())
-            @info "$i: $(CUDA.name(dev))"
-        end
-
-        @info "Scalar operation is disabled in CUDA"
-        CUDA.allowscalar(false)
-    end
-end
 
 end
