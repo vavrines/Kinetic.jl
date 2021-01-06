@@ -553,8 +553,6 @@ version = "0.8.4"
 [[KitBase]]
 deps = ["CUDA", "Conda", "Dates", "Distributions", "FFTW", "FastGaussQuadrature", "FileIO", "JLD2", "LinearAlgebra", "OffsetArrays", "Plots", "ProgressMeter", "PyCall", "SpecialFunctions", "Test"]
 git-tree-sha1 = "038edf1373543cc02f98eccf48f7acdae29f9f3c"
-repo-rev = "main"
-repo-url = "https://github.com/vavrines/KitBase.jl.git"
 uuid = "86eed249-3a28-466f-8d3a-596821e1af9a"
 version = "0.3.4"
 
