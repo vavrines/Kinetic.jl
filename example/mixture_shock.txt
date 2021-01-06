@@ -10,6 +10,7 @@ collision = bgk
 nSpecies = 2
 interpOrder = 2
 limiter = minmod
+boundary = fix
 cfl = 0.5
 maxTime = 100
 

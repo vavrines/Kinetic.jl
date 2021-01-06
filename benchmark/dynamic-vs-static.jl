@@ -1,3 +1,7 @@
+"""
+This file compares the performance by using dynamic and static arrays to store solutions.
+"""
+
 using Kinetic, StaticArrays, BenchmarkTools, OffsetArrays
 cd(@__DIR__)
 

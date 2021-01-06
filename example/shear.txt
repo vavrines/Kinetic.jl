@@ -10,6 +10,7 @@ collision = bgk
 nSpecies = 1
 interpOrder = 2
 limiter = vanleer
+boundary = fix
 cfl = 0.5
 maxTime = 0.005539
 

@@ -8,9 +8,7 @@
 -->
 
 [![version](https://juliahub.com/docs/Kinetic/version.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu)
-[![pkgeval](https://juliahub.com/docs/Kinetic/pkgeval.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu)
 ![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
-[![deps](https://juliahub.com/docs/Kinetic/deps.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu?t=2)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
 ![](https://zenodo.org/badge/243490351.svg)
 
