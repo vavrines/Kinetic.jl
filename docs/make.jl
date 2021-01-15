@@ -11,6 +11,7 @@ makedocs(
     pages = Any[
         "Home" => "index.md",
         "Installation" => "install.md",
+        "Basics" => "basics.md",
         "Type" => "type.md",
         "Algorithm" => "algorithm.md",
         "API" => [
