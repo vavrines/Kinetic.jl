@@ -9,18 +9,6 @@ Kinetic is interested in theoretical modeling and numerical simulation of many-p
 It employs the finite volume method (FVM) to conduct 1-3 dimensional numerical simulations on CPUs and GPUs.
 Any advection-diffusion type equation can be hooked and solved within the framework.
 The user interface is designed as intuitive and neat as possible, allowing users to focus on physics and to cooperate with existing packages in the Julia ecosystem.
-We pay special attentions to Hilbert's sixth problem, i.e. building the numerical passage between the kinetic theory of gases and continuum mechanics. 
-Two types of governing equations are therefore bridged, i.e. the Boltzmann equation
-
-```math
-\frac{\partial f}{\partial t}+ \mathbf u \cdot \nabla_\mathbf x f + \mathbf a \cdot \nabla_\mathbf u f = \int_{\mathcal R^3} \int_{\mathcal S^2} B (f(\mathbf u_*')f(\mathbf u')-f(\mathbf u_*) f(\mathbf u)) d\Omega d\mathbf u_*
-```
-
-and its upscaling moment system
-
-```math
-\frac{\partial \mathbf W}{\partial t} + \nabla_\mathbf x \cdot \mathbf F = \mathbf S
-```
 
 ## Getting help
 
