@@ -1,7 +1,7 @@
 # Pre-process
 
 ```@docs
-KitBase.initialize
+initialize
 ```
 
 The pre-process solver initializes the simulation that returns solver set, control volumes, interfaces, and current time.

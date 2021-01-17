@@ -2,7 +2,7 @@
 
 ```@docs
 Kinetic.initialize
-init_fvm
+Kinetic.init_fvm
 SolverSet
 set_ib
 solve!

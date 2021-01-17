@@ -92,4 +92,4 @@ The result can be visualized with built-in function `plot_line`, which presents 
 ```julia
 plot_line(set, ctr)
 ```
-<img src="./assets/sod.png" width = "600"  align=center />
+![](./assets/sod.png)

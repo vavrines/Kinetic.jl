@@ -33,7 +33,7 @@ If the particles only collide with a background material one obtains linear Bolt
 ```math
 Q(f)=\int_{\mathbb R^3} \mathcal B(\mathbf v_*, \mathbf v) \left[ f(\mathbf v_*)-f(\mathbf v)\right] d\mathbf v_*
 ```
-where the collision kernel `B` models the strength of collisions at different velocities. 
+where the collision kernel ``\mathcal B`` models the strength of collisions at different velocities. 
 If the interactions among particles are considered, the collision operator becomes nonlinear. 
 For example, the two-body collision results in nonlinear Boltzmann equation
 ```math
