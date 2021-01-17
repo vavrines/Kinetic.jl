@@ -1,4 +1,4 @@
-# Basics
+# Basic Physics
 
 The physical world shows a diverse set of behaviors on different characteristic scales.
 Consider the molecular motion of gases as an example.

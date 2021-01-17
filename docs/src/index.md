@@ -8,7 +8,8 @@ A wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built to l
 Kinetic is interested in theoretical modeling and numerical simulation of many-particle systems, e.g. gases, photons, plasmas, neutrons, electrons, etc.
 It employs the finite volume method (FVM) to conduct 1-3 dimensional numerical simulations on CPUs and GPUs.
 Any advection-diffusion type equation can be hooked and solved within the framework.
-The user interface is designed as intuitive and neat as possible, allowing users to focus on physics and to cooperate with existing packages in the Julia ecosystem.
+The user interface is designed as intuitive and neat as possible.
+The combined development of high-level and low-level APIs allows users to focus on physics and to cooperate with existing packages in the Julia ecosystem.
 
 ## Getting help
 

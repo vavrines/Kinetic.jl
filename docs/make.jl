@@ -11,9 +11,18 @@ makedocs(
     pages = Any[
         "Home" => "index.md",
         "Installation" => "install.md",
-        "Basics" => "basics.md",
+        "Tutorial" => "tutorial.md",
+        "Physics" => "physics.md",
         "Type" => "type.md",
-        "Algorithm" => "algorithm.md",
+        "Solver" => [
+            "solver.md",
+            "solver_pre.md",
+            "solver_timestep.md",
+            "solver_reconstruction.md",
+            "solver_flux.md",
+            "solver_update.md",
+            "solver_post.md",
+            ],
         "API" => [
             "api_io.md",
             "api_math.md",
