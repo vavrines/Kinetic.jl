@@ -4,6 +4,7 @@ Kinetic is organized with the data structures and methods of both generality and
 While most of the methods can be applied to multi-dimensional arrays directly, we provide a set of domain-specific structs that handles multiple dispatch in an elegant way.
 In the finite volume method, the data is stored separately throughout the cells.
 Therefore, we provide AbstractControlVolume structs for solving different equations that are used as arrays of structs (AoS) in the simulations.
+
 The 1D control volume structs are
 ```@docs
 ControlVolume1D
@@ -34,6 +35,10 @@ Interface2D2F
 ```
 
 The rest structs for saving general computational setups are
+```@docs
+SolverSet
+```
+
 ```@autodocs
 Modules = [KitBase]
 Order = [:type]

@@ -23,16 +23,14 @@ makedocs(
             "solver_update.md",
             "solver_post.md",
             ],
-        "API" => [
+        "Auxiliary" => [
             "api_io.md",
             "api_math.md",
-            "api_geo.md",
             "api_theory.md",
+            "api_geo.md",
             "api_phase.md",
-            "api_reconstruct.md",
-            "api_flux.md",
             "api_config.md",
-            "api_solver.md",
+            "api_step.md",
             ],
     ]
 )

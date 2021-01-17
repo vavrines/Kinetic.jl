@@ -1,6 +1,10 @@
-# Solver
+# Stepper
 
 ```@docs
+KitBase.step!
+```
+
+
 Kinetic.initialize
 Kinetic.init_fvm
 SolverSet
@@ -12,4 +16,3 @@ evolve!
 update!
 update_boundary!
 step!
-```
