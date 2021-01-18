@@ -23,6 +23,7 @@ makedocs(
             "solver_update.md",
             "solver_post.md",
             ],
+        "SciML" => "sciml.md",
         "Auxiliary" => [
             "api_io.md",
             "api_math.md",
