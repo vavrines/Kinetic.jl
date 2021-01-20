@@ -39,8 +39,8 @@ makedocs(
             "api_step.md",
             ],
         "KitML" => "kitml.md",
-        "KitFort" => "kitfort.md"
-        "Index" => "function_index.md"
+        "KitFort" => "kitfort.md",
+        "Index" => "function_index.md",
     ]
 )
 
