@@ -33,11 +33,13 @@ and continuum mechanics, e.g. the Euler and Navier-Stokes equations
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" target="_blank"><img src="https://latex.codecogs.com/svg.latex?\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" title="\frac{\partial \mathbf W}{\partial t} + \nabla_\mathbf x \cdot \mathbf F = \mathbf S" /></a>
 
-A list of current supported equations include:
+A list of current supported models and equations include:
 - linear Boltzmann equation
 - nonlinear Boltzmann equation
 - nonlinear kinetic model equation
 - multi-component Boltzmann equations
+- direct simulation Monte Carlo
+- stochastic particle method based on relaxation model
 - advection-diffusion equation
 - Burgers equation
 - Euler equations
