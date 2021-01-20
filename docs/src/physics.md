@@ -59,17 +59,19 @@ From microscopic particle transport to macroscopic fluid motion, there is a cont
 
 Kinetic.jl is designed to solve different physical models.
 We pay special attentions to Hilbert's sixth problem, i.e. building the numerical passage between the kinetic theory of gases and continuum mechanics. 
-A list of current solvers include:
+A list of current supported models and equations include
 - linear Boltzmann equation
 - nonlinear Boltzmann equation
 - nonlinear kinetic model equation
 - multi-component Boltzmann equations
+- direct simulation Monte Carlo
+- stochastic particle method based on relaxation model
 - advection-diffusion equation
 - Burgers equation
 - Euler equations
 - Navier-Stokes equations
-- Extended hydrodynamical equations from kinetic moments
+- Extended hydrodynamical equations from gas kinetic expansion
 - Magnetohydrodynamical equations
-- Two-fluid equations
 - Poisson equation
+- Fokker-Planck-Landau equation
 - Maxwell's equations
