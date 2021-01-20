@@ -1,4 +1,4 @@
-# Scientific Machine Learning
+# KitML and Scientific Machine Learning
 
 Machine learning is building its momentum in scientific computing.
 Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximator from machine learning models into the governing equations and achieve the balance between efficiency and accuracy.
