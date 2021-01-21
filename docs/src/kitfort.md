@@ -4,7 +4,7 @@ Numerical simulations of nonlinear models and differential equations are essenti
 The performance of a supercomputer or a software program is commonly measured in floating-point operations per second (FLOPS).
 Through the milestone astronomy research of [Celeste](https://juliacomputing.com/case-studies/celeste/), Julia has entered the PetaFLOPS club (together with C/C++ and Fortran) since 2017.
 Julia is experiencing a dramatic Rise in HPC and elsewhere, and that is why we use Julia to organize the Kinetic.
-However, Compared with the matured C/C++ ecosystem, the equivalent execution efficiency isn't going to happen in all time and situations.
+However, compared with the mature C/C++ ecosystem, the equivalent execution efficiency isn't going to happen in all time and situations.
 Some existing hardware architecture, e.g. [Sunway TaihuLight](https://en.wikipedia.org/wiki/Sunway_TaihuLight), the previou fastest supercomputer in [TOP500](https://www.top500.org/) list, is built upon 40,960 Chinese-designed SW26010 manycore 64-bit RISC processors, which is not specifically optimized for Julia.
 Therefore, we've develop an accompanying package [KitFort.jl](https://github.com/vavrines/KitFort.jl).
 The Fortran codes have been linked to the Julia syntax with the built-in `ccall` function.
@@ -22,3 +22,9 @@ julia> using KitFort
 It can be updated to the latest tagged release from the package manager by executing
 ```julia
 (v1.5) pkg> update KitFort
+```
+
+```@autodocs
+Modules = [KitFort]
+Order = [:type, :function]
+```

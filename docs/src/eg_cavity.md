@@ -236,15 +236,13 @@ end
 
 The result can be visualized with built-in function `plot_contour`, which presents the contours of gas density, U-velocity, V-velocity and temperature inside the cavity.
 ```julia
-# visulization
 KitBase.plot_contour(ks, ctr)
 ```
 
 ![](./assets/cavity.png)
 
-It is equivalent as the following backend.
+It is equivalent as the following low-level backend.
 ```julia
-# low-level backend
 begin
     using Plots
     sol = zeros(4, ks.pSpace.nx, ks.pSpace.ny)

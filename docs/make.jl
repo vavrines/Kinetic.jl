@@ -1,5 +1,6 @@
 import Pkg
 Pkg.add("Documenter")
+Pkg.add("KitFort")
 
 using Documenter, Kinetic
 using Kinetic: KitBase, KitML
@@ -21,7 +22,7 @@ solver_page = [
 
 makedocs(
     sitename= "Kinetic.jl",
-    modules = [Kinetic, KitBase, KitML],
+    modules = [Kinetic, KitBase, KitML, KitFort],
     pages = Any[
         "Home" => "index.md",
         "Installation" => "install.md",
