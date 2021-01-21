@@ -20,6 +20,10 @@ solver_page = [
     "Postprocess" => "solver_post.md",
 ]
 
+format = Documenter.HTML(
+    collapselevel = 1,
+)
+
 makedocs(
     sitename= "Kinetic.jl",
     modules = [Kinetic, KitBase, KitML, KitFort],
@@ -42,7 +46,8 @@ makedocs(
         "KitML" => "kitml.md",
         "KitFort" => "kitfort.md",
         "Index" => "function_index.md",
-    ]
+    ],
+    format = format,
 )
 
 deploydocs(
