@@ -30,5 +30,5 @@ Order = [:function]
 ```
 
 ```@docs
-KitFort.flux.kfvs!
+KitFort.flux_kfvs!
 ```
