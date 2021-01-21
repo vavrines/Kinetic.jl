@@ -1,4 +1,4 @@
-# Function Index
+# Index of Types and Methods
 
 ```@index
 ```
