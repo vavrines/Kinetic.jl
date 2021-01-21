@@ -2,7 +2,7 @@ import Pkg
 Pkg.add("Documenter")
 Pkg.add("KitFort")
 
-using Documenter, Kinetic
+using Documenter, Kinetic, KitFort
 using Kinetic: KitBase, KitML
 
 tutorial_page = [
