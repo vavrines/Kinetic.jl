@@ -1,4 +1,4 @@
-# KitFort and High-Performance Computing
+# High-Performance Computing and KitFort
 
 Numerical simulations of nonlinear models and differential equations are essentially connected with supercomputers and high-performance computing (HPC).
 The performance of a supercomputer or a software program is commonly measured in floating-point operations per second (FLOPS).
