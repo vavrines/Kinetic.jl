@@ -4,6 +4,7 @@ Pkg.add("KitFort")
 
 using Documenter, Kinetic, KitFort
 using Kinetic: KitBase, KitML
+using Reexport
 
 tutorial_page = [
     "Shock tube problem" => "eg_shock.md",

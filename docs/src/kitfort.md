@@ -28,7 +28,7 @@ It can be updated to the latest tagged release from the package manager by execu
 Modules = [KitFort]
 Order = [:function]
 ```
-
-```@docs
-KitFort.flux_kfvs!
+```@autodocs
+Modules = [Reexport]
+Order = [:function]
 ```
