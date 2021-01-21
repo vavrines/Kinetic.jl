@@ -8,6 +8,11 @@ It promises a completely differential structure and thus the neural ODE type tra
 The approach reduces the computational cost up to three orders of magnitude and preserves the perfect accuracy.
 The detailed theory and implementation can be found in [Tianbai Xiao and Martin Frank, Using neural networks to accelerate the solution of the Boltzmann equation](https://arxiv.org/pdf/2010.13649.pdf).
 
+```@docs
+ube_dfdt
+ube_dfdt!
+```
+
 First we load all the packages needed and set up the configurations.
 ```julia
 using OrdinaryDiffEq, Flux, DiffEqFlux, Plots
