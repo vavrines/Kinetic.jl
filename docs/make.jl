@@ -53,6 +53,7 @@ makedocs(
         "KitML" => "kitml.md",
         "KitFort" => "kitfort.md",
         "Index" => "function_index.md",
+        "Python" => "python.md"
         "Contribution" => "contribution.md",
         "Reference" => "reference.md",
     ],
