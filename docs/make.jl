@@ -10,6 +10,12 @@ tutorial_page = [
     "Lid-driven cavity" => "eg_cavity.md",
 ]
 
+type_page = [
+    "General" => "type.md",
+    "One-dimensional data" => "type_1d.md",
+    "Two-dimensional data" => "type_2d.md",
+]
+
 solver_page = [
     "General" => "solver.md",
     "Preprocess" => "solver_pre.md",
@@ -32,7 +38,7 @@ makedocs(
         "Installation" => "install.md",
         "Tutorial" => tutorial_page,
         "Physics" => "physics.md",
-        "Type" => "type.md",
+        "Type" => type_page,
         "Solver" => solver_page,
         "Utility" => [
             "api_io.md",
