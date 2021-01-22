@@ -46,6 +46,7 @@ makedocs(
         "KitML" => "kitml.md",
         "KitFort" => "kitfort.md",
         "Index" => "function_index.md",
+        "Contribution" => "contribution.md",
         "Reference" => "reference.md",
     ],
     format = format,
