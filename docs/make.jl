@@ -40,6 +40,7 @@ makedocs(
         "Physics" => "physics.md",
         "Type" => type_page,
         "Solver" => solver_page,
+        "Parallelization" => "parallel.md",
         "Utility" => [
             "api_io.md",
             "api_math.md",
