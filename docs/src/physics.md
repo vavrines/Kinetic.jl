@@ -55,23 +55,4 @@ Typical examples are the Euler and Navier-Stokes equations
 \frac{\partial \mathbf W}{\partial t} + \nabla_\mathbf x \cdot \mathbf F = \mathbf S
 ```
 From microscopic particle transport to macroscopic fluid motion, there is a continuous variation of flow dynamics. 
-
-
-Kinetic.jl is designed to solve different physical models.
 We pay special attentions to Hilbert's sixth problem, i.e. building the numerical passage between the kinetic theory of gases and continuum mechanics. 
-A list of current supported models and equations include
-- linear Boltzmann equation
-- nonlinear Boltzmann equation
-- nonlinear kinetic model equation
-- multi-component Boltzmann equations
-- direct simulation Monte Carlo
-- stochastic particle method based on relaxation model
-- advection-diffusion equation
-- Burgers equation
-- Euler equations
-- Navier-Stokes equations
-- Extended hydrodynamical equations from gas kinetic expansion
-- Magnetohydrodynamical equations
-- Poisson equation
-- Fokker-Planck-Landau equation
-- Maxwell's equations

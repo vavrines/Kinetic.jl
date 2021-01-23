@@ -1,15 +1,18 @@
 # Installation Instructions
 
 Kinetic is a registered Julia package in the official entry.
-We recommend installing it with the built-in Julia package manager, because this automatically installs a stable, tagged release. 
-From the Julia REPL, you could add the package and instantiate/build all dependencies via
+We recommend installing it with the built-in Julia package manager.
+It automatically installs a currently stable and tagged release. 
+From the Julia REPL, you can add the package, instantiate and build all the dependencies via
 ```julia
 julia> ]
 (v1.5) pkg> add Kinetic
+(v1.5) pkg> instantiate
 (v1.5) pkg> build Kinetic
 ```
+
 This will install Kinetic and all its dependencies.
-After that, using/import the package,
+After that, we can `using` or `import` the package,
 ```julia
 julia> using Kinetic
 ```

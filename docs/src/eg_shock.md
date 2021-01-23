@@ -1,10 +1,4 @@
-# Tutorial 
-
-Thanks to the brilliant expressiveness and low-overhead abstraction, we provide different levels of solution algorithm for modeling and simulating advection-diffusion dynamics.
-The high-level solver is able to solve complex physics in a few lines, while the low-level APIs keep all the detailed implementations and are easy to be called from Python and C.
-In the following, we present two quick tutorials to illustrate the usage of Kinetic.
-
-## Shock tube problem
+# Shock tube problem
 
 We first solve the shock tube problem in gas dynamics.
 It's a two dimensional problem, with one in physical domain ``x`` and another in particle velocity domain ``u``.

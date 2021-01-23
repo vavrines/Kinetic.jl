@@ -1,4 +1,4 @@
-# High-Performance Computing and KitFort
+# KitFort.jl
 
 Numerical simulations of nonlinear models and differential equations are essentially connected with supercomputers and high-performance computing (HPC).
 The performance of a supercomputer or a software program is commonly measured in floating-point operations per second (FLOPS).
@@ -22,13 +22,4 @@ julia> using KitFort
 It can be updated to the latest tagged release from the package manager by executing
 ```julia
 (v1.5) pkg> update KitFort
-```
-
-```@autodocs
-Modules = [KitFort]
-Order = [:function]
-```
-```@autodocs
-Modules = [Reexport]
-Order = [:function]
 ```

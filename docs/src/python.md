@@ -2,7 +2,7 @@
 
 For maximum convenience, a wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built to locate all the methods from Python.
 
-## How to use
+## How to use?
 
 Let's start by cloning the repository and changing into the directory.
 ```bash
@@ -27,16 +27,14 @@ The basic structs and methods are stored in the base module, and can be imported
 We provide some quick tutorial here for kineticpy.
 
 ```python
-from kineticpy import base
-import numpy as np
+>>> from kineticpy import base
+>>> import numpy as np
 
-u = np.linspace(-5, 5, 28)
-prim_var = np.array([1.0, 0.0, 1.0])
-M = base.maxwellian(u, prim_var) # compute Maxwellian distribution
-M.view()
-```
+>>> u = np.linspace(-5, 5, 28) # velocity space
+>>> prim_var = np.array([1.0, 0.0, 1.0]) # primitive flow variables
+>>> M = base.maxwellian(u, prim_var) # compute Maxwellian distribution
+>>> M.view()
 
-```
 array([7.83543327e-12, 2.77323769e-10, 7.46041809e-09, 1.52542631e-07,
        2.37067103e-06, 2.80029217e-05, 2.51412806e-04, 1.71562923e-03,
        8.89839075e-03, 3.50793472e-02, 1.05109877e-01, 2.39379825e-01,

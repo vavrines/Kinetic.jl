@@ -2,24 +2,18 @@
 
 Thank you for considering contributing to Kinetic! This short guide will
 give you ideas on how you can contribute and help you make a contribution.
-
 Please feel free to ask us questions and chat with us at any time if you're
 unsure about anything.
 
 ## What can I do?
 
-* Tackle an existing issue. We keep a list of good first issues
-  that are self-contained and suitable for a newcomer to try and work on.
-
+* Tackle an existing issue.
 * Try to run Kinetic and play around with it to simulate your favorite
-  fluids and ocean physics. If you run into any problems or find it difficult
+  fluid and kinetic physics. If you run into any problems or find it difficult
   to use or understand, please open an issue!
-
 * Write up an example or tutorial on how to do something useful with
   Kinetic, like how to set up a new physical configuration.
-
 * Improve documentation or comments if you found something hard to use.
-
 * Implement a new feature if you need it to use Kinetic.
 
 If you're interested in working on something, let us know by commenting on
@@ -27,7 +21,7 @@ existing issues or by opening a new issue if. This is to make sure no one else
 is working on the same issue and so we can help and guide you in case there
 is anything you need to know beforehand.
 
-## Ground Rules
+## Philosophy
 
 * Each pull request should consist of a logical collection of changes. You can
   include multiple bug fixes in a single pull request, but they should be related.
@@ -44,7 +38,7 @@ is anything you need to know beforehand.
 ## Reporting a bug
 
 The easiest way to get involved is to report issues you encounter when using
-Oceananigans or by requesting something you think is missing.
+Kinetic or by requesting something you think is missing.
 
 * Head over to the issues in [KitBase](https://github.com/vavrines/KitBase.jl/issues) or [KitML](https://github.com/vavrines/KitML.jl/issues) page.
 * Search to see if your issue already exists or has even been solved previously.
@@ -69,9 +63,8 @@ Oceananigans or by requesting something you think is missing.
   ```
 * Navigate to that folder in the terminal or in Anaconda Prompt if you're on Windows.
 * Connect your repository to the upstream (main project).
-  ```
-  git remote add oceananigans https://github.com/vavrines/KitBase.jl.git or https://github.com/vavrines/KitML.jl.git
-  ```
+  ```git remote add KitBase https://github.com/vavrines/KitBase.jl.git``` or 
+  ```git remote add KitML https://github.com/vavrines/KitML.jl.git```
 * Create the development environment by opening Julia via `julia --project` then
   typing in `] instantiate`. This will install all the dependencies in the Project.toml
   file.
@@ -80,7 +73,7 @@ Oceananigans or by requesting something you think is missing.
 
 Your development environment is now ready!
 
-## Pull Requests
+## Pull requests
 
 Changes and contributions should be made via GitHub pull requests against the ``master`` branch.
 
@@ -91,7 +84,7 @@ good commit messages.
 When you think your changes are ready to be merged into the main repository,
 push to your fork and submit a pull request in https://github.com/vavrines/KitBase.jl/compare/ and https://github.com/vavrines/KitML.jl/compare/.
 
-**Working on your first Pull Request?** You can learn how from this _free_ video series
+**Working on your first Pull Request?** You can learn how from the video series
 [How to Contribute to an Open Source Project on GitHub](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github), Aaron Meurer's [tutorial on the git workflow](https://www.asmeurer.com/git-workflow/), or the guide [“How to Contribute to Open Source"](https://opensource.guide/how-to-contribute/).
 
 ## Documentation
@@ -104,4 +97,4 @@ or clarification that you can take care of while you are here.
 
 ## Credits
 
-This contributor's guide is based on the excellent [MetPy contributor's guide](https://github.com/Unidata/MetPy/blob/master/CONTRIBUTING.md).
+This contributor's guide is based on the [MetPy contributor's guide](https://github.com/Unidata/MetPy/blob/master/CONTRIBUTING.md) and [Oceananigans](https://github.com/CliMA/Oceananigans.jl).

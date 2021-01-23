@@ -1,4 +1,4 @@
-# Lid-Driven Cavity
+# Lid-driven cavity
 
 We then show the lid-driven cavity.
 It's a four dimensional problem, with two in physical domain ``(x,y)`` and another in particle velocity domain ``(u,v)``.

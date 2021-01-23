@@ -6,6 +6,7 @@ using Documenter, Kinetic, KitFort
 using Kinetic: KitBase, KitML
 
 tutorial_page = [
+    "Examples" => "tutorial.md",
     "Shock tube problem" => "eg_shock.md",
     "Lid-driven cavity" => "eg_cavity.md",
 ]
@@ -26,6 +27,21 @@ solver_page = [
     "Postprocess" => "solver_post.md",
 ]
 
+utility_page = [
+    "I / O" => "api_io.md",
+    "Math" => "api_math.md",
+    "Theory" => "api_theory.md",
+    "Physical space" => "api_geo.md",
+    "Phase space" => "api_phase.md",
+    "Configuration" => "api_config.md",
+    "Stepper" => "api_step.md",
+]
+
+fortran_page = [
+    "KitFort.jl" => "fortran1.md",
+    "Benchmark" => "fortran2.md",
+]
+
 format = Documenter.HTML(
     collapselevel = 1,
 )
@@ -41,17 +57,9 @@ makedocs(
         "Type" => type_page,
         "Solver" => solver_page,
         "Parallelization" => "parallel.md",
-        "Utility" => [
-            "api_io.md",
-            "api_math.md",
-            "api_theory.md",
-            "api_geo.md",
-            "api_phase.md",
-            "api_config.md",
-            "api_step.md",
-            ],
-        "KitML" => "kitml.md",
-        "KitFort" => "kitfort.md",
+        "Utility" => utility_page,
+        "SciML" => "kitml.md",
+        "Fortran" => fortran_page,
         "Index" => "function_index.md",
         "Python" => "python.md",
         "Contribution" => "contribution.md",
