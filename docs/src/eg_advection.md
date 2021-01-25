@@ -90,4 +90,4 @@ end
 gif(anim, "advection.gif", fps = 45)
 ```
 
-![](../../assets/figure/advection.gif)
+![](./assets/advection.gif)

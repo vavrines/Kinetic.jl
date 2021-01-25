@@ -1,6 +1,6 @@
 # Shock tube problem
 
-We first solve the shock tube problem in gas dynamics.
+We then use the Boltzmann equation to solve the shock tube problem in gas dynamics.
 It's a two dimensional problem, with one in physical domain ``x`` and another in particle velocity domain ``u``.
 First let us prepare the configuration file as
 ```
