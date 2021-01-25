@@ -6,7 +6,7 @@ using Kinetic, StaticArrays, BenchmarkTools, OffsetArrays
 cd(@__DIR__)
 
 #--- dynamic ---#
-ks, ctr, face, t = Kinetic.initialize("sod.txt")
+ks, ctr, face, t = Kinetic.initialize("bench_ds.txt")
 
 @btime Kinetic.solve!(ks, ctr, face, t)
 """The result on my NUC is around 707 ms."""
