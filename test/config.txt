@@ -3,6 +3,7 @@
 # ------------------------------------------------------------
 
 # setup
+matter = gas
 case = shock
 space = 1d1f1v
 flux = kfvs
@@ -17,14 +18,14 @@ maxTime = 250.0
 # phase space
 x0 = -35.0
 x1 = 35.0
-nx = 100
+nx = 50
 pMeshType = uniform
 nxg = 0
 
 # velocity space
 umin = -12.0
 umax = 12.0
-nu = 64
+nu = 16
 vMeshType = rectangle
 nug = 0
 
@@ -33,6 +34,6 @@ knudsen = 1.0
 mach = 2.0
 prandtl = 1.0
 inK = 0.0
-omega = 0.72
+omega = 0.81
 alphaRef = 1.0
 omegaRef = 0.5
