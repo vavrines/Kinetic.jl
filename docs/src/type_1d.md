@@ -1,4 +1,4 @@
-# One-dimensional data
+# One-dimensional FVM
 
 In the finite volume method, the data is stored separately throughout the cells.
 Therefore, we provide `AbstractControlVolume` and `AbstractInterface` structs for processing in-cell and edge information,
@@ -14,7 +14,7 @@ ControlVolume1D4F
 ```
 
 Within each cell, different numbers of particle distribution function can be tracked.
-Correspondingly, the interface data is stored with
+The interface data is stored correspondingly.
 
 ```@docs
 Interface1D

@@ -14,18 +14,18 @@ Any advection-diffusion type equation can be hooked and solved within the framew
 Special attention has been paid to the [kinetic theory](https://en.wikipedia.org/wiki/Kinetic_theory_of_gases) and the Boltzmann-type equations,
 which depicts the time-space evolution of particles via ensemble averaging at the mesoscopic level.
 A partial list of current supported models and equations include:
-- linear Boltzmann equation
-- nonlinear Boltzmann equation
-- multi-component Boltzmann equations
-- Fokker-Planck-Landau equation
-- direct simulation Monte Carlo
-- advection-diffusion equation
-- Burgers equation
-- Euler equations
-- Navier-Stokes equations
-- Extended hydrodynamical equations from gas kinetic expansion
-- Magnetohydrodynamical equations
-- Maxwell's equations
+- linear Boltzmann equation;
+- nonlinear Boltzmann equation;
+- multi-component Boltzmann equations;
+- Fokker-Planck-Landau equation;
+- direct simulation Monte Carlo;
+- advection-diffusion equation;
+- Burgers' equation;
+- Euler equations;
+- Navier-Stokes equations;
+- Extended hydrodynamical equations from gas kinetic expansion;
+- Magnetohydrodynamical equations;
+- Maxwell's equations.
 
 ## Design philosophy
 

@@ -13,9 +13,14 @@ tutorial_page = [
 ]
 
 type_page = [
-    "General" => "type.md",
-    "One-dimensional data" => "type_1d.md",
-    "Two-dimensional data" => "type_2d.md",
+    "Configuration" => "type_config.md",
+    "Setup" => "type_setup.md",
+    "Domain" => "type_domain.md",
+    "Velocity" => "type_velocity.md",
+    "Property" => "type_property.md",
+    "Condition" => "type_ib.md",
+    "One-dimensional FVM" => "type_1d.md",
+    "Two-dimensional FVM" => "type_2d.md",
 ]
 
 solver_page = [
@@ -53,10 +58,10 @@ makedocs(
     pages = Any[
         "Home" => "index.md",
         "Installation" => "install.md",
-        "Tutorial" => tutorial_page,
         "Physics" => "physics.md",
         "Type" => type_page,
         "Solver" => solver_page,
+        "Tutorial" => tutorial_page,
         "Parallelization" => "parallel.md",
         "Utility" => utility_page,
         "SciML" => "kitml.md",
