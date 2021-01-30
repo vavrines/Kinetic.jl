@@ -1,10 +1,10 @@
 # Particle properties
 
 A struct `gas <: AbstractProperty` defines the properties of particle model.
-It currently supports the following models
-- scalar;
-- gas-type molecule;
-- plasma.
+It currently supports the following models:
+- scalar
+- gas-type molecule
+- plasma
 
 ```@docs
 Scalar
@@ -14,18 +14,18 @@ Plasma1D
 Plasma2D
 ```
 
-The fields denote, for example
-- Kn: reference Knudsen number;
-- Ma: reference Mach number;
-- Pr: reference Prandtl number;
-- K: internal degree of freedom of molecule;
-- γ: adiabatic index;
-- ω: viscosity index;
-- αᵣ: reference ``\alpha`` in viscosity evaluation;
-- ωᵣ: reference ``\omega`` in viscosity evaluation;
-- μᵣ: reference viscosity;
-- m: mass of each particle;
-- np: number of particles.
+The fields denote, for example:
+- Kn: reference Knudsen number
+- Ma: reference Mach number
+- Pr: reference Prandtl number
+- K: internal degree of freedom of molecule
+- γ: adiabatic index
+- ω: viscosity index
+- αᵣ: reference ``\alpha`` in viscosity evaluation
+- ωᵣ: reference ``\omega`` in viscosity evaluation
+- μᵣ: reference viscosity
+- m: mass of each particle
+- np: number of particles
 
 The viscosity is evaluated the following hard-sphere model.
 ```math

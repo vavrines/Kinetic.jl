@@ -5,6 +5,7 @@ It's a four dimensional problem, with two in physical domain ``(x,y)`` and anoth
 Similarly, we prepare the configuration file as
 ```
 # setup
+matter = gas
 case = cavity
 space = 2d2f2v
 flux = kfvs

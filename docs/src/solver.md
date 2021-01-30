@@ -1,4 +1,4 @@
-# General
+# General framework
 
 Kinetic employs the finite volume method (FVM) for modeling and simulation. 
 The general solution algorithm can be conclude as follows, where both explicit and implicit methods are implemented.

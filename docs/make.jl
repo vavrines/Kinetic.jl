@@ -1,13 +1,12 @@
 import Pkg
 Pkg.add("Documenter")
-Pkg.add("KitFort")
 
-using Documenter, Kinetic, KitFort
+using Documenter, Kinetic
 using Kinetic: KitBase, KitML
 
 tutorial_page = [
     "Examples" => "tutorial.md",
-    "Advection-diffusion" => "eg_advection.md",
+    "Advection diffusion" => "eg_advection.md",
     "Shock tube" => "eg_shock.md",
     "Lid-driven cavity" => "eg_cavity.md",
 ]
@@ -19,12 +18,11 @@ type_page = [
     "Velocity" => "type_velocity.md",
     "Property" => "type_property.md",
     "Condition" => "type_ib.md",
-    "One-dimensional FVM" => "type_1d.md",
-    "Two-dimensional FVM" => "type_2d.md",
+    "FVM" => "type_fvm.md",
 ]
 
 solver_page = [
-    "General" => "solver.md",
+    "Framework" => "solver.md",
     "Preprocess" => "solver_pre.md",
     "Timestep" => "solver_timestep.md",
     "Reconstruction" => "solver_reconstruction.md",
@@ -43,6 +41,13 @@ utility_page = [
     "Stepper" => "api_step.md",
 ]
 
+parallel_page = [
+    "General" => "parallel.md",
+    "Threading" => "para_thread.md",
+    "Distributed" => "para_dist.md",
+    "CUDA" => "para_cuda.md",
+]
+
 fortran_page = [
     "KitFort.jl" => "fortran1.md",
     "Benchmark" => "fortran2.md",
@@ -54,7 +59,7 @@ format = Documenter.HTML(
 
 makedocs(
     sitename= "Kinetic.jl",
-    modules = [Kinetic, KitBase, KitML, KitFort],
+    modules = [Kinetic, KitBase, KitML],
     pages = Any[
         "Home" => "index.md",
         "Installation" => "install.md",
@@ -62,7 +67,7 @@ makedocs(
         "Type" => type_page,
         "Solver" => solver_page,
         "Tutorial" => tutorial_page,
-        "Parallelization" => "parallel.md",
+        "Parallelization" => parallel_page,
         "Utility" => utility_page,
         "SciML" => "kitml.md",
         "Fortran" => fortran_page,

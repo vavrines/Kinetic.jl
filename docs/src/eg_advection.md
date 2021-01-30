@@ -1,4 +1,4 @@
-# Advection-diffusion
+# Advection diffusion
 
 The first example is the scalar advection-diffusion equation.
 It's a one dimensional problem in physical domain ``x``.
@@ -8,6 +8,7 @@ using ProgressMeter, OffsetArrays, Plots
 import KitBase
 
 set = KitBase.Setup(
+    "scalar", # matter
     "advection", # case
     "1d0f0v", # space
     "gks", # flux

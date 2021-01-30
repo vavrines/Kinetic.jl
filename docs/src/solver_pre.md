@@ -1,4 +1,4 @@
-# Pre-process
+# Preprocess
 
 ```@docs
 initialize

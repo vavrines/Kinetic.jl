@@ -5,10 +5,11 @@ evolve!
 ```
 
 The evolution solver calculate the interface numerical fluxes based on two neighbor cells.
+Different flux functions can be used with the option `model`.
 - macroscopic: Godunov, Lax, Roe, HLL, wave-propagation
 - mesoscopic: upwind, central-upwind, gas-kinetic scheme
 
-The available flux solvers are
+The available flux solvers are listed as follows.
 ```@docs
 flux_lax!
 flux_hll!

@@ -5,6 +5,7 @@ It's a two dimensional problem, with one in physical domain ``x`` and another in
 First let us prepare the configuration file as
 ```
 # case
+matter = gas
 case = sod
 space = 1d2f1v
 nSpecies = 1
