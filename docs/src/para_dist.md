@@ -1,7 +1,7 @@
 # Distributed computing
 
+The distributed computing is built upon Julia's `Distributed` module.
 ```julia
-Distributed
+using Distributed
 ```
-
-MPI type parallelization.
+It provides a MPI-type parallelization with a leaner code size.

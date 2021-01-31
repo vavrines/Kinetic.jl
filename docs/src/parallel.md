@@ -1,14 +1,12 @@
-# Parallel Computing
+# Parallel computing
 
 Julia supports different categories of parallel programming natively:
 - Asynchronous "tasks", or coroutines
 - Multi-threading
 - Distributed computing
 
-Kinetic integrates the the latter two with the CUDA based GPU computing.
-
-
-
+Kinetic integrates the the latter two mechanism along with the CUDA-based GPU computing.
+An initialization function is built in Kinetic.
 ```julia
 function __init__()
     np = nworkers()
@@ -29,5 +27,4 @@ function __init__()
     end
 end
 ```
-computational resources that will be called.
-
+As the package is imported, it will report the computational resources (processors, threads and CUDA devices) that are going to be utilized.
