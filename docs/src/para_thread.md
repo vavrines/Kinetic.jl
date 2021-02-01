@@ -1,6 +1,6 @@
 # Multiple threading
 
-The multi-threading functionality is built upon Julia's `@threads` macro.
+The multi-threading computation is built upon Julia's `@threads` macro.
 ```julia
 Base.Threads.@threads for ... end
 ```
