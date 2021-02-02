@@ -1,3 +1,5 @@
+push!(LOAD_PATH, "..")
+
 import Pkg
 Pkg.add("Documenter")
 
