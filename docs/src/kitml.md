@@ -207,3 +207,5 @@ plot!(
 )
 scatter!(vSpace.u[:, vSpace.nv÷2, vSpace.nw÷2], sol.u[2], lw = 2, label = "UBE", color = 3)
 ```
+
+![](./assets/ube.png)
