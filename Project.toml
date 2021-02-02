@@ -10,7 +10,7 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 KitBase = "0.3"
-KitML = "0.2"
+KitML = "0.1, 0.2"
 Reexport = "0.2, 1.0"
 julia = "^1"
 
