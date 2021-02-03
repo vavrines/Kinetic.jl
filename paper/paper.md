@@ -1,8 +1,8 @@
 ---
-title: 'Kinetic.jl: A lightweight finite volume toolbox in Julia'
+title: 'Kinetic.jl: A portable finite volume toolbox in Julia'
 tags:
-  - computational fluid dynamics
   - kinetic theory
+  - computational fluid dynamics
   - scientific machine learning
   - julia
 authors:
@@ -18,91 +18,130 @@ bibliography: paper.bib
 
 # Summary
 
-``Kinetic.jl`` is a lightweight toolbox for computational fluid dynamics and scientific machine learning. It focus on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc. Under the hood, the finite volume method (FVM) is implemented with various flux functions and update algorithms. Therefore, 1-3 dimensional numerical simulations can be conducted for any advection-diffusion type equations. Special attentions have been paid on Hilbert's sixth problem, i.e. to build the numerical passage between kinetic theory of gases, e.g. the Boltzmann equation
+Kinetic.jl is a lightweight finite volume toolbox written in the Julia programming language for the study of computational mechanics and scientific machine learning.
+It is an open-source project hosted on GitHub and distributed under MIT license.
+The main module consists of KitBase.jl with basic physics and KitML.jl with neural dynamics.
+The library provides a rich set of numerical flux functions.
+Any advection-diffusion type mechanical or neural equation can be hooked and solved in the framework.
+It is designed to balance the programming flexibility for scientific research, the algorithmic efficiency for application, and the simplicity for educational usage.
 
-<img src="bz.png" width = "600"  align=center />
+# Statement of need
 
-and the Navier-Stokes equations.
+A physical system can perform a wonderfully diverse set of acts on different characteristic scales.
+For example, particle transports can be described by kinetic theory of gases at particle mean free path scale [@chapman1990] and fluid mechanics at macroscopic level [@batchelor2000].
+With the rapidly advancing computing power, the finite volume method (FVM) is a prevalent method for quantitatively describing physical evolutions.
 
-<img src="ns.png" width = "150"  align=center />
+Most existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency but sacrifice the flexibility for development.
+For example, it is cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
+One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are splitted.
+Basically it benefits general users, while researchers still need to work on the back-end if a new feature is required. 
+Besides, the two-language problem introduces additional trade-off in both development and execution.
+Different from these packages, Kinetic.jl is built upon the Julia programming language [@bezanson2017], which is dynamically typed and designed for high performance computing for broad devices. 
+Based on type inference and multiple dispatch, it is a promising choice to solve the two-language problem.
 
-``Kinetic.jl`` is an open-source project hosted on GitHub and distributed under MIT license. The main module consists of ``KitBase.jl`` with basic physics and ``KitML.jl`` with neural dynamics. The high-performance Fortran library ``KitFort.jl`` is not included by default, but can be manually imported when the executing efficiency becomes the priority. A Python wrapper ``kineticpy`` has been built as well to locate the structures and methods through ``pyjulia``. It is easy to perform a subtask with the corresponding portable module.
+Kinetic.jl focus on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc.
+A hierarchy of abstractions is implemented.
+At the highest level, it is feasible to model and simulate a fluid dynamic problem within 10 lines of code. 
+At the lowest level, we design the methods for general numbers and arrays, so that it holds the perfect possibility to cooperate with existing packages in Julia ecosystem.
+As an example, It depends Flux.jl [@Flux2018] to create and train scientific machine learning models.
+The package holds the following innovations:
+- 100% Julia stack that encounters no two-language problem
+- Comprehensive support for kinetic theory and phase-space equations
+- Lightweight design to ensure the flexibility for secondary development
+- Closely coupling with scientific machine learning
 
-`Kinetic.jl` leverages the Julia programming language [@bezanson2017] for its implementation. The motivation behind it is to balance the flexibility for scientific research, the efficiency for application, and the simplicity for educational usage. Most of the mature FVM libraries, e.g. the OpenFOAM [@jasak2007], are written in compiled languages (C/C++, Fortran), which enjoy the perfect execution efficiency and sacrifice the speed and flexibility for a second development. For example, it is cumbersome to introduce phase-field evolution in OpenFOAM or integrate it with scientific machine learning (SciML) packages. Regarding this situation, the compromise has been made [@clawpack2020], which split the high-level front-ends and the low-level computational back-ends. Usually the front-end is implemented with interpreted languages, e.g. Python, which is able to call the low-level APIs written by compiled languages. Basically it benefits general users, while researchers need to work on the back-end anyhow if a new feature is in desire. Besides, the two-language problem will introduce additional trade-off in development and execution.
+# KitBase.jl
 
-Julia programming language is dynamically typed and designed for high performance computing for broad devices. Based on type inference and multiple dispatch, it is an ideal choice to solve the two-language problem. In `Kinetic.jl`, we provide different hierarchies of abstraction. At the highest level, it is feasible to model and simulate a typical gas dynamic problem within 10 lines of code. At the lowest level, we design the methods for general `Number` and `AbstractArray` , so that it holds the perfect possibility to cooperate with existing packages in Julia ecosystem. As an example, `KitML.jl` depends `Flux.jl` [@Flux2018] to conduct scientific machine learning problems.
+The main module of Kinetic.jl is splitted into two pieces to reduce the just-in-time (JIT) compilation time for domain specific applications.
+The basic physical laws and finite volume method are implemented in KitBase.jl.
+It provides a variety of solvers for the Boltzmann equation, Maxwell's equations, advection-diffusion equation, Burgers' equation, Euler and Navier-Stokes equations, etc.
+Different parallel computing techniques are provided, e.g. multi-threading, distributed computing and CUDA programming.
 
-In the following, we present an illustrative example of the shock tube problem in gas dynamics. With the configuration file `config.txt` set as below,
-
-
-```
-# case
-case = sod
-space = 1d2f1v
-nSpecies = 1
-flux = kfvs
-collision = bgk
-interpOrder = 2
-limiter = vanleer
-boundary = fix
-cfl = 0.5
-maxTime = 0.2
+In the following, we present an illustrative example of solving lid-driven cavity problem with the Boltzmann equation. 
+Two initialization methods, i.e. configuration text and Julia script, are available for setting up the solver.
+With the configuration file `config.toml` set as below,
+```toml
+# setup
+matter = gas # material
+case = cavity # case
+space = 2d2f2v # phase
+flux = kfvs # flux function
+collision = bgk # intermolecular collision
+nSpecies = 1 # number of species
+interpOrder = 2 # interpolation order of accuracy
+limiter = vanleer # limiter function
+boundary = maxwell # boundary condition
+cfl = 0.8 # CFL number
+maxTime = 5.0 # maximal simulation time
 
 # physical space
-x0 = 0
-x1 = 1
-nx = 200
-pMeshType = uniform
-nxg = 1
+x0 = 0.0 # starting point in x
+x1 = 1.0 # ending point in x
+nx = 45 # number of cells in x
+y0 = 0.0 # starting point in y
+y1 = 1.0 # ending point in y
+ny = 45 # number of cells in y
+pMeshType = uniform # mesh type
+nxg = 0 # number of ghost cell in x
+nyg = 0 # number of ghost cell in y
 
 # velocity space
-vMeshType = rectangle
-umin = -5
-umax = 5
-nu = 28
-nug = 0
+umin = -5.0 # starting point in u
+umax = 5.0 # ending point in u
+nu = 28 # number of cells in u
+vmin = -5.0 # starting point in v
+vmax = 5.0 # ending point in v
+nv = 28 # number of cells in v
+vMeshType = rectangle # mesh type
+nug = 0 # number of ghost cell in u
+nvg = 0 # number of ghost cell in v
 
-# gas
-knudsen = 0.0001
-mach = 0.0
-prandtl = 1
-inK = 2
-omega = 0.81
-alphaRef = 1.0
-omegaRef = 0.5
+# gas property
+knudsen = 0.075 # Knudsen number
+mach = 0.0 # Mach number
+prandtl = 1.0 # Prandtl number
+inK = 1.0 # molecular inner degree of freedom
+omega = 0.72 # viscosity index of hard-sphere gas
+alphaRef = 1.0 # viscosity index of hard-sphere gas in reference state
+omegaRef = 0.5 # viscosity index of hard-sphere gas ub reference state
+
+# boundary condition
+uLid = 0.15 # U-velocity of moving wall
+vLid = 0.0 # V-velocity of moving wall
+tLid = 1.0 # temperature of wall
 ```
 
-we execute the following codes
-
+let us execute the following codes
 ```julia
 using Kinetic
-set, ctr, face, t = initialize("config.txt")
+set, ctr, face, t = initialize("config.toml")
 t = solve!(set, ctr, face, t)
-plot_line(set, ctr)
+plot_contour(set, ctr)
 ```
 
-The computational setup is stored in `set` and the control volume solutions are stored in `ctr` and `face`. The high-level solver `solve!` is equivalent as the following solution algorithm.
+The computational setup is stored in `set`. 
+The control volume and interface solutions are stored in `ctr` and `face` correspondingly. 
+The result is visualized with built-in function `plot_contour`, which presents the distributions of gas density, velocity and temperature inside the cavity.
 
-```julia
-dt = timestep(ks, ctr, t)
-nt = Int(floor(ks.set.maxTime / dt))
-res = zeros(3)
-for iter = 1:nt
-    reconstruct!(ks, ctr)
-    evolve!(ks, ctr, face, dt)
-    update!(ks, ctr, face, dt, res)
-end
-```
+![Fig. 1](cavity.png)
+Fig. 1: macroscopic variables in the lid-driven cavity (topleft: density, top right: U-velocity, bottomleft: V-velocity, bottomright: temperature).
 
-The result is visualized with built-in function `plot_line`, which presents the profiles of gas density, velocity and temperature inside the tube.
+# KitML.jl
 
+Machine learning is building its momentum in scientific computing.
+Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximator from machine learning models into the governing equations and achieve the balance between efficiency and accuracy.
+In KitML.jl, we provide strategies to construct hybrid mechanical-neural models.
+The detailed theory and implementation can be found in the paper [@xiao2020].
 
- <img src="sod.png" width = "600"  align=center />
+# Extension
 
-The examples of scientific machine learning are introduced systematically in the paper [@xiao2020] .
+Numerical simulations of nonlinear models and differential equations are essentially connected with supercomputers and high-performance computing (HPC). 
+Considering that some existing hardware architecture, e.g. Sunway TaihuLight with Chinese-designed SW26010 processors, only provides optimization for specific languages, we've develop an accompanying package KitFort.jl.
+It is not a default component of Kinetic.jl, but can be manually imported.
+Besides, a wrapper kineticpy has been built as well to locate the structures and methods from Python ecosystem. 
 
 # Acknowledgements
 
-The current work is funded by the Alexander von Humboldt Foundation
+The current work is funded by the Alexander von Humboldt Foundation.
 
 # References
