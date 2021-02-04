@@ -50,8 +50,13 @@ parallel_page = [
     "CUDA" => "para_cuda.md",
 ]
 
+ml_page = [
+    "KitML" => "kitml1.md",
+    "UBE" => "kitml2.md",
+]
+
 fortran_page = [
-    "KitFort.jl" => "fortran1.md",
+    "KitFort" => "fortran1.md",
     "Benchmark" => "fortran2.md",
 ]
 
@@ -71,7 +76,7 @@ makedocs(
         "Tutorial" => tutorial_page,
         "Parallelization" => parallel_page,
         "Utility" => utility_page,
-        "SciML" => "kitml.md",
+        "SciML" => ml_page,
         "Fortran" => fortran_page,
         "Index" => "function_index.md",
         "Python" => "python.md",

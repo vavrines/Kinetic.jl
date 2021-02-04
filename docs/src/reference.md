@@ -10,3 +10,4 @@
 - Xiao, T., Xu, K., & Cai, Q. (2019). A unified gas-kinetic scheme for multiscale and multicomponent flow transport. Applied Mathematics and Mechanics, 40(3), 355-372.
 - Xiao, T., Liu, C., Xu, K., & Cai, Q. (2020). A velocity-space adaptive unified gas kinetic scheme for continuum and rarefied flows. Journal of Computational Physics, 415, 109535.
 - Xiao, T., & Frank, M. (2020). Using neural networks to accelerate the solution of the Boltzmann equation. arXiv:2010.13649.
+- Amos, B., Xu, L., & Kolter, J. Z. (2017, July). Input convex neural networks. In International Conference on Machine Learning (pp. 146-155). PMLR.

@@ -1,24 +1,16 @@
-# Scientific Machine Learning and KitML
+# Universal Boltzmann equation
 
-Machine learning is building its momentum in scientific computing.
-Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximator from machine learning models into the governing equations and achieve the balance between efficiency and accuracy.
 In the following, we present a universal differential equation strategy to construct the neural network enhanced Boltzmann equation.
 The complicated fivefold integral operator is replaced by a combination of relaxation and neural models.
 It promises a completely differential structure and thus the neural ODE type training and computing becomes possible.
 The approach reduces the computational cost up to three orders of magnitude and preserves the perfect accuracy.
 The detailed theory and implementation can be found in [Tianbai Xiao and Martin Frank, Using neural networks to accelerate the solution of the Boltzmann equation](https://arxiv.org/pdf/2010.13649.pdf).
 
-```@docs
-ube_dfdt
-ube_dfdt!
-```
-
 First we load all the packages needed and set up the configurations.
 ```julia
 using OrdinaryDiffEq, Flux, DiffEqFlux, Plots
 using KitBase, KitML
 
-# config
 begin
     case = "homogeneous"
     maxTime = 3
@@ -47,7 +39,6 @@ end
 
 The dataset is produced by the fast spectral method, which solves the nonlinear Boltzmann integral with fast Fourier transformation.
 ```julia
-# dataset
 begin
     tspan = (0.0, maxTime)
     tran = linspace(tspan[1], tspan[2], tlen)
@@ -124,7 +115,6 @@ end
 Then we define the neural network and construct the unified model with mechanical and neural parts.
 The training is conducted by DiffEqFlux.jl with ADAM optimizer.
 ```julia
-# neural model
 begin
     model_univ = DiffEqFlux.FastChain(
         DiffEqFlux.FastDense(nu, nu * nh, tanh),
@@ -152,18 +142,13 @@ begin
     end
 end
 
-# train
 res = DiffEqFlux.sciml_train(loss, p_model, ADAM(), cb = cb, maxiters = 200)
 res = DiffEqFlux.sciml_train(loss, res.minimizer, ADAM(), cb = cb, maxiters = 200)
-
-# residual history
-plot(log.(his))
 ```
 
 Once we have trained a hybrid Boltzmann collision term, we could solve it as a normal differential equation with any desirable solvers.
 Consider the Midpoint rule as an example, the solution algorithm and visualization can be organized.
 ```julia
-# solution
 ube = ODEProblem(KitML.ube_dfdt, f0_1D, tspan, [M0_1D, τ0, (model_univ, res.minimizer)]);
 sol = solve(
     ube,
@@ -173,7 +158,6 @@ sol = solve(
     saveat = tran,
 );
 
-# result
 plot(
     vSpace.u[:, vSpace.nv÷2, vSpace.nw÷2],
     data_boltz_1D[:, 1],
