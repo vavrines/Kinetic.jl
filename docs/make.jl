@@ -61,6 +61,7 @@ fortran_page = [
 ]
 
 format = Documenter.HTML(
+    assets = ["assets/favicon.ico"],
     collapselevel = 1,
 )
 
