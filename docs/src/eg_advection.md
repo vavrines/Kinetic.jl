@@ -58,7 +58,7 @@ dt = KitBase.timestep(ks, ctr, t)
 nt = ks.set.maxTime / dt |> Int
 
 anim = @animate for iter = 1:nt
-    KitBase.reconstruct!(ks, ctr; bc = Symbol(ks.set.boundary))
+    KitBase.reconstruct!(ks, ctr)
     
     for i in eachindex(face)
         face[i].fw = KitBase.flux_gks(
