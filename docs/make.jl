@@ -9,6 +9,7 @@ using Kinetic: KitBase, KitML
 tutorial_page = [
     "Examples" => "tutorial.md",
     "Advection diffusion" => "eg_advection.md",
+    "Burgers" => "eg_burgers.md",
     "Shock tube" => "eg_shock.md",
     "Lid-driven cavity" => "eg_cavity.md",
 ]
