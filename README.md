@@ -1,18 +1,26 @@
-<div align="center"> <img
+<div align="center">
+  <h1>Kinetic.jl</h1>
+  <img
+    src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif"
+    alt="Kinetic Logo" width="300">
+  </img>
+
+  [![version](https://juliahub.com/docs/Kinetic/version.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu)
+  ![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
+  [![](https://img.shields.io/badge/docs-stable-green.svg)](https://xiaotianbai.com/Kinetic.jl/stable/)
+  [![](https://img.shields.io/badge/docs-dev-green.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
+  ![](https://zenodo.org/badge/243490351.svg)
+  [![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
+</div>
+
+<!--<div align="center"> <img
   src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif"
   alt="Kinetic Logo" width="300"></img>
-</div>
+</div>-->
 <!--
 # Kinetic.jl
 <img src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif" width="300"/>
 -->
-
-[![version](https://juliahub.com/docs/Kinetic/version.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu)
-![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
-[![](https://img.shields.io/badge/docs-stable-green.svg)](https://xiaotianbai.com/Kinetic.jl/stable/)
-[![](https://img.shields.io/badge/docs-dev-green.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
-![](https://zenodo.org/badge/243490351.svg)
-[![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
 
 **Kinetic.jl** is a lightweight [Julia](https://julialang.org) toolbox for the study of computational fluid dynamics and scientific machine learning. The main module consists of [KitBase.jl](https://github.com/vavrines/KitBase.jl) with basic physics and [KitML.jl](https://github.com/vavrines/KitML.jl) with neural dynamics. The high-performance Fortran library [KitFort.jl](https://github.com/vavrines/KitFort.jl) can be manually imported when the executing efficiency becomes the first priority. A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built to locate the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia). The status of continuous integration and coverage for the ecosystem is listed below.
 
