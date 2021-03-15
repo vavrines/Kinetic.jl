@@ -65,7 +65,7 @@ The high-level solver `solve!` is equivalent as the following low-level procedur
 ```julia
 using ProgressMeter
 res = zeros(4)
-dt = timestep(ks, ctr, simTime)
+dt = timestep(ks, ctr, t)
 nt = floor(ks.set.maxTime / dt) |> Int
 @showprogress for iter = 1:nt
     reconstruct!(ks, ctr)
