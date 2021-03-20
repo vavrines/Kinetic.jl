@@ -15,7 +15,7 @@ interpOrder = 2
 limiter = vanleer
 boundary = maxwell
 cfl = 0.8
-maxTime = 2.0
+maxTime = 5.0
 
 # phase space
 x0 = 0.0
@@ -41,7 +41,7 @@ nvg = 0
 
 # gas
 knudsen = 0.075
-mach = 2.0
+mach = 0.0
 prandtl = 1.0
 inK = 1.0
 omega = 0.72
