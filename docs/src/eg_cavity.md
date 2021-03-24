@@ -57,8 +57,8 @@ tLid = 1.0
 We then execute the following codes to conduct a simulation
 ```julia
 using Kinetic
-set, ctr, a1face, a2face, t = initialize("config.txt")
-t = solve!(set, ctr, a1face, a2face, t)
+ks, ctr, a1face, a2face, t = initialize("config.txt")
+t = solve!(ks, ctr, a1face, a2face, t)
 ```
 
 The high-level solver `solve!` is equivalent as the following low-level procedures
