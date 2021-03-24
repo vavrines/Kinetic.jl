@@ -15,7 +15,7 @@ It contains:
 
 Besides, a unstrctured mesh struct is built, which supports 1-3 dimensional geometries.
 ```@docs
-UnstructMesh
+UnstructPSpace
 ```
 It can be created by the built-in mesh reader.
 ```@docs
