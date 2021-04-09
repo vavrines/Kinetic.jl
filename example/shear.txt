@@ -3,6 +3,7 @@
 # ------------------------------------------------------------
 
 # case
+matter = gas
 case = layer
 space = 2d2f2v
 flux = kfvs

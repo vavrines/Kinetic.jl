@@ -9,8 +9,8 @@ end
 
 begin
     γ = heat_capacity_ratio(inK, 2)
-    set = Setup(case, space, flux, collision, nSpecies, interpOrder, limiter, cfl, maxTime)
-    pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+    set = Setup(matter, case, space, flux, collision, nSpecies, interpOrder, limiter, boundary, cfl, maxTime)
+    pSpace = PSpace1D(x0, x1, nx, nxg)
     vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv, vMeshType, nug, nvg)
     
     μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)

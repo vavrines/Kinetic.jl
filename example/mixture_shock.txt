@@ -3,6 +3,7 @@
 # ------------------------------------------------------------
 
 # setup
+matter = gas
 case = brio-wu
 space = 1d2f1v
 flux = kfvs

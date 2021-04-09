@@ -1,4 +1,5 @@
-using Revise, ProgressMeter, Kinetic
+using Kinetic
+using KitBase.ProgressMeter
 
 cd(@__DIR__)
 ks, ctr, face, simTime = Kinetic.initialize("briowu_1d.txt")

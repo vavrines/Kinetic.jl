@@ -1,4 +1,5 @@
-using Revise, ProgressMeter, OffsetArrays, Kinetic
+using Kinetic
+using KitBase.ProgressMeter, KitBase.OffsetArrays
 
 cd(@__DIR__)
 D = read_dict("briowu_2d.txt")
@@ -9,8 +10,8 @@ end
 
 begin
     γ = heat_capacity_ratio(inK, 3)
-    set = Setup(case, space, flux, collision, nSpecies, interpOrder, limiter, cfl, maxTime)
-    pSpace = PSpace1D(x0, x1, nx, pMeshType, nxg)
+    set = Setup(matter, case, space, flux, collision, nSpecies, interpOrder, limiter, boundary, cfl, maxTime)
+    pSpace = PSpace1D(x0, x1, nx, nxg)
 
     ue0 = umin * sqrt(mi / me)
     ue1 = umax * sqrt(mi / me)

@@ -3,6 +3,7 @@
 # ------------------------------------------------------------
 
 # setup
+matter = plasma
 case = brio-wu
 space = 1d3f2v
 flux = kcu

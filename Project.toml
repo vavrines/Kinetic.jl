@@ -15,10 +15,7 @@ Reexport = "0.2, 1.0"
 julia = "^1"
 
 [extras]
-Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
-PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-build = ["PyCall", "Conda"]
 test = ["Test"]
