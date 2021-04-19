@@ -11,7 +11,7 @@
   [![](https://img.shields.io/badge/docs-dev-green.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
   ![](https://zenodo.org/badge/243490351.svg)
   [![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
-  [![GitHub commits since tagged version](https://img.shields.io/github/commits-since/vavrines/Kinetic.jl/v0.7.2.svg?style=social&logo=github)](https://github.com/vavrines/Kinetic.jl)
+  [![GitHub commits since tagged version](https://img.shields.io/github/commits-since/vavrines/Kinetic.jl/v0.7.0.svg?style=social&logo=github)](https://github.com/vavrines/Kinetic.jl)
 </div>
 
 <!--<div align="center"> <img
