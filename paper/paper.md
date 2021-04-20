@@ -45,10 +45,10 @@ At the highest level, it is feasible to model and simulate a fluid dynamic probl
 At the lowest level, we design the methods for general numbers and arrays, so that it holds the perfect possibility to cooperate with existing packages in Julia ecosystem.
 As an example, It depends Flux.jl [@Flux2018] to create and train scientific machine learning models.
 The package holds the following innovations:
-- 100% Julia stack that encounters no two-language problem
-- Comprehensive support for kinetic theory and phase-space equations
-- Lightweight design to ensure the flexibility for secondary development
-- Closely coupling with scientific machine learning
+* 100% Julia stack that encounters no two-language problem
+* Comprehensive support for kinetic theory and phase-space equations
+* Lightweight design to ensure the flexibility for secondary development
+* Closely coupling with scientific machine learning
 
 # KitBase.jl
 
