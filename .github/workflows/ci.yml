@@ -23,6 +23,8 @@ jobs:
         arch:
           - x64
     steps:
+      - run: |
+          pip3 install meshio --user
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
