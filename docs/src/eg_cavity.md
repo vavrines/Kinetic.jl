@@ -247,8 +247,8 @@ It is equivalent as the following low-level backend.
 begin
     using Plots
     sol = zeros(4, ks.pSpace.nx, ks.pSpace.ny)
-    for i in axes(ρ, 1)
-        for j in axes(ρ, 2)
+    for i in axes(sol, 2)
+        for j in axes(sol, 3)
             sol[1:3, i, j] .= ctr[i, j].prim[1:3]
             sol[4, i, j] = 1.0 / ctr[i, j].prim[4]
         end
