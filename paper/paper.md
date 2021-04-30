@@ -45,9 +45,13 @@ At the highest level, it is feasible to model and simulate a fluid dynamic probl
 At the lowest level, we design the methods for general numbers and arrays, so that it holds the perfect possibility to cooperate with existing packages in Julia ecosystem.
 As an example, It depends Flux.jl [@Flux2018] to create and train scientific machine learning models.
 The package holds the following innovations:
+
 - 100% Julia stack that encounters no two-language problem
+
 - Comprehensive support for kinetic theory and phase-space equations
+
 - Lightweight design to ensure the flexibility for secondary development
+
 - Closely coupling with scientific machine learning
 
 # KitBase.jl
@@ -114,13 +118,13 @@ tLid = 1.0 # temperature of wall
 let us execute the following codes
 ```julia
 using Kinetic
-set, ctr, face, t = initialize("config.toml")
-t = solve!(set, ctr, face, t)
+set, ctr, xface, yface, t = initialize("config.toml")
+t = solve!(set, ctr, xface, yface, t)
 plot_contour(set, ctr)
 ```
 
 The computational setup is stored in `set`. 
-The control volume and interface solutions are stored in `ctr` and `face` correspondingly. 
+The solutions over control volumes are represented in an array `ctr`, while `xface` and `yface` record the interface fluxes along x and y directions.
 The result is visualized with built-in function `plot_contour`, which presents the distributions of gas density, velocity and temperature inside the cavity.
 
 ![Fig. 1](cavity.png)
