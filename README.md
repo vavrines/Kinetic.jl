@@ -6,11 +6,11 @@
   </img>
 
   [![version](https://juliahub.com/docs/Kinetic/version.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu)
-  ![](https://travis-ci.com/vavrines/Kinetic.jl.svg?branch=master)
-  [![](https://img.shields.io/badge/docs-stable-green.svg)](https://xiaotianbai.com/Kinetic.jl/stable/)
-  [![](https://img.shields.io/badge/docs-dev-green.svg)](https://xiaotianbai.com/Kinetic.jl/dev/)
-  ![](https://zenodo.org/badge/243490351.svg)
-  [![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
+  [![](https://img.shields.io/badge/docs-latest-blue)](https://xiaotianbai.com/Kinetic.jl/dev/)
+  [![](https://img.shields.io/badge/docs-stable-blue)](https://xiaotianbai.com/Kinetic.jl/stable/)
+  
+  ![](https://zenodo.org/badge/243490351.svg?style=flat-square)
+  [![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg?style=flat-square)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
   [![GitHub commits since tagged version](https://img.shields.io/github/commits-since/vavrines/Kinetic.jl/v0.7.0.svg?style=social&logo=github)](https://github.com/vavrines/Kinetic.jl)
 </div>
 
@@ -23,12 +23,20 @@
 <img src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif" width="300"/>
 -->
 
-**Kinetic.jl** is a lightweight [Julia](https://julialang.org) toolbox for the study of computational fluid dynamics and scientific machine learning. The main module consists of [KitBase.jl](https://github.com/vavrines/KitBase.jl) with basic physics and [KitML.jl](https://github.com/vavrines/KitML.jl) with neural dynamics. The high-performance Fortran library [KitFort.jl](https://github.com/vavrines/KitFort.jl) can be manually imported when the executing efficiency becomes the first priority. A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built to locate the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia). The status of continuous integration and coverage for the ecosystem is listed below.
+**Kinetic** is a lightweight [Julia](https://julialang.org) toolbox for the study of computational fluid dynamics and scientific machine learning. 
+Depending on the focus, the main module is divided into portable components:
 
-| Kinetic | KitBase | KitML | KitFort |
+- [KitBase.jl](https://github.com/vavrines/KitBase.jl): basic physics and numerics
+- [KitML.jl](https://github.com/vavrines/KitML.jl): neural dynamics and machine learning
+
+The high-performance Fortran library is embedded in [KitFort.jl](https://github.com/vavrines/KitFort.jl).
+Although not the default option, it can be manually imported into the current ecosystem seamlessly when the ultimate executing efficiency is pursued.
+A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built as well to call the structs and methods remotely through [pyjulia](https://github.com/JuliaPy/pyjulia).
+
+| [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
 | ----------   | --------- | ---------------- | ------ |
-| ![CI](https://github.com/vavrines/Kinetic.jl/workflows/CI/badge.svg) | ![CI](https://github.com/vavrines/KitBase.jl/workflows/CI/badge.svg) | ![CI](https://github.com/vavrines/KitML.jl/workflows/CI/badge.svg) | ![CI](https://github.com/vavrines/KitFort.jl/workflows/CI/badge.svg) |
-| [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl.svg)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl.svg)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl.svg)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl.svg)](https://codecov.io/gh/vavrines/KitFort.jl) |
+| ![CI](https://img.shields.io/github/workflow/status/vavrines/Kinetic.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitBase.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitML.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitFort.jl/CI?style=flat-square) |
+| [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl?style=flat-square)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitFort.jl) |
 
 ## Motivation
 
@@ -59,7 +67,7 @@ A partial list of current supported models and equations include
 
 ## Documentation
 
-For the detailed information on the implementation and usage of the package, please
+For the detailed information on the implementation and usage of the package,
 [check the documentation](https://xiaotianbai.com/Kinetic.jl/dev/).
 
 ## Contributing
