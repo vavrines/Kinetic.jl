@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>CUDA · Kinetic.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="Kinetic.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Kinetic.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../install/">Installation</a></li><li><a class="tocitem" href="../physics/">Physics</a></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Type</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../type_config/">Configuration</a></li><li><a class="tocitem" href="../type_setup/">Setup</a></li><li><a class="tocitem" href="../type_domain/">Domain</a></li><li><a class="tocitem" href="../type_velocity/">Velocity</a></li><li><a class="tocitem" href="../type_property/">Property</a></li><li><a class="tocitem" href="../type_ib/">Condition</a></li><li><a class="tocitem" href="../type_fvm/">FVM</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox"/><label class="tocitem" for="menuitem-5"><span class="docs-label">Solver</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../solver/">Framework</a></li><li><a class="tocitem" href="../solver_pre/">Preprocess</a></li><li><a class="tocitem" href="../solver_timestep/">Timestep</a></li><li><a class="tocitem" href="../solver_reconstruction/">Reconstruction</a></li><li><a class="tocitem" href="../solver_flux/">Flux</a></li><li><a class="tocitem" href="../solver_update/">Update</a></li><li><a class="tocitem" href="../solver_post/">Postprocess</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-6" type="checkbox"/><label class="tocitem" for="menuitem-6"><span class="docs-label">Tutorial</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../tutorial/">Examples</a></li><li><a class="tocitem" href="../eg_advection/">Advection diffusion</a></li><li><a class="tocitem" href="../eg_burgers/">Burgers</a></li><li><a class="tocitem" href="../eg_shock/">Shock tube</a></li><li><a class="tocitem" href="../eg_cavity/">Lid-driven cavity</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-7" type="checkbox" checked/><label class="tocitem" for="menuitem-7"><span class="docs-label">Parallelization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../parallel/">General</a></li><li><a class="tocitem" href="../para_thread/">Threading</a></li><li><a class="tocitem" href="../para_dist/">Distributed</a></li><li class="is-active"><a class="tocitem" href>CUDA</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-8" type="checkbox"/><label class="tocitem" for="menuitem-8"><span class="docs-label">Utility</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../api_io/">I / O</a></li><li><a class="tocitem" href="../api_math/">Math</a></li><li><a class="tocitem" href="../api_theory/">Theory</a></li><li><a class="tocitem" href="../api_geo/">Physical space</a></li><li><a class="tocitem" href="../api_phase/">Phase space</a></li><li><a class="tocitem" href="../api_config/">Configuration</a></li><li><a class="tocitem" href="../api_step/">Stepper</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-9" type="checkbox"/><label class="tocitem" for="menuitem-9"><span class="docs-label">SciML</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../kitml1/">KitML</a></li><li><a class="tocitem" href="../kitml2/">UBE</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-10" type="checkbox"/><label class="tocitem" for="menuitem-10"><span class="docs-label">Fortran</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../fortran1/">KitFort</a></li><li><a class="tocitem" href="../fortran2/">Benchmark</a></li></ul></li><li><a class="tocitem" href="../function_index/">Index</a></li><li><a class="tocitem" href="../python/">Python</a></li><li><a class="tocitem" href="../contribution/">Contribution</a></li><li><a class="tocitem" href="../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Parallelization</a></li><li class="is-active"><a href>CUDA</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>CUDA</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/vavrines/Kinetic.jl/blob/master/docs/src/para_cuda.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="GPU-computing"><a class="docs-heading-anchor" href="#GPU-computing">GPU computing</a><a id="GPU-computing-1"></a><a class="docs-heading-anchor-permalink" href="#GPU-computing" title="Permalink"></a></h1><p>The thriving development of GPUs provides an alternative choice for scientific computing. Kinetic enables computation on the graphical architecture on the basis of <a href="https://github.com/JuliaGPU/CUDA.jl">CUDA.jl</a>. It provides the main programming interface for working with NVIDIA CUDA GPUs.  It features a user-friendly array abstraction, a compiler for writing CUDA kernels in Julia, and wrappers for various CUDA libraries. In the following, we present an illustrative test of kinetic flux vector splitting method to evaluate upwind flux of the Boltzmann equation. The test is conducted on a Tesla K80 GPU on <a href="nextjournal.com">nextjournal.com</a>. We first load all the modules, and do a CPU-based computation.</p><pre><code class="language-julia">import Pkg
+Pkg.add(&quot;Revise&quot;)
+Pkg.add(&quot;KitBase&quot;)
+Pkg.add(&quot;CUDA&quot;)
+Pkg.add(&quot;BenchmarkTools&quot;)
+
+using Revise, CUDA, BenchmarkTools, KitBase
+
+dt = 1e-3
+
+primL = [1.0, 0.0, 0.5]
+primR = [0.125, 0.0, 0.625]
+
+u = collect(-5.0:0.01:5.0)
+fL = maxwellian(u, primL)
+fR = maxwellian(u, primR)
+ff = similar(fL)
+sfL = zero(fL)
+sfR = zero(fR)
+
+@btime flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)</code></pre><p>The benchmark result on a Intel NUC8i7BEH desktop is around <code>5.244 μs (3 allocations: 24.00 KiB)</code>. Then let&#39;s turn to GPU.</p><pre><code class="language-julia">u = collect(-5.0:0.01:5.0) |&gt; CuArray
+fL = maxwellian(u, primL)
+fR = maxwellian(u, primR)
+ff = similar(fL)
+sfL = zero(fL)
+sfR = zero(fR)
+
+@btime flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)</code></pre><p>The benchmark result is around <code>32.965 μs (187 allocations: 10.73 KiB)</code>. As can be seen, due to the relative small input size, the GPU threads aren&#39;t fully occupied, and therefore CPU is more efficient in this case.</p><p>Then let&#39;s increase the input vector size, i.e. to consider more discrete particle velocity points for distribution functions.</p><pre><code class="language-julia">u = collect(-5.0:0.001:5.0)
+fL = maxwellian(u, primL)
+fR = maxwellian(u, primR)
+ff = similar(fL)
+sfL = zero(fL)
+sfR = zero(fR)
+
+@btime flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)
+
+u = collect(-5.0:0.001:5.0) |&gt; CuArray
+fL = maxwellian(u, primL)
+fR = maxwellian(u, primR)
+ff = similar(fL)
+sfL = zero(fL)
+sfR = zero(fR)
+
+@btime flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)</code></pre><p>The results become around <code>50.011 μs (6 allocations: 234.80 KiB)</code> for CPU and <code>33.640 μs (187 allocations: 10.73 KiB)</code> for GPU.</p><p>We could further increase the computation size.</p><pre><code class="language-julia">u = collect(-5.0:0.0001:5.0)
+fL = maxwellian(u, primL)
+fR = maxwellian(u, primR)
+ff = similar(fL)
+sfL = zero(fL)
+sfR = zero(fR)
+
+@btime flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)
+
+u = collect(-5.0:0.0001:5.0) |&gt; CuArray
+fL = maxwellian(u, primL)
+fR = maxwellian(u, primR)
+ff = similar(fL)
+sfL = zero(fL)
+sfR = zero(fR)
+
+@btime flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)</code></pre><p>The results become around <code>507.960 μs (6 allocations: 2.29 MiB)</code> for CPU and <code>32.021 μs (187 allocations: 10.73 KiB)</code> for GPU. Under this size of computation, the GPU brings about 16x efficiency increment.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../para_dist/">« Distributed</a><a class="docs-footer-nextpage" href="../api_io/">I / O »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 11 May 2021 08:44">Tuesday 11 May 2021</span>. Using Julia version 1.5.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
