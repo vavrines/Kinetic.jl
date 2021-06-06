@@ -20,10 +20,10 @@ bibliography: paper.bib
 
 Kinetic.jl is a lightweight finite volume toolbox written in the Julia programming language for the study of computational mechanics and scientific machine learning.
 It is an open-source project hosted on GitHub and distributed under MIT license.
-The main module consists of KitBase.jl with basic physics and KitML.jl with neural dynamics.
-The library provides a rich set of numerical flux functions.
-Any advection-diffusion type mechanical or neural equation can be hooked and solved in the framework.
-It is designed to balance the programming flexibility for scientific research, the algorithmic efficiency for application, and the simplicity for educational usage.
+The main module consists of KitBase.jl for basic physics and KitML.jl for neural dynamics.
+The library provides a rich set of numerical flux functions and source terms.
+Any advection-diffusion type mechanical or neural equation can be set up and solved in the framework.
+It is designed to balance the programming flexibility for scientific research, the algorithmic efficiency for applications, and the simplicity for educational usage.
 
 # Statement of need
 
