@@ -1,39 +1,52 @@
 # ------------------------------------------------------------
-# Configuration of 1D shock structure
+# Configuration of 2D lid-driven cavity
 # ------------------------------------------------------------
 
 # setup
-matter = gas
-case = shock
-space = 1d1f1v
-flux = kfvs
-collision = bgk
-nSpecies = 1
-interpOrder = 2
-limiter = vanleer
-boundary = fix
-cfl = 0.95
-maxTime = 250.0
+matter = gas # material
+case = cavity # case
+space = 2d2f2v # phase
+flux = kfvs # flux function
+collision = bgk # intermolecular collision
+nSpecies = 1 # number of species
+interpOrder = 2 # interpolation order of accuracy
+limiter = vanleer # limiter function
+boundary = maxwell # boundary condition
+cfl = 0.8 # CFL number
+maxTime = 0.01 # maximal simulation time
 
-# phase space
-x0 = -35.0
-x1 = 35.0
-nx = 50
-pMeshType = uniform
-nxg = 0
+# physical space
+x0 = 0.0 # starting point in x
+x1 = 1.0 # ending point in x
+nx = 23 # number of cells in x
+y0 = 0.0 # starting point in y
+y1 = 1.0 # ending point in y
+ny = 23 # number of cells in y
+pMeshType = uniform # mesh type
+nxg = 0 # number of ghost cell in x
+nyg = 0 # number of ghost cell in y
 
 # velocity space
-umin = -12.0
-umax = 12.0
-nu = 16
-vMeshType = rectangle
-nug = 0
+umin = -5.0 # starting point in u
+umax = 5.0 # ending point in u
+nu = 28 # number of cells in u
+vmin = -5.0 # starting point in v
+vmax = 5.0 # ending point in v
+nv = 28 # number of cells in v
+vMeshType = rectangle # mesh type
+nug = 0 # number of ghost cell in u
+nvg = 0 # number of ghost cell in v
 
-# gas
-knudsen = 1.0
-mach = 2.0
-prandtl = 1.0
-inK = 0.0
-omega = 0.81
-alphaRef = 1.0
-omegaRef = 0.5
+# gas property
+knudsen = 0.075 # Knudsen number
+mach = 0.0 # Mach number
+prandtl = 1.0 # Prandtl number
+inK = 1.0 # molecular inner degree of freedom
+omega = 0.72 # viscosity index of hard-sphere gas
+alphaRef = 1.0 # viscosity index of hard-sphere gas in reference state
+omegaRef = 0.5 # viscosity index of hard-sphere gas ub reference state
+
+# boundary condition
+uLid = 0.15 # U-velocity of moving wall
+vLid = 0.0 # V-velocity of moving wall
+tLid = 1.0 # temperature of wall
