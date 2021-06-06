@@ -33,17 +33,17 @@ With the rapidly advancing computing power, the finite volume method (FVM) is a 
 
 Most existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency but sacrifice the flexibility for development.
 For example, it is cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
-One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are splitted.
+One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are split.
 Basically it benefits general users, while researchers still need to work on the back-end if a new feature is required. 
 Besides, the two-language problem introduces additional trade-off in both development and execution.
-Different from these packages, Kinetic.jl is built upon the Julia programming language [@bezanson2017], which is dynamically typed and designed for high performance computing for broad devices. 
+Different from these packages, Kinetic.jl is built upon the Julia programming language [@bezanson2017], which is dynamically typed and designed for high performance computing for a broad range of devices. 
 Based on type inference and multiple dispatch, it is a promising choice to solve the two-language problem.
 
-Kinetic.jl focus on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc.
+Kinetic.jl focuses on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc.
 A hierarchy of abstractions is implemented.
 At the highest level, it is feasible to model and simulate a fluid dynamic problem within 10 lines of code. 
-At the lowest level, we design the methods for general numbers and arrays, so that it holds the perfect possibility to cooperate with existing packages in Julia ecosystem.
-As an example, It depends Flux.jl [@Flux2018] to create and train scientific machine learning models.
+At the lowest level, we design the methods for general numbers and arrays, so that it is possible to cooperate with existing packages in Julia ecosystem.
+As an example, It uses Flux.jl [@Flux2018] to create and train scientific machine learning models.
 The package holds the following innovations:
 
 - 100% Julia stack that encounters no two-language problem
@@ -52,7 +52,7 @@ The package holds the following innovations:
 
 - Lightweight design to ensure the flexibility for secondary development
 
-- Closely coupling with scientific machine learning
+- Close coupling with scientific machine learning
 
 # KitBase.jl
 
@@ -140,12 +140,12 @@ The detailed theory and implementation can be found in the paper [@xiao2020].
 # Extension
 
 Numerical simulations of nonlinear models and differential equations are essentially connected with supercomputers and high-performance computing (HPC). 
-Considering that some existing hardware architecture, e.g. Sunway TaihuLight with Chinese-designed SW26010 processors, only provides optimization for specific languages, we've develop an accompanying package KitFort.jl.
+Considering that some existing hardware architecture, e.g. Sunway TaihuLight with Chinese-designed SW26010 processors, only provides optimization for specific languages, we have developed an accompanying package KitFort.jl.
 It is not a default component of Kinetic.jl, but can be manually imported.
-Besides, a wrapper kineticpy has been built as well to locate the structures and methods from Python ecosystem. 
+Besides, a wrapper kineticpy has been built as well to locate the structures and methods from the Python ecosystem. 
 
 # Acknowledgements
 
-The current work is funded by the Alexander von Humboldt Foundation.
+The current work is funded by the Alexander von Humboldt Foundation (Ref3.5-CHN-1210132-HFST-P).
 
 # References
