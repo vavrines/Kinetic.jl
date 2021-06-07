@@ -1,5 +1,5 @@
 ---
-title: 'Kinetic.jl: A portable finite volume toolbox in Julia'
+title: 'Kinetic.jl: A portable finite volume toolbox for scientific and neural computing'
 tags:
   - kinetic theory
   - computational fluid dynamics
@@ -18,12 +18,13 @@ bibliography: paper.bib
 
 # Summary
 
-Kinetic.jl is a lightweight finite volume toolbox written in the Julia programming language for the study of computational mechanics and scientific machine learning.
+Kinetic.jl is a lightweight finite volume toolbox written in the Julia programming language for the study of computational physics and scientific machine learning.
 It is an open-source project hosted on GitHub and distributed under MIT license.
 The main module consists of KitBase.jl for basic physics and KitML.jl for neural dynamics.
 The library provides a rich set of numerical flux functions and source terms.
 Any advection-diffusion type mechanical or neural equation can be set up and solved in the framework.
-It is designed to balance the programming flexibility for scientific research, the algorithmic efficiency for applications, and the simplicity for educational usage.
+The techniques of scientific machine learning can be integrated seamlessly to build data-driven closure models and accelerate calculation of nonlinear terms.
+The package is designed to balance the programming flexibility for scientific research, the algorithmic efficiency for applications, and the simplicity for educational usage.
 
 # Statement of need
 
@@ -32,7 +33,7 @@ For example, particle transports can be described by kinetic theory of gases at 
 With the rapidly advancing computing power, the finite volume method (FVM) is a prevalent method for quantitatively describing physical evolutions.
 
 Most existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency but sacrifice the flexibility for development.
-For example, it is cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
+For example, it is cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017,@xiao2020a] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
 One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are split.
 Basically it benefits general users, while researchers still need to work on the back-end if a new feature is required. 
 Besides, the two-language problem introduces additional trade-off in both development and execution.
@@ -135,7 +136,7 @@ Fig. 1: macroscopic variables in the lid-driven cavity (topleft: density, top ri
 Machine learning is building its momentum in scientific computing.
 Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximator from machine learning models into the governing equations and achieve the balance between efficiency and accuracy.
 In KitML.jl, we provide strategies to construct hybrid mechanical-neural models.
-The detailed theory and implementation can be found in the paper [@xiao2020].
+The detailed theory and implementation can be found in the paper [@xiao2020b].
 
 # Extension
 
