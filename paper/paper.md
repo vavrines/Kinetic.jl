@@ -33,7 +33,7 @@ For example, particle transports can be described by kinetic theory of gases at 
 With the rapidly advancing computing power, the finite volume method (FVM) is a prevalent method for quantitatively describing physical evolutions.
 
 Most existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency but sacrifice the flexibility for development.
-For example, it is cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017,@xiao2020a] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
+For example, it is cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017;@xiao2020a] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
 One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are split.
 Basically it benefits general users, while researchers still need to work on the back-end if a new feature is required. 
 Besides, the two-language problem introduces additional trade-off in both development and execution.
