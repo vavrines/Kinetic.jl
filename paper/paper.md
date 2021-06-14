@@ -11,6 +11,8 @@ authors:
     affiliation: 1
 affiliations:
  - name: Karlsruhe Institute of Technology
+ - city: Karlsruhe
+ - country: Germany
    index: 1
 date: 06 January 2021
 bibliography: paper.bib
