@@ -33,7 +33,7 @@ It is challenging to propose a universal theory that can be applied for describi
 For example, the particle transports can be depicted statistically by fluid mechanics at a macroscopic level [@batchelor2000], but needs to be followed in more detail by the kinetic theory of gases at molecular mean free path scale [@chapman1990].
 With the rapidly advancing computing power, the finite volume method (FVM) provides a prevalent method to conduct direct numerical simulations based on first physical principles.
 
-Most of the existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are dedicated to solving Euler and Navier-Stokes equations.
+Most of the existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are dedicated to solving the Euler and the Navier-Stokes equations.
 Very limited work has been done for phase-field models [@zhu2017; @krause2021].
 Since classical fluid dynamics basically requires an one-shot simulation process from initial to final solution fields, these libraries are mostly written in compiled languages (C/C++ and Fortran).
 Such approach enjoy the perfect execution efficiency but sacrifices more or less the flexibility of secondary development.
