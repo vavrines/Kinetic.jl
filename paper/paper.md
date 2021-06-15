@@ -37,14 +37,14 @@ Most of the existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are dedicate
 Very limited work has been done for phase-field models [@zhu2017; @krause2021].
 Since classical fluid dynamics basically requires an one-shot simulation process from initial to final solution fields, these libraries are mostly written in compiled languages (C/C++ and Fortran).
 Such approach enjoy the perfect execution efficiency but sacrifices more or less the flexibility of secondary development.
-It becomes cubersome to integrate the existing numerical solver with scientific machine learning (SciML) packages, as interactive programming is becoming a mainstream practice in data science.
+It becomes cumbersome to integrate the existing numerical solver with scientific machine learning (SciML) packages, as interactive programming is becoming a mainstream practice in data science.
 It also brings considerable difficulties to general or educational users who are not familiar with the package in configuring environments and compiling binaries.
 
 One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are split.
 This methodology benefits general users, while researchers still need to work on the back-end if a new feature is required. 
 The so-called two-language problem introduces additional trade-off in both development and execution.
 For example, a two-tiered system brings unavoidable challenge for type domain transition and memory management.
-Special attention needs to be paid on optmizing the high-level codes, e.g. the vectorizatin of massive computation part, which can be unnatural in a physical simulation and might generate additional temporary objects. 
+Special attention needs to be paid on optimizing the high-level codes, e.g. the vectorization of massive computation part, which can be unnatural in a physical simulation and might generate additional temporary objects. 
 Besides, interfacing between layers may add significant overhead and makes whole-program optimization much more difficult [@bezanson2012].
 Different from these packages, Kinetic.jl is built upon the Julia programming language [@bezanson2017], which is dynamically typed and designed for high performance computing for a broad range of devices. 
 Based on type inference and multiple dispatch, it is a promising choice to solve the two-language problem.
