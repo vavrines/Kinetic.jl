@@ -133,8 +133,9 @@ t = solve!(set, ctr, xface, yface, t)
 plot_contour(set, ctr)
 ```
 
-The computational setup is stored in `set`. 
+In the above codes, the computational setup is stored in `set`. 
 The solutions over control volumes are represented in an array `ctr`, while `xface` and `yface` record the interface fluxes along x and y directions.
+In this example, the structured mesh is generated automatically by Kinetic.jl, while a non-structured mesh file can also be imported and used for computation.
 The result is visualized with built-in function `plot_contour`, which presents the distributions of gas density, velocity and temperature inside the cavity.
 
 ![Fig. 1](cavity.png)
@@ -143,9 +144,9 @@ Fig. 1: macroscopic variables in the lid-driven cavity (topleft: density, top ri
 # KitML.jl
 
 Machine learning is building its momentum in scientific computing.
-Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximator from machine learning surrogate models into the governing equations and achieve a better balance between efficiency and accuracy.
-In KitML.jl, we provide strategies to construct hybrid mechanical-neural models and form structure-preserving data-driven closure models.
-The detailed theory and implementation can be found in the paper [@xiao2020b].
+Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximators from machine learning surrogate models into the governing equations and achieve a better balance between efficiency and accuracy.
+In KitML.jl, we implement strategies to construct hybrid mechanical-neural differential operators and form structure-preserving data-driven closure models.
+The detailed background can be found in the paper [@xiao2020b].
 
 # Extension
 
