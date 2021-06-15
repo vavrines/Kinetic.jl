@@ -21,7 +21,7 @@ bibliography: paper.bib
 Kinetic.jl is a lightweight finite volume toolbox written in the Julia programming language for the study of computational physics and scientific machine learning.
 It is an open-source project hosted on GitHub and distributed under MIT license.
 The main module consists of KitBase.jl for basic physics and KitML.jl for neural dynamics.
-The library provides a rich set of numerical flux functions and source terms.
+The function library provides a rich set of numerical fluxes and source terms for differential and integral equations.
 Any advection-diffusion type mechanical or neural equation can be set up and solved within the framework.
 The machine learning methods can be integrated seamlessly to build data-driven closure models and accelerate the calculation of nonlinear terms.
 The package is designed to balance the programming flexibility for scientific research, the algorithmic efficiency for applications, and the simplicity for educational usage.
@@ -34,23 +34,24 @@ For example, the particle transports can be depicted statistically by fluid mech
 With the rapidly advancing computing power, the finite volume method (FVM) provides a prevalent method to conduct direct numerical simulations based on first physical principles.
 
 Most of the existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are dedicated to solving Euler and Navier-Stokes equations.
-Very limited work has been done for phase-field models [@zhu2017; krause2021].
-Since a classical fluid dynamics simulation is basically an one-shot process from initial to final solution field, these libraries are mostly written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency.
-Such approach sacrifices more or less the flexibility of secondary development.
-Besides, it becomes cubersome to integrate the existing deterministic solver with scientific machine learning (SciML) packages, as interactive programming is becoming a mainstream practice in data science.
+Very limited work has been done for phase-field models [@zhu2017; @krause2021].
+Since classical fluid dynamics basically requires an one-shot simulation process from initial to final solution fields, these libraries are mostly written in compiled languages (C/C++ and Fortran).
+Such approach enjoy the perfect execution efficiency but sacrifices more or less the flexibility of secondary development.
+It becomes cubersome to integrate the existing numerical solver with scientific machine learning (SciML) packages, as interactive programming is becoming a mainstream practice in data science.
 It also brings considerable difficulties to general or educational users who are not familiar with the package in configuring environments and compiling binaries.
 
 One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are split.
-Basically it benefits general users, while researchers still need to work on the back-end if a new feature is required. 
-Besides, the so-called two-language problem introduces additional trade-off in both development and execution.
+This methodology benefits general users, while researchers still need to work on the back-end if a new feature is required. 
+The so-called two-language problem introduces additional trade-off in both development and execution.
 For example, a two-tiered system brings unavoidable challenge for type domain transition and memory management.
-Interfacing between layers may add significant overhead and makes whole-program optimization much more difficult [@bezanson2012].
+Special attention needs to be paid on optmizing the high-level codes, e.g. the vectorizatin of massive computation part, which can be unnatural in a physical simulation and might generate additional temporary objects. 
+Besides, interfacing between layers may add significant overhead and makes whole-program optimization much more difficult [@bezanson2012].
 Different from these packages, Kinetic.jl is built upon the Julia programming language [@bezanson2017], which is dynamically typed and designed for high performance computing for a broad range of devices. 
 Based on type inference and multiple dispatch, it is a promising choice to solve the two-language problem.
 
 Kinetic.jl focuses on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc [@xiao2017; @xiao2020a].
 A hierarchy of abstractions is implemented in the library.
-At the highest level, it is feasible to model and simulate a fluid dynamic problem within 10 lines of code. 
+At the highest level, it is feasible to model and simulate a fluid dynamic problem within ten lines of code. 
 At the lowest level, we design the methods for general numbers and arrays, so that it is possible to cooperate with existing packages in Julia ecosystem.
 As an example, It uses Flux.jl [@Flux2018] to create and train scientific machine learning models.
 The package holds the following innovations:
@@ -142,8 +143,8 @@ Fig. 1: macroscopic variables in the lid-driven cavity (topleft: density, top ri
 # KitML.jl
 
 Machine learning is building its momentum in scientific computing.
-Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximator from machine learning models into the governing equations and achieve the balance between efficiency and accuracy.
-In KitML.jl, we provide strategies to construct hybrid mechanical-neural models.
+Given the nonlinear structure of differential and integral equations, it is promising to incorporate the universal function approximator from machine learning surrogate models into the governing equations and achieve a better balance between efficiency and accuracy.
+In KitML.jl, we provide strategies to construct hybrid mechanical-neural models and form structure-preserving data-driven closure models.
 The detailed theory and implementation can be found in the paper [@xiao2020b].
 
 # Extension
