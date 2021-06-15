@@ -33,30 +33,22 @@ It is challenging to propose a universal theory that can be applied for describi
 For example, the particle transports can be depicted statistically by fluid mechanics at a macroscopic level [@batchelor2000], but needs to be followed in more detail by the kinetic theory of gases at molecular mean free path scale [@chapman1990].
 With the rapidly advancing computing power, the finite volume method (FVM) provides a prevalent method to conduct direct numerical simulations based on first physical principles.
 
-Existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are mostly written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency but sacrifice the flexibility for development.
+Most of the existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are dedicated to solving Euler and Navier-Stokes equations.
+Very limited work has been done for phase-field models [@zhu2017; krause2021].
+Since a classical fluid dynamics simulation is basically an one-shot process from initial to final solution field, these libraries are mostly written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency.
+Such approach sacrifices more or less the flexibility of secondary development.
+Besides, it becomes cubersome to integrate the existing deterministic solver with scientific machine learning (SciML) packages, as interactive programming is becoming a mainstream practice in data science.
+It also brings considerable difficulties to general or educational users who are not familiar with the package in configuring environments and compiling binaries.
 
-general user
-
-in conjunction with restart 
-
-
-For example, it is 
-
-for Euler and Navier-Stokes equations
-
-
-data science
-
-machine learning 
-
-cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017; @xiao2020a] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
 One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are split.
 Basically it benefits general users, while researchers still need to work on the back-end if a new feature is required. 
-Besides, the two-language problem introduces additional trade-off in both development and execution.
+Besides, the so-called two-language problem introduces additional trade-off in both development and execution.
+For example, a two-tiered system brings unavoidable challenge for type domain transition and memory management.
+Interfacing between layers may add significant overhead and makes whole-program optimization much more difficult [@bezanson2012].
 Different from these packages, Kinetic.jl is built upon the Julia programming language [@bezanson2017], which is dynamically typed and designed for high performance computing for a broad range of devices. 
 Based on type inference and multiple dispatch, it is a promising choice to solve the two-language problem.
 
-Kinetic.jl focuses on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc.
+Kinetic.jl focuses on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc [@xiao2017; @xiao2020a].
 A hierarchy of abstractions is implemented in the library.
 At the highest level, it is feasible to model and simulate a fluid dynamic problem within 10 lines of code. 
 At the lowest level, we design the methods for general numbers and arrays, so that it is possible to cooperate with existing packages in Julia ecosystem.
