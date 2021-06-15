@@ -10,9 +10,7 @@ authors:
     orcid: 0000-0001-9127-9497
     affiliation: 1
 affiliations:
- - name: Karlsruhe Institute of Technology
- - city: Karlsruhe
- - country: Germany
+ - name: Karlsruhe Institute of Technology, 76131 Karlsruhe, Germany
    index: 1
 date: 06 January 2021
 bibliography: paper.bib
@@ -24,18 +22,34 @@ Kinetic.jl is a lightweight finite volume toolbox written in the Julia programmi
 It is an open-source project hosted on GitHub and distributed under MIT license.
 The main module consists of KitBase.jl for basic physics and KitML.jl for neural dynamics.
 The library provides a rich set of numerical flux functions and source terms.
-Any advection-diffusion type mechanical or neural equation can be set up and solved in the framework.
-The techniques of scientific machine learning can be integrated seamlessly to build data-driven closure models and accelerate calculation of nonlinear terms.
+Any advection-diffusion type mechanical or neural equation can be set up and solved within the framework.
+The machine learning methods can be integrated seamlessly to build data-driven closure models and accelerate the calculation of nonlinear terms.
 The package is designed to balance the programming flexibility for scientific research, the algorithmic efficiency for applications, and the simplicity for educational usage.
 
 # Statement of need
 
 A physical system can perform a wonderfully diverse set of acts on different characteristic scales.
-For example, particle transports can be described by kinetic theory of gases at particle mean free path scale [@chapman1990] and fluid mechanics at macroscopic level [@batchelor2000].
-With the rapidly advancing computing power, the finite volume method (FVM) is a prevalent method for quantitatively describing physical evolutions.
+It is challenging to propose a universal theory that can be applied for describing multi-scale physical evolutions quantitatively.
+For example, the particle transports can be depicted statistically by fluid mechanics at a macroscopic level [@batchelor2000], but needs to be followed in more detail by the kinetic theory of gases at molecular mean free path scale [@chapman1990].
+With the rapidly advancing computing power, the finite volume method (FVM) provides a prevalent method to conduct direct numerical simulations based on first physical principles.
 
-Most existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency but sacrifice the flexibility for development.
-For example, it is cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017; @xiao2020a] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
+Existing FVM libraries, e.g. the OpenFOAM [@jasak2007], are mostly written in compiled languages (C/C++ and Fortran), which enjoy the perfect execution efficiency but sacrifice the flexibility for development.
+
+general user
+
+in conjunction with restart 
+
+
+For example, it is 
+
+for Euler and Navier-Stokes equations
+
+
+data science
+
+machine learning 
+
+cumbersome to implement the phase-field evolution from the Boltzmann equation [@xiao2017; @xiao2020a] in OpenFOAM or integrate it with scientific machine learning (SciML) packages.
 One compromise can be made with a combination of static and dynamic languages [@clawpack2020], where the high-level front-ends and the low-level computational back-ends are split.
 Basically it benefits general users, while researchers still need to work on the back-end if a new feature is required. 
 Besides, the two-language problem introduces additional trade-off in both development and execution.
@@ -43,7 +57,7 @@ Different from these packages, Kinetic.jl is built upon the Julia programming la
 Based on type inference and multiple dispatch, it is a promising choice to solve the two-language problem.
 
 Kinetic.jl focuses on the theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc.
-A hierarchy of abstractions is implemented.
+A hierarchy of abstractions is implemented in the library.
 At the highest level, it is feasible to model and simulate a fluid dynamic problem within 10 lines of code. 
 At the lowest level, we design the methods for general numbers and arrays, so that it is possible to cooperate with existing packages in Julia ecosystem.
 As an example, It uses Flux.jl [@Flux2018] to create and train scientific machine learning models.
