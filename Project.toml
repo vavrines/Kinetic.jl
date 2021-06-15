@@ -1,7 +1,7 @@
 name = "Kinetic"
 uuid = "82403725-3cee-4f7c-b214-1ce71af4a797"
 authors = ["Tianbai Xiao <tianbaixiao@gmail.com>"]
-version = "0.7.4"
+version = "0.7.5"
 
 [deps]
 KitBase = "86eed249-3a28-466f-8d3a-596821e1af9a"
