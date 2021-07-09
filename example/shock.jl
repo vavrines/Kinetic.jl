@@ -3,6 +3,7 @@
 using Kinetic
 using KitML.DiffEqFlux
 using OrdinaryDiffEq
+using Plots
 
 set = Setup(
     "gas",
@@ -105,3 +106,7 @@ cb = function (p, l)
 end
 
 res = sci_train(loss, p_model, ADAM(), cb=Flux.throttle(cb, 1), maxiters=200)
+
+sol = solve(prob_ube, Euler(), u0=X, p=res.u, dt=dt)
+
+contour(ks.ps.x, ks.vs.u, sol.u[end])
