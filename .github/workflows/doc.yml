@@ -11,6 +11,7 @@ jobs:
         julia-arch: [x86]
         os: [ubuntu-latest]
     steps:
+      - run: pip install meshio --user
       - uses: actions/checkout@v1.0.0
       - uses: julia-actions/setup-julia@latest
         with:
