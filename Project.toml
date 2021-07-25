@@ -1,7 +1,7 @@
 name = "Kinetic"
 uuid = "82403725-3cee-4f7c-b214-1ce71af4a797"
 authors = ["Tianbai Xiao <tianbaixiao@gmail.com>"]
-version = "0.7.5"
+version = "0.7.6"
 
 [deps]
 KitBase = "86eed249-3a28-466f-8d3a-596821e1af9a"
@@ -10,7 +10,7 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 KitBase = "0.6"
-KitML = "0.3"
+KitML = "0.4"
 Reexport = "0.2, 1.0"
 julia = "^1"
 
