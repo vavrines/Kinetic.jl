@@ -46,16 +46,15 @@ A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been bui
 ## Installation
 
 Kinetic.jl is a registered package in the official [Julia package registry](https://github.com/JuliaRegistries/General).
-We recommend installing it with the built-in Julia package manager. 
-It automatically installs a currently stable and tagged release. 
-From the Julia REPL, you can get in the package manager (by pressing `]`) and add the package.
+We recommend installing it with the Julia package manager. 
+From the Julia REPL, you can get in the package manager (by pressing `]`) and add the package
 
 ```julia
 julia> ]
 (v1.6) pkg> add Kinetic
 ```
-This will automatically install Kinetic and all its dependencies
-Similarly, it can be updated to the latest tagged release from the package manager by typing
+This will automatically install a currently stable release and all its dependencies.
+Similarly, the previously installed versions can be updated to the latest tagged release by
 
 ```julia
 (v1.6) pkg> update Kinetic
@@ -74,17 +73,15 @@ and continuum mechanics, e.g. the Euler and Navier-Stokes equations
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" target="_blank"><img src="https://latex.codecogs.com/svg.latex?\frac{\partial&space;\mathbf&space;W}{\partial&space;t}&space;&plus;&space;\nabla_\mathbf&space;x&space;\cdot&space;\mathbf&space;F&space;=&space;\mathbf&space;S" title="\frac{\partial \mathbf W}{\partial t} + \nabla_\mathbf x \cdot \mathbf F = \mathbf S" /></a>
 
-A partial list of current supported models and equations include
-- linear Boltzmann equation
-- nonlinear Boltzmann equation
-- multi-component Boltzmann equations
+A partial list of current supported models and equations include:
+- Boltzmann equation
+- radiative transfer equation
 - Fokker-Planck-Landau equation
 - direct simulation Monte Carlo
 - advection-diffusion equation
 - Burgers equation
 - Euler equations
 - Navier-Stokes equations
-- Extended hydrodynamical equations from gas kinetic expansion
 - Magnetohydrodynamical equations
 - Maxwell's equations
 
