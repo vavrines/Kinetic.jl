@@ -4,6 +4,8 @@ The first example is the scalar advection-diffusion equation.
 It's a one dimensional problem in physical domain ``x``.
 Let's first configure the solver setup.
 ```julia
+using KitBase, Plots
+
 set = Setup(
     "scalar", # matter
     "advection", # case
