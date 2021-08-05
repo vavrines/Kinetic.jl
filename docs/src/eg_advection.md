@@ -38,7 +38,7 @@ The solution algorithm can be processed together with visualization.
 ```julia
 t = 0.0
 dt = KitBase.timestep(ks, ctr, t)
-nt = ks.set.maxTime / dt |> Int
+nt = ks.set.maxTime ÷ dt |> Int
 
 anim = @animate for iter = 1:nt
     reconstruct!(ks, ctr)
