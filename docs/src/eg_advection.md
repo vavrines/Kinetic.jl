@@ -1,39 +1,47 @@
 # Advection diffusion
 
 The first example is the scalar advection-diffusion equation.
-It's a one dimensional problem in physical domain ``x``.
+It's a one dimensional problem in spatial domain ``x``.
 Let's first configure the solver setup.
 ```julia
-using KitBase, Plots
+using Kinetic, Plots
 
 set = Setup(
-    "scalar", # matter
-    "advection", # case
-    "1d0f0v", # space
-    "gks", # flux
-    "", # collision: for scalar conservation laws there are none
-    1, # species
-    1, # interpolation order
-    "vanleer", # limiter
-    "period", # boundary
-    0.5, # cfl
-    1.0, # simulation time
+    matter = "scalar", # material
+    case = "advection", # test case
+    space = "1d0f0v", # phase space
+    flux = "gks", # flux
+    collision = "", # collision: for scalar conservation laws there are none
+    interpOrder = 1, # interpolation order
+    boundary = "period", # boundary condition
+    cfl = 0.5, # cfl
+    maxTime = 1.0, # simulation time
 )
-pSpace = PSpace1D(0.0, 1.0, 100, 1)
-vSpace = nothing
-property = Scalar(1.0, 1e-6)
-w0 = 1.0
-prim0 = conserve_prim(w0, property.a)
-ib = IB(w0, prim0, prim0, w0, prim0, prim0)
-ks = SolverSet(set, pSpace, vSpace, property, ib)
 ```
 
-The we allocate the data structure needed.
+Then we generate the computational mesh.
+Since we solve the macroscopic transport equation, the phase space is set to be nothing.
 ```julia
-ctr, face = init_fvm(ks, ks.ps) 
-for i in eachindex(ctr)
-    ctr[i].w = sin(2π * ks.pSpace.x[i]) # initial condition
-end
+ps = PSpace1D(0.0, 1.0, 100, 1)
+vs = nothing
+```
+
+And we define the physical property of material.
+For the advection-diffusion equation, the two fields are the advection speed and viscosity respectively.
+```julia
+property = Scalar(1.0, 1e-6)
+```
+
+A sine wave is used as the initial condition.
+```julia
+ib = IB(x -> sin(2π * x), property)
+```
+
+For brevity, the above setups can be integrated into a single structure.
+We also allocate the structures for cell-centered solutions and interface fluxes.
+```julia
+ks = SolverSet(set, pSpace, vSpace, property, ib)
+ctr, face = init_fvm(ks, ks.ps)
 ```
 
 The solution algorithm can be processed together with visualization.
@@ -47,11 +55,7 @@ anim = @animate for iter = 1:nt
     evolve!(ks, ctr, face, dt)
     update!(ks, ctr, face, dt, 0.0)
 
-    sol = zeros(ks.pSpace.nx)
-    for i in 1:ks.pSpace.nx
-        sol[i] = ctr[i].w
-    end
-    plot(ks.pSpace.x[1:ks.pSpace.nx], sol, xlabel="x", label="u", ylims=[-1, 1])
+    plot(ks, ctr, xlabel="x", label="u", ylims=[-1, 1])
 end
 
 gif(anim, "advection.gif", fps = 45)
