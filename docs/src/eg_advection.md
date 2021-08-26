@@ -40,8 +40,8 @@ ib = IB(x -> sin(2π * x), property)
 For brevity, the above setups can be integrated into a single structure.
 We also allocate the structures for cell-centered solutions and interface fluxes.
 ```julia
-ks = SolverSet(set, pSpace, vSpace, property, ib)
-ctr, face = init_fvm(ks, ks.ps)
+ks = SolverSet(set, ps, vs, property, ib)
+ctr, face = init_fvm(ks)
 ```
 
 The solution algorithm can be processed together with visualization.
