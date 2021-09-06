@@ -19,6 +19,7 @@ set = Setup(
 )
 ps = PSpace1D(0.0, 1.0, 100, 1)
 vs = nothing
+property = Scalar(0, 1e-6)
 ib = IB(x -> sin(2π * x), property)
 
 ks = SolverSet(set, ps, vs, property, ib)
