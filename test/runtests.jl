@@ -1,4 +1,4 @@
-using Kinetic
+using Kinetic, Plots
 
 # initialization
 set, ctr, xface, yface, t = initialize("config.toml")
@@ -7,4 +7,4 @@ set, ctr, xface, yface, t = initialize("config.toml")
 t = solve!(set, ctr, xface, yface, t)
 
 # visualization
-plot_contour(set, ctr)
+plot(set, ctr)
