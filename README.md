@@ -6,7 +6,7 @@
   </img>
 
   [![version](https://juliahub.com/docs/Kinetic/version.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu)
-  [![](https://img.shields.io/badge/docs-latest-blue)](https://xiaotianbai.com/Kinetic.jl/dev/)
+  [![](https://img.shields.io/badge/docs-latest-cornflowerblue)](https://xiaotianbai.com/Kinetic.jl/dev/)
   [![](https://img.shields.io/badge/docs-stable-blue)](https://xiaotianbai.com/Kinetic.jl/stable/)
   [![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg?style=flat-square)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
   [![Visits Badge](https://badges.pufler.dev/visits/vavrines/Kinetic.jl)](https://badges.pufler.dev)
@@ -32,15 +32,15 @@
 **Kinetic** is a lightweight [Julia](https://julialang.org) toolbox for the study of computational fluid dynamics.
 The main module is split into portable components:
 
-- [KitBase.jl](https://github.com/vavrines/KitBase.jl) for basic physics
-- [KitML.jl](https://github.com/vavrines/KitML.jl) for neural dynamics
+- [KitBase.jl](https://github.com/vavrines/KitBase.jl): basic physics and numerical schemes
+- [KitML.jl](https://github.com/vavrines/KitML.jl): neural dynamics and machine learning methods
+- [KitFort.jl](https://github.com/vavrines/KitFort.jl): alternative high-performance Fortran backend
 
-Besides, a high-performance Fortran library is embedded in [KitFort.jl](https://github.com/vavrines/KitFort.jl).
-As an optional module, it can be manually imported into the current ecosystem seamlessly when the ultimate executing efficiency is pursued.
+As an optional module, the alternative Fortran backend can be manually imported into the current ecosystem when the ultimate executing efficiency is pursued.
 A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built as well to call the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia).
 
 | [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
-| ----------   | --------- | ---------------- | ------ |
+| ---------- | --------- | ---------------- | ------ |
 | ![CI](https://img.shields.io/github/workflow/status/vavrines/Kinetic.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitBase.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitML.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitFort.jl/CI?style=flat-square) |
 | [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl?style=flat-square)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitFort.jl) |
 
@@ -52,13 +52,13 @@ From the Julia REPL, you can get in the package manager (by pressing `]`) and ad
 
 ```julia
 julia> ]
-(v1.6) pkg> add Kinetic
+(v1.7) pkg> add Kinetic
 ```
 This will automatically install a currently stable release and all its dependencies.
 Similarly, the previously installed versions can be updated to the latest tagged release by
 
 ```julia
-(v1.6) pkg> update Kinetic
+(v1.7) pkg> update Kinetic
 ```
 
 ## Physics
