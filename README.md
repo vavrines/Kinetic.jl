@@ -34,7 +34,7 @@ The main module is split into portable components:
 
 - [KitBase.jl](https://github.com/vavrines/KitBase.jl): basic physics and numerical schemes
 - [KitML.jl](https://github.com/vavrines/KitML.jl): neural dynamics and machine learning methods
-- [KitFort.jl](https://github.com/vavrines/KitFort.jl): alternative high-performance Fortran backend
+- [KitFort.jl](https://github.com/vavrines/KitFort.jl): high-performance Fortran backend
 
 As an optional module, the alternative Fortran backend can be manually imported into the current ecosystem when the ultimate executing efficiency is pursued.
 A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built as well to call the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia).
