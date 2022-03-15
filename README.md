@@ -4,12 +4,12 @@
     src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif"
     alt="Kinetic Logo" width="300">
   </img>
-
+  
   [![version](https://juliahub.com/docs/Kinetic/version.svg)](https://juliahub.com/ui/Packages/Kinetic/wrVmu)
   [![](https://img.shields.io/badge/docs-latest-blue)](https://xiaotianbai.com/Kinetic.jl/dev/)
   [![](https://img.shields.io/badge/docs-stable-blue)](https://xiaotianbai.com/Kinetic.jl/stable/)
   [![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg?style=flat-square)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
-  [![downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Kinetic)](https://pkgs.genieframework.com?packages=Kinetic)
+  [![downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Kinetic/label:downloads-sep:,-logo:Julia-color:important)](https://pkgs.genieframework.com?packages=Kinetic)
 </div>
 
 <!--
