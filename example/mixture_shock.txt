@@ -4,28 +4,28 @@
 
 # setup
 matter = gas
-case = brio-wu
+case = shock
 space = 1d2f1v
 flux = kfvs
 collision = bgk
 nSpecies = 2
-interpOrder = 2
-limiter = minmod
+interpOrder = 1
+limiter = vanleer
 boundary = fix
-cfl = 0.5
-maxTime = 100
+cfl = 0.8
+maxTime = 150
 
 # physical space
 x0 = -25
 x1 = 25
-nx = 100
+nx = 70
 pMeshType = uniform
 nxg = 1
 
 # velocity space
 umin = -5
 umax = 5
-nu = 48
+nu = 60
 vMeshType = rectangle
 nug = 0
 
@@ -39,4 +39,3 @@ mi = 1
 ni = 0.5
 me = 0.5
 ne = 0.5
-
