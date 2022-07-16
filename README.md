@@ -37,8 +37,9 @@ The main module is split into portable components:
 - [KitML.jl](https://github.com/vavrines/KitML.jl): neural dynamics and machine learning methods
 - [KitFort.jl](https://github.com/vavrines/KitFort.jl): high-performance Fortran backend
 
-As an optional module, the alternative Fortran backend can be manually imported into the current ecosystem when the ultimate executing efficiency is pursued.
-A Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) has been built as well to call the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia).
+As an optional module, the Fortran backend can be manually imported into the current ecosystem when the ultimate executing efficiency is pursued.
+The functionality of the module has been extended in [Langevin.jl](https://github.com/vavrines/Langevin.jl) to study uncertainty quantification in computational fluid dynamics.
+An alternative Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) is built as well to call the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia).
 
 | [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
 | ---------- | --------- | ---------------- | ------ |
