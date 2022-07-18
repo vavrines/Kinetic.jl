@@ -34,7 +34,7 @@ property = Scalar(1.0, 1e-6)
 
 A sine wave is used as the initial condition.
 ```julia
-ib = IB(x -> sin(2π * x), property)
+ib = IB((x, p...) -> sin(2π * x), property)
 ```
 
 For brevity, the above setups can be integrated into a single structure.
