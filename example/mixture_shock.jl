@@ -8,13 +8,12 @@ ctr, face = init_fvm(ks)
 
 begin
     iter = 0
-    res = zeros(3)
-    simTime = 0.0
-    dt = Kinetic.timestep(ks, ctr, simTime)
+    res = zeros(3, 2)
+    t = 0.0
+    dt = Kinetic.timestep(ks, ctr, t)
     nt = Int(floor(ks.set.maxTime / dt))
 end
 
-res = zeros(3, 2)
 @showprogress for iter = 1:nt
     Kinetic.reconstruct!(ks, ctr)
     Kinetic.evolve!(ks, ctr, face, dt)
