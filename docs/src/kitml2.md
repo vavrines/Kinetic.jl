@@ -4,12 +4,11 @@ In the following, we present a universal differential equation strategy to const
 The complicated fivefold integral operator is replaced by a combination of relaxation and neural models.
 It promises a completely differential structure and thus the neural ODE type training and computing becomes possible.
 The approach reduces the computational cost up to three orders of magnitude and preserves the perfect accuracy.
-The detailed theory and implementation can be found in [Tianbai Xiao and Martin Frank, Using neural networks to accelerate the solution of the Boltzmann equation](https://arxiv.org/pdf/2010.13649.pdf).
+The detailed theory and implementation can be found in [Tianbai Xiao & Martin Frank, Using neural networks to accelerate the solution of the Boltzmann equation](https://www.sciencedirect.com/science/article/pii/S0021999121004162).
 
 First we load all the packages needed and set up the configurations.
 ```julia
-using OrdinaryDiffEq, Flux, DiffEqFlux, Plots
-using KitBase, KitML
+using Flux, Kinetic, OrdinaryDiffEq, Plots, SciMLSensitivity, Solaris
 
 begin
     case = "homogeneous"
@@ -18,16 +17,12 @@ begin
     u0 = -5
     u1 = 5
     nu = 80
-    nug = 0
     v0 = -5
     v1 = 5
     nv = 28
-    nvg = 0
     w0 = -5
     w1 = 5
     nw = 28
-    nwg = 0
-    vMeshType = "rectangle"
     nm = 5
     knudsen = 1
     inK = 0
@@ -43,7 +38,7 @@ begin
     tspan = (0.0, maxTime)
     tran = linspace(tspan[1], tspan[2], tlen)
     γ = heat_capacity_ratio(inK, 3)
-    vSpace = VSpace3D(u0, u1, nu, v0, v1, nv, w0, w1, nw, vMeshType)
+    vSpace = VSpace3D(u0, u1, nu, v0, v1, nv, w0, w1, nw)
 
     f0 =
         Float32.(
@@ -113,17 +108,17 @@ end
 ```
 
 Then we define the neural network and construct the unified model with mechanical and neural parts.
-The training is conducted by DiffEqFlux.jl with ADAM optimizer.
+The training is conducted by Solaris.jl with the Adam optimizer.
 ```julia
 begin
-    model_univ = DiffEqFlux.FastChain(
-        DiffEqFlux.FastDense(nu, nu * nh, tanh),
-        DiffEqFlux.FastDense(nu * nh, nu),
+    model_univ = FnChain(
+        FnDense(nu, nu * nh, tanh),
+        FnDense(nu * nh, nu),
     )
-    p_model = DiffEqFlux.initial_params(model_univ)
+    p_model = init_params(model_univ)
 
-    function dfdt(f, p, t)
-        df = (M .- f) ./ τ .+ model_univ(M .- f, p)
+    function dfdt(df, f, p, t)
+        df .= (M .- f) ./ τ .+ model_univ(M .- f, p)
     end
     prob_ube = ODEProblem(dfdt, X, tspan, p_model)
 
@@ -142,19 +137,19 @@ begin
     end
 end
 
-res = DiffEqFlux.sciml_train(loss, p_model, ADAM(), cb = cb, maxiters = 200)
-res = DiffEqFlux.sciml_train(loss, res.minimizer, ADAM(), cb = cb, maxiters = 200)
+res = sci_train(loss, p_model, Adam(); cb = cb, maxiters = 200)
+res = sci_train(loss, res.u, Adam(); cb = cb, maxiters = 200)
 ```
 
 Once we have trained a hybrid Boltzmann collision term, we could solve it as a normal differential equation with any desirable solvers.
 Consider the Midpoint rule as an example, the solution algorithm and visualization can be organized.
 ```julia
-ube = ODEProblem(KitML.ube_dfdt, f0_1D, tspan, [M0_1D, τ0, (model_univ, res.minimizer)]);
+ube = ODEProblem(ube_dfdt, f0_1D, tspan, [M0_1D, τ0, (model_univ, res.u)]);
 sol = solve(
     ube,
     Midpoint(),
     u0 = f0_1D,
-    p = [M0_1D, τ0, (model_univ, res.minimizer)],
+    p = [M0_1D, τ0, (model_univ, res.u)],
     saveat = tran,
 );
 
