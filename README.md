@@ -12,6 +12,11 @@
   [![downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Kinetic/label:downloads-sep:,-logo:Julia-color:important)](https://pkgs.genieframework.com?packages=Kinetic)
 </div>
 
+| [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
+| ---------- | --------- | ---------------- | ------ |
+| ![CI](https://img.shields.io/github/workflow/status/vavrines/Kinetic.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitBase.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitML.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitFort.jl/CI?style=flat-square) |
+| [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl?style=flat-square)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitFort.jl) |
+
 <!--
 ![](https://img.shields.io/github/v/tag/vavrines/Kinetic.jl?include_prereleases&label=latest%20version&logo=github&sort=semver)
 ![](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -30,44 +35,36 @@
 <img src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif" width="300"/>
 -->
 
-**Kinetic** is a lightweight [Julia](https://julialang.org) toolbox for the study of computational fluid dynamics.
-The main module is split into portable components:
+**Kinetic** is a computational fluid dynamics toolbox written in [Julia](https://julialang.org).
+Based on differentiable programming, mechanical and neural network models are fused and solved in a unified framework.
+Simultaneous 1-3 dimensional numerical simulations can be performed on CPUs and GPUs.
 
-- [KitBase.jl](https://github.com/vavrines/KitBase.jl): basic physics and numerical schemes
-- [KitML.jl](https://github.com/vavrines/KitML.jl): neural dynamics and machine learning methods
-- [KitFort.jl](https://github.com/vavrines/KitFort.jl): high-performance Fortran backend
+The ecosystem follows the modular design philosophy.
+Depending on the specific use case, the main module is split into portable components to reduce the lantency caused by the LLVM [just-in-time](https://llvm.org/docs/tutorial/index.html#building-a-jit-in-llvm) compiler:
 
-As an optional module, the Fortran backend can be manually imported into the current ecosystem when the ultimate executing efficiency is pursued.
-The functionality of the module has been extended in [Langevin.jl](https://github.com/vavrines/Langevin.jl) to study uncertainty quantification in computational fluid dynamics.
-An alternative Python wrapper [kineticpy](https://github.com/vavrines/kineticpy) is built as well to call the structs and methods here through [pyjulia](https://github.com/JuliaPy/pyjulia).
-
-| [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
-| ---------- | --------- | ---------------- | ------ |
-| ![CI](https://img.shields.io/github/workflow/status/vavrines/Kinetic.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitBase.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitML.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitFort.jl/CI?style=flat-square) |
-| [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl?style=flat-square)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitFort.jl) |
+- [KitBase.jl](https://github.com/vavrines/KitBase.jl): physical models and numerical schemes
+- [KitML.jl](https://github.com/vavrines/KitML.jl): neural models and machine learning methods
+- [KitFort.jl](https://github.com/vavrines/KitFort.jl): optional high-performance Fortran backend
+- [FluxReconstruction.jl](https://github.com/vavrines/FluxReconstruction.jl): high-fidelity solution algorithms
+- [Langevin.jl](https://github.com/vavrines/Langevin.jl): intrusive uncertainty quantification methods
+- [kineticpy](https://github.com/vavrines/kineticpy): Python interface built on top of [kineticpy](https://github.com/vavrines/kineticpy)
 
 ## Installation
 
-Kinetic.jl is a registered package in the official [Julia package registry](https://github.com/JuliaRegistries/General).
+Kinetic is a registered package in the official [Julia package registry](https://github.com/JuliaRegistries/General).
 We recommend installing it with the Julia package manager. 
 From the Julia REPL, you can get in the package manager (by pressing `]`) and add the package
 
 ```julia
 julia> ]
-(v1.7) pkg> add Kinetic
+(v1.8) pkg> add Kinetic
 ```
 This will automatically install a currently stable release and all its dependencies.
-Similarly, the previously installed versions can be updated to the latest tagged release by
-
-```julia
-(v1.7) pkg> update Kinetic
-```
 
 ## Physics
 
-Kinetic.jl focuses on theoretical and numerical studies of many-particle systems of gases, photons, plasmas, neutrons, etc.
-It employs the finite volume method (FVM) to conduct 1-3 dimensional numerical simulations on CPUs and GPUs.
-Any advection-diffusion-type equation can be solved within the framework.
+Kinetic models and simulates fluid dynamics problems from the perspective of particle transport.
+Any advection-diffusion-type equation of different particles, including molecules, photons, plasmas, neutrons, etc., can be solved within the framework.
 Special attentions have been paid on Hilbert's sixth problem, i.e. to build the numerical passage between kinetic theory of gases, e.g. the Boltzmann equation, and continuum mechanics, e.g. the Euler and Navier-Stokes equations.
 A partial list of current supported models and equations include:
 - Boltzmann equation
@@ -83,12 +80,15 @@ A partial list of current supported models and equations include:
 
 ## Documentation
 
-For the detailed information on the implementation and usage of the package,
-[check the documentation](https://xiaotianbai.com/Kinetic.jl/dev/).
+For the detailed implementation and usage of the package, please
+check the documentation:
+
+- [**STABLE**](https://xiaotianbai.com/Kinetic.jl/stable/): latest tagged version of the package
+- [**LATEST**](https://xiaotianbai.com/Kinetic.jl/dev/): in-development version of the package
 
 ## Citing
 
-If you benefit from Kinetic.jl in your research, teaching, or other activities, we would be happy if you could mention or cite it:
+If you benefit from Kinetic in your research, teaching, or otherwise, we would be happy if you could mention or cite it:
 
 ```
 @article{Xiao2021,
@@ -107,4 +107,9 @@ If you benefit from Kinetic.jl in your research, teaching, or other activities, 
 
 ## Contributing
 
-If you have further questions regarding Kinetic.jl or have got an idea on improving it, please feel free to get in touch. Open an issue or pull request if you'd like to work on a new feature or even if you're new to open-source and want to find a cool little project or issue to work on that fits your interests. We're more than happy to help along the way.
+Feel free to dive in! If you have any questions or ideas, please [open an issue](https://github.com/vavrines/Kinetic.jl/issues/new) or submit pull requests.
+If you're new to the open source community and looking for a cool little project to work on that fits your interests, we're happy to help along the way.
+
+## License
+
+[MIT](LICENSE) © Tianbai Xiao
