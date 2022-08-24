@@ -7,3 +7,8 @@ docs/site
 docs/Manifest.toml
 
 deps/build.log
+
+*.jld2
+*.vtu
+.vscode/*
+LocalPreferences.toml
