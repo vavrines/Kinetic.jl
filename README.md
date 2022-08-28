@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Kinetic.jl</h1>
+  <h1>Kinetic</h1>
   <img
     src="https://i.postimg.cc/ncXfgjXd/dancing-circles.gif"
     alt="Kinetic Logo" width="300">
