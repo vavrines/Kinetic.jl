@@ -17,7 +17,7 @@ end
 @showprogress for iter = 1:nt
     reconstruct!(ks, ctr)
     evolve!(ks, ctr, face, dt)
-    update!(ks, ctr, face, dt, res; bc=:fix)
+    update!(ks, ctr, face, dt, res; bc = :fix)
 end
 
 sol = zeros(ks.ps.nx, 6)

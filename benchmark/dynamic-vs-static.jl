@@ -37,7 +37,10 @@ end
 
 face2 = deepcopy(face)
 for i = 1:ks.pSpace.nx+1
-    face2[i] = Interface1D2F(MVector{length(ks.ib.wL)}(ks.ib.wL), MVector{length(ks.ib.hL)}(ks.ib.hL))
+    face2[i] = Interface1D2F(
+        MVector{length(ks.ib.wL)}(ks.ib.wL),
+        MVector{length(ks.ib.hL)}(ks.ib.hL),
+    )
 end
 
 @btime Kinetic.solve!(ks, ctr2, face2, t)

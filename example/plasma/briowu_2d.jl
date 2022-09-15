@@ -19,8 +19,37 @@ begin
     ve1 = vmax * sqrt(mi / me)
     kne = knudsen * (me / mi)
 
-    vs = MVSpace2D(umin, umax, ue0, ue1, nu, vmin, vmax, ve0, ve1, nv; type = vMeshType, ngu = nug, ngv = nvg)
-    plasma = Plasma1D([knudsen,kne], mach, prandtl, inK, γ, mi, ni, me, ne, lD, rL, sol, echi, bnu)
+    vs = MVSpace2D(
+        umin,
+        umax,
+        ue0,
+        ue1,
+        nu,
+        vmin,
+        vmax,
+        ve0,
+        ve1,
+        nv;
+        type = vMeshType,
+        ngu = nug,
+        ngv = nvg,
+    )
+    plasma = Plasma1D(
+        [knudsen, kne],
+        mach,
+        prandtl,
+        inK,
+        γ,
+        mi,
+        ni,
+        me,
+        ne,
+        lD,
+        rL,
+        sol,
+        echi,
+        bnu,
+    )
 
     begin
         # upstream
@@ -155,31 +184,31 @@ end
 ctr, face = init_fvm(ks)
 
 begin
-    t = 0.
+    t = 0.0
     dt = timestep(ks, ctr, t)
-    nt = Int(floor(ks.set.maxTime / dt))+1
+    nt = Int(floor(ks.set.maxTime / dt)) + 1
     res = zeros(5, 2)
 end
 
-@showprogress for iter in 1:nt
+@showprogress for iter = 1:nt
     reconstruct!(ks, ctr)
-    evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=:true)
-    update!(ks, ctr, face, dt, res, isMHD=true)
+    evolve!(ks, ctr, face, dt; mode = :kcu, isPlasma = :true)
+    update!(ks, ctr, face, dt, res, isMHD = true)
 end
 
 soluiton = zeros(ks.ps.nx, 10, 2)
-for i in 1:ks.ps.nx
-    soluiton[i, 1, 1] = ctr[i].prim[1,1]
-    soluiton[i, 1, 2] = ctr[i].prim[1,2] / ks.gas.me
-    soluiton[i, 2:4, 1] .= ctr[i].prim[2:4,1]
-    soluiton[i, 2:4, 2] .= ctr[i].prim[2:4,2]
-    soluiton[i, 5, 1] = 1. / ctr[i].prim[5,1]
-    soluiton[i, 5, 2] = ks.gas.me / ctr[i].prim[5,2]
+for i = 1:ks.ps.nx
+    soluiton[i, 1, 1] = ctr[i].prim[1, 1]
+    soluiton[i, 1, 2] = ctr[i].prim[1, 2] / ks.gas.me
+    soluiton[i, 2:4, 1] .= ctr[i].prim[2:4, 1]
+    soluiton[i, 2:4, 2] .= ctr[i].prim[2:4, 2]
+    soluiton[i, 5, 1] = 1.0 / ctr[i].prim[5, 1]
+    soluiton[i, 5, 2] = ks.gas.me / ctr[i].prim[5, 2]
 
     soluiton[i, 6, 1] = ctr[i].B[2]
     soluiton[i, 6, 2] = ctr[i].E[1]
 end
 
 using Plots
-plot(ks.ps.x[1:ks.ps.nx], soluiton[:,1,1:2])
-plot(ks.ps.x[1:ks.ps.nx], soluiton[:,6,1:2])
+plot(ks.ps.x[1:ks.ps.nx], soluiton[:, 1, 1:2])
+plot(ks.ps.x[1:ks.ps.nx], soluiton[:, 6, 1:2])

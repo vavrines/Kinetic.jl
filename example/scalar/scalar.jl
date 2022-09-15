@@ -27,7 +27,7 @@ anim = @animate for iter = 1:nt
     evolve!(ks, ctr, face, dt)
     update!(ks, ctr, face, dt, 0.0)
 
-    plot(ks, ctr, xlabel="x", label="u", ylims=[-1, 1])
+    plot(ks, ctr, xlabel = "x", label = "u", ylims = [-1, 1])
 end
 
 gif(anim, "advection.gif", fps = 45)
