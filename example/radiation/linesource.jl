@@ -1,4 +1,5 @@
-using ProgressMeter, Kinetic
+using KitBase
+using KitBase.ProgressMeter: @showprogress
 
 begin
     # space
@@ -19,8 +20,7 @@ begin
 
     # quadrature
     quadratureorder = 6
-    points, triangulation = octa_quadrature(quadratureorder)
-    weights = Kinetic.quadrature_weights(points, triangulation)
+    points, weights = octa_quadrature(quadratureorder)
     nq = size(points, 1)
 
     # particle

@@ -9,10 +9,10 @@ space = 1d2f1v
 nSpecies = 1
 flux = kfvs
 collision = bgk
-interpOrder = 2
+interpOrder = 1
 limiter = vanleer
 boundary = fix
-cfl = 0.5
+cfl = 0.3
 maxTime = 0.2
 
 # physical space

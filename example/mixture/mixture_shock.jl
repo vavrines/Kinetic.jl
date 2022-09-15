@@ -1,5 +1,5 @@
-using Kinetic, Plots
-using Kinetic.KitBase.ProgressMeter: @showprogress
+using KitBase, Plots
+using KitBase.ProgressMeter: @showprogress
 
 cd(@__DIR__)
 
@@ -10,14 +10,14 @@ begin
     iter = 0
     res = zeros(3, 2)
     t = 0.0
-    dt = Kinetic.timestep(ks, ctr, t)
+    dt = timestep(ks, ctr, t)
     nt = Int(floor(ks.set.maxTime / dt))
 end
 
 @showprogress for iter = 1:nt
-    Kinetic.reconstruct!(ks, ctr)
-    Kinetic.evolve!(ks, ctr, face, dt)
-    Kinetic.update!(ks, ctr, face, dt, res; bc=:fix)
+    reconstruct!(ks, ctr)
+    evolve!(ks, ctr, face, dt)
+    update!(ks, ctr, face, dt, res; bc=:fix)
 end
 
 sol = zeros(ks.ps.nx, 6)
