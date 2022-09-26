@@ -9,7 +9,7 @@
   [![](https://img.shields.io/badge/docs-latest-blue)](https://xiaotianbai.com/Kinetic.jl/dev/)
   [![](https://img.shields.io/badge/docs-stable-blue)](https://xiaotianbai.com/Kinetic.jl/stable/)
   [![status](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4/status.svg?style=flat-square)](https://joss.theoj.org/papers/65d56efef938caf92c2cc942d2c25ea4)
-  [![downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Kinetic/label:downloads-sep:,-logo:Julia-color:important)](https://pkgs.genieframework.com?packages=Kinetic)
+  [![downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Kinetic/label:downloads-sep:,-logo:none-color:important)](https://pkgs.genieframework.com?packages=Kinetic)
   
   | [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
 | ---------- | --------- | ---------------- | ------ |
@@ -91,7 +91,7 @@ check the documentation:
 If you benefit from Kinetic in your research, teaching, or otherwise, we would be happy if you could mention or cite it:
 
 ```
-@article{Xiao2021,
+@article{xiao2021kinetic,
   doi = {10.21105/joss.03060},
   url = {https://doi.org/10.21105/joss.03060},
   year = {2021},
