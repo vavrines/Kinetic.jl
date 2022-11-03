@@ -1,7 +1,7 @@
 """
 Kinetic.jl: A Portable Framework for Computational Fluid Dynamics and Scientific Machine Learning
 
-Copyright (c) 2021 Tianbai Xiao (tianbaixiao@gmail.com)
+Copyright (c) 2022 Tianbai Xiao (tianbaixiao@gmail.com)
 """
 module Kinetic
 
