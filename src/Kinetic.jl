@@ -1,5 +1,5 @@
 """
-Kinetic.jl: A Portable Framework for Computational Fluid Dynamics and Scientific Machine Learning
+Kinetic.jl: A Portable Framework for Scientific and Neural Computing
 
 Copyright (c) 2022 Tianbai Xiao (tianbaixiao@gmail.com)
 """
@@ -8,9 +8,7 @@ module Kinetic
 export 転
 
 """
-Portable Framework for Computational Fluid Dynamics and Scientific Machine Learning
-
-轻量化的计算流体力学建模和计算框架
+轻量化的科学与神经网络计算框架
 
 "転" means "rolling" in Japannese
 """
