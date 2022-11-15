@@ -12,7 +12,7 @@ It's not a default submodule of Kinetic since we believe the Julia codes are suf
 However, it can be manually imported when the executing efficiency becomes the first priority by executing
 ```julia
 julia> ]
-(v1.5) pkg> add KitFort
+(v1.8) pkg> add KitFort
 ```
 After that, using/import the package.
 ```julia
@@ -21,5 +21,5 @@ julia> using KitFort
 
 It can be updated to the latest tagged release from the package manager by executing
 ```julia
-(v1.5) pkg> update KitFort
+(v1.8) pkg> update KitFort
 ```

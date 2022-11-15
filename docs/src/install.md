@@ -6,14 +6,14 @@ It automatically installs a currently stable and tagged release.
 From the Julia REPL, you can add the package.
 ```julia
 julia> ]
-(v1.6) pkg> add Kinetic
+(v1.8) pkg> add Kinetic
 ```
 
 This will automatically install Kinetic and all its dependencies, and it's not needed to build the package manually.
 You can also build the dependencies if some of them were removed by mistake.
 ```julia
 julia> ]
-(v1.6) pkg> build Kinetic
+(v1.8) pkg> build Kinetic
 ```
 After that, we can `using` or `import` the package.
 `using` will load the module and make its exported names available for direct use.
@@ -41,7 +41,7 @@ julia> Kinetic.linspace(0, 1, 5)
 
 Kinetic can be updated to the latest tagged release from the package manager.
 ```julia
-(v1.5) pkg> update Kinetic
+(v1.8) pkg> update Kinetic
 ```
 
 !!! tip "Use Julia 1.3 or newer"
