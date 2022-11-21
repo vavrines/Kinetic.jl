@@ -10,7 +10,7 @@ export 転
 """
 轻量化的科学与神经网络计算框架
 
-"転" means "rolling" in Japannese
+"転" means "rolling" in Japanese
 """
 const 転 = Kinetic
 
