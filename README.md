@@ -79,6 +79,64 @@ A partial list of current supported models and equations include:
 - Magnetohydrodynamical equations
 - Maxwell's equations
 
+## Structure
+
+The structure of Kinetic is shown in the schematic below:
+
+```mermaid
+flowchart LR
+    subgraph Com[Component]
+        KitBase
+        KitML
+    end
+    subgraph Backend
+        CPU
+        CUDA
+    end
+    subgraph Mesh
+        FiniteMesh
+    end
+    subgraph SciML[Scientific Machine Learning]
+        Solaris(Solaris)
+        Flux(Flux)
+        TensorFlow[TensorFlow]
+    end
+    subgraph AD[Automatic Differentiation]
+        ForwardDiff
+        Zygote
+    end
+    subgraph Parallel[Parallel Computing]
+        Threads
+        Distributed
+        MPI["MPI (experimental)"]
+    end
+    subgraph Serial[Serialization]
+        CSV
+        JLD2
+        BSON
+    end
+    subgraph Opt[Optimization]
+        Optimisers
+        Optim
+        Optimization
+    end
+    subgraph Ar[Array]
+        Array
+        StaticArrays
+        StructArrays
+    end
+    Kt(Kinetic)
+    Com --> Kt
+    Ar --> Kt
+    Mesh --> Kt
+    Backend --> Kt
+    AD --> Kt
+    Serial --> Kt
+    Kt --> Parallel
+    Kt --> SciML
+    Kt --> Opt
+```
+
 ## Documentation
 
 For the detailed implementation and usage of the package, please
