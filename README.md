@@ -14,7 +14,7 @@
   
   | [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
 | ---------- | --------- | ---------------- | ------ |
-| ![CI](https://img.shields.io/github/workflow/status/vavrines/Kinetic.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitBase.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitML.jl/CI?style=flat-square) | ![CI](https://img.shields.io/github/workflow/status/vavrines/KitFort.jl/CI?style=flat-square) |
+| ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/Kinetic.jl/ci.yml?branch=master&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitBase.jl/ci.yml?branch=main&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitML.jl/main.yml?branch=main&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitFort.jl/main.yml?branch=main&style=flat-square) |
 | [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl?style=flat-square)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitFort.jl) |
 </div>
 
