@@ -12,10 +12,11 @@
   [![downloads](https://img.shields.io/endpoint?color=important&label=downloads&logo=%2F&url=https%3A%2F%2Fpkgs.genieframework.com%2Fapi%2Fv1%2Fbadge%2FKitBase)](https://pkgs.genieframework.com?packages=Kinetic)
   <!--[![downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Kinetic/label:downloads-sep:,-logo:none-color:important)](https://pkgs.genieframework.com?packages=Kinetic)-->
   
-  | [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
+| [Kinetic](https://github.com/vavrines/Kinetic.jl) | [KitBase](https://github.com/vavrines/KitBase.jl) | [KitML](https://github.com/vavrines/KitML.jl) | [KitFort](https://github.com/vavrines/KitFort.jl) |
 | ---------- | --------- | ---------------- | ------ |
 | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/Kinetic.jl/ci.yml?branch=master&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitBase.jl/ci.yml?branch=main&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitML.jl/main.yml?branch=main&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitFort.jl/main.yml?branch=main&style=flat-square) |
 | [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl?style=flat-square)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitFort.jl) |
+![](https://img.shields.io/github/last-commit/vavrines/Kinetic.jl?label=updated&style=flat-square) | ![](https://img.shields.io/github/last-commit/vavrines/KitBase.jl?style=flat-square&label=updated) | ![](https://img.shields.io/github/last-commit/vavrines/KitML.jl?style=flat-square&label=updated) | ![](https://img.shields.io/github/last-commit/vavrines/KitFort.jl?style=flat-square&label=updated)
 </div>
 
 <!--
@@ -43,11 +44,11 @@ Simultaneous 1-3 dimensional numerical simulations can be performed on CPUs and 
 The ecosystem follows the modular design philosophy.
 Depending on the specific use case, the main module is split into portable components to reduce the lantency caused by the LLVM [just-in-time](https://llvm.org/docs/tutorial/index.html#building-a-jit-in-llvm) compiler:
 
-- [KitBase.jl](https://github.com/vavrines/KitBase.jl): physical models and numerical schemes
-- [KitML.jl](https://github.com/vavrines/KitML.jl): neural models and machine learning methods
-- [KitFort.jl](https://github.com/vavrines/KitFort.jl): optional high-performance Fortran backend
-- [FluxReconstruction.jl](https://github.com/vavrines/FluxReconstruction.jl): high-fidelity solution algorithms
-- [Langevin.jl](https://github.com/vavrines/Langevin.jl): intrusive uncertainty quantification methods
+- [KitBase](https://github.com/vavrines/KitBase.jl): physical models and numerical schemes
+- [KitML](https://github.com/vavrines/KitML.jl): neural models and machine learning methods
+- [KitFort](https://github.com/vavrines/KitFort.jl): optional high-performance Fortran backend
+- [FluxReconstruction](https://github.com/vavrines/FluxReconstruction.jl): high-fidelity solution algorithms
+- [Langevin](https://github.com/vavrines/Langevin.jl): intrusive uncertainty quantification methods
 - [kineticpy](https://github.com/vavrines/kineticpy): Python interface built on top of [pyjulia](https://github.com/JuliaPy/pyjulia)
 
 ## Installation
