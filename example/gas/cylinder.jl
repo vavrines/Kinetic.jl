@@ -2,8 +2,6 @@ using KitBase, Plots
 using KitBase.ProgressMeter: @showprogress
 pyplot()
 
-using Base.Threads: @threads
-
 begin
     set = Setup(
         case = "cylinder",
