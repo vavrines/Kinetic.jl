@@ -60,7 +60,7 @@ From the Julia REPL, you can get in the package manager (by pressing `]`) and ad
 
 ```julia
 julia> ]
-(v1.8) pkg> add Kinetic
+(v1.9) pkg> add Kinetic
 ```
 This will automatically install a currently stable release and all its dependencies.
 
