@@ -14,6 +14,7 @@ limiter = vanleer # limiter function
 boundary = maxwell # boundary condition
 cfl = 0.8 # CFL number
 maxTime = 0.01 # maximal simulation time
+hasForce = false # auxiliary force term
 
 # physical space
 x0 = 0.0 # starting point in x
