@@ -1,7 +1,7 @@
 """
 Kinetic.jl: A Portable Framework for Scientific and Neural Computing
 
-Copyright (c) 2022 Tianbai Xiao (tianbaixiao@gmail.com)
+Copyright (c) 2020-2023 Tianbai Xiao (tianbaixiao@gmail.com)
 """
 module Kinetic
 
