@@ -1,0 +1,52 @@
+# ------------------------------------------------------------
+# Configuration of 2D lid-driven cavity
+# ------------------------------------------------------------
+
+# setup
+matter = gas
+case = cavity
+space = 2d2f2v
+flux = kfvs
+collision = bgk
+nSpecies = 1
+interpOrder = 2
+limiter = vanleer
+boundary = maxwell
+cfl = 0.8
+maxTime = 1.0
+
+# phase space
+x0 = 0.0
+x1 = 1.0
+nx = 45
+y0 = 0.0
+y1 = 1.0
+ny = 45
+pMeshType = uniform
+nxg = 0
+nyg = 0
+
+# velocity space
+umin = -5.0
+umax = 5.0
+nu = 28
+vmin = -5.0
+vmax = 5.0
+nv = 28
+vMeshType = rectangle
+nug = 0
+nvg = 0
+
+# gas
+knudsen = 0.075
+mach = 0.0
+prandtl = 1.0
+inK = 1.0
+omega = 0.72
+alphaRef = 1.0
+omegaRef = 0.5
+
+# boundary
+uLid = 0.15
+vLid = 0.0
+tLid = 1.0
