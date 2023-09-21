@@ -31,3 +31,24 @@ res = zeros(3)
 end
 
 plot(ks, ctr)
+
+#--- pure 1D setting ---#
+set = Setup(case = "sod", space = "1d1f1v", maxTime = 0.12)
+gas = Gas(Kn = 1e-4, K = 0.0, γ = 3.0)
+fw, ff, bc, p = config_ib(set, ps, vs, gas)
+ib = IB1F(fw, ff, bc, p)
+
+ks = SolverSet(set, ps, vs, gas, ib)
+ctr, face = init_fvm(ks, :static_array; structarray = true)
+
+t = 0.0
+dt = KitBase.timestep(ks, ctr, t)
+nt = ks.set.maxTime ÷ dt |> Int
+res = zeros(3)
+@showprogress for iter = 1:nt
+    reconstruct!(ks, ctr)
+    evolve!(ks, ctr, face, dt)
+    update!(ks, ctr, face, dt, res)
+end
+
+plot(ks, ctr)

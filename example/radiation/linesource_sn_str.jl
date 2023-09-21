@@ -24,8 +24,8 @@ begin
     nq = size(points, 1)
 
     # particle
-    SigmaS = 1 * ones(ny + 4, nx + 4)
-    SigmaA = 0 * ones(ny + 4, nx + 4)
+    SigmaS = 1.0 .* ones(ny + 4, nx + 4)
+    SigmaA = 0.0 .* ones(ny + 4, nx + 4)
     SigmaT = SigmaS + SigmaA
 end
 
