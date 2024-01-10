@@ -6,7 +6,7 @@ Pkg.add("Documenter")
 using Documenter, Kinetic
 using Kinetic: KitBase, KitML
 using Kinetic.KitBase: ib_rh, ib_sod, ib_briowu, ib_cavity
-using Kinetic.KitBase: newton_cotes, quadrature_weights
+using Kinetic.KitBase: newton_cotes, triangle_weights
 using Kinetic.KitBase: em_coefficients, advection_flux, burgers_flux, euler_flux, euler_jacobi
 using Kinetic.KitBase: gauss_moments, mixture_gauss_moments, pdf_slope, mixture_pdf_slope, moments_conserve_slope, mixture_moments_conserve_slope
 using Kinetic.KitBase: aap_hs_diffeq!
