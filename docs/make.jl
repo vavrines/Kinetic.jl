@@ -13,6 +13,7 @@ using Kinetic.KitBase: aap_hs_diffeq!
 using Kinetic.KitBase: plot_line, plot_contour, write_jld
 using Kinetic.KitML.Solaris
 using Kinetic.KitML.Solaris: load_data, save_model
+using Kinetic.KitBase.FiniteMesh
 using Kinetic.KitBase.FiniteMesh: read_mesh, mesh_connectivity_2D, mesh_cell_center, mesh_cell_area_2D
 
 tutorial_page = [

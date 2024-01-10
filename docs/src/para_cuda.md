@@ -5,7 +5,7 @@ Kinetic enables computation on the graphical architecture on the basis of [CUDA.
 It provides the main programming interface for working with NVIDIA CUDA GPUs. 
 It features a user-friendly array abstraction, a compiler for writing CUDA kernels in Julia, and wrappers for various CUDA libraries.
 In the following, we present an illustrative test of kinetic flux vector splitting method to evaluate upwind flux of the Boltzmann equation.
-The test is conducted on a Tesla K80 GPU on [nextjournal.com](nextjournal.com).
+The test is conducted on a Tesla K80 GPU on [nextjournal.com](https://nextjournal.com).
 We first load all the modules, and do a CPU-based computation.
 
 ```julia

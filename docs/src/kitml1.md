@@ -50,9 +50,7 @@ It is important for entropy-based modelling, since the minimization principle wo
 
 ```@docs
 Convex
-ICNN
 FastConvex
-FastICNN
 ```
 Besides, we also provide scientific machine learning training interfaces and I/O methods.
 They are consistent with both [Flux.jl](https://github.com/FluxML/Flux.jl) and [DiffEqFlux.jl](https://github.com/SciML/DiffEqFlux.jl) ecosystem.
