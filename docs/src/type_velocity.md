@@ -1,7 +1,7 @@
 # Particle velocity space
 
 A struct `vSpace <: AbstractSetup` defines the particle velocity setup of a simulation.
-Structs for 1-3 dimensional particle velocity space are built.
+Structs for 1-3 dimensional particle velocity space are built. Note that these structs work for both single-component and multi-component substances.
 ```@docs
 VSpace1D
 VSpace2D
@@ -16,12 +16,6 @@ It contains
 - weights: quadrature weights for numerical integral
 
 Note that the one-dimensional velocity space can be used to handle 1-3 dimensional unstructured topology as well.
-In addition, velocity space structs for multi-component substance are implemented.
-```@docs
-MVSpace1D
-MVSpace2D
-MVSpace3D
-```
 
 For the simulation cases where no phase-space evolution is involved, `vSpace` can be set as `nothing` directly.
 ```julia
