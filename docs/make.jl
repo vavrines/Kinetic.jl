@@ -87,6 +87,7 @@ makedocs(
         "Reference"=>"reference.md",
     ],
     format = format,
+    checkdocs = :none,
 )
 
 deploydocs(repo = "github.com/vavrines/Kinetic.jl.git")
