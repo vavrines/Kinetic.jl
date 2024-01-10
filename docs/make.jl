@@ -68,7 +68,7 @@ format = Documenter.HTML(assets = ["assets/favicon.ico"], collapselevel = 1)
 
 makedocs(
     sitename = "Kinetic.jl",
-    modules = [Kinetic, KitBase, KitML],
+    modules = [Kinetic, KitBase, KitML, FiniteMesh, Solaris],
     pages = Any[
         "Home"=>"index.md",
         "Installation"=>"install.md",
