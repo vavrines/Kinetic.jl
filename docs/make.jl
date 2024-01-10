@@ -6,7 +6,6 @@ Pkg.add("Documenter")
 using Documenter, Kinetic
 using Kinetic: KitBase, KitML
 using Kinetic.KitBase: ib_rh, ib_sod, ib_briowu, ib_cavity
-using Kinetic.KitBase: mesh_connectivity_2D, mesh_center_2D, mesh_area_2D
 using Kinetic.KitBase: newton_cotes, quadrature_weights
 using Kinetic.KitBase: em_coefficients, advection_flux, burgers_flux, euler_flux, euler_jacobi
 using Kinetic.KitBase: gauss_moments, mixture_gauss_moments, pdf_slope, mixture_pdf_slope, moments_conserve_slope, mixture_moments_conserve_slope
@@ -14,7 +13,7 @@ using Kinetic.KitBase: aap_hs_diffeq!
 using Kinetic.KitBase: plot_line, plot_contour, write_jld
 using Kinetic.KitML.Solaris
 using Kinetic.KitML.Solaris: load_data, save_model
-using Kinetic.KitBase.FiniteMesh: read_mesh
+using Kinetic.KitBase.FiniteMesh: read_mesh, mesh_connectivity_2D, mesh_cell_center, mesh_cell_area_2D
 
 tutorial_page = [
     "Examples" => "tutorial.md",
