@@ -38,7 +38,7 @@
 -->
 
 **Kinetic** is a computational fluid dynamics toolbox written in <a href="https://julialang.org"><img src="https://raw.githubusercontent.com/JuliaLang/julia-logo-graphics/master/images/julia.ico" width="16em">Julia.</a>
-It aims to furnish efficient modeling and simulation methodologies for fluid dynamics, augmented by the power of machine learning.
+It aims to furnish efficient modeling and simulation methodologies for collective transport of particles, augmented by the power of machine learning.
 Based on differentiable programming, mechanical and neural network models are fused and solved in a unified framework.
 Simultaneous 1-3 dimensional numerical simulations can be performed on CPUs and GPUs.
 
