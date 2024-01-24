@@ -1,10 +1,13 @@
 using Kinetic, Plots
 
 # initialization
-set, ctr, xface, yface, t = initialize("config.toml")
+set, ctr, xface, yface, t = Kinetic.initialize("config.toml")
 
 # solution algorithm
-t = solve!(set, ctr, xface, yface, t)
+t = Kinetic.solve!(set, ctr, xface, yface, t)
 
 # visualization
 plot(set, ctr)
+
+# short name
+転 == Kinetic
