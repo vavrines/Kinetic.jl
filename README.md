@@ -19,9 +19,8 @@
 | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/Kinetic.jl/ci.yml?branch=master&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitBase.jl/ci.yml?branch=main&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitML.jl/main.yml?branch=main&style=flat-square) | ![CI](https://img.shields.io/github/actions/workflow/status/vavrines/KitFort.jl/main.yml?branch=main&style=flat-square) |
 | [![codecov](https://img.shields.io/codecov/c/github/vavrines/Kinetic.jl?style=flat-square)](https://codecov.io/gh/vavrines/Kinetic.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitBase.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitBase.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitML.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitML.jl) | [![codecov](https://img.shields.io/codecov/c/github/vavrines/KitFort.jl?style=flat-square)](https://codecov.io/gh/vavrines/KitFort.jl) |
 ![](https://img.shields.io/github/last-commit/vavrines/Kinetic.jl?label=updated&style=flat-square) | ![](https://img.shields.io/github/last-commit/vavrines/KitBase.jl?style=flat-square&label=updated) | ![](https://img.shields.io/github/last-commit/vavrines/KitML.jl?style=flat-square&label=updated) | ![](https://img.shields.io/github/last-commit/vavrines/KitFort.jl?style=flat-square&label=updated)
-</div>
 -->
-
+</div>
 
 <!--
 ![](https://img.shields.io/github/v/tag/vavrines/Kinetic.jl?include_prereleases&label=latest%20version&logo=github&sort=semver)
