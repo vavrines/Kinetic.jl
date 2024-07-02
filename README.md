@@ -53,6 +53,7 @@ Depending on the specific use case, the main module is split into portable compo
 - [KitFort](https://github.com/vavrines/KitFort.jl): optional high-performance Fortran backend
 - [FluxReconstruction](https://github.com/vavrines/FluxReconstruction.jl): high-fidelity solution algorithms
 - [Langevin](https://github.com/vavrines/Langevin.jl): intrusive uncertainty quantification methods
+- [KitAMR](https://github.com/CFDML/KitAMR.jl): large-scale distributed computing facilities
 - [kineticpy](https://github.com/vavrines/kineticpy): Python interface built on top of [pyjulia](https://github.com/JuliaPy/pyjulia)
 
 ## Installation
