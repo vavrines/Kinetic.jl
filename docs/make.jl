@@ -16,6 +16,9 @@ using Kinetic.KitML.Solaris: load_data, save_model
 using Kinetic.KitBase.FiniteMesh
 using Kinetic.KitBase.FiniteMesh: read_mesh, mesh_connectivity_2D, mesh_cell_center, mesh_cell_area_2D
 
+DocMeta.setdocmeta!(KitBase, :DocTestSetup, :(using KitBase); recursive = true)
+DocMeta.setdocmeta!(KitML, :DocTestSetup, :(using KitML); recursive = true)
+
 tutorial_page = [
     "Examples" => "tutorial.md",
     "Advection diffusion" => "eg_advection.md",
