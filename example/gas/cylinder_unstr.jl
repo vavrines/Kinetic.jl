@@ -45,16 +45,7 @@ begin
     hR = KitBase.maxwellian(vs.u, vs.v, primR)
     bR = @. hR * gas.K / 2 / primR[end]
 
-    p = (
-        wL = wL,
-        wR = wR,
-        primL = primL,
-        primR = primR,
-        HL = hL,
-        HR = hR,
-        BL = bL,
-        BR = bR,
-    )
+    p = (wL = wL, wR = wR, primL = primL, primR = primR, HL = hL, HR = hR, BL = bL, BR = bR)
 
     fw = function (x, y, p)
         return p.wL

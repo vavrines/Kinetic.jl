@@ -70,7 +70,10 @@ end
 face = Array{KitBase.Interface2D1F}(undef, size(ps.facePoints, 1))
 for i in eachindex(face)
     len = norm(ps.points[ps.facePoints[i, 1], :] .- ps.points[ps.facePoints[i, 2], :])
-    n = KitBase.unit_normal(ps.points[ps.facePoints[i, 1], :], ps.points[ps.facePoints[i, 2], :])
+    n = KitBase.unit_normal(
+        ps.points[ps.facePoints[i, 1], :],
+        ps.points[ps.facePoints[i, 2], :],
+    )
 
     if !(-1 in ps.faceCells[i, :])
         n0 = ps.cellCenter[ps.faceCells[i, 2], :] .- ps.cellCenter[ps.faceCells[i, 1], :]

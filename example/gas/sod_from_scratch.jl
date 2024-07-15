@@ -278,7 +278,7 @@ function step!(w, prim, h, b, fwL, fhL, fbL, fwR, fhR, fbR, u, K, γ, μᵣ, ω,
     # update W^{n+1}
     @. w += (fwL - fwR) / dx
     prim .= conserve_prim(w, γ)
-    
+
     # calculate M^{n+1} and tau^{n+1}
     MH, MB = maxwellian(u, prim, K)
     τ = vhs_collision_time(prim, μᵣ, ω)
