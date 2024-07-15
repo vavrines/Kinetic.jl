@@ -5,16 +5,38 @@ Pkg.add("Documenter")
 
 using Documenter, Kinetic
 using Kinetic: KitBase, KitML
+
 using Kinetic.KitBase: ib_rh, ib_sod, ib_briowu, ib_cavity
+using Kinetic.KitBase:
+    meshgrid,
+    fortsign,
+    mat_split,
+    central_diff,
+    central_diff!,
+    upwind_diff,
+    upwind_diff!,
+    unstruct_diff,
+    legendre_quadrature,
+    octa_quadrature
 using Kinetic.KitBase: newton_cotes, triangle_weights
-using Kinetic.KitBase: em_coefficients, advection_flux, burgers_flux, euler_flux, euler_jacobi
-using Kinetic.KitBase: gauss_moments, mixture_gauss_moments, pdf_slope, mixture_pdf_slope, moments_conserve_slope, mixture_moments_conserve_slope
+using Kinetic.KitBase:
+    em_coefficients, advection_flux, burgers_flux, euler_flux, euler_jacobi
+using Kinetic.KitBase:
+    gauss_moments,
+    mixture_gauss_moments,
+    pdf_slope,
+    mixture_pdf_slope,
+    moments_conserve_slope,
+    mixture_moments_conserve_slope
 using Kinetic.KitBase: aap_hs_diffeq!
 using Kinetic.KitBase: plot_line, plot_contour, write_jld
+
 using Kinetic.KitML.Solaris
 using Kinetic.KitML.Solaris: load_data, save_model
+
 using Kinetic.KitBase.FiniteMesh
-using Kinetic.KitBase.FiniteMesh: read_mesh, mesh_connectivity_2D, mesh_cell_center, mesh_cell_area_2D
+using Kinetic.KitBase.FiniteMesh:
+    read_mesh, mesh_connectivity_2D, mesh_cell_center, mesh_cell_area_2D
 
 DocMeta.setdocmeta!(KitBase, :DocTestSetup, :(using KitBase); recursive = true)
 DocMeta.setdocmeta!(KitML, :DocTestSetup, :(using KitML); recursive = true)
