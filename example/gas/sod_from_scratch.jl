@@ -347,7 +347,7 @@ end
 
 #--- Solution ---#
 set = Setup(0.5, 0.2)
-ps = PSpace1D(0, 1, 100)
+ps = PSpace1D(0, 1, 200)
 vs = VSpace1D(-5.0, 5.0, 72)
 gas = Gas(Kn = 1e-4)
 ks = SolverSet(set, ps, vs, gas)
@@ -362,4 +362,6 @@ end
 
 #--- Visualization ---#
 sol = extract_sol(ps, ctr)
-plot(ks.ps.x, sol)
+plot(ks.ps.x, sol[:, 1], xlabel = "x", label = "density", lw = 1.5)
+plot!(ks.ps.x, sol[:, 2], label = "velocity", lw = 1.5)
+plot!(ks.ps.x, 0.5 .* sol[:, 1] ./ sol[:, 3], label = "pressure", lw = 1.5)
