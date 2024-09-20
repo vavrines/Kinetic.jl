@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Stepper · Kinetic.jl</title><meta name="title" content="Stepper · Kinetic.jl"/><meta property="og:title" content="Stepper · Kinetic.jl"/><meta property="twitter:title" content="Stepper · Kinetic.jl"/><meta name="description" content="Documentation for Kinetic.jl."/><meta property="og:description" content="Documentation for Kinetic.jl."/><meta property="twitter:description" content="Documentation for Kinetic.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="Kinetic.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">Kinetic.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../install/">Installation</a></li><li><a class="tocitem" href="../physics/">Physics</a></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Type</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../type_config/">Configuration</a></li><li><a class="tocitem" href="../type_setup/">Setup</a></li><li><a class="tocitem" href="../type_domain/">Domain</a></li><li><a class="tocitem" href="../type_velocity/">Velocity</a></li><li><a class="tocitem" href="../type_property/">Property</a></li><li><a class="tocitem" href="../type_ib/">Condition</a></li><li><a class="tocitem" href="../type_fvm/">FVM</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox"/><label class="tocitem" for="menuitem-5"><span class="docs-label">Solver</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../solver/">Framework</a></li><li><a class="tocitem" href="../solver_pre/">Preprocess</a></li><li><a class="tocitem" href="../solver_timestep/">Timestep</a></li><li><a class="tocitem" href="../solver_reconstruction/">Reconstruction</a></li><li><a class="tocitem" href="../solver_flux/">Flux</a></li><li><a class="tocitem" href="../solver_update/">Update</a></li><li><a class="tocitem" href="../solver_post/">Postprocess</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-6" type="checkbox"/><label class="tocitem" for="menuitem-6"><span class="docs-label">Tutorial</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../tutorial/">Examples</a></li><li><a class="tocitem" href="../eg_advection/">Advection diffusion</a></li><li><a class="tocitem" href="../eg_burgers/">Burgers</a></li><li><a class="tocitem" href="../eg_shock/">Shock tube</a></li><li><a class="tocitem" href="../eg_cavity/">Lid-driven cavity</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-7" type="checkbox"/><label class="tocitem" for="menuitem-7"><span class="docs-label">Parallelization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../parallel/">General</a></li><li><a class="tocitem" href="../para_thread/">Threading</a></li><li><a class="tocitem" href="../para_dist/">Distributed</a></li><li><a class="tocitem" href="../para_cuda/">CUDA</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-8" type="checkbox" checked/><label class="tocitem" for="menuitem-8"><span class="docs-label">Utility</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../api_io/">I / O</a></li><li><a class="tocitem" href="../api_math/">Math</a></li><li><a class="tocitem" href="../api_theory/">Theory</a></li><li><a class="tocitem" href="../api_geo/">Physical space</a></li><li><a class="tocitem" href="../api_phase/">Phase space</a></li><li><a class="tocitem" href="../api_config/">Configuration</a></li><li class="is-active"><a class="tocitem" href>Stepper</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-9" type="checkbox"/><label class="tocitem" for="menuitem-9"><span class="docs-label">SciML</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../kitml1/">KitML</a></li><li><a class="tocitem" href="../kitml2/">UBE</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-10" type="checkbox"/><label class="tocitem" for="menuitem-10"><span class="docs-label">Fortran</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../fortran1/">KitFort</a></li><li><a class="tocitem" href="../fortran2/">Benchmark</a></li></ul></li><li><a class="tocitem" href="../function_index/">Index</a></li><li><a class="tocitem" href="../python/">Python</a></li><li><a class="tocitem" href="../contribution/">Contribution</a></li><li><a class="tocitem" href="../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Utility</a></li><li class="is-active"><a href>Stepper</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Stepper</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/vavrines/Kinetic.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/vavrines/Kinetic.jl/blob/master/docs/src/api_step.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Stepper"><a class="docs-heading-anchor" href="#Stepper">Stepper</a><a id="Stepper-1"></a><a class="docs-heading-anchor-permalink" href="#Stepper" title="Permalink"></a></h1><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.step!" href="#KitBase.step!"><code>KitBase.step!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">step!(w, prim, fwL, fwR, a, dx, RES, AVG)
-</code></pre><p>Scalar</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_0f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(w, prim, fwL, fwR, γ, dx, RES, AVG)
-</code></pre><p>1D0F</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_0f.jl#L21">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>Scalar</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_0f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(w, prim, fwL, fwR, γ, dx, RES, AVG)
+</code></pre><p>1D0F</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_0f.jl#L21">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     fwL,
@@ -17,8 +17,8 @@
     RES,
     AVG
 )
-</code></pre><p>1D0F Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_0f.jl#L40">source</a></section><section><div><pre><code class="language-julia hljs">step!(w, prim, fw1, fw2, fw3, γ, Δs, dirc, RES, AVG)
-</code></pre><p>2D0F @ triangle</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_0f.jl#L95">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>1D0F Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_0f.jl#L40">source</a></section><section><div><pre><code class="language-julia hljs">step!(w, prim, fw1, fw2, fw3, γ, Δs, dirc, RES, AVG)
+</code></pre><p>2D0F @ triangle</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_0f.jl#L95">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     fwL,
@@ -31,7 +31,7 @@
     AVG,
     collision
 )
-</code></pre><p>2D0F @ quadrilateral</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_0f.jl#L126">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>2D0F @ quadrilateral</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_0f.jl#L126">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     f,
@@ -51,7 +51,7 @@
     AVG,
     collision
 )
-</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_1f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_1f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     f,
@@ -73,7 +73,7 @@
     AVG,
     collision
 )
-</code></pre><p>1D1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_1f.jl#L58">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>1D1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_1f.jl#L58">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     f,
@@ -93,7 +93,7 @@
     AVG,
     collision
 )
-</code></pre><p>1D1F3V fast spectral method</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_1f.jl#L119">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>1D1F3V fast spectral method</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_1f.jl#L119">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     h,
@@ -118,7 +118,7 @@
     AVG,
     collision
 )
-</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_1f.jl#L163">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_1f.jl#L163">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     f,
@@ -143,7 +143,7 @@
     AVG,
     collision
 )
-</code></pre><p>2D1F2V @ triangle</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_1f.jl#L228">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>2D1F2V @ triangle</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_1f.jl#L228">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     f,
@@ -167,7 +167,7 @@
     AVG,
     collision
 )
-</code></pre><p>2D1F3V fast spectral method</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_1f.jl#L295">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>2D1F3V fast spectral method</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_1f.jl#L295">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     h,
@@ -191,7 +191,7 @@
     AVG,
     collision
 )
-</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_2f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_2f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     h,
@@ -218,7 +218,7 @@
     AVG,
     collision
 )
-</code></pre><p>1D2F1V mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_2f.jl#L67">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>1D2F1V mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_2f.jl#L67">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     h,
@@ -249,7 +249,7 @@
     AVG,
     collision
 )
-</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_2f.jl#L176">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_2f.jl#L176">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     h,
@@ -278,7 +278,7 @@
     AVG,
     collision
 )
-</code></pre><p>2D2F2V @ triangle</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_2f.jl#L254">source</a></section><section><div><pre><code class="language-julia hljs">step!(
+</code></pre><p>2D2F2V @ triangle</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_2f.jl#L254">source</a></section><section><div><pre><code class="language-julia hljs">step!(
     w,
     prim,
     h,
@@ -310,7 +310,7 @@
     AVG,
     collision
 )
-</code></pre><p>1D3F1V Rykov</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_3f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, dx, dt, RES, AVG, collision)
+</code></pre><p>1D3F1V Rykov</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_3f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, dx, dt, RES, AVG, collision)
 step!(
     KS,
     cell,
@@ -323,7 +323,7 @@ step!(
     collision,
     isMHD
 )
-</code></pre><p>1D3F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_3f.jl#L118">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, dx, dt, RES, AVG)
+</code></pre><p>1D3F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_3f.jl#L118">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, dx, dt, RES, AVG)
 step!(KS, cell, faceL, faceR, dx, dt, RES, AVG, collision)
 step!(
     KS,
@@ -337,9 +337,9 @@ step!(
     collision,
     isMHD
 )
-</code></pre><p>1D4F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/step_4f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, p; ...)
+</code></pre><p>1D4F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/step_4f.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, p; ...)
 step!(KS, cell, faceL, faceR, p, coll; kwargs...)
-</code></pre><p>Update flow variables with finite volume method</p><p>1D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L7">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, faceD, faceU, p; ...)
+</code></pre><p>Update flow variables with finite volume method</p><p>1D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L7">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, cell, faceL, faceR, faceD, faceU, p; ...)
 step!(
     KS,
     cell,
@@ -351,21 +351,21 @@ step!(
     coll;
     kwargs...
 )
-</code></pre><p>2D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L25">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
+</code></pre><p>2D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L25">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
 step!(KS, vs, gas, cell, faceL, faceR, p, coll; st)
-</code></pre><p>1D scalar</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L43">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
+</code></pre><p>1D scalar</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L43">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
 step!(KS, vs, gas, cell, faceL, faceR, p, coll; st)
-</code></pre><p>1D0F</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L63">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
+</code></pre><p>1D0F</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L63">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
 step!(KS, vs, gas, cell, faceL, faceR, p, coll; st)
-</code></pre><p>1D0F mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L83">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
+</code></pre><p>1D0F mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L83">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
 step!(KS, vs, gas, cell, faceL, faceR, p, coll; st)
-</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L118">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
+</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L118">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
 step!(KS, vs, gas, cell, faceL, faceR, p, coll; st)
-</code></pre><p>1D1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L157">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
+</code></pre><p>1D1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L157">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
 step!(KS, vs, gas, cell, faceL, faceR, p, coll; st)
-</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L221">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
+</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L221">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, p; ...)
 step!(KS, vs, gas, cell, faceL, faceR, p, coll; st)
-</code></pre><p>1D2F1V mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L264">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, faceD, faceU, p; ...)
+</code></pre><p>1D2F1V mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L264">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, faceD, faceU, p; ...)
 step!(
     KS,
     vs,
@@ -379,7 +379,7 @@ step!(
     coll;
     st
 )
-</code></pre><p>2D0F</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L310">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, faceD, faceU, p; ...)
+</code></pre><p>2D0F</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L310">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, faceD, faceU, p; ...)
 step!(
     KS,
     vs,
@@ -393,7 +393,7 @@ step!(
     coll;
     st
 )
-</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L332">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, faceD, faceU, p; ...)
+</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L332">source</a></section><section><div><pre><code class="language-julia hljs">step!(KS, vs, gas, cell, faceL, faceR, faceD, faceU, p; ...)
 step!(
     KS,
     vs,
@@ -407,4 +407,4 @@ step!(
     coll;
     st
 )
-</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_step.jl#L378">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../api_config/">« Configuration</a><a class="docs-footer-nextpage" href="../kitml1/">KitML »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.6.0 on <span class="colophon-date" title="Friday 30 August 2024 13:53">Friday 30 August 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_step.jl#L378">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../api_config/">« Configuration</a><a class="docs-footer-nextpage" href="../kitml1/">KitML »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Friday 20 September 2024 09:23">Friday 20 September 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

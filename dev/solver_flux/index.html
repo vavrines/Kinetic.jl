@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Flux · Kinetic.jl</title><meta name="title" content="Flux · Kinetic.jl"/><meta property="og:title" content="Flux · Kinetic.jl"/><meta property="twitter:title" content="Flux · Kinetic.jl"/><meta name="description" content="Documentation for Kinetic.jl."/><meta property="og:description" content="Documentation for Kinetic.jl."/><meta property="twitter:description" content="Documentation for Kinetic.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="Kinetic.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">Kinetic.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../install/">Installation</a></li><li><a class="tocitem" href="../physics/">Physics</a></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Type</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../type_config/">Configuration</a></li><li><a class="tocitem" href="../type_setup/">Setup</a></li><li><a class="tocitem" href="../type_domain/">Domain</a></li><li><a class="tocitem" href="../type_velocity/">Velocity</a></li><li><a class="tocitem" href="../type_property/">Property</a></li><li><a class="tocitem" href="../type_ib/">Condition</a></li><li><a class="tocitem" href="../type_fvm/">FVM</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox" checked/><label class="tocitem" for="menuitem-5"><span class="docs-label">Solver</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../solver/">Framework</a></li><li><a class="tocitem" href="../solver_pre/">Preprocess</a></li><li><a class="tocitem" href="../solver_timestep/">Timestep</a></li><li><a class="tocitem" href="../solver_reconstruction/">Reconstruction</a></li><li class="is-active"><a class="tocitem" href>Flux</a></li><li><a class="tocitem" href="../solver_update/">Update</a></li><li><a class="tocitem" href="../solver_post/">Postprocess</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-6" type="checkbox"/><label class="tocitem" for="menuitem-6"><span class="docs-label">Tutorial</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../tutorial/">Examples</a></li><li><a class="tocitem" href="../eg_advection/">Advection diffusion</a></li><li><a class="tocitem" href="../eg_burgers/">Burgers</a></li><li><a class="tocitem" href="../eg_shock/">Shock tube</a></li><li><a class="tocitem" href="../eg_cavity/">Lid-driven cavity</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-7" type="checkbox"/><label class="tocitem" for="menuitem-7"><span class="docs-label">Parallelization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../parallel/">General</a></li><li><a class="tocitem" href="../para_thread/">Threading</a></li><li><a class="tocitem" href="../para_dist/">Distributed</a></li><li><a class="tocitem" href="../para_cuda/">CUDA</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-8" type="checkbox"/><label class="tocitem" for="menuitem-8"><span class="docs-label">Utility</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../api_io/">I / O</a></li><li><a class="tocitem" href="../api_math/">Math</a></li><li><a class="tocitem" href="../api_theory/">Theory</a></li><li><a class="tocitem" href="../api_geo/">Physical space</a></li><li><a class="tocitem" href="../api_phase/">Phase space</a></li><li><a class="tocitem" href="../api_config/">Configuration</a></li><li><a class="tocitem" href="../api_step/">Stepper</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-9" type="checkbox"/><label class="tocitem" for="menuitem-9"><span class="docs-label">SciML</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../kitml1/">KitML</a></li><li><a class="tocitem" href="../kitml2/">UBE</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-10" type="checkbox"/><label class="tocitem" for="menuitem-10"><span class="docs-label">Fortran</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../fortran1/">KitFort</a></li><li><a class="tocitem" href="../fortran2/">Benchmark</a></li></ul></li><li><a class="tocitem" href="../function_index/">Index</a></li><li><a class="tocitem" href="../python/">Python</a></li><li><a class="tocitem" href="../contribution/">Contribution</a></li><li><a class="tocitem" href="../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Solver</a></li><li class="is-active"><a href>Flux</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Flux</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/vavrines/Kinetic.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/vavrines/Kinetic.jl/blob/master/docs/src/solver_flux.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Evolution"><a class="docs-heading-anchor" href="#Evolution">Evolution</a><a id="Evolution-1"></a><a class="docs-heading-anchor-permalink" href="#Evolution" title="Permalink"></a></h1><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.evolve!" href="#KitBase.evolve!"><code>KitBase.evolve!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">evolve!(KS, ctr, face, dt; mode, bc)
-</code></pre><p>Numerical flux solver</p><p><strong>Arguments</strong></p><ul><li><code>KS</code>: SolverSet</li><li><code>ctr</code>: array of cell-centered solution</li><li><code>face</code>: array of cell interface</li><li><code>dt</code>: time step</li><li><code>mode</code>: flux solver</li><li><code>bc</code>: boundary condition</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_evolution.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">evolve!(KS, ctr, a1face, a2face, dt; mode, bc)
-</code></pre><p>Numerical flux solver</p><p><strong>Arguments</strong></p><ul><li><code>KS</code>: SolverSet</li><li><code>ctr</code>: array of cell-centered solution</li><li><code>a1face</code>: array of cell interface perpendicular to <code>x</code> axis</li><li><code>a2face</code>: array of cell interface perpendicular to <code>y</code> axis</li><li><code>dt</code>: time step</li><li><code>mode</code>: flux solver</li><li><code>bc</code>: boundary condition</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Solver/solver_evolution.jl#L360">source</a></section></article><p>The evolution solver calculate the interface numerical fluxes based on two neighbor cells. Different flux functions can be used with the option <code>model</code>.</p><ul><li>macroscopic: Godunov, Lax, Roe, HLL, wave-propagation</li><li>mesoscopic: upwind, central-upwind, gas-kinetic scheme</li></ul><p>The available flux solvers are listed as follows.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_lax!" href="#KitBase.flux_lax!"><code>KitBase.flux_lax!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_lax!(fw, wL, wR, γ, dt, dx)
-</code></pre><p>Lax-Friedrichs flux</p><p><em>P. D. Lax, Weak Solutions of Nonlinear Hyperbolic Equations and Their Numerical Computation, Commun. Pure and Applied Mathematics, 7, 159-193, 1954.</em></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_fluid.jl#L22">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_hll!" href="#KitBase.flux_hll!"><code>KitBase.flux_hll!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_hll!(fw, wL, wR, γ, dt)
+</code></pre><p>Numerical flux solver</p><p><strong>Arguments</strong></p><ul><li><code>KS</code>: SolverSet</li><li><code>ctr</code>: array of cell-centered solution</li><li><code>face</code>: array of cell interface</li><li><code>dt</code>: time step</li><li><code>mode</code>: flux solver</li><li><code>bc</code>: boundary condition</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_evolution.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">evolve!(KS, ctr, a1face, a2face, dt; mode, bc)
+</code></pre><p>Numerical flux solver</p><p><strong>Arguments</strong></p><ul><li><code>KS</code>: SolverSet</li><li><code>ctr</code>: array of cell-centered solution</li><li><code>a1face</code>: array of cell interface perpendicular to <code>x</code> axis</li><li><code>a2face</code>: array of cell interface perpendicular to <code>y</code> axis</li><li><code>dt</code>: time step</li><li><code>mode</code>: flux solver</li><li><code>bc</code>: boundary condition</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Solver/solver_evolution.jl#L360">source</a></section></article><p>The evolution solver calculate the interface numerical fluxes based on two neighbor cells. Different flux functions can be used with the option <code>model</code>.</p><ul><li>macroscopic: Godunov, Lax, Roe, HLL, wave-propagation</li><li>mesoscopic: upwind, central-upwind, gas-kinetic scheme</li></ul><p>The available flux solvers are listed as follows.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_lax!" href="#KitBase.flux_lax!"><code>KitBase.flux_lax!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_lax!(fw, wL, wR, γ, dt, dx)
+</code></pre><p>Lax-Friedrichs flux</p><p><em>P. D. Lax, Weak Solutions of Nonlinear Hyperbolic Equations and Their Numerical Computation, Commun. Pure and Applied Mathematics, 7, 159-193, 1954.</em></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_fluid.jl#L22">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_hll!" href="#KitBase.flux_hll!"><code>KitBase.flux_hll!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_hll!(fw, wL, wR, γ, dt)
 flux_hll!(fw, wL, wR, γ, dt, len)
-</code></pre><p>HLL flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_fluid.jl#L36">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_roe!" href="#KitBase.flux_roe!"><code>KitBase.flux_roe!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_roe!(KS, face, ctrL, ctrR, args)
-</code></pre><p>Roe&#39;s flux with entropy fix    </p><p><em>P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference Schemes, Journal of Computational Physics, 43, pp. 357-372.</em> (<em>cf. http://cfdbooks.com/cfdcodes.html</em>)</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_fluid.jl#L237">source</a></section><section><div><pre><code class="language-julia hljs">flux_roe!(face, ctrL, ctrR, gas, p)
+</code></pre><p>HLL flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_fluid.jl#L36">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_roe!" href="#KitBase.flux_roe!"><code>KitBase.flux_roe!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_roe!(KS, face, ctrL, ctrR, args)
+</code></pre><p>Roe&#39;s flux with entropy fix    </p><p><em>P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference Schemes, Journal of Computational Physics, 43, pp. 357-372.</em> (<em>cf. http://cfdbooks.com/cfdcodes.html</em>)</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_fluid.jl#L237">source</a></section><section><div><pre><code class="language-julia hljs">flux_roe!(face, ctrL, ctrR, gas, p)
 flux_roe!(face, ctrL, ctrR, gas, p, dt)
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_fluid.jl#L248">source</a></section><section><div><pre><code class="language-julia hljs">flux_roe!(fw, wL, wR, γ, dt)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_fluid.jl#L248">source</a></section><section><div><pre><code class="language-julia hljs">flux_roe!(fw, wL, wR, γ, dt)
 flux_roe!(fw, wL, wR, γ, dt, δs)
 flux_roe!(fw, wL, wR, γ, dt, δs, n)
-</code></pre><p><strong>Arguments</strong></p><ul><li><code>n</code>: unit face normal (L -&gt; R)</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_fluid.jl#L271">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_gks" href="#KitBase.flux_gks"><code>KitBase.flux_gks</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_gks(u, μ, dt)
+</code></pre><p><strong>Arguments</strong></p><ul><li><code>n</code>: unit face normal (L -&gt; R)</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_fluid.jl#L271">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_gks" href="#KitBase.flux_gks"><code>KitBase.flux_gks</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_gks(u, μ, dt)
 flux_gks(u, μ, dt, a)
 flux_gks(u, μ, dt, a, su)
-</code></pre><p>Gas kinetic scalar flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L109">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks(uL, uR, μ, dt, dxL, dxR)
+</code></pre><p>Gas kinetic scalar flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L109">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks(uL, uR, μ, dt, dxL, dxR)
 flux_gks(uL, uR, μ, dt, dxL, dxR, a)
 flux_gks(uL, uR, μ, dt, dxL, dxR, a, suL)
 flux_gks(uL, uR, μ, dt, dxL, dxR, a, suL, suR)
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L141">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_gks!" href="#KitBase.flux_gks!"><code>KitBase.flux_gks!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_gks!(KS, face, ctrL, ctrR, args)
-</code></pre><p>Gas kinetic flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L5">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(face, ctrL, ctrR, gas, p)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L141">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_gks!" href="#KitBase.flux_gks!"><code>KitBase.flux_gks!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_gks!(KS, face, ctrL, ctrR, args)
+</code></pre><p>Gas kinetic flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L5">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(face, ctrL, ctrR, gas, p)
 flux_gks!(face, ctrL, ctrR, gas, p, dt)
-</code></pre><p>Scalar</p><p><code>flux_gks</code> is called since there is no in-place operation for scalar</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L13">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(face, ctrL, ctrR, gas, p)
+</code></pre><p>Scalar</p><p><code>flux_gks</code> is called since there is no in-place operation for scalar</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L13">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(face, ctrL, ctrR, gas, p)
 flux_gks!(face, ctrL, ctrR, gas, p, dt)
-</code></pre><p>Gas</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L40">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(face, ctrL, ctrR, gas, p)
+</code></pre><p>Gas</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L40">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(face, ctrL, ctrR, gas, p)
 flux_gks!(face, ctrL, ctrR, gas, p, dt)
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L71">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(fw, w, inK, γ, μᵣ, ω)
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L71">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(fw, w, inK, γ, μᵣ, ω)
 flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
-</code></pre><p>Gas kinetic Navier-Stokes flux</p><p>Continuous case</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L225">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(fw, wL, wR, inK, γ, μᵣ, ω, dt, dxL, dxR, swL, swR)
-</code></pre><p>1D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L268">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
+</code></pre><p>Gas kinetic Navier-Stokes flux</p><p>Continuous case</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L225">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(fw, wL, wR, inK, γ, μᵣ, ω, dt, dxL, dxR, swL, swR)
+</code></pre><p>1D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L268">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
     fw,
     wL,
     wR,
@@ -44,7 +44,7 @@ flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
     swL,
     swR
 )
-</code></pre><p>Gas mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L364">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
+</code></pre><p>Gas mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L364">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
     fw,
     fh,
     wL,
@@ -60,7 +60,7 @@ flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
     swL,
     swR
 )
-</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L474">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
+</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L474">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
     fw,
     fh,
     fb,
@@ -77,7 +77,7 @@ flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
     swL,
     swR
 )
-</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L603">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
+</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L603">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
     fw,
     wL,
     wR,
@@ -92,7 +92,7 @@ flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
     swL,
     swR
 )
-</code></pre><p>2D &amp; 2D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L776">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
+</code></pre><p>2D &amp; 2D</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L776">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
     fw,
     wL,
     wR,
@@ -110,7 +110,7 @@ flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
     swL,
     swR
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L875">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L875">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
     fw,
     ff,
     wL,
@@ -128,7 +128,7 @@ flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
     swL,
     swR
 )
-</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L991">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
+</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L991">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(
     fw,
     fh,
     fb,
@@ -147,20 +147,20 @@ flux_gks!(fw, w, inK, γ, μᵣ, ω, sw)
     swL,
     swR
 )
-</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L1154">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(fw, wL, wR, inK, γ, μᵣ, ω, dt)
+</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L1154">source</a></section><section><div><pre><code class="language-julia hljs">flux_gks!(fw, wL, wR, inK, γ, μᵣ, ω, dt)
 flux_gks!(fw, wL, wR, inK, γ, μᵣ, ω, dt, swL)
 flux_gks!(fw, wL, wR, inK, γ, μᵣ, ω, dt, swL, swR)
-</code></pre><p>Flux reconstruction</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_gks.jl#L1404">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_kfvs!" href="#KitBase.flux_kfvs!"><code>KitBase.flux_kfvs!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_kfvs!(KS, face, ctrL, ctrR, args)
-</code></pre><p>Kinetic flux vector splitting (KFVS) flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(ff, fL, fR, u, dt)
+</code></pre><p>Flux reconstruction</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_gks.jl#L1404">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_kfvs!" href="#KitBase.flux_kfvs!"><code>KitBase.flux_kfvs!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_kfvs!(KS, face, ctrL, ctrR, args)
+</code></pre><p>Kinetic flux vector splitting (KFVS) flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(ff, fL, fR, u, dt)
 flux_kfvs!(ff, fL, fR, u, dt, sfL)
 flux_kfvs!(ff, fL, fR, u, dt, sfL, sfR)
-</code></pre><p>Kinetic flux vector splitting (KFVS) flux</p><p>1F1V for pure DOM</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L223">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, ω, dt)
+</code></pre><p>Kinetic flux vector splitting (KFVS) flux</p><p>1F1V for pure DOM</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L223">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, ω, dt)
 flux_kfvs!(fw, ff, fL, fR, u, ω, dt, sfL)
 flux_kfvs!(fw, ff, fL, fR, u, ω, dt, sfL, sfR)
-</code></pre><p>1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L253">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, ω, dt)
+</code></pre><p>1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L253">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, ω, dt)
 flux_kfvs!(fw, ff, fL, fR, u, ω, dt, sfL)
 flux_kfvs!(fw, ff, fL, fR, u, ω, dt, sfL, sfR)
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L287">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt)
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L287">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt)
 flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt, shL)
 flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt, shL, sbL)
 flux_kfvs!(
@@ -194,7 +194,7 @@ flux_kfvs!(
     shR,
     sbR
 )
-</code></pre><p>2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L321">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt)
+</code></pre><p>2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L321">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt)
 flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt, shL)
 flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, ω, dt, shL, sbL)
 flux_kfvs!(
@@ -228,7 +228,7 @@ flux_kfvs!(
     shR,
     sbR
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L366">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, fr, hL, bL, rL, hR, bR, rR, u, ω, dt)
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L366">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, fr, hL, bL, rL, hR, bR, rR, u, ω, dt)
 flux_kfvs!(
     fw,
     fh,
@@ -340,11 +340,11 @@ flux_kfvs!(
     sbR,
     srR
 )
-</code></pre><p>3F1V @ Rykov</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L410">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt)
+</code></pre><p>3F1V @ Rykov</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L410">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt)
 flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt, len)
 flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt, len, sfL)
 flux_kfvs!(fw, ff, fL, fR, u, v, w, ω, dt, len, sfL, sfR)
-</code></pre><p>1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L465">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
+</code></pre><p>1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L465">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
     fw,
     fh0,
     fh1,
@@ -542,7 +542,7 @@ flux_kfvs!(
     sh2R,
     sh3R
 )
-</code></pre><p>4F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L507">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
+</code></pre><p>4F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L507">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
     fw,
     fh0,
     fh1,
@@ -740,10 +740,10 @@ flux_kfvs!(
     sh2R,
     sh3R
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L570">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len)
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L570">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len)
 flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len, sfL)
 flux_kfvs!(fw, ff, fL, fR, u, v, ω, dt, len, sfL, sfR)
-</code></pre><p>1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L641">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, v, ω, dt, len)
+</code></pre><p>1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L641">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(fw, fh, fb, hL, bL, hR, bR, u, v, ω, dt, len)
 flux_kfvs!(
     fw,
     fh,
@@ -810,7 +810,7 @@ flux_kfvs!(
     shR,
     sbR
 )
-</code></pre><p>2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L681">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
+</code></pre><p>2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L681">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
     fw,
     fh0,
     fh1,
@@ -950,7 +950,7 @@ flux_kfvs!(
     sh1R,
     sh2R
 )
-</code></pre><p>3F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L732">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
+</code></pre><p>3F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L732">source</a></section><section><div><pre><code class="language-julia hljs">flux_kfvs!(
     fw,
     fh0,
     fh1,
@@ -1090,18 +1090,18 @@ flux_kfvs!(
     sh1R,
     sh2R
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kfvs.jl#L792">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_kcu!" href="#KitBase.flux_kcu!"><code>KitBase.flux_kcu!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_kcu!(KS, face, ctrL, ctrR, args)
-</code></pre><p>Kinetic central-upwind (KCU) flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kfvs.jl#L792">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_kcu!" href="#KitBase.flux_kcu!"><code>KitBase.flux_kcu!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_kcu!(KS, face, ctrL, ctrR, args)
+</code></pre><p>Kinetic central-upwind (KCU) flux</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
 flux_kcu!(face, ctrL, ctrR, gas, vs, p, dt)
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L9">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L9">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
 flux_kcu!(face, ctrL, ctrR, gas, vs, p, dt)
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L45">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L45">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
 flux_kcu!(face, ctrL, ctrR, gas, vs, p, dt)
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L108">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L108">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
 flux_kcu!(face, ctrL, ctrR, gas, vs, p, dt)
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L152">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L152">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(face, ctrL, ctrR, gas, vs, p)
 flux_kcu!(face, ctrL, ctrR, gas, vs, p, dt)
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L201">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L201">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     ff,
     wL,
@@ -1117,7 +1117,7 @@ flux_kcu!(face, ctrL, ctrR, gas, vs, p, dt)
     Pr,
     dt
 )
-</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L247">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L247">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     ff,
     wL,
@@ -1135,7 +1135,7 @@ flux_kcu!(face, ctrL, ctrR, gas, vs, p, dt)
     Kn,
     dt
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L317">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L317">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     ff,
     wL,
@@ -1172,7 +1172,7 @@ flux_kcu!(
     dt,
     len
 )
-</code></pre><p>1D1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L396">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>1D1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L396">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     fh,
     fb,
@@ -1191,7 +1191,7 @@ flux_kcu!(
     Pr,
     dt
 )
-</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L472">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L472">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     fh,
     fb,
@@ -1212,7 +1212,7 @@ flux_kcu!(
     Kn,
     dt
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L547">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L547">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     fh0,
     fh1,
@@ -1237,7 +1237,7 @@ flux_kcu!(
     Pr,
     dt
 )
-</code></pre><p>1D4F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L639">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>1D4F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L639">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     fh0,
     fh1,
@@ -1292,7 +1292,7 @@ flux_kcu!(
     dt,
     isMHD
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L729">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L729">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     ff,
     wL,
@@ -1310,7 +1310,7 @@ flux_kcu!(
     dt,
     len
 )
-</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L841">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L841">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     fh,
     fb,
@@ -1331,7 +1331,7 @@ flux_kcu!(
     dt,
     len
 )
-</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L912">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L912">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     fh0,
     fh1,
@@ -1355,7 +1355,7 @@ flux_kcu!(
     dt,
     len
 )
-</code></pre><p>2D3F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L989">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
+</code></pre><p>2D3F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L989">source</a></section><section><div><pre><code class="language-julia hljs">flux_kcu!(
     fw,
     fh0,
     fh1,
@@ -1408,7 +1408,7 @@ flux_kcu!(
     len,
     isMHD
 )
-</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_kcu.jl#L1074">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_ugks!" href="#KitBase.flux_ugks!"><code>KitBase.flux_ugks!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_ugks!(
+</code></pre><p>Mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_kcu.jl#L1074">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_ugks!" href="#KitBase.flux_ugks!"><code>KitBase.flux_ugks!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_ugks!(
     fw,
     fh,
     fb,
@@ -1523,7 +1523,7 @@ flux_ugks!(
     shR,
     sbR
 )
-</code></pre><p>Unified gas kinetic scheme (UGKS)</p><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_ugks.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_ugks!(
+</code></pre><p>Unified gas kinetic scheme (UGKS)</p><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_ugks.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_ugks!(
     fw,
     fh,
     fb,
@@ -1648,7 +1648,7 @@ flux_ugks!(
     shR,
     sbR
 )
-</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_ugks.jl#L117">source</a></section><section><div><pre><code class="language-julia hljs">flux_ugks!(
+</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_ugks.jl#L117">source</a></section><section><div><pre><code class="language-julia hljs">flux_ugks!(
     fw,
     fh0,
     fh1,
@@ -1865,8 +1865,8 @@ flux_ugks!(
     sh1R,
     sh2R
 )
-</code></pre><p>3F2V with AAP model</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_ugks.jl#L263">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_boundary_maxwell!" href="#KitBase.flux_boundary_maxwell!"><code>KitBase.flux_boundary_maxwell!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(fw, bc, w, inK, γ, dt, rot)
-</code></pre><p>Maxwell&#39;s diffusive boundary flux</p><p>1D continuum</p><p><strong>Arguments</strong></p><ul><li><code>fw</code>: fluxes for conservative variables</li><li><code>bc</code>: boundary condition for primitive variables</li><li><code>w</code>: conservative variables</li><li><code>inK</code>: internal degrees of freedom</li><li><code>dt</code>: time step</li><li><code>rot</code>: rotation indicator (1/-1)</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(
+</code></pre><p>3F2V with AAP model</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_ugks.jl#L263">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_boundary_maxwell!" href="#KitBase.flux_boundary_maxwell!"><code>KitBase.flux_boundary_maxwell!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(fw, bc, w, inK, γ, dt, rot)
+</code></pre><p>Maxwell&#39;s diffusive boundary flux</p><p>1D continuum</p><p><strong>Arguments</strong></p><ul><li><code>fw</code>: fluxes for conservative variables</li><li><code>bc</code>: boundary condition for primitive variables</li><li><code>w</code>: conservative variables</li><li><code>inK</code>: internal degrees of freedom</li><li><code>dt</code>: time step</li><li><code>rot</code>: rotation indicator (1/-1)</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L1">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(
     fw,
     a1,
     a2,
@@ -1879,7 +1879,7 @@ flux_ugks!(
     a9,
     rot
 )
-</code></pre><p>1D2F1V &amp; 1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L36">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(
+</code></pre><p>1D2F1V &amp; 1F3V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L36">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(
     fw,
     fh,
     fb,
@@ -1892,9 +1892,9 @@ flux_ugks!(
     dt,
     rot
 )
-</code></pre><p>1D2F1V mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L102">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(fw, bc, w, inK, γ, dt, len, rot)
-</code></pre><p>2D Continuum</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L148">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(fw, fh, bc, h, u, v, ω, dt, len, rot)
-</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L173">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(
+</code></pre><p>1D2F1V mixture</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L102">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(fw, bc, w, inK, γ, dt, len, rot)
+</code></pre><p>2D Continuum</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L148">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(fw, fh, bc, h, u, v, ω, dt, len, rot)
+</code></pre><p>2D1F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L173">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_maxwell!(
     fw,
     fh,
     fb,
@@ -1909,9 +1909,9 @@ flux_ugks!(
     len,
     rot
 )
-</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L205">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_boundary_specular!" href="#KitBase.flux_boundary_specular!"><code>KitBase.flux_boundary_specular!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_boundary_specular!(fw, ff, f, u, ω, dt)
-</code></pre><p>Specular reflection boundary flux</p><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L247">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_specular!(fw, fh, fb, h, b, u, ω, dt)
-</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_boundary.jl#L269">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_em!" href="#KitBase.flux_em!"><code>KitBase.flux_em!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_em!(
+</code></pre><p>2D2F2V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L205">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_boundary_specular!" href="#KitBase.flux_boundary_specular!"><code>KitBase.flux_boundary_specular!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_boundary_specular!(fw, ff, f, u, ω, dt)
+</code></pre><p>Specular reflection boundary flux</p><p>1D1F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L247">source</a></section><section><div><pre><code class="language-julia hljs">flux_boundary_specular!(fw, fh, fb, h, b, u, ω, dt)
+</code></pre><p>1D2F1V</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_boundary.jl#L269">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_em!" href="#KitBase.flux_em!"><code>KitBase.flux_em!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_em!(
     femL,
     femR,
     ELL,
@@ -1936,7 +1936,7 @@ flux_ugks!(
     ν,
     dt
 )
-</code></pre><p>Wave propagation method for Maxwell&#39;s equations</p><p><strong>Arguments</strong></p><ul><li><code>E, B, ϕ, ψ</code>: variables in hyperbolic Maxwell&#39;s equations</li><li><code>Ap, An</code>: eigenmatrix (A -&gt; A+ &amp; A-), eigenvalue (D)</li><li><code>dxL, dxR</code>: full size of left &amp; right cells</li><li><code>sol</code>: speed of light</li><li><code>χₑ, νᵦ</code>: auxiliary parameters</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_em.jl#L1">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_emx!" href="#KitBase.flux_emx!"><code>KitBase.flux_emx!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_emx!(
+</code></pre><p>Wave propagation method for Maxwell&#39;s equations</p><p><strong>Arguments</strong></p><ul><li><code>E, B, ϕ, ψ</code>: variables in hyperbolic Maxwell&#39;s equations</li><li><code>Ap, An</code>: eigenmatrix (A -&gt; A+ &amp; A-), eigenvalue (D)</li><li><code>dxL, dxR</code>: full size of left &amp; right cells</li><li><code>sol</code>: speed of light</li><li><code>χₑ, νᵦ</code>: auxiliary parameters</li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_em.jl#L1">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_emx!" href="#KitBase.flux_emx!"><code>KitBase.flux_emx!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_emx!(
     femL,
     femR,
     femLU,
@@ -1967,7 +1967,7 @@ flux_ugks!(
     ν,
     dt
 )
-</code></pre><p>Wave propagation method for 2D Maxwell&#39;s equations in x direction</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_em.jl#L110">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_emy!" href="#KitBase.flux_emy!"><code>KitBase.flux_emy!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_emy!(
+</code></pre><p>Wave propagation method for 2D Maxwell&#39;s equations in x direction</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_em.jl#L110">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="KitBase.flux_emy!" href="#KitBase.flux_emy!"><code>KitBase.flux_emy!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">flux_emy!(
     femL,
     femR,
     femRU,
@@ -1998,4 +1998,4 @@ flux_ugks!(
     ν,
     dt
 )
-</code></pre><p>Wave propagation method for 2D Maxwell&#39;s equations in y direction</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/b90ec687d95006325bf051be8c7c7deebe485a9f/src/Flux/flux_em.jl#L237">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../solver_reconstruction/">« Reconstruction</a><a class="docs-footer-nextpage" href="../solver_update/">Update »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.6.0 on <span class="colophon-date" title="Friday 30 August 2024 13:53">Friday 30 August 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre><p>Wave propagation method for 2D Maxwell&#39;s equations in y direction</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/vavrines/KitBase.jl/blob/6c5abf06ed8997559aeafff3c4d1c83d5cc28171/src/Flux/flux_em.jl#L237">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../solver_reconstruction/">« Reconstruction</a><a class="docs-footer-nextpage" href="../solver_update/">Update »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Friday 20 September 2024 09:23">Friday 20 September 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
