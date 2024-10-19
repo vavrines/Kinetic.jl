@@ -9,17 +9,17 @@ plot(ks, ctr)
 using KitBase: ib_cavity
 using KitBase.ProgressMeter: @showprogress
 
-set = Setup(
-    case = "cacity",
-    space = "2d2f2v",
-    boundary = ["maxwell", "maxwell", "maxwell", "maxwell"],
-    limiter = "minmod",
-    cfl = 0.5,
-    maxTime = 1,
+set = Setup(;
+    case="cacity",
+    space="2d2f2v",
+    boundary=["maxwell", "maxwell", "maxwell", "maxwell"],
+    limiter="minmod",
+    cfl=0.5,
+    maxTime=1,
 )
 ps = PSpace2D(0, 1, 45, 0, 1, 45)
 vs = VSpace2D(-5, 5, 28, -5, 5, 28)
-gas = Gas(Kn = 0.075, K = 1.0)
+gas = Gas(; Kn=0.075, K=1.0)
 ib = IB2F(ib_cavity(set, ps, vs, gas)...)
 
 ks = SolverSet(set, ps, vs, gas, ib)
@@ -30,7 +30,7 @@ dt = timestep(ks, ctr, 0.0)
 nt = ks.set.maxTime ÷ dt |> Int
 res = zeros(4)
 
-@showprogress for iter = 1:nt
+@showprogress for iter in 1:nt
     evolve!(ks, ctr, a1face, a2face, dt)
     update!(ks, ctr, a1face, a2face, dt, res)
 
@@ -42,9 +42,9 @@ end
 plot(ks, ctr)
 
 #--- lower-level backend ---#
-@showprogress for iter = 1:nt
-    @inbounds Threads.@threads for j = 1:ks.ps.ny
-        for i = 2:ks.ps.nx
+@showprogress for iter in 1:nt
+    @inbounds Threads.@threads for j in 1:ks.ps.ny
+        for i in 2:ks.ps.nx
             KitBase.flux_kfvs!(
                 a1face[i, j].fw,
                 a1face[i, j].fh,
@@ -65,8 +65,8 @@ plot(ks, ctr)
     # vertical flux
     vn = ks.vs.v
     vt = -ks.vs.u
-    @inbounds Threads.@threads for j = 2:ks.ps.ny
-        for i = 1:ks.ps.nx
+    @inbounds Threads.@threads for j in 2:ks.ps.ny
+        for i in 1:ks.ps.nx
             KitBase.flux_kfvs!(
                 a2face[i, j].fw,
                 a2face[i, j].fh,
@@ -86,7 +86,7 @@ plot(ks, ctr)
     end
 
     # boundary flux
-    @inbounds Threads.@threads for j = 1:ks.ps.ny
+    @inbounds Threads.@threads for j in 1:ks.ps.ny
         KitBase.flux_boundary_maxwell!(
             a1face[1, j].fw,
             a1face[1, j].fh,
@@ -120,7 +120,7 @@ plot(ks, ctr)
         )
     end
 
-    @inbounds Threads.@threads for i = 1:ks.ps.nx
+    @inbounds Threads.@threads for i in 1:ks.ps.nx
         KitBase.flux_boundary_maxwell!(
             a2face[i, 1].fw,
             a2face[i, 1].fh,
@@ -157,8 +157,8 @@ plot(ks, ctr)
     end
 
     # update
-    @inbounds Threads.@threads for j = 1:ks.ps.ny
-        for i = 1:ks.ps.nx
+    @inbounds Threads.@threads for j in 1:ks.ps.ny
+        for i in 1:ks.ps.nx
             KitBase.step!(
                 ctr[i, j].w,
                 ctr[i, j].prim,

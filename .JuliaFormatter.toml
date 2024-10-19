@@ -1,1 +1,8 @@
+always_for_in = true
+remove_extra_newlines = true
+always_use_return = true
+whitespace_in_kwargs = false
 format_docstrings = true
+separate_kwargs_with_semicolon = true
+disallow_single_arg_nesting = true
+format_markdown = false

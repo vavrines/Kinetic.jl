@@ -38,8 +38,8 @@ using Kinetic.KitBase.FiniteMesh
 using Kinetic.KitBase.FiniteMesh:
     read_mesh, mesh_connectivity_2D, mesh_cell_center, mesh_cell_area_2D
 
-DocMeta.setdocmeta!(KitBase, :DocTestSetup, :(using KitBase); recursive = true)
-DocMeta.setdocmeta!(KitML, :DocTestSetup, :(using KitML); recursive = true)
+DocMeta.setdocmeta!(KitBase, :DocTestSetup, :(using KitBase); recursive=true)
+DocMeta.setdocmeta!(KitML, :DocTestSetup, :(using KitML); recursive=true)
 
 tutorial_page = [
     "Examples" => "tutorial.md",
@@ -90,12 +90,12 @@ ml_page = ["KitML" => "kitml1.md", "UBE" => "kitml2.md"]
 
 fortran_page = ["KitFort" => "fortran1.md", "Benchmark" => "fortran2.md"]
 
-format = Documenter.HTML(assets = ["assets/favicon.ico"], collapselevel = 1)
+format = Documenter.HTML(; assets=["assets/favicon.ico"], collapselevel=1)
 
-makedocs(
-    sitename = "Kinetic.jl",
-    modules = [Kinetic, KitBase, KitML, FiniteMesh, Solaris],
-    pages = Any[
+makedocs(;
+    sitename="Kinetic.jl",
+    modules=[Kinetic, KitBase, KitML, FiniteMesh, Solaris],
+    pages=Any[
         "Home"=>"index.md",
         "Installation"=>"install.md",
         "Physics"=>"physics.md",
@@ -111,8 +111,8 @@ makedocs(
         "Contribution"=>"contribution.md",
         "Reference"=>"reference.md",
     ],
-    format = format,
-    checkdocs = :none,
+    format=format,
+    checkdocs=:none,
 )
 
-deploydocs(repo = "github.com/vavrines/Kinetic.jl.git")
+deploydocs(; repo="github.com/vavrines/Kinetic.jl.git")

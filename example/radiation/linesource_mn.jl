@@ -72,8 +72,8 @@ begin
     s2 = 0.03^2
     flr = 1e-4
     init_field(x, y) = max(flr, 1.0 / (4.0 * pi * s2) * exp(-(x^2 + y^2) / 4.0 / s2))
-    for j = 1:nx
-        for i = 1:ny
+    for j in 1:nx
+        for i in 1:ny
             y = y0 + (i - 0.5) * dy
             x = x0 + (j - 0.5) * dx
             # only zeroth order moment is non-zero
@@ -86,10 +86,10 @@ global t = 0.0
 flux1 = zeros(ne, nx + 1, ny)
 flux2 = zeros(ne, nx, ny + 1)
 
-@showprogress for iter = 1:20
+@showprogress for iter in 1:20
     # regularization
-    Threads.@threads for j = 1:ny
-        for i = 1:nx
+    Threads.@threads for j in 1:ny
+        for i in 1:nx
             res = KitBase.optimize_closure(
                 α[:, i, j],
                 m,
@@ -110,8 +110,8 @@ flux2 = zeros(ne, nx, ny + 1)
 
     # flux
     fη1 = zeros(nq)
-    for j = 1:ny
-        for i = 2:nx
+    for j in 1:ny
+        for i in 2:nx
             KitBase.flux_kfvs!(
                 fη1,
                 KitBase.maxwell_boltzmann_dual.(α[:, i-1, j]' * m)[:],
@@ -127,8 +127,8 @@ flux2 = zeros(ne, nx, ny + 1)
     end
 
     fη2 = zeros(nq)
-    for i = 1:nx
-        for j = 2:ny
+    for i in 1:nx
+        for j in 2:ny
             KitBase.flux_kfvs!(
                 fη2,
                 KitBase.maxwell_boltzmann_dual.(α[:, i, j-1]' * m)[:],
@@ -144,9 +144,9 @@ flux2 = zeros(ne, nx, ny + 1)
     end
 
     # update
-    for j = 2:ny-1
-        for i = 2:nx-1
-            for q = 1:1
+    for j in 2:ny-1
+        for i in 2:nx-1
+            for q in 1:1
                 phi[q, i, j] =
                     phi[q, i, j] +
                     (flux1[q, i, j] - flux1[q, i+1, j]) / dx +
@@ -154,7 +154,7 @@ flux2 = zeros(ne, nx, ny + 1)
                     (SigmaS[i, j] * phi[q, i, j] - SigmaT[i, j] * phi[q, i, j]) * dt
             end
 
-            for q = 2:ne
+            for q in 2:ne
                 phi[q, i, j] =
                     phi[q, i, j] +
                     (flux1[q, i, j] - flux1[q, i+1, j]) / dx +

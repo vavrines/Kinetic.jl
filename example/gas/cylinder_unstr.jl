@@ -45,7 +45,7 @@ begin
     hR = KitBase.maxwellian(vs.u, vs.v, primR)
     bR = @. hR * gas.K / 2 / primR[end]
 
-    p = (wL = wL, wR = wR, primL = primL, primR = primR, HL = hL, HR = hR, BL = bL, BR = bR)
+    p = (wL=wL, wR=wR, primL=primL, primR=primR, HL=hL, HR=hR, BL=bL, BR=bR)
 
     fw = function (x, y, p)
         return p.wL
@@ -65,7 +65,7 @@ ctr, face = KitBase.init_fvm(ks, ks.ps)
 dt = KitBase.timestep(ks, ctr, 0.0)
 nt = ks.set.maxTime ÷ dt |> Int
 
-@showprogress for iter = 1:nt
+@showprogress for iter in 1:nt
     @inbounds Threads.@threads for i in eachindex(face)
         vn = ks.vs.u .* face[i].n[1] .+ ks.vs.v .* face[i].n[2]
         vt = ks.vs.v .* face[i].n[1] .- ks.vs.u .* face[i].n[2]
@@ -118,7 +118,7 @@ nt = ks.set.maxTime ÷ dt |> Int
     sumavg = zeros(4)
     @inbounds Threads.@threads for i in eachindex(ctr)
         if ps.cellType[i] in (0, 2)
-            dirc = [sign(dot(ctr[i].n[j], face[ps.cellFaces[i, j]].n)) for j = 1:3]
+            dirc = [sign(dot(ctr[i].n[j], face[ps.cellFaces[i, j]].n)) for j in 1:3]
 
             KitBase.step!(
                 ctr[i].w,

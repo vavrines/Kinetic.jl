@@ -28,7 +28,7 @@ end
 ctr = Array{KitBase.ControlVolumeUS1F}(undef, size(ps.cellid, 1))
 for i in eachindex(ctr)
     n = Vector{Float64}[]
-    for j = 1:3
+    for j in 1:3
         push!(
             n,
             KitBase.unit_normal(
@@ -92,7 +92,7 @@ end
 
 dt = 1.2 / 150 * cfl
 nt = tspan[2] ÷ dt |> Int
-@showprogress for iter = 1:nt
+@showprogress for iter in 1:nt
     @inbounds Threads.@threads for i in eachindex(face)
         velo = vs.u[:, 1] .* face[i].n[1] + vs.u[:, 2] .* face[i].n[2]
         if !(-1 in ps.faceCells[i, :])
@@ -108,7 +108,7 @@ nt = tspan[2] ÷ dt |> Int
 
     @inbounds Threads.@threads for i in eachindex(ctr)
         if ps.cellType[i] == 0
-            for j = 1:3
+            for j in 1:3
                 dirc = sign(dot(ctr[i].n[j], face[ps.cellFaces[i, j]].n))
                 @. ctr[i].f -=
                     dirc * face[ps.cellFaces[i, j]].ff * face[ps.cellFaces[i, j]].len /

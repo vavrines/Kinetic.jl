@@ -180,7 +180,7 @@ sound_speed(prim, γ) = (0.5 * γ / prim[end])^0.5
 Calculate fluxes
 """
 function evolve!(KS, ctr, face, dt;)
-    @inbounds for i = 2:KS.ps.nx
+    @inbounds for i in 2:KS.ps.nx
         flux_kfvs!(
             face[i].fw,
             face[i].fh,
@@ -230,7 +230,7 @@ Calculate time step
 function timestep(KS, ctr)
     tmax = 0.0
 
-    @inbounds for i = 1:KS.ps.nx
+    @inbounds for i in 1:KS.ps.nx
         prim = ctr[i].prim
         sos = sound_speed(prim, KS.gas.γ)
         vmax = max(KS.vs.u1, abs(prim[2])) + sos
@@ -246,7 +246,7 @@ end
 Update macroscopic and mesoscopic variables
 """
 function update!(KS, ctr, face, dt)
-    @inbounds for i = 2:KS.ps.nx-1
+    @inbounds for i in 2:KS.ps.nx-1
         step!(
             ctr[i].w,
             ctr[i].prim,
@@ -349,19 +349,19 @@ end
 set = Setup(0.5, 0.2)
 ps = PSpace1D(0, 1, 200)
 vs = VSpace1D(-5.0, 5.0, 72)
-gas = Gas(Kn = 1e-4)
+gas = Gas(; Kn=1e-4)
 ks = SolverSet(set, ps, vs, gas)
 ctr, face = init_fvm(ks)
 dt = timestep(ks, ctr)
 nt = ks.set.maxTime ÷ dt |> Int
 # main loop
-for iter = 1:nt
+for iter in 1:nt
     evolve!(ks, ctr, face, dt)
     update!(ks, ctr, face, dt)
 end
 
 #--- Visualization ---#
 sol = extract_sol(ps, ctr)
-plot(ks.ps.x, sol[:, 1], xlabel = "x", label = "density", lw = 1.5)
-plot!(ks.ps.x, sol[:, 2], label = "velocity", lw = 1.5)
-plot!(ks.ps.x, 0.5 .* sol[:, 1] ./ sol[:, 3], label = "pressure", lw = 1.5)
+plot(ks.ps.x, sol[:, 1]; xlabel="x", label="density", lw=1.5)
+plot!(ks.ps.x, sol[:, 2]; label="velocity", lw=1.5)
+plot!(ks.ps.x, 0.5 .* sol[:, 1] ./ sol[:, 3]; label="pressure", lw=1.5)

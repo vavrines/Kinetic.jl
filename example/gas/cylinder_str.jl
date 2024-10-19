@@ -3,17 +3,17 @@ using KitBase.ProgressMeter: @showprogress
 pyplot()
 
 begin
-    set = Setup(
-        case = "cylinder",
-        space = "2d2f2v",
-        boundary = ["maxwell", "extra", "mirror", "mirror"],
-        limiter = "minmod",
-        cfl = 0.5,
-        maxTime = 2.0, # time
+    set = Setup(;
+        case="cylinder",
+        space="2d2f2v",
+        boundary=["maxwell", "extra", "mirror", "mirror"],
+        limiter="minmod",
+        cfl=0.5,
+        maxTime=2.0, # time
     )
     ps = CSpace2D(1.0, 6.0, 30, 0.0, π, 50, 1, 1)
     vs = VSpace2D(-10.0, 10.0, 48, -10.0, 10.0, 48)
-    gas = Gas(Kn = 1e-3, Ma = 4.0, K = 1.0)
+    gas = Gas(; Kn=1e-3, Ma=4.0, K=1.0)
 
     prim0 = [1.0, 0.0, 0.0, 1.0]
     prim1 = [1.0, gas.Ma * sound_speed(1.0, gas.γ), 0.0, 1.0]
@@ -43,11 +43,11 @@ t = 0.0
 dt = timestep(ks, ctr, 0.0)
 nt = ks.set.maxTime ÷ dt |> Int
 res = zeros(4)
-@showprogress for iter = 1:nt
+@showprogress for iter in 1:nt
     evolve!(ks, ctr, a1face, a2face, dt)
     update!(ks, ctr, a1face, a2face, dt, res)
 
-    for j = ks.ps.nθ÷2+1:ks.ps.nθ
+    for j in ks.ps.nθ÷2+1:ks.ps.nθ
         ctr[ks.ps.nr+1, j].w .= ks.ib.fw(6, 0)
         ctr[ks.ps.nr+1, j].prim .= conserve_prim(ctr[ks.ps.nr+1, j].w, ks.gas.γ)
         ctr[ks.ps.nr+1, j].sw .= 0.0
@@ -72,7 +72,7 @@ begin
     contourf(
         ps.x[1:ks.ps.nr, 1:ks.ps.nθ],
         ps.y[1:ks.ps.nr, 1:ks.ps.nθ],
-        sol[:, :, 4],
-        ratio = 1,
+        sol[:, :, 4];
+        ratio=1,
     )
 end

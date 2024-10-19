@@ -13,8 +13,7 @@ begin
     γ = heat_capacity_ratio(inK, 2)
     set = set_setup(D)
     pSpace = PSpace1D(x0, x1, nx, nxg)
-    vSpace =
-        VSpace2D(umin, umax, nu, vmin, vmax, nv; type = vMeshType, ngu = nug, ngv = nvg)
+    vSpace = VSpace2D(umin, umax, nu, vmin, vmax, nv; type=vMeshType, ngu=nug, ngv=nvg)
 
     μᵣ = ref_vhs_vis(knudsen, alphaRef, omegaRef)
     gas = set_property(D)
@@ -33,18 +32,7 @@ begin
 
     bc = zeros(4)
 
-    p = (
-        x0 = x0,
-        x1 = x1,
-        wL = wL,
-        wR = wR,
-        primL = primL,
-        primR = primR,
-        HL = HL,
-        HR = HR,
-        BL = BL,
-        BR = BR,
-    )
+    p = (x0=x0, x1=x1, wL=wL, wR=wR, primL=primL, primR=primR, HL=HL, HR=HR, BL=BL, BR=BR)
 
     fw = function (x, p)
         if x <= (p.x0 + p.x1) / 2
@@ -87,7 +75,7 @@ begin
         ctr[i] = ControlVolume(w, prim, h, b, 2)
     end
 
-    for i = 1:ks.pSpace.nx+1
+    for i in 1:ks.pSpace.nx+1
         fw = deepcopy(ks.ib.fw(ks.ps.x[1], ks.ib.p))
         ff = deepcopy(ks.ib.ff(ks.ps.x[1], ks.ib.p)[1])
         face[i] = Interface(fw, ff, ff, 2)
@@ -105,7 +93,7 @@ end
 
 # There're no default solver for 1D simulation with 2D setting
 # Let's do it manually
-@showprogress for iter = 1:nt
+@showprogress for iter in 1:nt
     #Kinetic.reconstruct!(ks, ctr)
 
     @inbounds Threads.@threads for i in eachindex(face)
@@ -125,7 +113,7 @@ end
         )
     end
 
-    @inbounds Threads.@threads for i = 1:ks.pSpace.nx
+    @inbounds Threads.@threads for i in 1:ks.pSpace.nx
         #--- store W^n and calculate shakhov term ---#
         w_old = deepcopy(ctr[i].w)
 
@@ -141,23 +129,19 @@ end
         #--- update distribution function ---#
         for q in axes(MH, 2), p in axes(MH, 1)
             ctr[i].h[p, q] =
-                (
-                    ctr[i].h[p, q] +
-                    (face[i].fh[p, q] - face[i+1].fh[p, q]) / ks.ps.dx[i] +
-                    dt / τ * MH[p, q]
-                ) / (1.0 + dt / τ)
+                (ctr[i].h[p, q] +
+                 (face[i].fh[p, q] - face[i+1].fh[p, q]) / ks.ps.dx[i] +
+                 dt / τ * MH[p, q]) / (1.0 + dt / τ)
             ctr[i].b[p, q] =
-                (
-                    ctr[i].b[p, q] +
-                    (face[i].fb[p, q] - face[i+1].fb[p, q]) / ks.ps.dx[i] +
-                    dt / τ * MB[p, q]
-                ) / (1.0 + dt / τ)
+                (ctr[i].b[p, q] +
+                 (face[i].fb[p, q] - face[i+1].fb[p, q]) / ks.ps.dx[i] +
+                 dt / τ * MB[p, q]) / (1.0 + dt / τ)
         end
     end
 end
 
 sol = zeros(ks.pSpace.nx, 10)
-for i = 1:ks.pSpace.nx
+for i in 1:ks.pSpace.nx
     sol[i, 1:3] = ctr[i].prim[1:3]
     sol[i, 4] = 1.0 / ctr[i].prim[4]
 end
@@ -172,9 +156,7 @@ u1d = VSpace1D(umin, umax, nu)
 f = zeros(ks.vSpace.nv)
 for j in axes(ctr[1].h, 2), i in axes(ctr[1].h, 1)
     f[j] =
-        0.5 * (
-            sum(@. u1d.weights * ctr[ks.pSpace.nx÷2].h[:, j]) +
-            sum(@. u1d.weights * ctr[ks.pSpace.nx÷2+1].h[:, j])
-        )
+        0.5 * (sum(@. u1d.weights * ctr[ks.pSpace.nx÷2].h[:, j]) +
+         sum(@. u1d.weights * ctr[ks.pSpace.nx÷2+1].h[:, j]))
 end
 plot(ks.vSpace.v[end÷2, :, 1], f)

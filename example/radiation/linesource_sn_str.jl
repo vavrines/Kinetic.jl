@@ -34,11 +34,11 @@ phi = zeros(nq, nx, ny)
 s2 = 0.03^2
 flr = 1e-4
 init_field(x, y) = max(flr, 1.0 / (4.0 * pi * s2) * exp(-(x^2 + y^2) / 4.0 / s2))
-for j = 1:nx
-    for i = 1:ny
+for j in 1:nx
+    for i in 1:ny
         y = y0 + dy / 2 + (i - 3) * dy
         x = x0 + dx / 2 + (j - 3) * dx
-        for q = 1:nq
+        for q in 1:nq
             phi[q, i, j] = init_field(x, y) / 4.0 / π
         end
     end
@@ -50,21 +50,21 @@ global t = 0.0
 flux1 = zeros(nq, nx + 1, ny)
 flux2 = zeros(nq, nx, ny + 1)
 
-@showprogress for iter = 1:50
-    for i = 2:nx, j = 1:ny
+@showprogress for iter in 1:50
+    for i in 2:nx, j in 1:ny
         tmp = @view flux1[:, i, j]
         flux_kfvs!(tmp, phi[:, i-1, j], phi[:, i, j], points[:, 1], dt)
     end
-    for i = 1:nx, j = 2:ny
+    for i in 1:nx, j in 2:ny
         tmp = @view flux2[:, i, j]
         flux_kfvs!(tmp, phi[:, i, j-1], phi[:, i, j], points[:, 2], dt)
     end
 
-    for j = 1:ny, i = 1:nx
+    for j in 1:ny, i in 1:nx
         integral = discrete_moments(phi[:, i, j], weights)
         integral *= 1.0 / 4.0 / pi
 
-        for q = 1:nq
+        for q in 1:nq
             phi[q, i, j] =
                 phi[q, i, j] +
                 (flux1[q, i, j] - flux1[q, i+1, j]) / dx +
@@ -77,7 +77,7 @@ flux2 = zeros(nq, nx, ny + 1)
 end
 
 ρ = zeros(nx, ny)
-for i = 1:nx, j = 1:ny
+for i in 1:nx, j in 1:ny
     ρ[i, j] = discrete_moments(phi[:, i, j], weights)
 end
 

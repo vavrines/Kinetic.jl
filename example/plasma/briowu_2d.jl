@@ -30,9 +30,9 @@ begin
         ve0,
         ve1,
         nv;
-        type = vMeshType,
-        ngu = nug,
-        ngv = nvg,
+        type=vMeshType,
+        ngu=nug,
+        ngv=nvg,
     )
     plasma = Plasma1D(
         [knudsen, kne],
@@ -114,24 +114,24 @@ begin
         bcR = zeros(5, 2)
 
         p = (
-            x0 = x0,
-            x1 = x1,
-            wL = wL,
-            wR = wR,
-            primL = primL,
-            primR = primR,
-            h0L = h0L,
-            h1L = h1L,
-            h2L = h2L,
-            h0R = h0R,
-            h1R = h1R,
-            h2R = h2R,
-            EL = EL,
-            ER = ER,
-            BL = BL,
-            BR = BR,
-            lorenzL = lorenzL,
-            lorenzR = lorenzR,
+            x0=x0,
+            x1=x1,
+            wL=wL,
+            wR=wR,
+            primL=primL,
+            primR=primR,
+            h0L=h0L,
+            h1L=h1L,
+            h2L=h2L,
+            h0R=h0R,
+            h1R=h1R,
+            h2R=h2R,
+            EL=EL,
+            ER=ER,
+            BL=BL,
+            BR=BR,
+            lorenzL=lorenzL,
+            lorenzR=lorenzR,
         )
 
         fw = function (x, p)
@@ -190,14 +190,14 @@ begin
     res = zeros(5, 2)
 end
 
-@showprogress for iter = 1:nt
+@showprogress for iter in 1:nt
     reconstruct!(ks, ctr)
-    evolve!(ks, ctr, face, dt; mode = :kcu, isPlasma = :true)
-    update!(ks, ctr, face, dt, res, isMHD = true)
+    evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=:true)
+    update!(ks, ctr, face, dt, res; isMHD=true)
 end
 
 soluiton = zeros(ks.ps.nx, 10, 2)
-for i = 1:ks.ps.nx
+for i in 1:ks.ps.nx
     soluiton[i, 1, 1] = ctr[i].prim[1, 1]
     soluiton[i, 1, 2] = ctr[i].prim[1, 2] / ks.gas.me
     soluiton[i, 2:4, 1] .= ctr[i].prim[2:4, 1]

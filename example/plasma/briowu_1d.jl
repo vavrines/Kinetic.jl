@@ -8,14 +8,14 @@ dt = timestep(ks, ctr, t)
 nt = Int(floor(ks.set.maxTime / dt)) + 1
 res = zeros(5, 2)
 
-@showprogress for iter = 1:nt
+@showprogress for iter in 1:nt
     reconstruct!(ks, ctr)
-    evolve!(ks, ctr, face, dt; mode = :kcu, isPlasma = true)
-    update!(ks, ctr, face, dt, res; coll = :bgk, bc = :extra, isMHD = true)
+    evolve!(ks, ctr, face, dt; mode=:kcu, isPlasma=true)
+    update!(ks, ctr, face, dt, res; coll=:bgk, bc=:extra, isMHD=true)
 end
 
 sol = zeros(ks.ps.nx, 10, 2)
-for i = 1:ks.ps.nx
+for i in 1:ks.ps.nx
     sol[i, 1, 1] = ctr[i].prim[1, 1]
     sol[i, 1, 2] = ctr[i].prim[1, 2] / ks.gas.me
     sol[i, 2:4, 1] .= ctr[i].prim[2:4, 1]
