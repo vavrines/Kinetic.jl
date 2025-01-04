@@ -356,8 +356,7 @@ plot(ks, ctr)
 # heat flux
 hf = zeros(ps.nx, ps.ny, 2)
 for i in 1:ps.nx, j in 1:ps.ny
-    hf[i, j, :] .=
-        heat_flux(ctr[i, j].f, ctr[i, j].prim, vs.u, vs.v, vs.weights)
+    hf[i, j, :] .= heat_flux(ctr[i, j].f, ctr[i, j].prim, vs.u, vs.v, vs.weights)
 end
 
 # tecplot
