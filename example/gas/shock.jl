@@ -25,4 +25,3 @@ res = zeros(5)
 end
 
 plot(ks, ctr)
-
