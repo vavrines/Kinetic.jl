@@ -95,6 +95,7 @@ flowchart LR
     subgraph Com[Component]
         KitBase
         KitML
+        KitAMR
     end
     subgraph Backend
         CPU
@@ -111,6 +112,7 @@ flowchart LR
     subgraph AD[Automatic Differentiation]
         ForwardDiff
         Zygote
+        Enzyme
     end
     subgraph Parallel[Parallel Computing]
         Threads
