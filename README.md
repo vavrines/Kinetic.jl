@@ -42,12 +42,12 @@
 -->
 
 **Kinetic** is a computational fluid dynamics toolbox written in <a href="https://julialang.org"><img src="https://raw.githubusercontent.com/JuliaLang/julia-logo-graphics/master/images/julia.ico" width="16em">Julia.</a>
-It aims to furnish efficient modeling and simulation methodologies for collective transport of particles, augmented by the power of machine learning.
+It aims to furnish efficient modeling and simulation methodologies for the collective transport of particles, augmented by the power of machine learning.
 Based on differentiable programming, mechanical and neural network models are fused and solved in a unified framework.
-Simultaneous 1-3 dimensional numerical simulations can be performed on CPUs and GPUs.
+Simultaneous 1- to 3-dimensional numerical simulations can be performed on CPUs and GPUs.
 
 The ecosystem follows the modular design philosophy.
-Depending on the specific use case, the main module is split into portable components to reduce the lantency caused by the LLVM [just-in-time](https://llvm.org/docs/tutorial/index.html#building-a-jit-in-llvm) compiler:
+Depending on the specific use case, the main module is split into portable components to reduce the latency caused by the LLVM [just-in-time](https://llvm.org/docs/tutorial/index.html#building-a-jit-in-llvm) compiler:
 
 - [KitBase](https://github.com/vavrines/KitBase.jl): physical models and numerical schemes
 - [KitML](https://github.com/vavrines/KitML.jl): neural models and machine learning methods
@@ -55,17 +55,18 @@ Depending on the specific use case, the main module is split into portable compo
 - [FluxReconstruction](https://github.com/vavrines/FluxReconstruction.jl): high-fidelity solution algorithms
 - [Langevin](https://github.com/vavrines/Langevin.jl): intrusive uncertainty quantification methods
 - [KitAMR](https://github.com/CFDML/KitAMR.jl): large-scale distributed computing facilities
+- [HyperFSI](https://github.com/CFDML/HyperFSI.jl): fluid-structure interaction facilities
 - [kineticpy](https://github.com/vavrines/kineticpy): Python interface built on top of [pyjulia](https://github.com/JuliaPy/pyjulia)
 
 ## Installation
 
 Kinetic is a registered package in the official [Julia package registry](https://github.com/JuliaRegistries/General).
 We recommend installing it with the Julia package manager. 
-From the Julia REPL, you can get in the package manager (by pressing `]`) and add the package
+From the Julia REPL, you can get into the package manager (by pressing `]`) and add the package
 
 ```julia
 julia> ]
-(v1.11) pkg> add Kinetic
+(v1.12) pkg> add Kinetic
 ```
 This will automatically install a currently stable release and all its dependencies.
 
@@ -73,8 +74,8 @@ This will automatically install a currently stable release and all its dependenc
 
 Kinetic models and simulates fluid dynamics problems from the perspective of particle transport.
 Any advection-diffusion-type equation of different particles, including molecules, photons, plasmas, neutrons, etc., can be solved within the framework.
-Special attentions have been paid on Hilbert's sixth problem, i.e. to build the numerical passage between kinetic theory of gases, e.g. the Boltzmann equation, and continuum mechanics, e.g. the Euler and Navier-Stokes equations.
-A partial list of current supported models and equations include:
+Special attention has been paid to Hilbert's sixth problem, i.e., to build the numerical passage between kinetic theory of gases, e.g., the Boltzmann equation, and continuum mechanics, e.g., the Euler and Navier-Stokes equations.
+A partial list of current supported models and equations includes:
 - Boltzmann equation
 - radiative transfer equation
 - Fokker-Planck-Landau equation
@@ -95,6 +96,7 @@ flowchart LR
     subgraph Com[Component]
         KitBase
         KitML
+        KitAMR
     end
     subgraph Backend
         CPU
@@ -111,6 +113,7 @@ flowchart LR
     subgraph AD[Automatic Differentiation]
         ForwardDiff
         Zygote
+        Enzyme
     end
     subgraph Parallel[Parallel Computing]
         Threads
